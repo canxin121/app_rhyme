@@ -1,0 +1,200 @@
+name: "Release"
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  build_on_macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "beta"
+
+      - name: Install Flutter Dependency
+        run: flutter pub get
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Flutter build ios
+        run: |
+          flutter build ios --release --no-codesign --verbose
+
+          chmod 777 unbitcode.sh
+          sh unbitcode.sh
+
+          mkdir -p Payload
+          mv ./build/ios/iphoneos/Runner.app Payload
+          zip -r -y Payload.zip Payload/Runner.app
+          mv Payload.zip AppRhyme-ios-release-unknown.ipa
+
+      - name: Flutter build macos
+        run: flutter build macos --release --verbose
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-ios-release-unknown.ipa
+          path: AppRhyme-ios-release-unknown.ipa
+          compression-level: 9
+
+      - name: Release Ios
+        uses: softprops/action-gh-release@v1
+        with:
+          files: AppRhyme-ios-release-unknown.ipa
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Upload Macos app
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-macos-release-unknown.zip
+          path: build/macos/Build/Products/Release/*.app
+
+      - name: Package Executable
+        run: |
+          mkdir -p build/app/
+          zip -r "build/app/AppRhyme-macos-release-unknown.zip" "build/macos/Build/Products/Release/AppRhyme.app"
+
+      - name: Release Macos
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/AppRhyme-macos-release-unknown.zip
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+  build_on_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "beta"
+
+      - name: Install Flutter Dependency
+        run: flutter pub get
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependency
+        run: |
+          sudo apt-get update -y
+          sudo apt install libwebkit2gtk-4.1-dev
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Flutter build linux
+        run: flutter build linux --release --verbose
+
+      - name: Flutter build apk
+        run: flutter build apk --release --split-per-abi --verbose
+
+      - name: Package Executable
+        run: 7z a -r "../../../../../build/app/AppRhyme-linux-release-amd64.zip" *
+        working-directory: build/linux/x64/release/bundle
+
+      - name: Upload Linux app
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-linux-release-amd64
+          path: build/app/AppRhyme-linux-release-amd64.zip
+
+      - name: Release Linux
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/AppRhyme-linux-release-amd64.zip
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Upload APK1
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-arm64-v8a-release.apk
+          path: build/app/outputs/apk/release/app-arm64-v8a-release.apk
+          compression-level: 9
+
+      - name: Upload APK2
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-armeabi-v7a-release.apk
+          path: build/app/outputs/apk/release/app-armeabi-v7a-release.apk
+          compression-level: 9
+
+      - name: Upload APK3
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-x86_64-release.apk
+          path: build/app/outputs/apk/release/app-x86_64-release.apk
+          compression-level: 9
+
+      - name: Rename APKs
+        run: |
+          mv build/app/outputs/apk/release/app-arm64-v8a-release.apk build/app/outputs/apk/release/AppRhyme-arm64-v8a-release.apk
+          mv build/app/outputs/apk/release/app-armeabi-v7a-release.apk build/app/outputs/apk/release/AppRhyme-armeabi-v7a-release.apk
+          mv build/app/outputs/apk/release/app-x86_64-release.apk build/app/outputs/apk/release/AppRhyme-x86_64-release.apk
+
+      - name: Release Apks
+        uses: softprops/action-gh-release@v1
+        with:
+          files: >
+            build/app/outputs/apk/release/AppRhyme-arm64-v8a-release.apk,
+            build/app/outputs/apk/release/AppRhyme-armeabi-v7a-release.apk,
+            build/app/outputs/apk/release/AppRhyme-x86_64-release.apk
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+  build_on_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "beta"
+
+      - name: Install Flutter Dependency
+        run: flutter pub get
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Flutter build windows
+        run: flutter build windows --release --verbose
+
+      - name: Package Executable
+        run: 7z a -r -sse "..\..\..\..\..\build\app\AppRhyme-win-release-amd64.zip" *
+        working-directory: build\windows\x64\runner\Release
+
+      - name: Upload files
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-release-amd64
+          path: build/app/AppRhyme-win-release-amd64.zip
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/AppRhyme-win-release-amd64.zip
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
