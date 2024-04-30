@@ -6,7 +6,7 @@
 
     <application
         android:label="AppRhyme"
-        android:name="${applicationName}"
+        android:name="androidx.multidex.MultiDexApplication"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity

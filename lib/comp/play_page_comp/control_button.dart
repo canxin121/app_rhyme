@@ -43,11 +43,7 @@ class ControlButtonState extends State<ControlButton> {
                   child: Icon(CupertinoIcons.pause_solid,
                       color: CupertinoColors.white, size: widget.buttonSize),
                   onPressed: () {
-                    globalAudioServiceHandler.pause().then((value) {
-                      log("成功暂停");
-                    }).catchError((e) {
-                      log("播放失败:$e");
-                    });
+                    globalAudioServiceHandler.pause();
                   },
                 ));
           } else {

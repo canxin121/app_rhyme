@@ -32,15 +32,15 @@ jobs:
           zip -r -y Payload.zip Payload/Runner.app
           mv Payload.zip AppRhyme.ipa
 
-      - name: Flutter build macos
-        run: flutter build macos --release --verbose
-
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: AppRhyme.ipa
           path: AppRhyme.ipa
           compression-level: 9
+
+      - name: Flutter build macos
+        run: flutter build macos --release --verbose
 
       - name: Upload Macos app
         uses: actions/upload-artifact@v4
@@ -55,43 +55,35 @@ jobs:
         run: tree build/macos/Build/Products/
       
       - name: Package Executable
-        run: zip -r "build/app/AppRhyme-macos-release-unknown.zip" "build/macos/Build/Products/Release/AppRhyme.app"
+        run: 
+          mkdir -p build/app/
+          zip -r "build/app/AppRhyme-macos-release-unknown.zip" "build/macos/Build/Products/Release/AppRhyme.app"
   
   build_on_linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: 17
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
       - uses: subosito/flutter-action@v2
         with:
           channel: "beta"
-
+      
       - name: Install Flutter Dependency
         run: flutter pub get
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+      
 
       - name: Install Linux dependency
         run: |
           sudo apt-get update -y
           sudo apt install libwebkit2gtk-4.1-dev
           sudo apt-get install -y ninja-build libgtk-3-dev
+          sudo apt-get install libasound2-dev
 
       - name: Flutter build linux
         run: flutter build linux --release --verbose
-
-      - name: Flutter build apk
-        run: flutter build apk --release --split-per-abi --verbose
 
       - name: Package Executable
         run: 7z a -r "../../../../../build/app/AppRhyme-linux-release-amd64.zip" *
@@ -102,6 +94,55 @@ jobs:
         with:
           name: AppRhyme-linux-release-amd64
           path: build/app/AppRhyme-linux-release-amd64.zip
+
+  build_on_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "beta"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Install Flutter Dependency
+        run: flutter pub get
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Cargo-Ndk
+        run: cargo install cargo-ndk --version 2.11.0 --force
+
+      - name: Install android ndk
+        uses: nttld/setup-ndk@v1
+        id: install-ndk
+        with:
+          ndk-version: r22b
+
+      - name: Flutter build windows
+        run: flutter build windows --release --verbose
+
+      - name: Package Executable
+        run: 7z a -r -sse "..\..\..\..\..\build\app\AppRhyme-release-amd64.zip" *
+        working-directory: build\windows\x64\runner\Release
+
+      - name: Upload files
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-release-amd64
+          path: build/app/AppRhyme-release-amd64.zip
+
+      - name: Flutter build apk
+        run: flutter build apk --release --split-per-abi --verbose
 
       - name: Upload APK1
         uses: actions/upload-artifact@v4
@@ -129,31 +170,3 @@ jobs:
           mv build/app/outputs/apk/release/app-arm64-v8a-release.apk build/app/outputs/apk/release/AppRhyme-arm64-v8a-release.apk
           mv build/app/outputs/apk/release/app-armeabi-v7a-release.apk build/app/outputs/apk/release/AppRhyme-armeabi-v7a-release.apk
           mv build/app/outputs/apk/release/app-x86_64-release.apk build/app/outputs/apk/release/AppRhyme-x86_64-release.apk
-
-  build_on_windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "beta"
-
-      - name: Install Flutter Dependency
-        run: flutter pub get
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Flutter build windows
-        run: flutter build windows --release --verbose
-
-      - name: Package Executable
-        run: 7z a -r -sse "..\..\..\..\..\build\app\AppRhyme-release-amd64.zip" *
-        working-directory: build\windows\x64\runner\Release
-
-      - name: Upload files
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme-release-amd64
-          path: build/app/AppRhyme-release-amd64.zip

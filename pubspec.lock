@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
+  ansicolor:
+    dependency: transitive
+    description:
+      name: ansicolor
+      sha256: "8bf17a8ff6ea17499e40a2d2542c2f481cd7615760c6d34065cb22bfd22e6880"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   archive:
     dependency: transitive
     description:
@@ -66,7 +74,7 @@ packages:
     source: hosted
     version: "0.1.2"
   audio_session:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: audio_session
       sha256: a49af9981eec5d7cd73b37bacb6ee73f8143a6a9f9bd5b6021e6c346b9b6cf4e
@@ -568,6 +576,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.37"
+  just_audio_background:
+    dependency: "direct main"
+    description:
+      name: just_audio_background
+      sha256: "3454ffc97edfa1282b7f42759bfa8aa13d9114a24465f4101e0d3ae58a9327fb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1-beta.11"
   just_audio_platform_interface:
     dependency: transitive
     description:
@@ -589,10 +605,10 @@ packages:
     description:
       path: just_audio_windows
       ref: HEAD
-      resolved-ref: eb743575b8f44ba5699f27b1d3294f7ebbc43e25
-      url: "https://github.com/canxin121/just_audio_windows"
+      resolved-ref: ac9f785ce7233649494f0437f14d6419b9f1502f
+      url: "https://github.com/bdlukaa/just_audio_windows"
     source: git
-    version: "0.2.0"
+    version: "0.2.1"
   lazy_memo:
     dependency: transitive
     description:
@@ -917,6 +933,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0+1"
+  talker:
+    dependency: "direct main"
+    description:
+      name: talker
+      sha256: "7fd2118fbdd35ee9004d1ed326d101cdbabe5fed3575e9e9aa050535e019e885"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.5"
+  talker_logger:
+    dependency: transitive
+    description:
+      name: talker_logger
+      sha256: d09f459ff09ab510f74f4384d674dccce0a85ecf8b5733258ffdc9869d082505
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.5"
   term_glyph:
     dependency: transitive
     description:

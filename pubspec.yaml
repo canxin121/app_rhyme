@@ -22,7 +22,7 @@ dependencies:
   just_audio: ^0.9.37
   just_audio_windows:
     git:
-      url: https://github.com/canxin121/just_audio_windows
+      url: https://github.com/bdlukaa/just_audio_windows
       path: just_audio_windows
   flutter_volume_controller: ^1.3.2
   blur: ^3.1.0
@@ -39,6 +39,10 @@ dependencies:
   window_manager: ^0.3.8
   flutter_lyric:
     git: https://github.com/ozyl/flutter_lyric
+  talker: ^4.1.5
+  just_audio_background: ^0.0.1-beta.11
+  audio_session: ^0.1.19
+  # audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -78,7 +82,7 @@ package_rename_config:
 
   macos:
     app_name: AppRhyme
-    package_name: canxin.app.rhyme
+    package_name: com.canxin.AppRhyme 
     copyright_notice: Copyright ©️ 2024 Canxin121. All rights reserved.
 
   windows:

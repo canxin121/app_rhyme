@@ -21,5 +21,4 @@ reqwest = { version = "0.12.4", features = [
     "rustls-tls-webpki-roots",
     "stream",
 ], default-features = false }
-ahash = "0.8.11"
 futures = "0.3.30"

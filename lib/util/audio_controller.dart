@@ -16,13 +16,14 @@ Future<void> initGlobalAudioServiceHandler() async {
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'com.ryanheise.myapp.channel.audio',
       androidNotificationChannelName: 'Audio playback',
-      androidNotificationOngoing: true,
+      androidNotificationOngoing: false,
     ),
   );
 }
 
 // 应该实现所有的播放和控制，但是完全不关心ui如何
-class AudioServiceHandler extends BaseAudioHandler with SeekHandler {
+class AudioServiceHandler extends BaseAudioHandler
+    with SeekHandler, QueueHandler {
   final AudioPlayer player = AudioPlayer();
   final PlayMusicQueue musicQueue = PlayMusicQueue();
   int playingMusicIndex = 0;
@@ -47,9 +48,11 @@ class AudioServiceHandler extends BaseAudioHandler with SeekHandler {
       String toPlaySource = music.playInfo.file;
       var tag = music.item;
       // 设置播放资源
-      await player.setAudioSource(AudioSource.uri(Uri.parse(toPlaySource)));
+      await player
+          .setAudioSource(AudioSource.uri(Uri.parse(toPlaySource), tag: tag));
       // 设置系统显示
       // 这里的mediaItem是AudioService内部的
+
       mediaItem.add(tag);
       // 开始播放
       await play();
@@ -122,20 +125,16 @@ class AudioServiceHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> play() async {
     await player.play();
-    Future.delayed(const Duration(microseconds: 500)).then((value) {
-      if (!player.playing) {
-        play();
-      }
-    });
+    // Future.delayed(const Duration(milliseconds: 500)).then((value) {
+    //   if (!player.playing) {
+    //     play();
+    //   }
+    // });
   }
 
   @override
   Future<void> pause() async {
-    try {
-      await player.pause();
-    } catch (e) {
-      print(e.toString());
-    }
+    await player.pause();
   }
 
   @override
