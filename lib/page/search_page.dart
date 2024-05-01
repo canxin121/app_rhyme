@@ -54,7 +54,6 @@ class SearchController extends GetxController {
         newItems.add(DisplayMusic(result));
       }
       List<DisplayMusic> uniqueItems = [];
-      log("new: ${newItems.length}");
 
       if (pagingController.value.itemList != null) {
         for (DisplayMusic newItem in newItems) {

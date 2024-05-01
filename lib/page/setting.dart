@@ -2,7 +2,6 @@ import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/types/extern_api.dart';
-import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
@@ -28,7 +27,7 @@ class SettingsPageState extends State<SettingsPage> {
               externApiPath: path, userAgreement: globalConfig.userAgreement);
           globalConfig.save();
         } catch (e) {
-          log("设置第三方音乐源失败:$e");
+          talker.error("[Setting Page] 设置第三方音乐源失败:$e");
         }
       });
     }

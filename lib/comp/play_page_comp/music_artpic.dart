@@ -4,10 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class MusicArtPic extends StatefulWidget {
-  final double imageSize;
   const MusicArtPic({
     super.key,
-    required this.imageSize,
   }); // 修改构造函数
 
   @override
@@ -22,26 +20,23 @@ class MusicArtPicState extends State<MusicArtPic> {
         future: playingMusicImage(), // 这里调用异步函数
         builder: (BuildContext context, AsyncSnapshot<Hero> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(18.0),
-              child: SizedBox(
-                width: widget.imageSize,
-                height: widget.imageSize,
-                child: defaultArtPic, // 异步函数提供的图片或默认图片
-              ),
-            );
+            return Container(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18.0),
+                  child: defaultArtPic,
+                ) // 异步函数提供的图片或默认图片
+                );
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
             // 使用Cupertino组件包裹图片，并限制大小和加圆角边框
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(18.0),
-              child: SizedBox(
-                width: widget.imageSize,
-                height: widget.imageSize,
-                child: snapshot.data ?? defaultArtPic, // 异步函数提供的图片或默认图片
-              ),
-            );
+            return Container(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18.0),
+                  child: snapshot.data ?? defaultArtPic,
+                ));
           }
         },
       ),

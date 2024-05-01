@@ -128,3 +128,16 @@ Future<ImageProvider> getMusicImageProvider(
   }
   return image;
 }
+
+Future<Image> useCacheImage(String file) async {
+  var cache = await useCacheFile(file: file, cachePath: picCachePath);
+  if (cache != null) {
+    return Image.file(File(cache));
+  } else {
+    if (file.contains("http")) {
+      return Image.network(file);
+    } else {
+      return Image.file(File(file));
+    }
+  }
+}

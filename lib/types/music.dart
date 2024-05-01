@@ -7,7 +7,7 @@ import 'package:audio_service/audio_service.dart';
 
 // 是一个原本只具有展示功能的DisplayMusicTuple通过请求第三方api变成可以播放的音乐
 // 这个过程已经决定了一个音乐是否可以播放，因此本函数应该可能throw Exception
-Future<PlayMusic> display2PlayMusic(DisplayMusic music,
+Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
     [Quality? quality]) async {
   late Quality finalQuality;
   if (quality != null) {
@@ -17,36 +17,44 @@ Future<PlayMusic> display2PlayMusic(DisplayMusic music,
       finalQuality = music.info.defaultQuality!;
     } else if (music.info.qualities.isNotEmpty) {
       finalQuality = music.info.qualities[0];
-      log("音乐无默认音质,选择音质中第一个进行播放:$finalQuality");
+      talker.log("[Display2PlayMusic] 音乐无默认音质,选择音质中第一个进行播放:$finalQuality");
     } else {
-      throw Exception("音乐无可播放音质");
+      talker.error("[Display2PlayMusic] 音乐没有可供播放的音质");
+      return null;
     }
   }
+
   // 音乐缓存获取的逻辑
-  var extra = music.ref.getExtraInto(quality: finalQuality);
-  if (globalExternApi == null) {
-    log("无第三方音乐源,无法获取播放信息");
-    throw Exception("无第三方音乐源,无法获取播放信息");
+  var result = music.toCacheFileNameAndExtra();
+  if (result == null) {
+    return null;
   }
+  var (cacheFileName, extra) = result;
+  // 尝试获取本地缓存
+  var cache = await useCacheFile(
+      file: "", cachePath: musicCachePath, filename: cacheFileName);
+  // 有本地缓存直接返回
+  if (cache != null) {
+    return PlayMusic(music.ref, music.info, PlayInfo(cache, finalQuality),
+        music.ref.getExtraInto(quality: finalQuality));
+  }
+  // 没有本地缓存，也没有第三方api，直接返回null
+  if (globalExternApi == null) {
+    talker.error("[Display2PlayMusic] 无第三方音乐源,无法获取播放信息");
+  }
+
   var playinfo =
       await globalExternApi!.getMusicPlayInfo(music.info.source, extra);
 
-  var playMusic = PlayMusic(music.ref, music.info, playinfo, extra);
-
-  String? file = await useCacheFile(
-      file: "",
-      cachePath: musicCachePath,
-      filename: playMusic.toCacheFileName());
-  if (file != null) {
-    playMusic.playInfo.file = file;
-    playMusic.hasCache = true;
-    log("使用缓存后音乐进行播放: $file");
+  // 如果第三方api夜叉找不到，直接返回null
+  if (playinfo == null) {
+    talker.error("[Display2PlayMusic] 第三方音乐源无法获取到playinfo: ${music.info.name}");
+    return null;
   }
+  var playMusic = PlayMusic(music.ref, music.info, playinfo, extra);
 
   return playMusic;
 }
-
-void log(String s) {}
 
 class DisplayMusic {
   late MusicW ref;
@@ -58,16 +66,23 @@ class DisplayMusic {
   DisplayMusic.fromPlayMusic(PlayMusic music) {
     DisplayMusic(music.ref);
   }
-  String toCacheFileName() {
+  (String, String)? toCacheFileNameAndExtra() {
     if (info.defaultQuality == null) {
-      return "";
+      return null;
     }
-    return "${info.name}_${info.artist.join(',')}_${info.source}_${ref.getExtraInto(quality: info.defaultQuality!).hashCode}.${info.defaultQuality!.format ?? "unknown"}";
+    var extra = ref.getExtraInto(quality: info.defaultQuality!);
+    var cacheFileName =
+        "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}.${info.defaultQuality!.format ?? "unknown"}";
+    return (cacheFileName, extra);
   }
 
   Future<bool> hasCache() async {
+    var result = toCacheFileNameAndExtra();
+    if (result == null) {
+      return false;
+    }
     var cache = await useCacheFile(
-        file: "", cachePath: musicCachePath, filename: toCacheFileName());
+        file: "", cachePath: musicCachePath, filename: result.$1);
     if (cache != null) {
       return true;
     } else {

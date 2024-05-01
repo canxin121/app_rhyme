@@ -72,6 +72,7 @@ class QualityTimeState extends State<QualityTime> {
                         var newPlayMusic = await display2PlayMusic(
                             DisplayMusic.fromPlayMusic(playingMusic),
                             qualityOptions[index]);
+                        if (newPlayMusic == null) return;
                         await globalAudioHandler.replaceMusic(newPlayMusic);
                       }
                     });

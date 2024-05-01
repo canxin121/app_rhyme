@@ -89,8 +89,7 @@ class MusicPageState extends State<MusicPage> {
                       icon: CupertinoIcons.play_fill,
                       label: '播放全部',
                       onPressed: () {
-                        globalAudioHandler
-                            .clearReplaceMusicAll(_musics.reversed.toList());
+                        globalAudioHandler.clearReplaceMusicAll(_musics);
                       },
                     ),
                     _buildButton(
@@ -142,6 +141,7 @@ class MusicPageState extends State<MusicPage> {
                       () async {
                         // 缓存
                         var playMusic = await display2PlayMusic(music);
+                        if (playMusic == null) return;
                         cacheFile(
                                 file: playMusic.playInfo.file,
                                 cachePath: musicCachePath,
@@ -189,10 +189,13 @@ class MusicPageState extends State<MusicPage> {
                       },
                       () async {
                         // 删除缓存
+                        var result = music.toCacheFileNameAndExtra();
+                        if (result == null) return;
+                        var (cacheFileName, _) = result;
                         deleteCacheFile(
                                 file: "",
                                 cachePath: musicCachePath,
-                                filename: music.toCacheFileName())
+                                filename: cacheFileName)
                             .then((value) {
                           // 删除缓存后刷新是否有缓存
                           setState(() {});
@@ -200,6 +203,7 @@ class MusicPageState extends State<MusicPage> {
                             print("成功删除缓存:${music.info.name}");
                           }
                           display2PlayMusic(music).then((value) {
+                            if (value == null) return;
                             globalAudioHandler.replaceMusic(value);
                           });
                         });

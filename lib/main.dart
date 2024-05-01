@@ -3,7 +3,6 @@ import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/src/rust/api/init.dart';
 import 'package:app_rhyme/src/rust/api/music_sdk.dart';
 import 'package:app_rhyme/types/extern_api.dart';
-import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/window.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -32,7 +31,7 @@ Future<void> main() async {
     try {
       globalExternApi = ExternApi(globalConfig.externApiPath!);
     } catch (e) {
-      log("加载第三方音乐源失败: $e");
+      talker.error("[Main] 加载第三方音乐源失败: $e");
     }
   }
 

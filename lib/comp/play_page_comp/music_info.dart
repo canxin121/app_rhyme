@@ -21,20 +21,10 @@ class MusicInfoState extends State<MusicInfo> {
             return Container(
               alignment: Alignment.topLeft,
               child: Text(
-                playingMusicName,
-                style: const TextStyle(fontSize: 24.0),
+                "$playingMusicName\n$playingMusicArtist",
+                style: const TextStyle(fontSize: 20.0),
                 textAlign: TextAlign.center,
-              ),
-            );
-          }),
-          // 演唱者
-          Obx(() {
-            return Container(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                playingMusicArtist,
-                style: const TextStyle(fontSize: 18.0),
-                textAlign: TextAlign.center,
+                overflow: TextOverflow.clip,
               ),
             );
           }),
