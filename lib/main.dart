@@ -10,6 +10,9 @@ import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:talker/talker.dart';
+
+Talker talker = Talker();
 
 late SqlMusicFactoryW globalSqlMusicFactory;
 late Config globalConfig;
@@ -33,7 +36,7 @@ Future<void> main() async {
     }
   }
 
-  await initGlobalAudioServiceHandler();
+  await initGlobalAudioHandler();
   await initGlobalAudioUiController();
   runApp(const MyApp());
 }

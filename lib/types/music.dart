@@ -7,18 +7,23 @@ import 'package:audio_service/audio_service.dart';
 
 // 是一个原本只具有展示功能的DisplayMusicTuple通过请求第三方api变成可以播放的音乐
 // 这个过程已经决定了一个音乐是否可以播放，因此本函数应该可能throw Exception
-Future<PlayMusic> display2PlayMusic(DisplayMusic music) async {
-  late Quality defaultQuality;
-  if (music.info.defaultQuality != null) {
-    defaultQuality = music.info.defaultQuality!;
-  } else if (music.info.qualities.isNotEmpty) {
-    defaultQuality = music.info.qualities[0];
-    log("音乐无默认音质,选择音质中第一个进行播放:$defaultQuality");
+Future<PlayMusic> display2PlayMusic(DisplayMusic music,
+    [Quality? quality]) async {
+  late Quality finalQuality;
+  if (quality != null) {
+    finalQuality = quality;
   } else {
-    throw Exception("音乐无可播放音质");
+    if (music.info.defaultQuality != null) {
+      finalQuality = music.info.defaultQuality!;
+    } else if (music.info.qualities.isNotEmpty) {
+      finalQuality = music.info.qualities[0];
+      log("音乐无默认音质,选择音质中第一个进行播放:$finalQuality");
+    } else {
+      throw Exception("音乐无可播放音质");
+    }
   }
   // 音乐缓存获取的逻辑
-  var extra = music.ref.getExtraInto(quality: defaultQuality);
+  var extra = music.ref.getExtraInto(quality: finalQuality);
   if (globalExternApi == null) {
     log("无第三方音乐源,无法获取播放信息");
     throw Exception("无第三方音乐源,无法获取播放信息");
@@ -49,6 +54,9 @@ class DisplayMusic {
   DisplayMusic(MusicW musicRef_) {
     ref = musicRef_;
     info = ref.getMusicInfo();
+  }
+  DisplayMusic.fromPlayMusic(PlayMusic music) {
+    DisplayMusic(music.ref);
   }
   String toCacheFileName() {
     if (info.defaultQuality == null) {
@@ -116,5 +124,20 @@ class PlayMusic {
   }
   String toCacheFileName() {
     return "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}.${playInfo.quality.format ?? "unknown"}";
+  }
+
+  MediaItem toMediaItem() {
+    Uri? artUri;
+    if (info.artPic != null) {
+      artUri = Uri.parse(info.artPic!);
+    } else {
+      artUri = null;
+    }
+    return MediaItem(
+        id: playInfo.file,
+        title: info.name,
+        album: info.album,
+        artUri: artUri,
+        artist: info.artist.join(","));
   }
 }

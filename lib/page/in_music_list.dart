@@ -89,7 +89,8 @@ class MusicPageState extends State<MusicPage> {
                       icon: CupertinoIcons.play_fill,
                       label: '播放全部',
                       onPressed: () {
-                        globalAudioServiceHandler.replaceAllMusic(_musics);
+                        globalAudioHandler
+                            .clearReplaceMusicAll(_musics.reversed.toList());
                       },
                     ),
                     _buildButton(
@@ -97,8 +98,10 @@ class MusicPageState extends State<MusicPage> {
                       icon: Icons.shuffle,
                       label: '随机播放',
                       onPressed: () {
-                        globalAudioServiceHandler
-                            .replaceAllMusic(shuffleList(_musics));
+                        var musics = _musics.toList();
+                        musics.shuffle();
+                        globalAudioHandler
+                            .clearReplaceMusicAll(shuffleList(musics));
                       },
                     ),
                   ],
@@ -124,7 +127,7 @@ class MusicPageState extends State<MusicPage> {
                   key: ValueKey(music.info.id),
                   music: music,
                   onClick: () {
-                    globalAudioServiceHandler.addMusicPlay(
+                    globalAudioHandler.addMusicPlay(
                       music,
                     );
                   },
@@ -147,7 +150,7 @@ class MusicPageState extends State<MusicPage> {
                           // 下载完成之后设置本地路径为新的播放文件
                           playMusic.playInfo.file = file;
                           // 如果这首歌正在播放列表中，替换他，防止继续在线播放
-                          globalAudioServiceHandler.replaceMusic(playMusic);
+                          globalAudioHandler.replaceMusic(playMusic);
                           // 在这里需要重新判断是否 hasCache,所以直接setState解决
                           setState(() {});
                         });
@@ -197,7 +200,7 @@ class MusicPageState extends State<MusicPage> {
                             print("成功删除缓存:${music.info.name}");
                           }
                           display2PlayMusic(music).then((value) {
-                            globalAudioServiceHandler.replaceMusic(value);
+                            globalAudioHandler.replaceMusic(value);
                           });
                         });
                       }

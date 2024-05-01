@@ -1,4 +1,5 @@
 import 'package:app_rhyme/src/rust/api/mirror.dart';
+import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/selection.dart';
@@ -57,8 +58,8 @@ class QualityTimeState extends State<QualityTime> {
               );
             }),
             onPressed: () {
-              List<Quality>? qualityOptions = globalAudioServiceHandler
-                  .musicQueue.currentlyPlaying.value?.info.qualities;
+              List<Quality>? qualityOptions =
+                  globalAudioHandler.playingMusic.value?.info.qualities;
               List<String>? qualityStrs =
                   qualityOptions?.map((e) => e.short).toList();
               if (qualityOptions != null && qualityOptions.isNotEmpty) {
@@ -66,8 +67,13 @@ class QualityTimeState extends State<QualityTime> {
                     context: context,
                     options: qualityStrs!,
                     actionCallbacks: (index) async {
-                      globalAudioServiceHandler
-                          .tryChangePlayingMusicQuality(qualityOptions[index]);
+                      var playingMusic = globalAudioHandler.playingMusic.value;
+                      if (playingMusic != null) {
+                        var newPlayMusic = await display2PlayMusic(
+                            DisplayMusic.fromPlayMusic(playingMusic),
+                            qualityOptions[index]);
+                        await globalAudioHandler.replaceMusic(newPlayMusic);
+                      }
                     });
               }
             },

@@ -19,7 +19,7 @@ class LyricDisplayState extends State<LyricDisplay> {
   bool playing = false;
   int position = 0;
   late StreamSubscription<Duration> stream1;
-  late StreamSubscription<PlayMusic?> stream2;
+  late StreamSubscription<Duration> stream2;
   var lyricModel =
       LyricsModelBuilder.create().bindLyricToMain("[00:00.00]无歌词").getModel();
   var lyricUI = UINetease(lyricAlign: LyricAlign.CENTER, highlight: true);
@@ -27,14 +27,12 @@ class LyricDisplayState extends State<LyricDisplay> {
   void initState() {
     super.initState();
     lyricModel = LyricsModelBuilder.create()
-        .bindLyricToMain(globalAudioServiceHandler
-                .musicQueue.currentlyPlaying.value?.info.lyric ??
+        .bindLyricToMain(globalAudioHandler.playingMusic.value?.info.lyric ??
             "[00:00.00]无歌词")
         .getModel();
 
-    playing =
-        globalAudioServiceHandler.musicQueue.currentlyPlaying.value != null;
-    stream1 = globalAudioServiceHandler.player
+    playing = globalAudioHandler.playingMusic.value != null;
+    stream1 = globalAudioHandler
         .createPositionStream(
             maxPeriod: const Duration(milliseconds: 5),
             minPeriod: const Duration(milliseconds: 5))
@@ -44,12 +42,12 @@ class LyricDisplayState extends State<LyricDisplay> {
       });
     });
 
-    stream2 =
-        globalAudioServiceHandler.musicQueue.currentlyPlaying.listen((p0) {
+    stream2 = globalAudioUiController.duration.listen((p0) {
       setState(() {
-        playing = p0 != null;
         lyricModel = LyricsModelBuilder.create()
-            .bindLyricToMain(p0?.info.lyric ?? "[00:00.00]无歌词")
+            .bindLyricToMain(
+                globalAudioHandler.playingMusic.value?.info.lyric ??
+                    "[00:00.00]无歌词")
             .getModel();
       });
     });
@@ -81,7 +79,7 @@ class LyricDisplayState extends State<LyricDisplay> {
           children: [
             IconButton(
                 onPressed: () {
-                  globalAudioServiceHandler
+                  globalAudioHandler
                       .seek(Duration(milliseconds: progress))
                       .then((value) {
                     confirm.call();

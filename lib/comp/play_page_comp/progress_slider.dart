@@ -46,7 +46,7 @@ class ProgressSliderState extends State<ProgressSlider> {
           onProgressUpdated: (value) {
             isPressing = false;
             var toSeek = globalAudioUiController.getToSeek(value);
-            globalAudioServiceHandler.seek(toSeek);
+            globalAudioHandler.seek(toSeek);
           },
         ),
         onTap: () {

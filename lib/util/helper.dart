@@ -28,12 +28,9 @@ Future<String> fileCacheHelper(String file, String cachePath) async {
 
 Future<Hero> playingMusicImage() async {
   late Image image;
-  if (globalAudioServiceHandler.musicQueue.currentlyPlaying.value != null &&
-      globalAudioServiceHandler
-              .musicQueue.currentlyPlaying.value!.info.artPic !=
-          null) {
-    String url = globalAudioServiceHandler
-        .musicQueue.currentlyPlaying.value!.info.artPic!;
+  var playingMusic = globalAudioHandler.playingMusic.value;
+  if (playingMusic != null && playingMusic.info.artPic != null) {
+    String url = playingMusic.info.artPic!;
     String toUseSource = await fileCacheHelper(url, picCachePath);
     if (toUseSource.contains("http")) {
       image = Image.network(toUseSource);
@@ -51,10 +48,9 @@ Future<Hero> playingMusicImage() async {
 
 String get playingMusicQualityShort {
   late Quality quality;
-  if (globalAudioServiceHandler.musicQueue.currentlyPlayingPlayinfo.value !=
-      null) {
-    quality = globalAudioServiceHandler
-        .musicQueue.currentlyPlayingPlayinfo.value!.quality;
+  var playingMusic = globalAudioHandler.playingMusic.value;
+  if (playingMusic != null) {
+    quality = playingMusic.playInfo.quality;
   } else {
     quality = const Quality(short: "Quality");
   }
@@ -63,9 +59,9 @@ String get playingMusicQualityShort {
 
 String get playingMusicName {
   late String name;
-  if (globalAudioServiceHandler.musicQueue.currentlyPlaying.value != null) {
-    name =
-        globalAudioServiceHandler.musicQueue.currentlyPlaying.value!.info.name;
+  var playingMusic = globalAudioHandler.playingMusic.value;
+  if (playingMusic != null) {
+    name = playingMusic.info.name;
   } else {
     name = "Music";
   }
@@ -74,10 +70,9 @@ String get playingMusicName {
 
 String get playingMusicArtist {
   late String artist;
-  if (globalAudioServiceHandler.musicQueue.currentlyPlaying.value != null) {
-    artist = globalAudioServiceHandler
-        .musicQueue.currentlyPlaying.value!.info.artist
-        .join(",");
+  var playingMusic = globalAudioHandler.playingMusic.value;
+  if (playingMusic != null) {
+    artist = playingMusic.info.artist.join(",");
   } else {
     artist = "Artist";
   }

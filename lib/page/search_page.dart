@@ -139,7 +139,7 @@ class SearchPage extends StatelessWidget {
                   itemBuilder: (context, item, index) => MusicCard(
                     music: item,
                     onClick: () {
-                      globalAudioServiceHandler.addMusicPlay(
+                      globalAudioHandler.addMusicPlay(
                         item,
                       );
                     },

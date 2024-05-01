@@ -93,7 +93,7 @@ class MusicPlayBar extends StatelessWidget {
                                 child: CupertinoButton(
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    globalAudioServiceHandler.skipToNext();
+                                    globalAudioHandler.seekToPrevious();
                                   },
                                   child: const Icon(
                                     CupertinoIcons.backward_fill,
@@ -112,7 +112,7 @@ class MusicPlayBar extends StatelessWidget {
                                         color: CupertinoColors.black,
                                       ),
                                       onPressed: () {
-                                        globalAudioServiceHandler.pause();
+                                        globalAudioHandler.pause();
                                       },
                                     ));
                               } else {
@@ -125,7 +125,7 @@ class MusicPlayBar extends StatelessWidget {
                                         color: CupertinoColors.black,
                                       ),
                                       onPressed: () {
-                                        globalAudioServiceHandler.play();
+                                        globalAudioHandler.play();
                                       },
                                     ));
                               }
@@ -135,7 +135,7 @@ class MusicPlayBar extends StatelessWidget {
                                 child: CupertinoButton(
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    globalAudioServiceHandler.skipToNext();
+                                    globalAudioHandler.seekToNext();
                                   },
                                   child: const Icon(
                                     CupertinoIcons.forward_fill,

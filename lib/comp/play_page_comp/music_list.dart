@@ -13,7 +13,7 @@ class PlayMusicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      var musics = globalAudioServiceHandler.musicQueue.downCast();
+      var musics = globalAudioHandler.playMusicList;
 
       return Expanded(
           child: CustomScrollView(
@@ -33,7 +33,7 @@ class PlayMusicList extends StatelessWidget {
                   .hashCode),
               music: musics[index],
               onClick: () {
-                globalAudioServiceHandler.skipToMusic(index);
+                globalAudioHandler.seek(Duration.zero, index);
               },
               onPress: () {
                 showCupertinoPopupWithActions(context: context, options: [
@@ -41,7 +41,7 @@ class PlayMusicList extends StatelessWidget {
                   "添加"
                 ], actionCallbacks: [
                   () async {
-                    globalAudioServiceHandler.delMusic(index);
+                    globalAudioHandler.removeAt(index);
                   },
                   () async {
                     var tables = await globalSqlMusicFactory.readMusicLists();

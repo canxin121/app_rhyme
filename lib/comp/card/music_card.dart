@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/mirror.dart';
-import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/time_parse.dart';
@@ -10,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MusicCard extends StatefulWidget {
-  final DisplayMusic music;
+  final dynamic music;
   final VoidCallback? onClick;
   final VoidCallback? onPress;
   final Future<bool>? hasCache;
