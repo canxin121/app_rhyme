@@ -5,6 +5,8 @@ import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -110,6 +112,18 @@ class SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                 ),
+                CupertinoFormRow(
+                    prefix: const Text("运行日志"),
+                    child: CupertinoButton(
+                        child: const Icon(
+                          CupertinoIcons.book,
+                          color: CupertinoColors.activeGreen,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(CupertinoPageRoute(
+                            builder: (context) => TalkerScreen(talker: talker),
+                          ));
+                        }))
               ],
             ),
           ],

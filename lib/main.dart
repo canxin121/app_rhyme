@@ -8,6 +8,7 @@ import 'package:app_rhyme/util/window.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:talker/talker.dart';
 
@@ -46,6 +47,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
+      localizationsDelegates: const [
+        DefaultMaterialLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+      ],
       title: 'AppRhyme',
       theme: CupertinoThemeData(
           primaryColor: CupertinoColors.black,

@@ -104,12 +104,20 @@ class AudioHandler extends GetxController {
   }
 
   Future<void> clearReplaceMusicAll(List<DisplayMusic> musics) async {
-    talker.log(
+    talker.info(
         "[Log Music Handler] Request to add all musics of length: ${musics.length}");
     List<PlayMusic> newPlayMusics = [];
     List<AudioSource> newAudioSources = [];
+    List<Future<PlayMusic?>> futures = [];
+
+// 首先创建所有的future，但不等待它们
     for (var music in musics) {
-      var playMusic = await display2PlayMusic(music);
+      futures.add(display2PlayMusic(music));
+    }
+
+// 然后等待所有future完成，并按顺序处理结果
+    List<PlayMusic?> playMusicsResults = await Future.wait(futures);
+    for (var playMusic in playMusicsResults) {
       if (playMusic == null) continue;
       newPlayMusics.add(playMusic);
       newAudioSources.add(AudioSource.uri(Uri.parse(playMusic.playInfo.file),
@@ -125,7 +133,7 @@ class AudioHandler extends GetxController {
       talker.error(
           "[Error Music Handler] In clearReplaceMusicAll, Failed to diaplayMusic2PlayMusic: $e");
     }
-    talker.log(
+    talker.info(
         "[Log Music Handler] After add all: crt playMusicList length:${playMusicList.length},crt playSourceList length:${playSourceList.length}");
     await _player.seek(Duration.zero, index: 0);
 
@@ -142,7 +150,7 @@ class AudioHandler extends GetxController {
   }
 
   Future<void> clear() async {
-    talker.log("[Log Music Handler] Request to clear all musics");
+    talker.info("[Log Music Handler] Request to clear all musics");
     if (playMusicList.isNotEmpty) {
       playMusicList.clear();
     }
@@ -154,7 +162,7 @@ class AudioHandler extends GetxController {
   }
 
   Future<void> removeAt(int index) async {
-    talker.log("[Log Music Handler] Request to remove music of index:$index");
+    talker.info("[Log Music Handler] Request to remove music of index:$index");
     // 如果正在播放，先暂停
     if (_player.currentIndex != null && _player.currentIndex! == index) {
       await _player.pause();
@@ -206,7 +214,7 @@ class AudioHandler extends GetxController {
     } else {
       playingMusic.value = null;
     }
-    talker.log(
+    talker.info(
         "[Music Handler] Called updateRx: playingMusic: ${playingMusic.value?.info.name ?? "No music"}");
     update();
   }

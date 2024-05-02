@@ -7,6 +7,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_volume_controller
   just_audio_windows
   screen_retriever
+  share_plus
+  url_launcher_windows
   window_manager
 )
 

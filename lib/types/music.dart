@@ -17,7 +17,7 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
       finalQuality = music.info.defaultQuality!;
     } else if (music.info.qualities.isNotEmpty) {
       finalQuality = music.info.qualities[0];
-      talker.log("[Display2PlayMusic] 音乐无默认音质,选择音质中第一个进行播放:$finalQuality");
+      talker.info("[Display2PlayMusic] 音乐无默认音质,选择音质中第一个进行播放:$finalQuality");
     } else {
       talker.error("[Display2PlayMusic] 音乐没有可供播放的音质");
       return null;
