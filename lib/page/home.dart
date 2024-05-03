@@ -6,7 +6,6 @@ import 'package:app_rhyme/page/setting.dart';
 import 'package:app_rhyme/page/user_agreement.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 
@@ -94,7 +93,7 @@ class HomePageState extends State<HomePage> {
                         items: const [
                           BottomNavigationBarItem(
                             icon: Padding(
-                              padding: EdgeInsets.only(top: 10),
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
                               child: Icon(
                                 CupertinoIcons.music_albums_fill,
                               ),
@@ -102,22 +101,18 @@ class HomePageState extends State<HomePage> {
                           ),
                           BottomNavigationBarItem(
                             icon: Padding(
-                              padding: EdgeInsets.only(top: 10),
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
                               child: Icon(CupertinoIcons.search),
                             ),
                           ),
                           BottomNavigationBarItem(
                             icon: Padding(
-                              padding: EdgeInsets.only(top: 10),
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
                               child: Icon(CupertinoIcons.settings),
                             ),
                           ),
                         ],
                       )),
-                  // 底部导航栏图标按钮和底部的一个空白边界
-                  Container(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      color: barBackgoundColor)
                 ],
               ),
             ),

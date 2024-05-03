@@ -11,7 +11,6 @@ import 'package:app_rhyme/comp/play_page_comp/volume_slider.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:dismissible_page/dismissible_page.dart';
-import 'package:pro_animated_blur/pro_animated_blur.dart';
 
 enum PageState { main, list, lyric }
 
@@ -116,16 +115,6 @@ class SongDisplayPageState extends State<SongDisplayPage> {
         flex: 1,
         child: VolumeSlider(),
       ),
-      Flexible(
-        flex: 1,
-        child: Container(
-          padding: const EdgeInsets.only(top: 10, bottom: 10),
-          child: BottomButton(
-            onList: onListBotton,
-            onLyric: onLyricBotton,
-          ),
-        ),
-      )
     ];
 
     return DismissiblePage(
@@ -134,36 +123,41 @@ class SongDisplayPageState extends State<SongDisplayPage> {
       backgroundColor: CupertinoColors.white,
       onDismissed: () => Navigator.of(context).pop(),
       child: Container(
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              CupertinoColors.systemGrey2,
-              CupertinoColors.systemGrey,
-            ],
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                CupertinoColors.systemGrey2,
+                CupertinoColors.systemGrey,
+              ],
+            ),
           ),
-        ),
-        child: Column(
-          children: <Widget>[
-            Flexible(
-                flex: topFlex,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: topWidgets,
-                )),
-            // // 使用 Expanded 包裹一个新的 Column，以便底部组件从下往上排布
-            // Flexible(
-            //   flex: bottomFlex,
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.end,
-            //     children: bottomWidgets,
-            //   ),
-            // ),
-          ],
-        ),
-      ),
+          child: Stack(children: [
+            Column(
+              children: <Widget>[
+                Flexible(
+                    flex: topFlex,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: topWidgets,
+                    )),
+                // // 使用 Expanded 包裹一个新的 Column，以便底部组件从下往上排布
+                // Flexible(
+                //   flex: bottomFlex,
+                //   child: Column(
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     children: bottomWidgets,
+                //   ),
+                // ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: BottomButton(onList: onListBotton, onLyric: onLyricBotton),
+            )
+          ])),
     );
   }
 }
