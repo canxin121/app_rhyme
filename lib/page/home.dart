@@ -75,6 +75,8 @@ class HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           Obx(() => globalTopUiController.currentWidget.value),
+
+          // 以下内容改成固定在页面底部的
           // 使用MediaQuery检测键盘是否可见
           if (!isKeyboardVisible)
             Align(
@@ -84,15 +86,6 @@ class HomePageState extends State<HomePage> {
                 children: [
                   // 音乐播放控制栏
                   const MusicPlayBar(),
-                  // 一个浅色的分隔
-                  const Divider(
-                    color: CupertinoColors.systemGrey6,
-                    height: 1,
-                    thickness: 1,
-                    indent: 20,
-                    endIndent: 20,
-                  ),
-                  // 底部的导航图标按钮
                   Obx(() => CupertinoTabBar(
                         activeColor: activeIconColor,
                         backgroundColor: barBackgoundColor,

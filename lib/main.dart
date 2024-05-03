@@ -24,7 +24,7 @@ Future<void> main() async {
   await initWindow();
 
   await RustLib.init();
-  FlutterError.onError = (details) { 
+  FlutterError.onError = (details) {
     FlutterError.presentError(details);
     talker.error("[Flutter Error] $details");
   };

@@ -1,5 +1,6 @@
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/types/music.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -17,8 +18,10 @@ Future<void> initGlobalAudioHandler() async {
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
   );
+
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
+
   globalAudioHandler = AudioHandler();
 }
 
@@ -42,6 +45,11 @@ class AudioHandler extends GetxController {
     });
     // 将playSourceList交给player作为列表，不过目前是空的
     _player.setAudioSource(playSourceList);
+
+    _player.currentIndexStream.listen((event) {
+      talker.info("[Music Handler] currentIndexStream updated");
+      updateRx();
+    });
   }
 
   AudioHandler() {
