@@ -15,13 +15,17 @@ class MusicArtPic extends StatefulWidget {
 class MusicArtPicState extends State<MusicArtPic> {
   @override
   Widget build(BuildContext context) {
-    return Obx(
+    return SafeArea(
+        child: Obx(
       () => FutureBuilder<Hero>(
         future: playingMusicImage(), // 这里调用异步函数
         builder: (BuildContext context, AsyncSnapshot<Hero> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container(
-                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(18.0),
                   child: defaultArtPic,
@@ -32,7 +36,10 @@ class MusicArtPicState extends State<MusicArtPic> {
           } else {
             // 使用Cupertino组件包裹图片，并限制大小和加圆角边框
             return Container(
-                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(18.0),
                   child: snapshot.data ?? defaultArtPic,
@@ -40,6 +47,6 @@ class MusicArtPicState extends State<MusicArtPic> {
           }
         },
       ),
-    );
+    ));
   }
 }

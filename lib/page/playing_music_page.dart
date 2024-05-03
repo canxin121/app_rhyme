@@ -23,16 +23,12 @@ class SongDisplayPage extends StatefulWidget {
 
 class SongDisplayPageState extends State<SongDisplayPage> {
   PageState pageState = PageState.main;
-  int topFlex = 5;
-  int bottomFlex = 7;
   void onListBotton() {
     setState(() {
       if (pageState == PageState.list) {
         pageState = PageState.main;
-        bottomFlex = 7;
       } else {
         pageState = PageState.list;
-        bottomFlex = 2;
       }
     });
   }
@@ -41,10 +37,8 @@ class SongDisplayPageState extends State<SongDisplayPage> {
     setState(() {
       if (pageState == PageState.lyric) {
         pageState = PageState.main;
-        bottomFlex = 7;
       } else {
         pageState = PageState.lyric;
-        bottomFlex = 2;
       }
     });
   }
@@ -58,17 +52,12 @@ class SongDisplayPageState extends State<SongDisplayPage> {
     switch (pageState) {
       case PageState.main:
         topWidgets = <Widget>[
-          const Flexible(
-            flex: 1,
-            child: MusicArtPic(),
-          )
+          const MusicArtPic(),
         ];
         break;
       case PageState.list:
         topWidgets = <Widget>[
-          Padding(padding: EdgeInsets.only(top: screenHeight * 0.03)),
           const PlayingMusicCard(),
-          const Padding(padding: EdgeInsets.only(left: 30)),
           Container(
             padding: const EdgeInsets.only(left: 20),
             alignment: Alignment.centerLeft,
@@ -80,42 +69,18 @@ class SongDisplayPageState extends State<SongDisplayPage> {
               ),
             ),
           ),
-          const PlayMusicList(),
+          const Expanded(
+            child: PlayMusicList(),
+          ),
         ];
         break;
       case PageState.lyric:
         topWidgets = [
-          Padding(padding: EdgeInsets.only(top: screenHeight * 0.03)),
           const PlayingMusicCard(),
-          const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-          LyricDisplay(maxHeight: screenHeight * 0.55),
+          LyricDisplay(maxHeight: screenHeight * 0.7),
         ];
         break;
     }
-    // 底部组件，包括 ProgressSlider, QualityTime, ControlButton, VolumeSlider 和 BottomButton
-    List<Widget> bottomWidgets = [
-      if (pageState == PageState.main)
-        const Flexible(flex: 2, child: MusicInfo()),
-      const Flexible(
-        flex: 1,
-        child: ProgressSlider(),
-      ),
-      const Flexible(
-        flex: 1,
-        child: QualityTime(),
-      ),
-      Flexible(
-        flex: 3,
-        child: ControlButton(
-          buttonSize: screenWidth * 0.1,
-          buttonSpacing: screenWidth * 0.2,
-        ),
-      ),
-      const Flexible(
-        flex: 1,
-        child: VolumeSlider(),
-      ),
-    ];
 
     return DismissiblePage(
       isFullScreen: true,
@@ -135,33 +100,34 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             ),
           ),
           child: Stack(children: [
+            // 上方组件
             Column(
-              children: <Widget>[
-                Flexible(
-                    flex: topFlex,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: topWidgets,
-                    )),
-                // // 使用 Expanded 包裹一个新的 Column，以便底部组件从下往上排布
-                // Flexible(
-                //   flex: bottomFlex,
-                //   child: Column(
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: bottomWidgets,
-                //   ),
-                // ),
-              ],
+              children: topWidgets,
             ),
-            // 固定在页面底部的导航按钮
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: BottomButton(
-                onList: onListBotton,
-                onLyric: onLyricBotton,
-                padding: const EdgeInsets.only(top: 10, bottom: 20),
+            // 固定在页面底部的内容
+            Positioned(
+              bottom: 0, // 确保它固定在底部
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (pageState == PageState.main) const MusicInfo(),
+                  const ProgressSlider(),
+                  const QualityTime(),
+                  ControlButton(
+                    buttonSize: screenWidth * 0.1,
+                    buttonSpacing: screenWidth * 0.2,
+                  ),
+                  const VolumeSlider(),
+                  BottomButton(
+                    onList: onListBotton,
+                    onLyric: onLyricBotton,
+                    padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  ),
+                ],
               ),
-            )
+            ),
           ])),
     );
   }

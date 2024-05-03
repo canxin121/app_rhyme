@@ -80,6 +80,7 @@ class HomePageState extends State<HomePage> {
               children: [
                 // 音乐播放控制栏
                 const MusicPlayBar(),
+                // 底部导航按钮
                 Obx(() => CupertinoTabBar(
                       activeColor: activeIconColor,
                       backgroundColor: barBackgoundColor,

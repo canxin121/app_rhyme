@@ -15,8 +15,7 @@ class PlayMusicList extends StatelessWidget {
     return Obx(() {
       var musics = globalAudioHandler.playMusicList;
 
-      return Expanded(
-          child: CustomScrollView(
+      return CustomScrollView(
         slivers: <Widget>[
           SliverList.separated(
             separatorBuilder: (context, index) => const Divider(
@@ -63,7 +62,7 @@ class PlayMusicList extends StatelessWidget {
             itemCount: musics.length,
           ),
         ],
-      ));
+      );
     });
   }
 }
