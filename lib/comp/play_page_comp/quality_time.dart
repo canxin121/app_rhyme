@@ -69,11 +69,13 @@ class QualityTimeState extends State<QualityTime> {
                     actionCallbacks: (index) async {
                       var playingMusic = globalAudioHandler.playingMusic.value;
                       if (playingMusic != null) {
+                        var displayData = DisplayMusic(playingMusic.ref,
+                            info_: playingMusic.info);
                         var newPlayMusic = await display2PlayMusic(
-                            DisplayMusic.fromPlayMusic(playingMusic),
-                            qualityOptions[index]);
+                            displayData, qualityOptions[index]);
                         if (newPlayMusic == null) return;
-                        await globalAudioHandler.replaceMusic(newPlayMusic);
+                        await globalAudioHandler
+                            .replacePlayingMusic(newPlayMusic);
                       }
                     });
               }

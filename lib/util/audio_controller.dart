@@ -95,6 +95,27 @@ class AudioHandler extends GetxController {
     }
   }
 
+  Future<void> replacePlayingMusic(PlayMusic playMusic) async {
+    try {
+      if (playingMusic.value == null) return;
+      int index = playMusicList
+          .indexWhere((element) => element.extra == playingMusic.value!.extra);
+      if (index != -1) {
+        // 删除对应位置的音乐
+        await removeAt(index);
+        // 插入新音乐到对应位置
+        await _insert(index, playMusic);
+        // 重新播放这个位置的音乐
+        await seek(Duration.zero, index: index);
+        updateRx();
+        await play();
+      }
+    } catch (e) {
+      talker.error(
+          "[Music Handler]  In replaceMusic, Failed to display2PlayMusic: $e");
+    }
+  }
+
   Future<void> replaceMusic(PlayMusic playMusic) async {
     try {
       int index = playMusicList

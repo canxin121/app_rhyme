@@ -79,7 +79,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
       case PageState.lyric:
         topWidgets = [
           const PlayingMusicCard(),
-          LyricDisplay(maxHeight: screenHeight * 0.7),
+          LyricDisplay(maxHeight: screenHeight * 0.50),
         ];
         break;
     }
@@ -103,8 +103,11 @@ class SongDisplayPageState extends State<SongDisplayPage> {
           ),
           child: Stack(children: [
             // 上方组件
-            Column(
-              children: topWidgets,
+            Container(
+              constraints: BoxConstraints(maxHeight: screenHeight * 0.7),
+              child: Column(
+                children: topWidgets,
+              ),
             ),
             // 固定在页面底部的内容
             Positioned(
@@ -117,11 +120,13 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                   if (pageState == PageState.main) const MusicInfo(),
                   const ProgressSlider(),
                   const QualityTime(),
-                  ControlButton(
-                    buttonSize: screenWidth * 0.1,
-                    buttonSpacing: screenWidth * 0.2,
-                  ),
-                  if (!Platform.isIOS) const VolumeSlider(),
+                  Container(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: ControlButton(
+                        buttonSize: screenWidth * 0.1,
+                        buttonSpacing: screenWidth * 0.2,
+                      )),
+                  // if (!Platform.isIOS) const VolumeSlider(),
                   BottomButton(
                     onList: onListBotton,
                     onLyric: onLyricBotton,

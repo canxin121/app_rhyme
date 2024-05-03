@@ -187,7 +187,9 @@ class MusicPageState extends State<MusicPage> {
                     },
                     () async {
                       // 删除缓存
-                      var result = music.toCacheFileNameAndExtra();
+                      if (music.info.defaultQuality == null) return;
+                      var result = music
+                          .toCacheFileNameAndExtra(music.info.defaultQuality!);
                       if (result == null) return;
                       var (cacheFileName, _) = result;
                       deleteCacheFile(

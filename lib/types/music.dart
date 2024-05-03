@@ -25,7 +25,7 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
   }
 
   // 音乐缓存获取的逻辑
-  var result = music.toCacheFileNameAndExtra();
+  var result = music.toCacheFileNameAndExtra(finalQuality);
   if (result == null) {
     return null;
   }
@@ -61,25 +61,28 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
 class DisplayMusic {
   late MusicW ref;
   late MusicInfo info;
-  DisplayMusic(MusicW musicRef_) {
+  DisplayMusic(MusicW musicRef_, {MusicInfo? info_}) {
     ref = musicRef_;
-    info = ref.getMusicInfo();
+    if (info_ != null) {
+      info = info_;
+    } else {
+      info = ref.getMusicInfo();
+    }
   }
-  DisplayMusic.fromPlayMusic(PlayMusic music) {
-    DisplayMusic(music.ref);
-  }
-  (String, String)? toCacheFileNameAndExtra() {
+
+  (String, String)? toCacheFileNameAndExtra(Quality quality) {
     if (info.defaultQuality == null) {
       return null;
     }
-    var extra = ref.getExtraInto(quality: info.defaultQuality!);
+    var extra = ref.getExtraInto(quality: quality);
     var cacheFileName =
         "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}.${info.defaultQuality!.format ?? "unknown"}";
     return (cacheFileName, extra);
   }
 
   Future<bool> hasCache() async {
-    var result = toCacheFileNameAndExtra();
+    if (info.defaultQuality == null) return false;
+    var result = toCacheFileNameAndExtra(info.defaultQuality!);
     if (result == null) {
       return false;
     }

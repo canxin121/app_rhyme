@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:app_rhyme/comp/music_bar/bar.dart';
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/page/out_music_list_grid.dart';
@@ -79,7 +81,9 @@ class HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 音乐播放控制栏
-                const MusicPlayBar(),
+                MusicPlayBar(
+                  maxHeight: min(60, MediaQuery.of(context).size.height * 0.1),
+                ),
                 // 底部导航按钮
                 Obx(() => CupertinoTabBar(
                       activeColor: activeIconColor,

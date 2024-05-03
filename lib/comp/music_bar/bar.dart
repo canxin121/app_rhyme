@@ -7,13 +7,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class MusicPlayBar extends StatelessWidget {
-  const MusicPlayBar({super.key});
+  final double maxHeight;
+  const MusicPlayBar({super.key, required this.maxHeight});
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.1,
+        maxHeight: maxHeight,
       ),
       child: GestureDetector(
         onVerticalDragUpdate: (details) {
