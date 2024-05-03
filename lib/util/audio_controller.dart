@@ -127,8 +127,14 @@ class AudioHandler extends GetxController {
     for (var playMusic in playMusicsResults) {
       if (playMusic == null) continue;
       newPlayMusics.add(playMusic);
-      newAudioSources.add(AudioSource.uri(Uri.parse(playMusic.playInfo.file),
-          tag: playMusic.toMediaItem()));
+
+      if (playMusic.playInfo.file.contains("http")) {
+        newAudioSources.add(AudioSource.uri(Uri.parse(playMusic.playInfo.file),
+            tag: playMusic.toMediaItem()));
+      } else {
+        newAudioSources.add(AudioSource.file(playMusic.playInfo.file,
+            tag: playMusic.toMediaItem()));
+      }
     }
 
     await clear();
