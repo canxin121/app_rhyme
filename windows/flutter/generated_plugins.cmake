@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
-  flutter_volume_controller
   just_audio_windows
   screen_retriever
   share_plus

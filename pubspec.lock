@@ -393,14 +393,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_volume_controller:
-    dependency: "direct main"
-    description:
-      name: flutter_volume_controller
-      sha256: fa4c36dfe7ef7f423704f34ab8e64e00b4a30a90aa6e56f251e9dba649efcd7f
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.2"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -793,14 +785,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-  pro_animated_blur:
-    dependency: "direct main"
-    description:
-      name: pro_animated_blur
-      sha256: "2a4506266b743939758425a6ac28d249365ccdf3d7fc159675832c3c156d8300"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.2+1"
   process:
     dependency: transitive
     description:
