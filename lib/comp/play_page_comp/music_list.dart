@@ -33,7 +33,7 @@ class PlayMusicList extends StatelessWidget {
                   .hashCode),
               music: musics[index],
               onClick: () {
-                globalAudioHandler.seek(Duration.zero, index);
+                globalAudioHandler.seek(Duration.zero, index: index);
               },
               onPress: () {
                 showCupertinoPopupWithActions(context: context, options: [

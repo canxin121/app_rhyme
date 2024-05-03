@@ -35,6 +35,7 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
       file: "", cachePath: musicCachePath, filename: cacheFileName);
   // 有本地缓存直接返回
   if (cache != null) {
+    talker.info("[Display2PlayMusic] 使用本地歌曲缓存转化歌曲: ${music.info.name}");
     return PlayMusic(music.ref, music.info, PlayInfo(cache, finalQuality),
         music.ref.getExtraInto(quality: finalQuality));
   }
@@ -51,8 +52,9 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
     talker.error("[Display2PlayMusic] 第三方音乐源无法获取到playinfo: ${music.info.name}");
     return null;
   }
-  var playMusic = PlayMusic(music.ref, music.info, playinfo, extra);
 
+  talker.info("[Display2PlayMusic] 使用第三方Api请求转化歌曲: ${music.info.name}");
+  var playMusic = PlayMusic(music.ref, music.info, playinfo, extra);
   return playMusic;
 }
 

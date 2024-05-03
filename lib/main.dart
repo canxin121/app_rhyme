@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:app_rhyme/page/home.dart';
 import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/src/rust/api/init.dart';
@@ -17,13 +19,19 @@ Talker talker = Talker();
 late SqlMusicFactoryW globalSqlMusicFactory;
 late Config globalConfig;
 ExternApi? globalExternApi;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initWindow();
 
   await RustLib.init();
-
+  FlutterError.onError = (details) { 
+    FlutterError.presentError(details);
+    talker.error("[Flutter Error] $details");
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    talker.error("[PlatForm Error] Error: $error\nStackTrace: $stack");
+    return true;
+  };
   String rootPath = (await getApplicationDocumentsDirectory()).path;
   var stores = await initStore(storeRoot: rootPath);
   globalSqlMusicFactory = stores.$1;

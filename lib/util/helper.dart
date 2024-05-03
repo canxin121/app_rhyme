@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:app_rhyme/main.dart';
@@ -16,10 +15,10 @@ Future<String> fileCacheHelper(String file, String cachePath) async {
     cachePath: cachePath,
   );
   if (localSource != null) {
-    talker.debug("fileCacheHelper: 使用已缓存source: ($file)->($localSource)");
+    talker.debug("[fileCacheHelper] 使用已缓存source: ($file)->($localSource)");
     toUseSource = localSource;
   } else {
-    talker.debug("fileCacheHelper: 不缓存,直接使用 $file");
+    talker.debug("[fileCacheHelper] 不缓存,直接使用 $file");
     toUseSource = file;
   }
 

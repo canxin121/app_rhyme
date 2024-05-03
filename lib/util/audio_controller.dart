@@ -33,6 +33,8 @@ class AudioHandler extends GetxController {
   Future<void> _init() async {
     // 先默认开启所有的循环
     _player.setLoopMode(LoopMode.all);
+    // 关闭随机播放
+    _player.setShuffleModeEnabled(false);
     // 监听错误事件并用talker来log
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
@@ -48,15 +50,21 @@ class AudioHandler extends GetxController {
 
   Future<void> addMusicPlay(DisplayMusic music) async {
     try {
-      PlayMusic? playMusic = await display2PlayMusic(music);
-      if (playMusic == null) return;
-
-      var index = playMusicList
-          .indexWhere((element) => element.extra == playMusic.extra);
-      if (index != -1) {
-        playMusicList.removeAt(index);
-        playSourceList.removeAt(index);
+      PlayMusic? playMusic;
+      var index = -1;
+      if (music.info.defaultQuality != null) {
+        index = playMusicList.indexWhere((element) =>
+            element.extra ==
+            music.ref.getExtraInto(quality: music.info.defaultQuality!));
       }
+      if (index != -1) {
+        playMusic = playMusicList.removeAt(index);
+        playSourceList.removeAt(index);
+      } else {
+        playMusic = await display2PlayMusic(music);
+      }
+
+      if (playMusic == null) return;
 
       // 添加新的音乐
       playMusicList.add(playMusic);
@@ -70,14 +78,13 @@ class AudioHandler extends GetxController {
       }
 
       // 播放新的音乐
-      await _player.seek(Duration.zero, index: playSourceList.length - 1);
+      await seek(Duration.zero, index: playSourceList.length - 1);
 
       updateRx();
-      await _player.play();
+      await play();
     } catch (e) {
-      talker.error("[Error Music Handler] In addMusicPlay, Error occur: $e");
+      talker.error("[Music Handler] In addMusicPlay, Error occur: $e");
     }
-    // 先检查是否已有这个音乐，如果已有，删除掉原有的
   }
 
   Future<void> replaceMusic(PlayMusic playMusic) async {
@@ -92,30 +99,30 @@ class AudioHandler extends GetxController {
         await _insert(index, playMusic);
         if (shouldPlay) {
           // 重新播放这个位置的音乐
-          await _player.seek(Duration.zero, index: index);
+          await seek(Duration.zero, index: index);
           updateRx();
-          await _player.play();
+          await play();
         }
       }
     } catch (e) {
       talker.error(
-          "[Error Music Handler]  In replaceMusic, Failed to display2PlayMusic: $e");
+          "[Music Handler]  In replaceMusic, Failed to display2PlayMusic: $e");
     }
   }
 
   Future<void> clearReplaceMusicAll(List<DisplayMusic> musics) async {
     talker.info(
-        "[Log Music Handler] Request to add all musics of length: ${musics.length}");
+        "[Music Handler] Request to add all musics of length: ${musics.length}");
     List<PlayMusic> newPlayMusics = [];
     List<AudioSource> newAudioSources = [];
     List<Future<PlayMusic?>> futures = [];
 
-// 首先创建所有的future，但不等待它们
+    // 首先创建所有的future，但不等待它们
     for (var music in musics) {
       futures.add(display2PlayMusic(music));
     }
 
-// 然后等待所有future完成，并按顺序处理结果
+    // 然后等待所有future完成，并按顺序处理结果
     List<PlayMusic?> playMusicsResults = await Future.wait(futures);
     for (var playMusic in playMusicsResults) {
       if (playMusic == null) continue;
@@ -131,14 +138,14 @@ class AudioHandler extends GetxController {
       await playSourceList.addAll(newAudioSources);
     } catch (e) {
       talker.error(
-          "[Error Music Handler] In clearReplaceMusicAll, Failed to diaplayMusic2PlayMusic: $e");
+          "[Music Handler] In clearReplaceMusicAll, Failed to diaplayMusic2PlayMusic: $e");
     }
-    talker.info(
-        "[Log Music Handler] After add all: crt playMusicList length:${playMusicList.length},crt playSourceList length:${playSourceList.length}");
-    await _player.seek(Duration.zero, index: 0);
+
+    await seek(Duration.zero, index: 0);
 
     updateRx();
-    await _player.play();
+    log2List("After add all");
+    await play();
   }
 
   Future<void> _insert(int index, PlayMusic music) async {
@@ -150,7 +157,7 @@ class AudioHandler extends GetxController {
   }
 
   Future<void> clear() async {
-    talker.info("[Log Music Handler] Request to clear all musics");
+    talker.info("[Music Handler] Request to clear all musics");
     if (playMusicList.isNotEmpty) {
       playMusicList.clear();
     }
@@ -159,11 +166,11 @@ class AudioHandler extends GetxController {
       update();
     }
     updateRx();
+    log2List("Afer Clear all musics");
   }
 
   Future<void> removeAt(int index) async {
-    talker.info("[Log Music Handler] Request to remove music of index:$index");
-    // 如果正在播放，先暂停
+    talker.info("[Music Handler] Request to remove music of index:$index");
     if (_player.currentIndex != null && _player.currentIndex! == index) {
       await _player.pause();
     }
@@ -173,25 +180,52 @@ class AudioHandler extends GetxController {
   }
 
   Future<void> seekToNext() async {
-    await _player.seekToNext();
+    try {
+      await _player.seekToNext();
+      talker.info("[Music Handler] In seekToNext, Succeed");
+    } catch (e) {
+      talker.error("[Music Handler] In seekToNext, error occur: $e");
+    }
     updateRx();
+    await play();
   }
 
   Future<void> seekToPrevious() async {
-    await _player.seekToPrevious();
+    try {
+      await _player.seekToPrevious();
+      talker.info("[Music Handler] In seekToPrevious, Succeed");
+    } catch (e) {
+      talker.error("[Music Handler] In seekToPrevious, error occur: $e");
+    }
     updateRx();
+    await play();
   }
 
   Future<void> pause() async {
-    await _player.pause();
+    try {
+      await _player.pause();
+      talker.info("[Music Handler] In pause, succeed");
+    } catch (e) {
+      talker.error("[Music Handler] In pause, error occur: $e");
+    }
   }
 
   Future<void> play() async {
-    await _player.play();
+    try {
+      await _player.play();
+      talker.info("[Music Handler] In play, succeed");
+    } catch (e) {
+      talker.error("[Music Handler] In play. error occur: $e");
+    }
   }
 
-  Future<void> seek(Duration position, [int? index]) async {
-    await _player.seek(position, index: index);
+  Future<void> seek(Duration position, {int? index}) async {
+    try {
+      await _player.seek(position, index: index);
+      talker.info("[Music Handler] In seek, Succeed");
+    } catch (e) {
+      talker.error("[Music Handler] In seek, error occur: $e");
+    }
   }
 
   Stream<Duration> createPositionStream({
@@ -217,6 +251,21 @@ class AudioHandler extends GetxController {
     talker.info(
         "[Music Handler] Called updateRx: playingMusic: ${playingMusic.value?.info.name ?? "No music"}");
     update();
+  }
+
+  void log2List(String prefix) {
+    String playListStr =
+        playMusicList.map((element) => element.info.name).join(",");
+    String sourceListStr =
+        playSourceList.sequence.map((e) => e.tag.title).join(",");
+    String msg;
+    if (playListStr == sourceListStr) {
+      talker.log(
+          "[Music Handler] $prefix: PlayList = PlaySourceList = [$playListStr]");
+    } else {
+      talker.error(
+          "[Music Handler] $prefix: PlayList != PlaySourceList\nPlayList:[$playListStr]\nPlaySourceList:[$playSourceList]");
+    }
   }
 }
 

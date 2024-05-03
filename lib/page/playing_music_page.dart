@@ -134,40 +134,40 @@ class SongDisplayPageState extends State<SongDisplayPage> {
       backgroundColor: CupertinoColors.white,
       onDismissed: () => Navigator.of(context).pop(),
       child: Container(
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              CupertinoColors.systemGrey2,
-              CupertinoColors.systemGrey,
-            ],
+          // clipBehavior: Clip.antiAliasWithSaveLayer,
+          // decoration: const BoxDecoration(
+          //   gradient: LinearGradient(
+          //     begin: Alignment.topRight,
+          //     end: Alignment.bottomLeft,
+          //     colors: [
+          //       CupertinoColors.systemGrey2,
+          //       CupertinoColors.systemGrey,
+          //     ],
+          //   ),
+          // ),
+          // child: ProAnimatedBlur(
+          //   blur: 500,
+          //   duration: const Duration(milliseconds: 0),
+          //   child: Column(
+          //     children: <Widget>[
+          //       Flexible(
+          //           flex: topFlex,
+          //           child: Column(
+          //             mainAxisAlignment: MainAxisAlignment.start,
+          //             children: topWidgets,
+          //           )),
+          //       // 使用 Expanded 包裹一个新的 Column，以便底部组件从下往上排布
+          //       Flexible(
+          //         flex: bottomFlex,
+          //         child: Column(
+          //           mainAxisAlignment: MainAxisAlignment.end,
+          //           children: bottomWidgets,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           ),
-        ),
-        child: ProAnimatedBlur(
-          blur: 500,
-          duration: const Duration(milliseconds: 0),
-          child: Column(
-            children: <Widget>[
-              Flexible(
-                  flex: topFlex,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: topWidgets,
-                  )),
-              // 使用 Expanded 包裹一个新的 Column，以便底部组件从下往上排布
-              Flexible(
-                flex: bottomFlex,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: bottomWidgets,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
