@@ -261,10 +261,10 @@ class AudioHandler extends GetxController {
     String msg;
     if (playListStr == sourceListStr) {
       talker.log(
-          "[Music Handler] $prefix: PlayList = PlaySourceList = [$playListStr]");
+          "[Music Handler] $prefix: PlayList = PlaySourceList, length = ${playMusicList.length}, content = [$playListStr]");
     } else {
       talker.error(
-          "[Music Handler] $prefix: PlayList != PlaySourceList\nPlayList:[$playListStr]\nPlaySourceList:[$playSourceList]");
+          "[Music Handler] $prefix: PlayList != PlaySourceList\nPlayList = length: ${playMusicList.length}, content = [$playListStr]\nPlaySourceList: length = ${playSourceList.length},content = [$playSourceList]");
     }
   }
 }
