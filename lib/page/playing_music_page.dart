@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/comp/card/playing_music_card.dart';
 import 'package:app_rhyme/comp/play_page_comp/botton_button.dart';
 import 'package:app_rhyme/comp/play_page_comp/control_button.dart';
@@ -112,14 +114,14 @@ class SongDisplayPageState extends State<SongDisplayPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // if (pageState == PageState.main) const MusicInfo(),
+                  if (pageState == PageState.main) const MusicInfo(),
                   const ProgressSlider(),
-                  // const QualityTime(),
+                  const QualityTime(),
                   ControlButton(
                     buttonSize: screenWidth * 0.1,
                     buttonSpacing: screenWidth * 0.2,
                   ),
-                  // const VolumeSlider(),
+                  if (!Platform.isIOS) const VolumeSlider(),
                   BottomButton(
                     onList: onListBotton,
                     onLyric: onLyricBotton,
