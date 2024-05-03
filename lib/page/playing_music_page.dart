@@ -153,9 +153,14 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                 // ),
               ],
             ),
+            // 固定在页面底部的导航按钮
             Align(
               alignment: Alignment.bottomCenter,
-              child: BottomButton(onList: onListBotton, onLyric: onLyricBotton),
+              child: BottomButton(
+                onList: onListBotton,
+                onLyric: onLyricBotton,
+                padding: const EdgeInsets.only(top: 10, bottom: 20),
+              ),
             )
           ])),
     );

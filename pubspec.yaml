@@ -42,9 +42,7 @@ dependencies:
   talker: ^4.1.5
   just_audio_background: ^0.0.1-beta.11
   audio_session: ^0.1.19
-  flutter_keyboard_visibility: ^6.0.0
   talker_flutter: ^4.1.5
-  # audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:
