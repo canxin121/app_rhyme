@@ -59,37 +59,37 @@ class SongDisplayPageState extends State<SongDisplayPage> {
     switch (pageState) {
       case PageState.main:
         topWidgets = <Widget>[
-          // const Flexible(
-          //   flex: 1,
-          // child: MusicArtPic(),
-          // )
+          const Flexible(
+            flex: 1,
+            child: MusicArtPic(),
+          )
         ];
         break;
       case PageState.list:
         topWidgets = <Widget>[
           Padding(padding: EdgeInsets.only(top: screenHeight * 0.03)),
-          // const PlayingMusicCard(),
-          // const Padding(padding: EdgeInsets.only(left: 30)),
-          // Container(
-          //   padding: const EdgeInsets.only(left: 20),
-          //   alignment: Alignment.centerLeft,
-          //   child: const Text(
-          //     '待播清单',
-          //     style: TextStyle(
-          //       fontSize: 20.0,
-          //       fontWeight: FontWeight.bold,
-          //     ),
-          //   ),
-          // ),
+          const PlayingMusicCard(),
+          const Padding(padding: EdgeInsets.only(left: 30)),
+          Container(
+            padding: const EdgeInsets.only(left: 20),
+            alignment: Alignment.centerLeft,
+            child: const Text(
+              '待播清单',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           const PlayMusicList(),
         ];
         break;
       case PageState.lyric:
         topWidgets = [
           Padding(padding: EdgeInsets.only(top: screenHeight * 0.03)),
-          // const PlayingMusicCard(),
-          // const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-          // LyricDisplay(maxHeight: screenHeight * 0.55),
+          const PlayingMusicCard(),
+          const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+          LyricDisplay(maxHeight: screenHeight * 0.55),
         ];
         break;
     }
