@@ -113,13 +113,13 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   // if (pageState == PageState.main) const MusicInfo(),
-                  // const ProgressSlider(),
+                  const ProgressSlider(),
                   // const QualityTime(),
                   ControlButton(
                     buttonSize: screenWidth * 0.1,
                     buttonSpacing: screenWidth * 0.2,
                   ),
-                  const VolumeSlider(),
+                  // const VolumeSlider(),
                   BottomButton(
                     onList: onListBotton,
                     onLyric: onLyricBotton,
