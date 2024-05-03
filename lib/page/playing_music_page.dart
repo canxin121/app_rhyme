@@ -105,29 +105,29 @@ class SongDisplayPageState extends State<SongDisplayPage> {
               children: topWidgets,
             ),
             // 固定在页面底部的内容
-            // Positioned(
-            //   bottom: 0, // 确保它固定在底部
-            //   left: 0,
-            //   right: 0,
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.end,
-            //     children: [
-            //       if (pageState == PageState.main) const MusicInfo(),
-            //       const ProgressSlider(),
-            //       const QualityTime(),
-            //       ControlButton(
-            //         buttonSize: screenWidth * 0.1,
-            //         buttonSpacing: screenWidth * 0.2,
-            //       ),
-            //       const VolumeSlider(),
-            //       BottomButton(
-            //         onList: onListBotton,
-            //         onLyric: onLyricBotton,
-            //         padding: const EdgeInsets.only(top: 10, bottom: 20),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            Positioned(
+              bottom: 0, // 确保它固定在底部
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // if (pageState == PageState.main) const MusicInfo(),
+                  // const ProgressSlider(),
+                  // const QualityTime(),
+                  ControlButton(
+                    buttonSize: screenWidth * 0.1,
+                    buttonSpacing: screenWidth * 0.2,
+                  ),
+                  const VolumeSlider(),
+                  BottomButton(
+                    onList: onListBotton,
+                    onLyric: onLyricBotton,
+                    padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  ),
+                ],
+              ),
+            ),
           ])),
     );
   }
