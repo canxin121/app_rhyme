@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/time_parse.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +20,7 @@ class LyricDisplayState extends State<LyricDisplay> {
   var lyricModel =
       LyricsModelBuilder.create().bindLyricToMain("[00:00.00]无歌词").getModel();
   var lyricUI = UINetease(lyricAlign: LyricAlign.CENTER, highlight: true);
+  late StreamSubscription<PlayMusic?> stream;
   @override
   void initState() {
     super.initState();
@@ -24,13 +28,19 @@ class LyricDisplayState extends State<LyricDisplay> {
         .bindLyricToMain(globalAudioHandler.playingMusic.value?.info.lyric ??
             "[00:00.00]无歌词")
         .getModel();
-    globalAudioHandler.playingMusic.listen((p0) {
+    stream = globalAudioHandler.playingMusic.listen((p0) {
       setState(() {
         lyricModel = LyricsModelBuilder.create()
             .bindLyricToMain(p0?.info.lyric ?? "[00:00.00]无歌词")
             .getModel();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    stream.cancel();
+    super.dispose();
   }
 
   @override
