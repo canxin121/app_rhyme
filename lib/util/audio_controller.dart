@@ -281,6 +281,10 @@ class AudioHandler extends GetxController {
           "[Music Handler] $prefix: PlayList != PlaySourceList\nPlayList = length: ${playMusicList.length}, content = [$playListStr]\nPlaySourceList: length = ${playSourceList.length},content = [$playSourceList]");
     }
   }
+
+  bool isPlaying() {
+    return _player.playing;
+  }
 }
 
 Future<void> initGlobalAudioUiController() async {
