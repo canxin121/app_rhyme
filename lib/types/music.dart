@@ -167,6 +167,7 @@ class PlayMusic {
   AudioSource toAudioSource() {
     if (playInfo.file.contains("http")) {
       if (Platform.isIOS || Platform.isMacOS) {
+        talker.info("[PlayMusic ToAudioSource] Use ProgressiveAudioSource");
         return ProgressiveAudioSource(Uri.parse(playInfo.file),
             tag: toMediaItem(),
             options: const ProgressiveAudioSourceOptions(
@@ -177,6 +178,7 @@ class PlayMusic {
       }
     } else {
       if (Platform.isIOS || Platform.isMacOS) {
+        talker.info("[PlayMusic ToAudioSource] Use ProgressiveAudioSource");
         return ProgressiveAudioSource(Uri.file(playInfo.file),
             tag: toMediaItem(),
             options: const ProgressiveAudioSourceOptions(
