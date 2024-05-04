@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_sdk.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:just_audio/just_audio.dart';
 
 // 是一个原本只具有展示功能的DisplayMusicTuple通过请求第三方api变成可以播放的音乐
 // 这个过程已经决定了一个音乐是否可以播放，因此本函数应该可能throw Exception
@@ -159,5 +162,29 @@ class PlayMusic {
         album: info.album,
         artUri: artUri,
         artist: info.artist.join(","));
+  }
+
+  AudioSource toAudioSource() {
+    if (playInfo.file.contains("http")) {
+      if (Platform.isIOS || Platform.isMacOS) {
+        return ProgressiveAudioSource(Uri.parse(playInfo.file),
+            tag: toMediaItem(),
+            options: const ProgressiveAudioSourceOptions(
+                darwinAssetOptions:
+                    DarwinAssetOptions(preferPreciseDurationAndTiming: true)));
+      } else {
+        return AudioSource.uri(Uri.parse(playInfo.file), tag: toMediaItem());
+      }
+    } else {
+      if (Platform.isIOS || Platform.isMacOS) {
+        return ProgressiveAudioSource(Uri.file(playInfo.file),
+            tag: toMediaItem(),
+            options: const ProgressiveAudioSourceOptions(
+                darwinAssetOptions:
+                    DarwinAssetOptions(preferPreciseDurationAndTiming: true)));
+      } else {
+        return AudioSource.file(playInfo.file, tag: toMediaItem());
+      }
+    }
   }
 }

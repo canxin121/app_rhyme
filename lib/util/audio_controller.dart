@@ -77,14 +77,7 @@ class AudioHandler extends GetxController {
 
       // 添加新的音乐
       playMusicList.add(playMusic);
-      if (playMusic.playInfo.file.contains("http")) {
-        await playSourceList.add(AudioSource.uri(
-            Uri.parse(playMusic.playInfo.file),
-            tag: playMusic.toMediaItem()));
-      } else {
-        await playSourceList.add(AudioSource.file(playMusic.playInfo.file,
-            tag: playMusic.toMediaItem()));
-      }
+      await playSourceList.add(playMusic.toAudioSource());
 
       // 播放新的音乐
       await seek(Duration.zero, index: playSourceList.length - 1);
@@ -157,14 +150,7 @@ class AudioHandler extends GetxController {
     for (var playMusic in playMusicsResults) {
       if (playMusic == null) continue;
       newPlayMusics.add(playMusic);
-
-      if (playMusic.playInfo.file.contains("http")) {
-        newAudioSources.add(AudioSource.uri(Uri.parse(playMusic.playInfo.file),
-            tag: playMusic.toMediaItem()));
-      } else {
-        newAudioSources.add(AudioSource.file(playMusic.playInfo.file,
-            tag: playMusic.toMediaItem()));
-      }
+      newAudioSources.add(playMusic.toAudioSource());
     }
 
     await clear();
@@ -186,10 +172,7 @@ class AudioHandler extends GetxController {
 
   Future<void> _insert(int index, PlayMusic music) async {
     playMusicList.insert(index, music);
-    await playSourceList.insert(
-        index,
-        AudioSource.uri(Uri.parse(music.playInfo.file),
-            tag: music.toMediaItem()));
+    await playSourceList.insert(index, music.toAudioSource());
   }
 
   Future<void> clear() async {
@@ -260,7 +243,7 @@ class AudioHandler extends GetxController {
       await _player.seek(position, index: index);
       talker.info(
           "[Music Handler] In seek, Succeed; Seek to ${formatDuration(position.inSeconds)} of ${index ?? "current"}");
-      Future.delayed(Duration(seconds: 1)).then((value) {
+      Future.delayed(const Duration(seconds: 1)).then((value) {
         talker.info(
             "[Music Handler] After Seek, the position is ${formatDuration(globalAudioUiController.position.value.inSeconds - 1)}");
       });
