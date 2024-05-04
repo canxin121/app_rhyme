@@ -1,6 +1,6 @@
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/types/music.dart';
-import 'package:audio_service/audio_service.dart';
+import 'package:app_rhyme/util/time_parse.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -39,6 +39,7 @@ class AudioHandler extends GetxController {
     // 关闭随机播放
     _player.setShuffleModeEnabled(false);
     // 监听错误事件并用talker来log
+
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
       talker.error('[PlaybackEventStream Error] $e');
@@ -257,7 +258,12 @@ class AudioHandler extends GetxController {
   Future<void> seek(Duration position, {int? index}) async {
     try {
       await _player.seek(position, index: index);
-      talker.info("[Music Handler] In seek, Succeed");
+      talker.info(
+          "[Music Handler] In seek, Succeed; Seek to ${formatDuration(position.inSeconds)} of ${index ?? "current"}");
+      Future.delayed(Duration(seconds: 1)).then((value) {
+        talker.info(
+            "[Music Handler] After Seek, the position is ${formatDuration(globalAudioUiController.position.value.inSeconds - 1)}");
+      });
     } catch (e) {
       talker.error("[Music Handler] In seek, error occur: $e");
     }
@@ -293,7 +299,6 @@ class AudioHandler extends GetxController {
         playMusicList.map((element) => element.info.name).join(",");
     String sourceListStr =
         playSourceList.sequence.map((e) => e.tag.title).join(",");
-    String msg;
     if (playListStr == sourceListStr) {
       talker.log(
           "[Music Handler] $prefix: PlayList = PlaySourceList, length = ${playMusicList.length}, content = [$playListStr]");
@@ -346,16 +351,29 @@ class AudioUiController extends GetxController {
         update();
       }
     });
-    globalAudioHandler._player
-        .createPositionStream(
-            maxPeriod: const Duration(milliseconds: 100),
-            minPeriod: const Duration(milliseconds: 1))
-        .listen((newPosition) {
-      position.value = newPosition;
+    globalAudioHandler._player.positionDiscontinuityStream.listen((event) {
+      position.value = event.event.updatePosition;
       playProgress.value =
           position.value.inMicroseconds / duration.value.inMicroseconds;
       update();
     });
+    globalAudioHandler._player.positionStream.listen((event) {
+      position.value = event;
+      playProgress.value =
+          position.value.inMicroseconds / duration.value.inMicroseconds;
+      update();
+    });
+
+    // globalAudioHandler._player
+    //     .createPositionStream(
+    //         maxPeriod: const Duration(milliseconds: 100),
+    //         minPeriod: const Duration(milliseconds: 1))
+    //     .listen((newPosition) {
+    //   position.value = newPosition;
+    //   playProgress.value =
+    //       position.value.inMicroseconds / duration.value.inMicroseconds;
+    //   update();
+    // });
   }
 
   Duration getToSeek(double toSeek) {

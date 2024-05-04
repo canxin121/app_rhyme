@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:app_rhyme/comp/card/playing_music_card.dart';
 import 'package:app_rhyme/comp/play_page_comp/botton_button.dart';
 import 'package:app_rhyme/comp/play_page_comp/control_button.dart';
@@ -9,7 +7,6 @@ import 'package:app_rhyme/comp/play_page_comp/music_info.dart';
 import 'package:app_rhyme/comp/play_page_comp/music_list.dart';
 import 'package:app_rhyme/comp/play_page_comp/progress_slider.dart';
 import 'package:app_rhyme/comp/play_page_comp/quality_time.dart';
-import 'package:app_rhyme/comp/play_page_comp/volume_slider.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:dismissible_page/dismissible_page.dart';

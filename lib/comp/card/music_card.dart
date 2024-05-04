@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';

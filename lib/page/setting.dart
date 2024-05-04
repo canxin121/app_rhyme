@@ -5,7 +5,6 @@ import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 class SettingsPage extends StatefulWidget {

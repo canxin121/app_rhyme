@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
+import 'package:app_rhyme/util/time_parse.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
@@ -15,7 +17,7 @@ class ProgressSliderState extends State<ProgressSlider> {
   InteractiveSliderController progressController =
       InteractiveSliderController(0);
   late StreamSubscription<double> listen1;
-  bool isPressing = false;
+  bool isPressing = true;
 
   @override
   void initState() {
@@ -44,26 +46,21 @@ class ProgressSliderState extends State<ProgressSlider> {
           padding: const EdgeInsets.all(0),
           controller: progressController,
           onProgressUpdated: (value) {
-            isPressing = false;
             var toSeek = globalAudioUiController.getToSeek(value);
+            talker.info(
+                "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
             globalAudioHandler.seek(toSeek);
+            isPressing = false;
           },
         ),
-        onTap: () {
-          isPressing = true;
-        },
-        onLongPress: () {
-          isPressing = true;
-        },
-        onLongPressMoveUpdate: (_) {
-          isPressing = true;
-        },
-        onPanDown: (_) {
-          isPressing = true;
-        },
-        onPanStart: (_) {
-          isPressing = true;
-        },
+        onTapDown: (_) => setState(() => isPressing = true),
+        onTapUp: (_) => setState(() => isPressing = true),
+        onTapCancel: () => setState(() => isPressing = true),
+        onLongPressStart: (_) => setState(() => isPressing = true),
+        onLongPressEnd: (_) => setState(() => isPressing = true),
+        onPanDown: (_) => setState(() => isPressing = true),
+        onPanCancel: () => setState(() => isPressing = true),
+        onPanEnd: (_) => setState(() => isPressing = true),
       ),
     );
   }

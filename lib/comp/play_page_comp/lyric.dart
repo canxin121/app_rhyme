@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/time_parse.dart';
@@ -62,10 +63,12 @@ class LyricDisplayState extends State<LyricDisplay> {
               children: [
                 IconButton(
                     onPressed: () {
-                      globalAudioHandler
-                          .seek(Duration(milliseconds: progress))
-                          .then((value) {
+                      var toSeek = Duration(milliseconds: progress);
+                      talker.info(
+                          "[Lyric] Call seek to ${formatDuration(toSeek.inSeconds)}");
+                      globalAudioHandler.seek(toSeek).then((value) {
                         confirm.call();
+                        // 这里是考虑到在暂停状态下。需要开启播放
                         if (!globalAudioHandler.isPlaying()) {
                           globalAudioHandler.play();
                         }
