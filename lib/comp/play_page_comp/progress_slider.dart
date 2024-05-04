@@ -17,7 +17,7 @@ class ProgressSliderState extends State<ProgressSlider> {
   InteractiveSliderController progressController =
       InteractiveSliderController(0);
   late StreamSubscription<double> listen1;
-  bool isPressing = true;
+  bool isPressing = false;
 
   @override
   void initState() {
