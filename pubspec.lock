@@ -571,10 +571,11 @@ packages:
   just_audio:
     dependency: "direct main"
     description:
-      name: just_audio
-      sha256: b7cb6bbf3750caa924d03f432ba401ec300fd90936b3f73a9b33d58b1e96286b
-      url: "https://pub.dev"
-    source: hosted
+      path: just_audio
+      ref: HEAD
+      resolved-ref: "295207826a37ce44d3c1d20cc0d3857a5d04ceec"
+      url: "https://github.com/canxin121/just_audio"
+    source: git
     version: "0.9.37"
   just_audio_background:
     dependency: "direct main"
