@@ -284,9 +284,6 @@ class AudioHandler extends GetxController {
       } catch (e) {
         talker.error("[Music Handler] Failed to updateRx,set null");
         playingMusic.value = null;
-        Future.delayed(const Duration(seconds: 1)).then((value) {
-          updateRx();
-        });
       }
     } else {
       playingMusic.value = null;
