@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:app_rhyme/main.dart';
+// import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
@@ -15,10 +15,10 @@ Future<String> fileCacheHelper(String file, String cachePath) async {
     cachePath: cachePath,
   );
   if (localSource != null) {
-    talker.debug("[fileCacheHelper] 使用已缓存source: ($file)->($localSource)");
+    // talker.debug("[fileCacheHelper] 使用已缓存source: ($file)->($localSource)");
     toUseSource = localSource;
   } else {
-    talker.debug("[fileCacheHelper] 不缓存,直接使用 $file");
+    // talker.debug("[fileCacheHelper] 不缓存,直接使用 $file");
     toUseSource = file;
   }
 
@@ -78,44 +78,15 @@ String get playingMusicArtist {
   return artist;
 }
 
-Future<ImageProvider> getMusicListImageProvider(
-    MusicList musicList, bool useCache) async {
-  late ImageProvider image;
-  if (musicList.artPic.isNotEmpty) {
-    String url = musicList.artPic;
-    String source = await fileCacheHelper(url, picCachePath);
-    if (source.contains("http")) {
-      image = NetworkImage(source);
+Future<Image> useCacheImage(String? file_) async {
+  if (file_ != null && file_.isNotEmpty) {
+    var file = await fileCacheHelper(file_, picCachePath);
+    if (file.contains("http")) {
+      return Image.network(file);
     } else {
-      image = FileImage(File(source));
+      return Image.file(File(file));
     }
   } else {
-    image = defaultArtPicProvider;
-  }
-  return image;
-}
-
-Future<Image> getMusicListImage(MusicList musicList, bool useCache) async {
-  late Image image;
-  if (musicList.artPic.isNotEmpty) {
-    String url = musicList.artPic;
-    String source = await fileCacheHelper(url, picCachePath);
-    if (source.contains("http")) {
-      image = Image.network(source);
-    } else {
-      image = Image.file(File(source));
-    }
-  } else {
-    image = defaultArtPic;
-  }
-  return image;
-}
-
-Future<Image> useCacheImage(String file_) async {
-  var file = await fileCacheHelper(file_, picCachePath);
-  if (file.contains("http")) {
-    return Image.network(file);
-  } else {
-    return Image.file(File(file));
+    return defaultArtPic;
   }
 }

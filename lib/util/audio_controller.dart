@@ -100,7 +100,7 @@ class AudioHandler extends GetxController {
       // 播放新的音乐
       await seek(Duration.zero, index: playSourceList.length - 1);
 
-      updateRx();
+      updateRx(music: playMusic);
       await play();
     } catch (e) {
       talker.error("[Music Handler] In addMusicPlay, Error occur: $e");
@@ -119,7 +119,7 @@ class AudioHandler extends GetxController {
         await _insert(index, playMusic);
         // 重新播放这个位置的音乐
         await seek(Duration.zero, index: index);
-        updateRx();
+        updateRx(music: playMusic);
         await play();
       }
     } catch (e) {
@@ -152,6 +152,9 @@ class AudioHandler extends GetxController {
   }
 
   Future<void> clearReplaceMusicAll(List<DisplayMusic> musics) async {
+    if (musics.isEmpty) {
+      return;
+    }
     talker.info(
         "[Music Handler] Request to add all musics of length: ${musics.length}");
     List<PlayMusic> newPlayMusics = [];
@@ -183,7 +186,7 @@ class AudioHandler extends GetxController {
 
     await seek(Duration.zero, index: 0);
 
-    updateRx();
+    updateRx(music: newPlayMusics[0]);
     log2List("After add all");
     await play();
   }
@@ -270,17 +273,12 @@ class AudioHandler extends GetxController {
     }
   }
 
-  Stream<Duration> createPositionStream({
-    int steps = 800,
-    Duration minPeriod = const Duration(milliseconds: 200),
-    Duration maxPeriod = const Duration(milliseconds: 200),
-  }) {
-    return _player.createPositionStream(
-        steps: steps, minPeriod: minPeriod, maxPeriod: maxPeriod);
-  }
-
-  void updateRx() {
-    if (playMusicList.isNotEmpty && _player.currentIndex != null) {
+  void updateRx({PlayMusic? music}) {
+    if (music != null) {
+      playingMusic.value = music;
+    } else if (playMusicList.isNotEmpty &&
+        _player.currentIndex != null &&
+        _player.currentIndex! >= 0) {
       try {
         playingMusic.value = playMusicList[_player.currentIndex!];
       } catch (e) {

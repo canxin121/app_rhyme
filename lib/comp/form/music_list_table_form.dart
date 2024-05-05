@@ -40,7 +40,7 @@ class MusicListDialogState extends State<MusicListDialog> {
         TextEditingController(text: widget.defaultMusicList?.desc ?? '');
     image = defaultArtPic;
     if (widget.defaultMusicList != null) {
-      getMusicListImage(widget.defaultMusicList!, false).then((value) {
+      useCacheImage(widget.defaultMusicList!.artPic).then((value) {
         setState(() {
           image = value;
         });

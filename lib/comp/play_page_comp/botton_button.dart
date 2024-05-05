@@ -7,11 +7,13 @@ class BottomButton extends StatefulWidget {
   final VoidCallback onList;
   final VoidCallback onLyric;
   final EdgeInsetsGeometry padding;
+  final double size;
   const BottomButton(
       {super.key,
       required this.onList,
       required this.onLyric,
-      required this.padding});
+      required this.padding,
+      required this.size});
 
   @override
   State<StatefulWidget> createState() => BottomButtonState();
@@ -33,6 +35,7 @@ class BottomButtonState extends State<BottomButton> {
                 ? CupertinoIcons.quote_bubble_fill
                 : CupertinoIcons.quote_bubble,
             color: CupertinoColors.white,
+            size: widget.size,
           ),
           onPressed: () {
             setState(() {
@@ -51,6 +54,7 @@ class BottomButtonState extends State<BottomButton> {
                 ? CupertinoIcons.square_list_fill
                 : CupertinoIcons.square_list,
             color: CupertinoColors.white,
+            size: widget.size,
           ),
           onPressed: () {
             setState(() {

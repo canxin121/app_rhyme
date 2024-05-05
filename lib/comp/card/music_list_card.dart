@@ -27,56 +27,56 @@ class MusicListCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.0), // 设置圆角
             child: AspectRatio(
               aspectRatio: 1.0,
-              child: FutureBuilder<ImageProvider>(
-                  // 这里的第二个传参表示是否缓存
-                  future: getMusicListImageProvider(musicList, true),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<ImageProvider> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: defaultArtPicProvider, // 默认图片
-                            fit: BoxFit.cover,
-                          ),
-                          border: Border.all(
-                            color: CupertinoColors.systemGrey, // 边框颜色
-                            width: 1.0, // 边框宽度
-                          ),
-                          borderRadius: BorderRadius.circular(8.0), // 边框圆角
+              child: FutureBuilder<Image>(
+                // 这里的第二个传参表示是否缓存
+                future: useCacheImage(musicList.artPic),
+                builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: defaultArtPic.image, // 默认图片
+                          fit: BoxFit.cover,
                         ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: defaultArtPicProvider, // 默认图片
-                            fit: BoxFit.cover,
-                          ),
-                          border: Border.all(
-                            color: CupertinoColors.systemGrey, // 边框颜色
-                            width: 1.0, // 边框宽度
-                          ),
-                          borderRadius: BorderRadius.circular(8.0), // 边框圆角
+                        border: Border.all(
+                          color: CupertinoColors.systemGrey, // 边框颜色
+                          width: 1.0, // 边框宽度
                         ),
-                      );
-                    } else {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image:
-                                snapshot.data ?? defaultArtPicProvider, // 默认图片
-                            fit: BoxFit.cover,
-                          ),
-                          border: Border.all(
-                            color: CupertinoColors.systemGrey, // 边框颜色
-                            width: 1.0, // 边框宽度
-                          ),
-                          borderRadius: BorderRadius.circular(8.0), // 边框圆角
+                        borderRadius: BorderRadius.circular(8.0), // 边框圆角
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: defaultArtPic.image, // 默认图片
+                          fit: BoxFit.cover,
                         ),
-                      );
-                    }
-                  }),
+                        border: Border.all(
+                          color: CupertinoColors.systemGrey, // 边框颜色
+                          width: 1.0, // 边框宽度
+                        ),
+                        borderRadius: BorderRadius.circular(8.0), // 边框圆角
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: snapshot.data?.image ??
+                              defaultArtPic.image, // 默认图片
+                          fit: BoxFit.cover,
+                        ),
+                        border: Border.all(
+                          color: CupertinoColors.systemGrey, // 边框颜色
+                          width: 1.0, // 边框宽度
+                        ),
+                        borderRadius: BorderRadius.circular(8.0), // 边框圆角
+                      ),
+                    );
+                  }
+                },
+              ),
             ),
           ),
           // 歌单名称

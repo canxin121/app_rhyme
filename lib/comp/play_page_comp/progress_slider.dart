@@ -7,7 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
 class ProgressSlider extends StatefulWidget {
-  const ProgressSlider({super.key});
+  final EdgeInsets padding;
+  const ProgressSlider({super.key, required this.padding});
   @override
   ProgressSliderState createState() => ProgressSliderState();
 }
@@ -40,7 +41,7 @@ class ProgressSliderState extends State<ProgressSlider> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 10, right: 10),
+      padding: widget.padding,
       child: GestureDetector(
         child: InteractiveSlider(
           padding: const EdgeInsets.all(0),

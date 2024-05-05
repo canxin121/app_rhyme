@@ -6,12 +6,16 @@ import 'package:get/get.dart';
 
 // 这个组件在 待播放列表和歌词的上方显示
 class PlayingMusicCard extends StatefulWidget {
+  final double height;
+  final EdgeInsets picPadding;
   final VoidCallback? onClick;
   final VoidCallback? onPress;
   const PlayingMusicCard({
     super.key,
     this.onClick,
     this.onPress,
+    required this.height,
+    required this.picPadding,
   });
 
   @override
@@ -26,39 +30,33 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
 
   @override
   Widget build(BuildContext context) {
-    // 根据isTaller参数决定卡片的高度
-    double cardHeight = 80.0;
-
     return SafeArea(
         child: GestureDetector(
       onTap: widget.onClick,
       onLongPress: widget.onPress,
       child: SizedBox(
-        height: cardHeight, // 使用变量cardHeight作为高度
-        width: double.infinity, // 确保SizedBox填充水平空间
+        height: widget.height,
+        width: double.infinity,
         child: Container(
           padding: const EdgeInsets.all(5.0),
           decoration: const BoxDecoration(
-            // 可以添加装饰来可视化容器的边界
-            color: Colors.transparent, // 设置透明背景
+            color: Colors.transparent,
           ),
           child: Row(
             children: <Widget>[
-              const Padding(padding: EdgeInsets.only(left: 20)),
+              Padding(padding: widget.picPadding),
               Obx(() => ClipRRect(
                     borderRadius: BorderRadius.circular(4.0),
                     child: FutureBuilder<Hero>(
-                      future: playingMusicImage(), // 这里调用异步函数
+                      future: playingMusicImage(),
                       builder:
                           (BuildContext context, AsyncSnapshot<Hero> snapshot) {
                         if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return defaultArtPic; // 默认图片
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
+                                ConnectionState.waiting ||
+                            snapshot.hasError) {
+                          return defaultArtPic;
                         } else {
-                          return snapshot.data ??
-                              defaultArtPic; // 异步函数提供的图片或默认图片
+                          return snapshot.data ?? defaultArtPic;
                         }
                       },
                     ),
@@ -93,6 +91,7 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                   ),
                 ),
               ),
+              const Padding(padding: EdgeInsets.only(right: 20)),
             ],
           ),
         ),

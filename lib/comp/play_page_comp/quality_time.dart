@@ -5,12 +5,12 @@ import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/selection.dart';
 import 'package:app_rhyme/util/time_parse.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class QualityTime extends StatefulWidget {
   final double padding;
-  const QualityTime({super.key, this.padding = 20.0});
+  final double fontHeight;
+  const QualityTime({super.key, this.padding = 20.0, required this.fontHeight});
 
   @override
   State<StatefulWidget> createState() => QualityTimeState();
@@ -29,10 +29,10 @@ class QualityTimeState extends State<QualityTime> {
                 formatDuration(
                     globalAudioUiController.position.value.inSeconds),
                 textAlign: TextAlign.left,
-                style: const TextStyle(
+                style: TextStyle(
                   color: CupertinoColors.systemGrey6,
                   fontWeight: FontWeight.w300,
-                  fontSize: 12,
+                  fontSize: widget.fontHeight,
                 ),
               )),
           // 音质信息按钮
@@ -43,9 +43,9 @@ class QualityTimeState extends State<QualityTime> {
             child: Obx(() {
               return Text(
                 playingMusicQualityShort,
-                style: const TextStyle(
+                style: TextStyle(
                   color: CupertinoColors.white,
-                  fontSize: 10.0,
+                  fontSize: widget.fontHeight,
                   fontWeight: FontWeight.normal,
                 ),
               );
@@ -78,10 +78,10 @@ class QualityTimeState extends State<QualityTime> {
                 formatDuration(
                     globalAudioUiController.duration.value.inSeconds),
                 textAlign: TextAlign.right,
-                style: const TextStyle(
+                style: TextStyle(
                   color: CupertinoColors.systemGrey6,
                   fontWeight: FontWeight.w300,
-                  fontSize: 12, // 小字体
+                  fontSize: widget.fontHeight, // 小字体
                 ),
               )),
         ],

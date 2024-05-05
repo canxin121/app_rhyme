@@ -14,6 +14,7 @@ class MusicCard extends StatefulWidget {
   final Future<bool>? hasCache;
   final Padding? padding;
   final bool? showQualityBackGround;
+  final double height;
   const MusicCard({
     super.key,
     required this.music,
@@ -22,6 +23,7 @@ class MusicCard extends StatefulWidget {
     this.hasCache,
     this.padding,
     this.showQualityBackGround = true,
+    this.height = 60,
   });
 
   @override
@@ -39,13 +41,11 @@ class MusicCardState extends State<MusicCard> {
 
   @override
   Widget build(BuildContext context) {
-    double cardHeight = 60.0;
-
     return GestureDetector(
       onTap: widget.onClick,
       onLongPress: widget.onPress,
       child: SizedBox(
-        height: cardHeight,
+        height: widget.height,
         width: double.infinity,
         child: Container(
           padding: const EdgeInsets.all(5.0),
