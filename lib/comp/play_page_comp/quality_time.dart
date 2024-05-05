@@ -4,7 +4,6 @@ import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/selection.dart';
 import 'package:app_rhyme/util/time_parse.dart';
-import 'package:blur/blur.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -49,12 +48,6 @@ class QualityTimeState extends State<QualityTime> {
                   fontSize: 10.0,
                   fontWeight: FontWeight.normal,
                 ),
-              ).frosted(
-                blur: 10,
-                frostColor: Colors.transparent,
-                borderRadius: BorderRadius.circular(15),
-                padding: const EdgeInsets.only(
-                    left: 10, right: 10, top: 5, bottom: 5),
               );
             }),
             onPressed: () {
