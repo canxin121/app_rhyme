@@ -86,7 +86,9 @@ class SongDisplayPageState extends State<SongDisplayPage> {
           ),
           // 应当占据剩下的所有高度
           PlayMusicList(
-            maxHeight: screenHeight * 0.87 - 300,
+            maxHeight: Platform.isIOS
+                ? screenHeight * 0.87 - 350
+                : screenHeight * 0.87 - 300,
             picPadding: const EdgeInsets.only(left: 20),
           ),
         ];
@@ -97,7 +99,11 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             height: 70,
             picPadding: EdgeInsets.only(left: 20),
           ),
-          LyricDisplay(maxHeight: screenHeight * 0.87 - 240)
+          // 应当占据剩下的空间
+          LyricDisplay(
+              maxHeight: (Platform.isIOS)
+                  ? screenHeight * 0.87 - 290
+                  : screenHeight * 0.87 - 240)
         ];
         break;
     }
