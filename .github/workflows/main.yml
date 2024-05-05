@@ -132,14 +132,14 @@ jobs:
         run: flutter build windows --release --verbose
 
       - name: Package Executable
-        run: 7z a -r -sse "..\..\..\..\..\build\app\AppRhyme-release-amd64.zip" *
+        run: 7z a -r -sse "..\..\..\..\..\build\app\AppRhyme-win-release-amd64.zip" *
         working-directory: build\windows\x64\runner\Release
 
       - name: Upload files
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-amd64
-          path: build/app/AppRhyme-release-amd64.zip
+          name: AppRhyme-win-release-amd64
+          path: build/app/AppRhyme-win-release-amd64.zip
 
       - name: Flutter build apk
         run: flutter build apk --release --split-per-abi --verbose
