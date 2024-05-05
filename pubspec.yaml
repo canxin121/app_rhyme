@@ -44,7 +44,8 @@ dependencies:
   just_audio_background: ^0.0.1-beta.11
   audio_session: ^0.1.19
   talker_flutter: ^4.1.5
-
+  just_audio_mpv: ^0.1.6
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

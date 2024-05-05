@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/time_parse.dart';
@@ -6,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
+bool isWindowsFirstPlay = true;
+
 DateTime lastComplete = DateTime(1999);
 
 late AudioHandler globalAudioHandler;
@@ -13,11 +17,13 @@ late AudioUiController globalAudioUiController;
 
 // 初始化所有和Audio相关的内容
 Future<void> initGlobalAudioHandler() async {
-  await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
-  );
+  if (!Platform.isWindows) {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+      androidNotificationChannelName: 'Audio playback',
+      androidNotificationOngoing: true,
+    );
+  }
 
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
@@ -27,11 +33,19 @@ Future<void> initGlobalAudioHandler() async {
 
 class AudioHandler extends GetxController {
   final AudioPlayer _player = AudioPlayer();
-  // 这两个本质都是list，但是我们需要确保其同步变化
   final RxList<PlayMusic> playMusicList = RxList<PlayMusic>([]);
   final Rx<PlayMusic?> playingMusic = Rx<PlayMusic?>(null);
   final ConcatenatingAudioSource playSourceList =
-      ConcatenatingAudioSource(children: []);
+      ConcatenatingAudioSource(children: [
+    if (Platform.isWindows)
+      AudioSource.asset(
+        "assets/nature.mp3",
+        tag: const MediaItem(
+          title: "Empty",
+          id: 'default',
+        ),
+      ),
+  ]);
 
   Future<void> _init() async {
     // 先默认开启所有的循环
@@ -59,6 +73,10 @@ class AudioHandler extends GetxController {
 
   Future<void> addMusicPlay(DisplayMusic music) async {
     try {
+      if (Platform.isWindows && isWindowsFirstPlay) {
+        isWindowsFirstPlay = false;
+        await clear();
+      }
       PlayMusic? playMusic;
       var index = -1;
       if (music.info.defaultQuality != null) {
@@ -268,6 +286,9 @@ class AudioHandler extends GetxController {
       } catch (e) {
         talker.error("[Music Handler] Failed to updateRx,set null");
         playingMusic.value = null;
+        Future.delayed(const Duration(seconds: 1)).then((value) {
+          updateRx();
+        });
       }
     } else {
       playingMusic.value = null;
