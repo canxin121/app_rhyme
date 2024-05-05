@@ -1,9 +1,9 @@
 import 'package:app_rhyme/src/rust/api/mirror.dart';
+import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/selection.dart';
 import 'package:app_rhyme/util/time_parse.dart';
-import 'package:blur/blur.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -48,17 +48,11 @@ class QualityTimeState extends State<QualityTime> {
                   fontSize: 10.0,
                   fontWeight: FontWeight.normal,
                 ),
-              ).frosted(
-                blur: 10,
-                frostColor: Colors.transparent,
-                borderRadius: BorderRadius.circular(15),
-                padding: const EdgeInsets.only(
-                    left: 10, right: 10, top: 5, bottom: 5),
               );
             }),
             onPressed: () {
-              List<Quality>? qualityOptions = globalAudioServiceHandler
-                  .musicQueue.currentlyPlaying.value?.info.qualities;
+              List<Quality>? qualityOptions =
+                  globalAudioHandler.playingMusic.value?.info.qualities;
               List<String>? qualityStrs =
                   qualityOptions?.map((e) => e.short).toList();
               if (qualityOptions != null && qualityOptions.isNotEmpty) {
@@ -66,8 +60,16 @@ class QualityTimeState extends State<QualityTime> {
                     context: context,
                     options: qualityStrs!,
                     actionCallbacks: (index) async {
-                      globalAudioServiceHandler
-                          .tryChangePlayingMusicQuality(qualityOptions[index]);
+                      var playingMusic = globalAudioHandler.playingMusic.value;
+                      if (playingMusic != null) {
+                        var displayData = DisplayMusic(playingMusic.ref,
+                            info_: playingMusic.info);
+                        var newPlayMusic = await display2PlayMusic(
+                            displayData, qualityOptions[index]);
+                        if (newPlayMusic == null) return;
+                        await globalAudioHandler
+                            .replacePlayingMusic(newPlayMusic);
+                      }
                     });
               }
             },

@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-// 这个组件唯一使用就是在 待播放列表的上方显示，将被合并
+// 这个组件在 待播放列表和歌词的上方显示
 class PlayingMusicCard extends StatefulWidget {
   final VoidCallback? onClick;
   final VoidCallback? onPress;
@@ -29,7 +29,8 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
     // 根据isTaller参数决定卡片的高度
     double cardHeight = 80.0;
 
-    return GestureDetector(
+    return SafeArea(
+        child: GestureDetector(
       onTap: widget.onClick,
       onLongPress: widget.onPress,
       child: SizedBox(
@@ -96,6 +97,6 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

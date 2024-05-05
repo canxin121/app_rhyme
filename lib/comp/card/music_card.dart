@@ -1,16 +1,14 @@
-import 'dart:io';
-
 import 'package:app_rhyme/src/rust/api/mirror.dart';
-import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
+import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/time_parse.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MusicCard extends StatefulWidget {
-  final DisplayMusic music;
+  final dynamic music;
   final VoidCallback? onClick;
   final VoidCallback? onPress;
   final Future<bool>? hasCache;
@@ -61,9 +59,18 @@ class MusicCardState extends State<MusicCard> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4.0),
                 child: info.artPic != null
-                    ? info.artPic!.contains("http")
-                        ? Image.network(info.artPic!, width: 40.0)
-                        : Image.file(File(info.artPic!), width: 40.0)
+                    ? FutureBuilder(
+                        future: useCacheImage(info.artPic!),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError ||
+                              snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                            return defaultArtPic;
+                          } else {
+                            return snapshot.data ?? defaultArtPic;
+                          }
+                        },
+                      )
                     : defaultArtPic,
               ),
               Expanded(

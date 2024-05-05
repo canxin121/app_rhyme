@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -31,7 +29,7 @@ class ControlButtonState extends State<ControlButton> {
               child: Icon(CupertinoIcons.backward_fill,
                   color: CupertinoColors.white, size: widget.buttonSize),
               onPressed: () {
-                globalAudioServiceHandler.skipToPrevious();
+                globalAudioHandler.seekToPrevious();
               },
             )),
         Obx(() {
@@ -43,7 +41,7 @@ class ControlButtonState extends State<ControlButton> {
                   child: Icon(CupertinoIcons.pause_solid,
                       color: CupertinoColors.white, size: widget.buttonSize),
                   onPressed: () {
-                    globalAudioServiceHandler.pause();
+                    globalAudioHandler.pause();
                   },
                 ));
           } else {
@@ -54,7 +52,7 @@ class ControlButtonState extends State<ControlButton> {
                   child: Icon(CupertinoIcons.play_arrow_solid,
                       color: CupertinoColors.white, size: widget.buttonSize),
                   onPressed: () {
-                    globalAudioServiceHandler.play();
+                    globalAudioHandler.play();
                   },
                 ));
           }
@@ -66,7 +64,7 @@ class ControlButtonState extends State<ControlButton> {
               child: Icon(CupertinoIcons.forward_fill,
                   color: CupertinoColors.white, size: widget.buttonSize),
               onPressed: () {
-                globalAudioServiceHandler.skipToNext();
+                globalAudioHandler.seekToNext();
               },
             )),
       ],

@@ -2,10 +2,10 @@ import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/types/extern_api.dart';
-import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -28,7 +28,7 @@ class SettingsPageState extends State<SettingsPage> {
               externApiPath: path, userAgreement: globalConfig.userAgreement);
           globalConfig.save();
         } catch (e) {
-          log("设置第三方音乐源失败:$e");
+          talker.error("[Setting Page] 设置第三方音乐源失败:$e");
         }
       });
     }
@@ -111,6 +111,18 @@ class SettingsPageState extends State<SettingsPage> {
                           ),
                         ),
                 ),
+                CupertinoFormRow(
+                    prefix: const Text("运行日志"),
+                    child: CupertinoButton(
+                        child: const Icon(
+                          CupertinoIcons.book,
+                          color: CupertinoColors.activeGreen,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(CupertinoPageRoute(
+                            builder: (context) => TalkerScreen(talker: talker),
+                          ));
+                        }))
               ],
             ),
           ],

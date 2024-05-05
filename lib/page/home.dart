@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:app_rhyme/comp/music_bar/bar.dart';
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/page/out_music_list_grid.dart';
@@ -6,7 +8,6 @@ import 'package:app_rhyme/page/setting.dart';
 import 'package:app_rhyme/page/user_agreement.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 final TopUiController globalTopUiController = Get.put(TopUiController());
@@ -51,6 +52,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  bool isKeyboardVisible = false;
   @override
   void initState() {
     super.initState();
@@ -64,25 +66,25 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      resizeToAvoidBottomInset: false,
       child: Stack(
         children: [
-          Obx(() => globalTopUiController.currentWidget.value),
+          SafeArea(
+            child: Obx(() => globalTopUiController.currentWidget.value),
+          ),
+
+          // 以下内容改成固定在页面底部的
+          // 使用MediaQuery检测键盘是否可见
           Align(
             alignment: Alignment.bottomCenter,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 音乐播放控制栏
-                const MusicPlayBar(),
-                // 一个浅色的分隔
-                const Divider(
-                  color: CupertinoColors.systemGrey6,
-                  height: 1,
-                  thickness: 1,
-                  indent: 20,
-                  endIndent: 20,
+                MusicPlayBar(
+                  maxHeight: min(60, MediaQuery.of(context).size.height * 0.1),
                 ),
-                // 底部的导航图标按钮
+                // 底部导航按钮
                 Obx(() => CupertinoTabBar(
                       activeColor: activeIconColor,
                       backgroundColor: barBackgoundColor,
@@ -91,7 +93,7 @@ class HomePageState extends State<HomePage> {
                       items: const [
                         BottomNavigationBarItem(
                           icon: Padding(
-                            padding: EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.only(top: 10, bottom: 10),
                             child: Icon(
                               CupertinoIcons.music_albums_fill,
                             ),
@@ -99,22 +101,18 @@ class HomePageState extends State<HomePage> {
                         ),
                         BottomNavigationBarItem(
                           icon: Padding(
-                            padding: EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.only(top: 10, bottom: 10),
                             child: Icon(CupertinoIcons.search),
                           ),
                         ),
                         BottomNavigationBarItem(
                           icon: Padding(
-                            padding: EdgeInsets.only(top: 10),
+                            padding: EdgeInsets.only(top: 10, bottom: 10),
                             child: Icon(CupertinoIcons.settings),
                           ),
                         ),
                       ],
                     )),
-                // 底部导航栏图标按钮和底部的一个空白边界
-                Container(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    color: barBackgoundColor)
               ],
             ),
           ),

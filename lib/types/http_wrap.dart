@@ -6,20 +6,24 @@ import 'package:http/http.dart' as http;
 class HttpHelper {
   Future<String> sendRequest(String method, Map<String, String> headers,
       String url, String payload) async {
-    var uri = Uri.parse(url);
-    switch (method.toUpperCase()) {
-      case 'GET':
-        return (await http.get(uri, headers: headers)).body;
-      case 'POST':
-        return (await http.post(uri, headers: headers, body: payload)).body;
-      case 'PUT':
-        return (await http.put(uri, headers: headers, body: payload)).body;
-      case 'DELETE':
-        return (await http.delete(uri, headers: headers)).body;
-      case 'PATCH':
-        return (await http.patch(uri, headers: headers, body: payload)).body;
-      default:
-        throw Exception('Unsupported HTTP method: $method');
+    try {
+      var uri = Uri.parse(url);
+      switch (method.toUpperCase()) {
+        case 'GET':
+          return (await http.get(uri, headers: headers)).body;
+        case 'POST':
+          return (await http.post(uri, headers: headers, body: payload)).body;
+        case 'PUT':
+          return (await http.put(uri, headers: headers, body: payload)).body;
+        case 'DELETE':
+          return (await http.delete(uri, headers: headers)).body;
+        case 'PATCH':
+          return (await http.patch(uri, headers: headers, body: payload)).body;
+        default:
+          return "";
+      }
+    } catch (e) {
+      return "";
     }
   }
 }

@@ -6,8 +6,12 @@ enum PageState { home, lyric, list }
 class BottomButton extends StatefulWidget {
   final VoidCallback onList;
   final VoidCallback onLyric;
-
-  const BottomButton({super.key, required this.onList, required this.onLyric});
+  final EdgeInsetsGeometry padding;
+  const BottomButton(
+      {super.key,
+      required this.onList,
+      required this.onLyric,
+      required this.padding});
 
   @override
   State<StatefulWidget> createState() => BottomButtonState();
@@ -23,9 +27,8 @@ class BottomButtonState extends State<BottomButton> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         CupertinoButton(
-          padding: const EdgeInsets.all(0),
+          padding: widget.padding,
           child: Icon(
-            // 根据当前页面状态来决定图标
             currentPage == PageState.lyric
                 ? CupertinoIcons.quote_bubble_fill
                 : CupertinoIcons.quote_bubble,
@@ -33,8 +36,6 @@ class BottomButtonState extends State<BottomButton> {
           ),
           onPressed: () {
             setState(() {
-              // 如果当前在歌词页面，点击则回到主页
-              // 否则，进入歌词页面
               currentPage = currentPage == PageState.lyric
                   ? PageState.home
                   : PageState.lyric;
@@ -43,7 +44,7 @@ class BottomButtonState extends State<BottomButton> {
           },
         ),
         CupertinoButton(
-          padding: const EdgeInsets.all(0),
+          padding: widget.padding,
           child: Icon(
             // 根据当前页面状态来决定图标
             currentPage == PageState.list

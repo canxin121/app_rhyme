@@ -1,65 +1,96 @@
+import 'dart:io';
+
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_sdk.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:just_audio/just_audio.dart';
 
 // 是一个原本只具有展示功能的DisplayMusicTuple通过请求第三方api变成可以播放的音乐
 // 这个过程已经决定了一个音乐是否可以播放，因此本函数应该可能throw Exception
-Future<PlayMusic> display2PlayMusic(DisplayMusic music) async {
-  late Quality defaultQuality;
-  if (music.info.defaultQuality != null) {
-    defaultQuality = music.info.defaultQuality!;
-  } else if (music.info.qualities.isNotEmpty) {
-    defaultQuality = music.info.qualities[0];
-    log("音乐无默认音质,选择音质中第一个进行播放:$defaultQuality");
+Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
+    [Quality? quality]) async {
+  late Quality finalQuality;
+  if (quality != null) {
+    finalQuality = quality;
   } else {
-    throw Exception("音乐无可播放音质");
+    if (music.info.defaultQuality != null) {
+      finalQuality = music.info.defaultQuality!;
+    } else if (music.info.qualities.isNotEmpty) {
+      finalQuality = music.info.qualities[0];
+      talker.info("[Display2PlayMusic] 音乐无默认音质,选择音质中第一个进行播放:$finalQuality");
+    } else {
+      talker.error("[Display2PlayMusic] 音乐没有可供播放的音质");
+      return null;
+    }
   }
+
   // 音乐缓存获取的逻辑
-  var extra = music.ref.getExtraInto(quality: defaultQuality);
-  if (globalExternApi == null) {
-    log("无第三方音乐源,无法获取播放信息");
-    throw Exception("无第三方音乐源,无法获取播放信息");
+  var result = music.toCacheFileNameAndExtra(finalQuality);
+  if (result == null) {
+    return null;
   }
+  var (cacheFileName, extra) = result;
+  // 尝试获取本地缓存
+  var cache = await useCacheFile(
+      file: "", cachePath: musicCachePath, filename: cacheFileName);
+  // 有本地缓存直接返回
+  if (cache != null) {
+    talker.info("[Display2PlayMusic] 使用本地歌曲缓存转化歌曲: ${music.info.name}");
+    return PlayMusic(music.ref, music.info, PlayInfo(cache, finalQuality),
+        music.ref.getExtraInto(quality: finalQuality));
+  }
+  // 没有本地缓存，也没有第三方api，直接返回null
+  if (globalExternApi == null) {
+    talker.error("[Display2PlayMusic] 无第三方音乐源,无法获取播放信息");
+  }
+
   var playinfo =
       await globalExternApi!.getMusicPlayInfo(music.info.source, extra);
 
-  var playMusic = PlayMusic(music.ref, music.info, playinfo, extra);
-
-  String? file = await useCacheFile(
-      file: "",
-      cachePath: musicCachePath,
-      filename: playMusic.toCacheFileName());
-  if (file != null) {
-    playMusic.playInfo.file = file;
-    playMusic.hasCache = true;
-    log("使用缓存后音乐进行播放: $file");
+  // 如果第三方api夜叉找不到，直接返回null
+  if (playinfo == null) {
+    talker.error("[Display2PlayMusic] 第三方音乐源无法获取到playinfo: ${music.info.name}");
+    return null;
   }
 
+  talker.info("[Display2PlayMusic] 使用第三方Api请求转化歌曲: ${music.info.name}");
+  var playMusic = PlayMusic(music.ref, music.info, playinfo, extra);
   return playMusic;
 }
-
-void log(String s) {}
 
 class DisplayMusic {
   late MusicW ref;
   late MusicInfo info;
-  DisplayMusic(MusicW musicRef_) {
+  DisplayMusic(MusicW musicRef_, {MusicInfo? info_}) {
     ref = musicRef_;
-    info = ref.getMusicInfo();
-  }
-  String toCacheFileName() {
-    if (info.defaultQuality == null) {
-      return "";
+    if (info_ != null) {
+      info = info_;
+    } else {
+      info = ref.getMusicInfo();
     }
-    return "${info.name}_${info.artist.join(',')}_${info.source}_${ref.getExtraInto(quality: info.defaultQuality!).hashCode}.${info.defaultQuality!.format ?? "unknown"}";
+  }
+
+  (String, String)? toCacheFileNameAndExtra(Quality quality) {
+    if (info.defaultQuality == null) {
+      return null;
+    }
+    var extra = ref.getExtraInto(quality: quality);
+    var cacheFileName =
+        "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}.${info.defaultQuality!.format ?? "unknown"}";
+    return (cacheFileName, extra);
   }
 
   Future<bool> hasCache() async {
+    if (info.defaultQuality == null) return false;
+    var result = toCacheFileNameAndExtra(info.defaultQuality!);
+    if (result == null) {
+      return false;
+    }
     var cache = await useCacheFile(
-        file: "", cachePath: musicCachePath, filename: toCacheFileName());
+        file: "", cachePath: musicCachePath, filename: result.$1);
     if (cache != null) {
       return true;
     } else {
@@ -116,5 +147,46 @@ class PlayMusic {
   }
   String toCacheFileName() {
     return "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}.${playInfo.quality.format ?? "unknown"}";
+  }
+
+  MediaItem toMediaItem() {
+    Uri? artUri;
+    if (info.artPic != null) {
+      artUri = Uri.parse(info.artPic!);
+    } else {
+      artUri = null;
+    }
+    return MediaItem(
+        id: playInfo.file,
+        title: info.name,
+        album: info.album,
+        artUri: artUri,
+        artist: info.artist.join(","));
+  }
+
+  AudioSource toAudioSource() {
+    if (playInfo.file.contains("http")) {
+      if (Platform.isIOS || Platform.isMacOS || Platform.isWindows) {
+        talker.info("[PlayMusic ToAudioSource] Use ProgressiveAudioSource");
+        return ProgressiveAudioSource(Uri.parse(playInfo.file),
+            tag: toMediaItem(),
+            options: const ProgressiveAudioSourceOptions(
+                darwinAssetOptions:
+                    DarwinAssetOptions(preferPreciseDurationAndTiming: true)));
+      } else {
+        return AudioSource.uri(Uri.parse(playInfo.file), tag: toMediaItem());
+      }
+    } else {
+      if (Platform.isIOS || Platform.isMacOS || Platform.isWindows) {
+        talker.info("[PlayMusic ToAudioSource] Use ProgressiveAudioSource");
+        return ProgressiveAudioSource(Uri.file(playInfo.file),
+            tag: toMediaItem(),
+            options: const ProgressiveAudioSourceOptions(
+                darwinAssetOptions:
+                    DarwinAssetOptions(preferPreciseDurationAndTiming: true)));
+      } else {
+        return AudioSource.file(playInfo.file, tag: toMediaItem());
+      }
+    }
   }
 }
