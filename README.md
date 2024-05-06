@@ -10,8 +10,8 @@
 - 音乐播放(由用户的音源提供)
 - 音乐缓存(由用户的音源提供)
 
-![display1](assets\display1.jpeg)
-![display2](assets\display2.jpeg)
+![display1](assets/display1.jpeg)
+![display2](assets/display2.jpeg)
 
 本应用正在积极开发中，更多功能很快就会到来
 
