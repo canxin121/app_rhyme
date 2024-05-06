@@ -165,8 +165,8 @@ class PlayMusic {
 
   AudioSource toAudioSource() {
     if (playInfo.file.contains("http")) {
-      if (Platform.isIOS || Platform.isMacOS || Platform.isWindows) {
-        talker.info("[PlayMusic ToAudioSource] Use ProgressiveAudioSource");
+      if ((Platform.isIOS || Platform.isMacOS) &&
+          playInfo.quality.short.contains("flac")) {
         return ProgressiveAudioSource(Uri.parse(playInfo.file),
             tag: toMediaItem(),
             options: const ProgressiveAudioSourceOptions(
@@ -176,8 +176,8 @@ class PlayMusic {
         return AudioSource.uri(Uri.parse(playInfo.file), tag: toMediaItem());
       }
     } else {
-      if (Platform.isIOS || Platform.isMacOS || Platform.isWindows) {
-        talker.info("[PlayMusic ToAudioSource] Use ProgressiveAudioSource");
+      if ((Platform.isIOS || Platform.isMacOS) &&
+          playInfo.quality.short.contains("flac")) {
         return ProgressiveAudioSource(Uri.file(playInfo.file),
             tag: toMediaItem(),
             options: const ProgressiveAudioSourceOptions(
