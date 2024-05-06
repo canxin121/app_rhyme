@@ -13,9 +13,10 @@ dependencies:
 
   cupertino_icons: ^1.0.6
   rust_lib_app_rhyme:
-    path: rust_builder  
+    path: rust_builder
   flutter_rust_bridge: 2.0.0-dev.32
-  interactive_slider: ^0.2.2
+  interactive_slider:
+    git: https://github.com/canxin121/interactive_slider
   dismissible_page: ^1.0.2
   get: ^4.6.6
   audio_service: ^0.18.13
@@ -43,7 +44,7 @@ dependencies:
   talker_flutter: ^4.1.5
   pull_down_button: ^0.9.4
   glassmorphism_ui: ^0.3.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -61,14 +62,14 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   windows:
     generate: true
-    icon_size: 256 
+    icon_size: 256
   macos:
     generate: true
 
 package_rename_config:
   android:
     app_name: AppRhyme
-    package_name: canxin.app.rhyme 
+    package_name: canxin.app.rhyme
 
   ios:
     app_name: AppRhyme
@@ -82,7 +83,7 @@ package_rename_config:
 
   macos:
     app_name: AppRhyme
-    package_name: com.canxin.AppRhyme 
+    package_name: com.canxin.AppRhyme
     copyright_notice: Copyright ©️ 2024 Canxin121. All rights reserved.
 
   windows:

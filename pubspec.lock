@@ -523,10 +523,11 @@ packages:
   interactive_slider:
     dependency: "direct main"
     description:
-      name: interactive_slider
-      sha256: f90020cd1f1376fc8c0a099f48432d25bb2128cef95f9f72acc71e06c5f7d622
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "0e24162555481a8d041a6a8b418968d4f046f41c"
+      url: "https://github.com/canxin121/interactive_slider"
+    source: git
     version: "0.2.2"
   js:
     dependency: transitive
