@@ -100,12 +100,12 @@ class AudioHandler extends GetxController {
 
       // 添加新的音乐
       playMusicList.add(playMusic);
+      updateRx(music: playMusic);
       await playSourceList.add(playMusic.toAudioSource());
 
       // 播放新的音乐
       await seek(Duration.zero, index: playSourceList.length - 1);
 
-      updateRx(music: playMusic);
       await play();
     } catch (e) {
       talker.error("[Music Handler] In addMusicPlay, Error occur: $e");
