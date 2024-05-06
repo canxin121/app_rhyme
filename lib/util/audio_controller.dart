@@ -93,6 +93,11 @@ class AudioHandler extends GetxController {
 
       if (playMusic == null) return;
 
+      if (_player.playing) {
+        await pause();
+        await seek(Duration.zero);
+      }
+
       // 添加新的音乐
       playMusicList.add(playMusic);
       await playSourceList.add(playMusic.toAudioSource());
@@ -110,6 +115,10 @@ class AudioHandler extends GetxController {
   Future<void> replacePlayingMusic(PlayMusic playMusic) async {
     try {
       if (playingMusic.value == null) return;
+      if (_player.playing) {
+        await pause();
+        await seek(Duration.zero);
+      }
       int index = playMusicList
           .indexWhere((element) => element.extra == playingMusic.value!.extra);
       if (index != -1) {
@@ -134,6 +143,10 @@ class AudioHandler extends GetxController {
           .indexWhere((element) => element.extra == playMusic.extra);
       bool shouldPlay = index == _player.currentIndex;
       if (index != -1) {
+        if (shouldPlay && _player.playing) {
+          await pause();
+          await seek(Duration.zero);
+        }
         // 删除对应位置的音乐
         await removeAt(index);
         // 插入新音乐到对应位置
@@ -173,6 +186,12 @@ class AudioHandler extends GetxController {
       newPlayMusics.add(playMusic);
       newAudioSources.add(playMusic.toAudioSource());
     }
+    if (newAudioSources.isEmpty) return;
+
+    if (_player.playing) {
+      await pause();
+      await seek(Duration.zero);
+    }
 
     await clear();
 
@@ -211,7 +230,9 @@ class AudioHandler extends GetxController {
 
   Future<void> removeAt(int index) async {
     talker.info("[Music Handler] Request to remove music of index:$index");
-    if (_player.currentIndex != null && _player.currentIndex! == index) {
+    if (_player.playing &&
+        _player.currentIndex != null &&
+        _player.currentIndex! == index) {
       await _player.pause();
     }
     playMusicList.removeAt(index);
@@ -261,13 +282,17 @@ class AudioHandler extends GetxController {
 
   Future<void> seek(Duration position, {int? index}) async {
     try {
+      if (_player.playing) {
+        await pause();
+      }
       await _player.seek(position, index: index);
+      await play();
       talker.info(
           "[Music Handler] In seek, Succeed; Seek to ${formatDuration(position.inSeconds)} of ${index ?? "current"}");
-      Future.delayed(const Duration(seconds: 1)).then((value) {
-        talker.info(
-            "[Music Handler] After Seek, the position is ${formatDuration(globalAudioUiController.position.value.inSeconds - 1)}");
-      });
+      // Future.delayed(const Duration(seconds: 1)).then((value) {
+      //   talker.info(
+      //       "[Music Handler] After Seek, the position is ${formatDuration(globalAudioUiController.position.value.inSeconds - 1)}");
+      // });
     } catch (e) {
       talker.error("[Music Handler] In seek, error occur: $e");
     }
