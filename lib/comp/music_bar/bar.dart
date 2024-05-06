@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/page/playing_music_page.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
@@ -43,9 +45,10 @@ class MusicPlayBar extends StatelessWidget {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return GlassContainer(
-                              shadowColor:
-                                  CupertinoColors.black.withOpacity(0.4),
-                              shadowStrength: 8,
+                              shadowColor: Platform.isIOS
+                                  ? CupertinoColors.black.withOpacity(0.2)
+                                  : CupertinoColors.black.withOpacity(0.4),
+                              shadowStrength: Platform.isIOS ? 3 : 8,
                               shape: BoxShape.rectangle,
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(4)),
@@ -60,9 +63,10 @@ class MusicPlayBar extends StatelessWidget {
                           return Text('Error: ${snapshot.error}');
                         } else {
                           return GlassContainer(
-                              shadowColor:
-                                  CupertinoColors.black.withOpacity(0.4),
-                              shadowStrength: 8,
+                              shadowColor: Platform.isIOS
+                                  ? CupertinoColors.black.withOpacity(0.2)
+                                  : CupertinoColors.black.withOpacity(0.4),
+                              shadowStrength: Platform.isIOS ? 3 : 8,
                               shape: BoxShape.rectangle,
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(4)),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/helper.dart';
@@ -63,9 +65,10 @@ class QualityTimeState extends State<QualityTime> {
             },
             child: Obx(() {
               return GlassContainer(
-                  borderRadius: BorderRadius.circular(8), // 设置圆角的半径
-                  shadowStrength: 8, // 设置阴影强度
-                  shadowColor: CupertinoColors.black.withOpacity(0.2), // 设置阴影颜色
+                  shadowColor: Platform.isIOS
+                      ? CupertinoColors.black.withOpacity(0.1)
+                      : CupertinoColors.black.withOpacity(0.2),
+                  shadowStrength: Platform.isIOS ? 3 : 8,
                   child: Container(
                     margin: const EdgeInsets.only(
                         left: 10, right: 10, top: 2, bottom: 2),

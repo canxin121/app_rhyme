@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
@@ -58,8 +60,10 @@ class MusicCardState extends State<MusicCard> {
               widget.padding ??
                   const Padding(padding: EdgeInsets.only(left: 10)),
               GlassContainer(
-                shadowColor: CupertinoColors.black.withOpacity(0.4),
-                shadowStrength: 5,
+                shadowColor: Platform.isIOS
+                    ? CupertinoColors.black.withOpacity(0.2)
+                    : CupertinoColors.black.withOpacity(0.4),
+                shadowStrength: Platform.isIOS ? 2 : 5,
                 shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(4.0),
                 child: info.artPic != null

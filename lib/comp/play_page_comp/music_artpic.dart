@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,8 +30,10 @@ class MusicArtPicState extends State<MusicArtPic> {
             return Container(
                 padding: widget.padding,
                 child: GlassContainer(
-                  shadowColor: CupertinoColors.black.withOpacity(0.4),
-                  shadowStrength: 8,
+                  shadowColor: Platform.isIOS
+                      ? CupertinoColors.black.withOpacity(0.2)
+                      : CupertinoColors.black.withOpacity(0.4),
+                  shadowStrength: Platform.isIOS ? 3 : 8,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(18.0),
                   child: defaultArtPic,
@@ -40,8 +44,10 @@ class MusicArtPicState extends State<MusicArtPic> {
             return Container(
                 padding: widget.padding,
                 child: GlassContainer(
-                  shadowColor: CupertinoColors.black.withOpacity(0.5),
-                  shadowStrength: 8,
+                  shadowColor: Platform.isIOS
+                      ? CupertinoColors.black.withOpacity(0.2)
+                      : CupertinoColors.black.withOpacity(0.4),
+                  shadowStrength: Platform.isIOS ? 3 : 8,
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(18.0),
                   child: snapshot.data ?? defaultArtPic,

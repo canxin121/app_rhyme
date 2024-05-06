@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:flutter/cupertino.dart';
@@ -47,8 +49,10 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
             children: <Widget>[
               Padding(padding: widget.picPadding),
               Obx(() => GlassContainer(
-                    shadowColor: CupertinoColors.black.withOpacity(0.4),
-                    shadowStrength: 8,
+                    shadowColor: Platform.isIOS
+                        ? CupertinoColors.black.withOpacity(0.2)
+                        : CupertinoColors.black.withOpacity(0.4),
+                    shadowStrength: Platform.isIOS ? 4 : 8,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4.0),
                     child: FutureBuilder<Hero>(
