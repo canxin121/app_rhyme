@@ -362,17 +362,6 @@ class AudioUiController extends GetxController {
           position.value.inMicroseconds / duration.value.inMicroseconds;
       update();
     });
-
-    // globalAudioHandler._player
-    //     .createPositionStream(
-    //         maxPeriod: const Duration(milliseconds: 100),
-    //         minPeriod: const Duration(milliseconds: 1))
-    //     .listen((newPosition) {
-    //   position.value = newPosition;
-    //   playProgress.value =
-    //       position.value.inMicroseconds / duration.value.inMicroseconds;
-    //   update();
-    // });
   }
 
   Duration getToSeek(double toSeek) {

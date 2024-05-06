@@ -62,10 +62,12 @@ class MyApp extends StatelessWidget {
       ],
       title: 'AppRhyme',
       theme: CupertinoThemeData(
-          primaryColor: CupertinoColors.black,
+          brightness: Brightness.light,
+          primaryColor: CupertinoColors.white,
           textTheme: CupertinoTextThemeData(
               textStyle: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont())),
+                  .useSystemChineseFont()),
+          applyThemeToAll: true),
       home: const HomePage(),
     );
   }
