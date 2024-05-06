@@ -6,15 +6,16 @@ import 'package:app_rhyme/util/time_parse.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
 class MusicCard extends StatefulWidget {
   final dynamic music;
   final VoidCallback? onClick;
-  final VoidCallback? onPress;
   final Future<bool>? hasCache;
   final Padding? padding;
   final bool? showQualityBackGround;
   final double height;
+  final Future<void> Function(LongPressStartDetails details)? onPress;
   const MusicCard({
     super.key,
     required this.music,
@@ -43,7 +44,7 @@ class MusicCardState extends State<MusicCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onClick,
-      onLongPress: widget.onPress,
+      onLongPressStart: widget.onPress,
       child: SizedBox(
         height: widget.height,
         width: double.infinity,
@@ -56,7 +57,10 @@ class MusicCardState extends State<MusicCard> {
             children: <Widget>[
               widget.padding ??
                   const Padding(padding: EdgeInsets.only(left: 10)),
-              ClipRRect(
+              GlassContainer(
+                shadowColor: CupertinoColors.black.withOpacity(0.4),
+                shadowStrength: 5,
+                shape: BoxShape.rectangle,
                 borderRadius: BorderRadius.circular(4.0),
                 child: info.artPic != null
                     ? FutureBuilder(

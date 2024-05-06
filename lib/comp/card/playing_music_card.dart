@@ -3,6 +3,7 @@ import 'package:app_rhyme/util/helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
 // 这个组件在 待播放列表和歌词的上方显示
 class PlayingMusicCard extends StatefulWidget {
@@ -45,7 +46,10 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
           child: Row(
             children: <Widget>[
               Padding(padding: widget.picPadding),
-              Obx(() => ClipRRect(
+              Obx(() => GlassContainer(
+                    shadowColor: CupertinoColors.black.withOpacity(0.4),
+                    shadowStrength: 8,
+                    shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4.0),
                     child: FutureBuilder<Hero>(
                       future: playingMusicImage(),

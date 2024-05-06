@@ -1,17 +1,13 @@
 import 'package:app_rhyme/comp/card/music_card.dart';
-import 'package:app_rhyme/comp/form/music_list_table_form.dart';
-import 'package:app_rhyme/main.dart';
-import 'package:app_rhyme/src/rust/api/cache.dart';
-import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/src/rust/api/music_sdk.dart';
-import 'package:app_rhyme/util/default.dart';
-import 'package:app_rhyme/util/selection.dart';
+import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 class SearchController extends GetxController {
   var allowEmptyTime = 3.obs;
@@ -27,16 +23,6 @@ class SearchController extends GetxController {
       update();
     });
   }
-
-  // void onLeaveDrop() {
-  //   // 在离开时只在全局保留10个搜索结果，减少不使用时的内存消耗
-  //   if (pagingController.value.itemList != null &&
-  //       pagingController.value.itemList!.length > 10) {
-  //     pagingController.value.itemList =
-  //         pagingController.value.itemList!.sublist(0, 10);
-  //     update();
-  //   }
-  // }
 
   Future<void> fetchPage(int pageKey) async {
     try {
@@ -98,7 +84,6 @@ class SearchPage extends StatelessWidget {
         child: Column(
       children: [
         const CupertinoNavigationBar(
-            // 界面最上面的 编辑选项
             leading: Padding(
           padding: EdgeInsets.only(left: 0.0),
           child: Align(
@@ -112,7 +97,6 @@ class SearchPage extends StatelessWidget {
             ),
           ),
         )),
-        // const Padding(padding: EdgeInsets.only(top: 40)),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: CupertinoSearchTextField(
@@ -135,70 +119,20 @@ class SearchPage extends StatelessWidget {
                   endIndent: 30,
                 ),
                 builderDelegate: PagedChildBuilderDelegate<DisplayMusic>(
-                  itemBuilder: (context, item, index) => MusicCard(
-                    music: item,
+                  itemBuilder: (context, displayMusic, index) => MusicCard(
+                    music: displayMusic,
                     onClick: () {
                       globalAudioHandler.addMusicPlay(
-                        item,
+                        displayMusic,
                       );
                     },
-                    // 以下是每个搜索结果音乐的，可进行的操作
-                    onPress: () {
-                      showCupertinoPopupWithActions(context: context, options: [
-                        "添加到歌单",
-                        "创建新歌单"
-                      ], actionCallbacks: [
-                        // 添加到已有歌单中
-                        () async {
-                          var tables =
-                              await globalSqlMusicFactory.readMusicLists();
-                          List<String> options =
-                              tables.map((e) => e.name).toList();
-                          if (context.mounted) {
-                            showCupertinoPopupWithSameAction(
-                                context: context,
-                                options: options,
-                                actionCallbacks: (index) async {
-                                  // 将音乐插入歌单中
-                                  await globalSqlMusicFactory.insertMusic(
-                                      musicList: tables[index],
-                                      musics: [item.ref]);
-                                  // 缓存音乐的图片, 没必要阻塞
-                                  if (item.info.artPic != null) {
-                                    cacheFile(
-                                      file: item.info.artPic!,
-                                      cachePath: picCachePath,
-                                    );
-                                  }
-                                });
-                          }
-                        },
-                        // 创建一个新歌单并添加进去
-                        () async {
-                          var table = MusicList(
-                              name: item.info.artist.join(","),
-                              artPic: item.info.artPic ?? "",
-                              desc: "");
-                          createMusicListTableForm(context, table)
-                              .then((newTable) {
-                            if (newTable != null) {
-                              // 创建新歌单
-                              globalSqlMusicFactory.createMusicListTable(
-                                  musicLists: [newTable]).then((_) {
-                                globalSqlMusicFactory.insertMusic(
-                                    musicList: newTable, musics: [item.ref]);
-                              });
-                              // 缓存音乐的图片, 没必要阻塞
-                              if (item.info.artPic != null) {
-                                cacheFile(
-                                  file: item.info.artPic!,
-                                  cachePath: picCachePath,
-                                );
-                              }
-                            }
-                          });
-                        }
-                      ]);
+                    onPress: (details) async {
+                      var position = details.globalPosition & Size.zero;
+                      await showPullDownMenu(
+                          context: context,
+                          items: searchMusicCardPullDown(
+                              context, displayMusic, position),
+                          position: position);
                     },
                   ),
                 ),

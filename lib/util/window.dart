@@ -14,7 +14,7 @@ Future<void> initWindow() async {
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
     );
-    // windowManager.setResizable(false);
+    windowManager.setResizable(false);
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();

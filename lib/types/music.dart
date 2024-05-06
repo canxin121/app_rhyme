@@ -124,7 +124,6 @@ class PlayMusic {
   late MediaItem item;
   late PlayInfo playInfo;
   late String extra;
-  bool hasCache = false;
   PlayMusic(
       MusicW musicRef_, MusicInfo info_, PlayInfo playinfo_, String extra_) {
     ref = musicRef_;

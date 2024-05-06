@@ -348,14 +348,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.19"
-  flutter_popup:
-    dependency: "direct main"
-    description:
-      name: flutter_popup
-      sha256: "8d653ebb04f0e334797aeb5b49eaf7653c57012e1a7cdeac09297dacf79a6524"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.0"
   flutter_rust_bridge:
     dependency: "direct main"
     description:
@@ -395,6 +387,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.6"
+  glassmorphism_ui:
+    dependency: "direct main"
+    description:
+      name: glassmorphism_ui
+      sha256: "4a28b45fedb74c2b30e25495980394e3cf5b3634c74ec1ebedaef4d4c295f46f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   glob:
     dependency: transitive
     description:
@@ -786,6 +786,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.3"
+  pull_down_button:
+    dependency: "direct main"
+    description:
+      name: pull_down_button
+      sha256: "48b928203afdeafa4a8be5dc96980523bc8a2ddbd04569f766071a722be22379"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.4"
   quote_buffer:
     dependency: transitive
     description:

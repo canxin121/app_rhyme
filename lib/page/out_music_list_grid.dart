@@ -1,14 +1,13 @@
-import 'package:app_rhyme/comp/form/music_list_table_form.dart';
 import 'package:app_rhyme/comp/card/music_list_card.dart';
 import 'package:app_rhyme/page/home.dart';
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/page/in_music_list.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/util/colors.dart';
-import 'package:app_rhyme/util/selection.dart';
+import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_popup/flutter_popup.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 class MusicTablesPage extends StatefulWidget {
   const MusicTablesPage({super.key});
@@ -30,14 +29,6 @@ class MusicTablesPageState extends State<MusicTablesPage> {
     setState(() {
       musicLists = globalSqlMusicFactory.readMusicLists();
     });
-  }
-
-  Future<void> onAdd() async {
-    var result = await createMusicListTableForm(context);
-    if (result != null) {
-      await globalSqlMusicFactory.createMusicListTable(musicLists: [result]);
-      refreshMusicLists();
-    }
   }
 
   Future<void> onMulSelece() async {}
@@ -62,7 +53,19 @@ class MusicTablesPageState extends State<MusicTablesPage> {
                     ),
                   ),
                 ),
-                trailing: editTextButton(context, onAdd, onMulSelece)),
+                trailing: GestureDetector(
+                  child: Text(
+                    '编辑',
+                    style: TextStyle(color: activeIconColor),
+                  ),
+                  onTapDown: (details) {
+                    showPullDownMenu(
+                        context: context,
+                        items: musicListGridActionPullDown(
+                            context, refreshMusicLists),
+                        position: details.globalPosition & Size.zero);
+                  },
+                )),
             // 这里创建的是一个 所有歌单的grid view
             Expanded(
                 child: FutureBuilder<List<MusicList>>(
@@ -72,7 +75,7 @@ class MusicTablesPageState extends State<MusicTablesPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('发生错误: ${snapshot.error}'));
-                } else if (snapshot.hasData) {
+                } else {
                   // 这里控制每一行显示多少个
                   return GridView.builder(
                     padding: const EdgeInsets.only(
@@ -95,39 +98,17 @@ class MusicTablesPageState extends State<MusicTablesPage> {
                             musicList: musicList,
                           ));
                         },
-                        onPress: () {
-                          showCupertinoPopupWithActions(
+                        onPress: (details) {
+                          var position = details.globalPosition & Size.zero;
+                          showPullDownMenu(
                               context: context,
-                              options: [
-                                "删除",
-                                "编辑"
-                              ],
-                              actionCallbacks: [
-                                () async {
-                                  await globalSqlMusicFactory.delMusicListTable(
-                                      musicLists: [musicList]);
-                                  refreshMusicLists();
-                                },
-                                () async {
-                                  createMusicListTableForm(context, musicList)
-                                      .then((value) {
-                                    if (value != null) {
-                                      globalSqlMusicFactory
-                                          .changeMusicListMetadata(
-                                              oldList: [musicList],
-                                              newList: [value]).then((_) {
-                                        refreshMusicLists();
-                                      });
-                                    }
-                                  });
-                                }
-                              ]);
+                              items: musicListPullDown(context, musicList,
+                                  refreshMusicLists, position),
+                              position: position);
                         },
                       );
                     },
                   );
-                } else {
-                  return const Center(child: Text('没有数据'));
                 }
               },
             )),
@@ -136,29 +117,4 @@ class MusicTablesPageState extends State<MusicTablesPage> {
       ),
     );
   }
-}
-
-Widget editTextButton(BuildContext context, Future<void> Function() asyncOnadd,
-    Future<void> Function() asyncOnMulSelect) {
-  return CustomPopup(
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          child: const Text('添加'),
-          onPressed: () {
-            asyncOnadd().then((value) {
-              Navigator.pop(context);
-            });
-          },
-        ),
-      ],
-    ),
-    child: Text(
-      '编辑',
-      style: TextStyle(
-        color: activeIconColor,
-      ),
-    ),
-  );
 }

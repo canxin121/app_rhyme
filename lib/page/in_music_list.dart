@@ -9,12 +9,12 @@ import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/other.dart';
-import 'package:app_rhyme/util/selection.dart';
+import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_popup/flutter_popup.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 class MusicPage extends StatefulWidget {
   final MusicList musicList;
@@ -47,6 +47,7 @@ class MusicPageState extends State<MusicPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         padding: const EdgeInsetsDirectional.only(end: 16),
@@ -57,7 +58,19 @@ class MusicPageState extends State<MusicPage> {
             globalTopUiController.backToOriginWidget();
           },
         ),
-        trailing: editTextButton(context),
+        trailing: GestureDetector(
+          child: Text(
+            '编辑',
+            style: TextStyle(color: activeIconColor),
+          ),
+          onTapDown: (details) {
+            showPullDownMenu(
+                context: context,
+                items:
+                    musicListActionPullDown(context, _musics, refreshMusicList),
+                position: details.globalPosition & Size.zero);
+          },
+        ),
       ),
       child: SafeArea(
           child: CustomScrollView(
@@ -66,12 +79,12 @@ class MusicPageState extends State<MusicPage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: Screen.width * 0.1,
-                  left: Screen.width * 0.1,
-                  right: Screen.width * 0.1),
+                  top: screenWidth * 0.1,
+                  left: screenWidth * 0.1,
+                  right: screenWidth * 0.1),
               child: Container(
                 constraints: BoxConstraints(
-                  maxWidth: Screen.width * 0.7,
+                  maxWidth: screenWidth * 0.7,
                 ),
                 child: MusicListCard(musicList: _musicList),
               ),
@@ -131,14 +144,10 @@ class MusicPageState extends State<MusicPage> {
                   );
                 },
                 hasCache: music.hasCache(),
-                onPress: () {
-                  showCupertinoPopupWithActions(context: context, options: [
-                    "缓存",
-                    "删除",
-                    "用作封面",
-                    "删除缓存"
-                  ], actionCallbacks: [
-                    () async {
+                onPress: (details) async {
+                  await showPullDownMenu(
+                    context: context,
+                    items: inListMusicCardPullDown(context, music, () async {
                       // 缓存
                       var playMusic = await display2PlayMusic(music);
                       if (playMusic == null) return;
@@ -154,38 +163,7 @@ class MusicPageState extends State<MusicPage> {
                         // 在这里需要重新判断是否 hasCache,所以直接setState解决
                         setState(() {});
                       });
-                    },
-                    () async {
-                      // 删除音乐
-                      await globalSqlMusicFactory.delMusic(
-                          musicList: _musicList,
-                          ids: Int64List.fromList([music.info.id]));
-                      setState(() {
-                        _musics.removeAt(index);
-                      });
-                    },
-                    () async {
-                      // 将音乐图片应用成歌单图片
-                      var pic = music.info.artPic;
-                      if (pic != null) {
-                        await globalSqlMusicFactory.changeMusicListMetadata(
-                            oldList: [
-                              _musicList
-                            ],
-                            newList: [
-                              MusicList(
-                                  name: "", artPic: pic, desc: _musicList.desc)
-                            ]).then((_) {
-                          setState(() {
-                            _musicList = MusicList(
-                                name: _musicList.name,
-                                artPic: pic,
-                                desc: _musicList.desc);
-                          });
-                        });
-                      }
-                    },
-                    () async {
+                    }, () async {
                       // 删除缓存
                       if (music.info.defaultQuality == null) return;
                       var result = music
@@ -207,8 +185,39 @@ class MusicPageState extends State<MusicPage> {
                           globalAudioHandler.replaceMusic(value);
                         });
                       });
-                    }
-                  ]);
+                    }, () async {
+                      // 删除音乐
+                      await globalSqlMusicFactory.delMusic(
+                          musicList: _musicList,
+                          ids: Int64List.fromList([music.info.id]));
+                      setState(() {
+                        _musics.removeAt(index);
+                      });
+                    }, () async {
+                      // 编辑音乐
+                    }, () async {
+                      // 将音乐图片应用成歌单图片
+                      var pic = music.info.artPic;
+                      if (pic != null) {
+                        await globalSqlMusicFactory.changeMusicListMetadata(
+                            oldList: [
+                              _musicList
+                            ],
+                            newList: [
+                              MusicList(
+                                  name: "", artPic: pic, desc: _musicList.desc)
+                            ]).then((_) {
+                          setState(() {
+                            _musicList = MusicList(
+                                name: _musicList.name,
+                                artPic: pic,
+                                desc: _musicList.desc);
+                          });
+                        });
+                      }
+                    }),
+                    position: details.globalPosition & Size.zero,
+                  );
                 },
               );
             },
@@ -223,26 +232,6 @@ class MusicPageState extends State<MusicPage> {
       )),
     );
   }
-}
-
-Widget editTextButton(BuildContext context) {
-  return CustomPopup(
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () {},
-          child: const Text('多选'),
-        ),
-      ],
-    ),
-    child: Text(
-      '编辑',
-      style: TextStyle(
-        color: activeIconColor,
-      ),
-    ),
-  );
 }
 
 Widget _buildButton(BuildContext context,

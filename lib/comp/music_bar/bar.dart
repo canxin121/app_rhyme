@@ -5,6 +5,7 @@ import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
 class MusicPlayBar extends StatelessWidget {
   final double maxHeight;
@@ -41,20 +42,34 @@ class MusicPlayBar extends StatelessWidget {
                           (BuildContext context, AsyncSnapshot<Hero> snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return AspectRatio(
-                            aspectRatio: 1,
-                            child: Hero(
-                              tag: "PlayingMusicPic",
-                              child: defaultArtPic,
-                            ),
-                          );
+                          return GlassContainer(
+                              shadowColor:
+                                  CupertinoColors.black.withOpacity(0.4),
+                              shadowStrength: 8,
+                              shape: BoxShape.rectangle,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(4)),
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: Hero(
+                                  tag: "PlayingMusicPic",
+                                  child: defaultArtPic,
+                                ),
+                              ));
                         } else if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         } else {
-                          return AspectRatio(
-                            aspectRatio: 1,
-                            child: snapshot.data ?? defaultArtPic,
-                          );
+                          return GlassContainer(
+                              shadowColor:
+                                  CupertinoColors.black.withOpacity(0.4),
+                              shadowStrength: 8,
+                              shape: BoxShape.rectangle,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(4)),
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: snapshot.data ?? defaultArtPic,
+                              ));
                         }
                       },
                     )),

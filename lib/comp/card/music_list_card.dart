@@ -2,13 +2,13 @@ import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/util/helper.dart';
+import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
 // 这是自定义歌单的展示卡片
 class MusicListCard extends StatelessWidget {
   final MusicList musicList;
   final VoidCallback? onClick;
-  final VoidCallback? onPress;
-
+  final void Function(LongPressStartDetails details)? onPress;
   const MusicListCard({
     super.key,
     required this.musicList,
@@ -19,11 +19,14 @@ class MusicListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onLongPressStart: onPress,
       onTap: onClick,
-      onLongPress: onPress,
       child: Column(
         children: <Widget>[
-          ClipRRect(
+          GlassContainer(
+            shadowColor: CupertinoColors.black.withOpacity(0.4),
+            shadowStrength: 5,
+            shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(8.0), // 设置圆角
             child: AspectRatio(
               aspectRatio: 1.0,

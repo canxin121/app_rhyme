@@ -1,10 +1,10 @@
 import 'package:app_rhyme/comp/card/music_card.dart';
-import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
-import 'package:app_rhyme/util/selection.dart';
+import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 // PlayMusicList组件
 class PlayMusicList extends StatelessWidget {
@@ -44,30 +44,15 @@ class PlayMusicList extends StatelessWidget {
                   onClick: () {
                     globalAudioHandler.seek(Duration.zero, index: index);
                   },
-                  onPress: () {
-                    showCupertinoPopupWithActions(context: context, options: [
-                      "删除",
-                      "添加"
-                    ], actionCallbacks: [
-                      () async {
-                        globalAudioHandler.removeAt(index);
-                      },
-                      () async {
-                        var tables =
-                            await globalSqlMusicFactory.readMusicLists();
-                        var tableNames = tables.map((e) => e.name).toList();
-                        if (context.mounted) {
-                          showCupertinoPopupWithSameAction(
-                              context: context,
-                              options: tableNames,
-                              actionCallbacks: (index_) async {
-                                await globalSqlMusicFactory.insertMusic(
-                                    musicList: tables[index_],
-                                    musics: [musics[index].ref]);
-                              });
-                        }
-                      }
-                    ]);
+                  onPress: (details) async {
+                    var position = details.globalPosition & Size.zero;
+                    showPullDownMenu(
+                        context: context,
+                        items: displayListMusicCardPullDown(
+                            context, musics[index], () async {
+                          await globalAudioHandler.removeAt(index);
+                        }, position),
+                        position: position);
                   },
                 ),
                 itemCount: musics.length,
