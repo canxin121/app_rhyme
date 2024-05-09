@@ -95,7 +95,6 @@ class AudioHandler extends GetxController {
 
       if (_player.playing) {
         await pause();
-        await seek(Duration.zero);
       }
 
       // 添加新的音乐
