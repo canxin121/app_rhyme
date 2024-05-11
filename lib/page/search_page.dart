@@ -159,20 +159,24 @@ class SearchController extends GetxController {
   }
 }
 
+final SearchController globalSearchController = Get.put(SearchController());
+
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final SearchController controller = Get.put(SearchController());
     final double screenHeight = MediaQuery.of(context).size.height;
+    globalSearchController.searchController.value = TextEditingController();
+
     return CupertinoPageScaffold(
         child: Column(
       children: [
         CupertinoNavigationBar(
             trailing: GestureDetector(
               child: Obx(() {
-                if (controller.searchTarget.value == SearchTarget.music) {
+                if (globalSearchController.searchTarget.value ==
+                    SearchTarget.music) {
                   return Text(
                     '歌曲',
                     style: TextStyle(color: activeIconColor)
@@ -191,8 +195,8 @@ class SearchPage extends StatelessWidget {
                     context: context,
                     items: searchPageActionPullDown(
                         context,
-                        controller.searchTarget.value,
-                        controller.changeSearchTarget),
+                        globalSearchController.searchTarget.value,
+                        globalSearchController.changeSearchTarget),
                     position: details.globalPosition & Size.zero);
               },
             ),
@@ -212,20 +216,21 @@ class SearchPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: CupertinoSearchTextField(
-            controller: controller.searchController.value,
+            controller: globalSearchController.searchController.value,
             onSubmitted: (String value) {
               if (value.isNotEmpty) {
-                controller.allowEmptyTime.value = 3;
-                controller.pagingController.value.refresh();
+                globalSearchController.allowEmptyTime.value = 3;
+                globalSearchController.pagingController.value.refresh();
               }
             },
           ),
         ),
         Expanded(
           child: Obx(() {
-            if (controller.searchTarget.value == SearchTarget.music) {
+            if (globalSearchController.searchTarget.value ==
+                SearchTarget.music) {
               return PagedListView.separated(
-                pagingController: controller.pagingController.value,
+                pagingController: globalSearchController.pagingController.value,
                 padding: EdgeInsets.only(bottom: screenHeight * 0.1),
                 separatorBuilder: (context, index) => const Divider(
                   color: CupertinoColors.systemGrey4,
@@ -254,7 +259,8 @@ class SearchPage extends StatelessWidget {
             } else {
               return PagedGridView(
                   padding: EdgeInsets.only(bottom: screenHeight * 0.2),
-                  pagingController: controller.pagingController.value,
+                  pagingController:
+                      globalSearchController.pagingController.value,
                   builderDelegate: PagedChildBuilderDelegate(
                       itemBuilder: (context, payloadAndMusicList_, index) {
                     var payloadAndMusicList =
