@@ -7,7 +7,8 @@ import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:flutter/cupertino.dart';
 
-Future<String> fileCacheHelper(String file, String cachePath) async {
+Future<String> fileCacheHelper(String file, String cachePath,
+    {bool cache = false}) async {
   late String toUseSource;
 
   var localSource = await useCacheFile(
@@ -18,6 +19,9 @@ Future<String> fileCacheHelper(String file, String cachePath) async {
     // talker.debug("[fileCacheHelper] 使用已缓存source: ($file)->($localSource)");
     toUseSource = localSource;
   } else {
+    if (cache) {
+      cacheFile(file: file, cachePath: cachePath);
+    }
     // talker.debug("[fileCacheHelper] 不缓存,直接使用 $file");
     toUseSource = file;
   }
@@ -78,9 +82,9 @@ String get playingMusicArtist {
   return artist;
 }
 
-Future<Image> useCacheImage(String? file_) async {
+Future<Image> useCacheImage(String? file_, {bool cache = false}) async {
   if (file_ != null && file_.isNotEmpty) {
-    var file = await fileCacheHelper(file_, picCachePath);
+    var file = await fileCacheHelper(file_, picCachePath, cache: cache);
     if (file.contains("http")) {
       return Image.network(file);
     } else {

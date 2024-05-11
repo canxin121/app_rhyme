@@ -10,6 +10,7 @@ import 'package:app_rhyme/comp/play_page_comp/music_info.dart';
 import 'package:app_rhyme/comp/play_page_comp/music_list.dart';
 import 'package:app_rhyme/comp/play_page_comp/progress_slider.dart';
 import 'package:app_rhyme/comp/play_page_comp/quality_time.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:dismissible_page/dismissible_page.dart';
@@ -76,12 +77,12 @@ class SongDisplayPageState extends State<SongDisplayPage> {
           Container(
             padding: const EdgeInsets.only(left: 20, top: 20, bottom: 10),
             alignment: Alignment.centerLeft,
-            child: const Text(
+            child: Text(
               '待播清单',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.bold,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
           // 应当占据剩下的所有高度

@@ -12,22 +12,25 @@ import 'package:glassmorphism_ui/glassmorphism_ui.dart';
 
 class MusicCard extends StatefulWidget {
   final dynamic music;
+  final Color fontColor;
   final VoidCallback? onClick;
   final Future<bool>? hasCache;
   final Padding? padding;
   final bool? showQualityBackGround;
+  final bool titleBold;
   final double height;
   final Future<void> Function(LongPressStartDetails details)? onPress;
-  const MusicCard({
-    super.key,
-    required this.music,
-    this.onClick,
-    this.onPress,
-    this.hasCache,
-    this.padding,
-    this.showQualityBackGround = true,
-    this.height = 60,
-  });
+  const MusicCard(
+      {super.key,
+      required this.music,
+      this.onClick,
+      this.onPress,
+      this.hasCache,
+      this.padding,
+      this.showQualityBackGround = true,
+      this.height = 60,
+      this.fontColor = CupertinoColors.black,
+      this.titleBold = true});
 
   @override
   MusicCardState createState() => MusicCardState();
@@ -90,18 +93,19 @@ class MusicCardState extends State<MusicCard> {
                     children: <Widget>[
                       Text(
                         info.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
+                          color: widget.fontColor,
+                          fontWeight: widget.titleBold ? FontWeight.bold : null,
                         ).useSystemChineseFont(),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 3.0),
                       Text(
                         info.artist.join(", "),
-                        style: const TextStyle(
+                        style: TextStyle(
                                 fontSize: 12.0,
-                                color: CupertinoColors.black,
+                                color: widget.fontColor,
                                 fontWeight: FontWeight.w500)
                             .useSystemChineseFont(),
                         overflow: TextOverflow.ellipsis,
@@ -130,22 +134,23 @@ class MusicCardState extends State<MusicCard> {
                             : null,
                         child: Text(
                           info.defaultQuality!.short,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10.0,
-                            color: CupertinoColors.black,
+                            color: widget.fontColor,
                             fontWeight: FontWeight.bold,
                           ).useSystemChineseFont(),
                         ),
                       ),
                     const Padding(padding: EdgeInsets.only(left: 10)),
                     // 显示音乐总时长
-                    Text(
-                      formatDuration(info.duration!),
-                      style: const TextStyle(
-                        fontSize: 10.0,
-                        color: CupertinoColors.black,
-                      ).useSystemChineseFont(),
-                    ),
+                    if (info.duration != null)
+                      Text(
+                        formatDuration(info.duration!),
+                        style: TextStyle(
+                          fontSize: 10.0,
+                          color: widget.fontColor,
+                        ).useSystemChineseFont(),
+                      ),
                     // 音乐总时长和是否下载图标的间隙
                     const Padding(padding: EdgeInsets.only(left: 10)),
                     // 标志是否有缓存的图标

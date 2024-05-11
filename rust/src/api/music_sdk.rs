@@ -1,7 +1,6 @@
-
 use music_api::{
-    search_factory::SearchFactory, sql_store_actory::SqlMusicFactory,
-    Music, MusicInfo, MusicList, Quality,
+    search_factory::SearchFactory, sql_store_actory::SqlMusicFactory, Music, MusicInfo, MusicList,
+    Quality,
 };
 use sqlx::{Any, Pool};
 use tokio::sync::RwLock;
@@ -37,6 +36,40 @@ impl From<Music> for MusicW {
     fn from(value: Music) -> Self {
         MusicW { inner: value }
     }
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn search_music_list(
+    content: &str,
+    page: u32,
+    source: &str,
+) -> Result<Vec<(String, MusicList)>, anyhow::Error> {
+    Ok(SearchFactory::search_music_list(source, content, page).await?)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn get_musics_from_music_list(
+    payload: &str,
+    page: u32,
+    source: &str,
+) -> Result<Vec<MusicW>, anyhow::Error> {
+    Ok(
+        SearchFactory::get_musics_from_music_list(source, payload, page)
+            .await?
+            .into_iter()
+            .map(|m| MusicW::from(m))
+            .collect(),
+    )
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn search_album(
+    music: &MusicW,
+    page: u32,
+) -> Result<(MusicList, Vec<MusicW>), anyhow::Error> {
+    let (music_list, musics) = SearchFactory::search_album(&music.inner, page).await?;
+    let musics = musics.into_iter().map(|m| MusicW::from(m)).collect();
+    Ok((music_list, musics))
 }
 
 #[flutter_rust_bridge::frb]

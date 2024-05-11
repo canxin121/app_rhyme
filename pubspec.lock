@@ -29,10 +29,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: "0763b45fa9294197a2885c8567927e2830ade852e5c896fd4ab7e0e348d0f373"
+      sha256: ecf4273855368121b1caed0d10d4513c7241dfc813f7d3c8933b36622ae9b265
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.0"
+    version: "3.5.1"
   args:
     dependency: transitive
     description:
@@ -217,6 +217,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.5"
   exception_templates:
     dependency: transitive
     description:
@@ -269,10 +277,10 @@ packages:
     dependency: transitive
     description:
       name: file_selector_macos
-      sha256: b15c3da8bd4908b9918111fa486903f5808e388b8d1c559949f584725a6594d6
+      sha256: f42eacb83b318e183b1ae24eead1373ab1334084404c8c16e0354f9a3e55d385
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.3+3"
+    version: "0.9.4"
   file_selector_platform_interface:
     dependency: transitive
     description:
@@ -435,6 +443,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  iconsax_flutter:
+    dependency: transitive
+    description:
+      name: iconsax_flutter
+      sha256: "95b65699da8ea98f87c5d232f06b0debaaf1ec1332b697e4d90969ec9a93037d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   image:
     dependency: transitive
     description:
@@ -447,18 +463,18 @@ packages:
     dependency: "direct main"
     description:
       name: image_picker
-      sha256: fe9ee64ccb8d599a5dfb0e21cc6652232c610bcf667af4e79b9eb175cc30a7a5
+      sha256: "33974eca2e87e8b4e3727f1b94fa3abcb25afe80b6bc2c4d449a0e150aedf720"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   image_picker_android:
     dependency: transitive
     description:
       name: image_picker_android
-      sha256: "8e75431a62b7feb4fd55cb4a5c6f0ac4564460ec5dc09f9c4a0d50a5ce7c4cb9"
+      sha256: "79455f6cff4cbef583b2b524bbf0d4ec424e5959f4d464e36ef5323715b98370"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.10"
+    version: "0.8.12"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -471,10 +487,10 @@ packages:
     dependency: transitive
     description:
       name: image_picker_ios
-      sha256: f74064bc548b5164a033ec05638e23c91be1a249c255e0f56319dddffd759794
+      sha256: cb0db0ec0d3e2cd49674f2e6053be25ccdb959832607c1cbd215dd6cf10fb0dd
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.10+1"
+    version: "0.8.11"
   image_picker_linux:
     dependency: transitive
     description:
@@ -711,10 +727,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_foundation
-      sha256: "5a7999be66e000916500be4f15a3633ebceb8302719b47b9cc49ce924125350f"
+      sha256: f234384a3fdd67f989b4d54a5d73ca2a6c422fa55ae694381ae0f4375cd1ea16
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.4.0"
   path_provider_linux:
     dependency: transitive
     description:
@@ -739,6 +755,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  pausable_timer:
+    dependency: transitive
+    description:
+      name: pausable_timer
+      sha256: "6ef1a95441ec3439de6fb63f39a011b67e693198e7dae14e20675c3c00e86074"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0+3"
   petitparser:
     dependency: transitive
     description:
@@ -875,10 +899,10 @@ packages:
     dependency: transitive
     description:
       name: sqflite
-      sha256: "5ce2e1a15e822c3b4bfb5400455775e421da7098eed8adc8f26298ada7c9308c"
+      sha256: a43e5a27235518c03ca238e7b4732cf35eabe863a369ceba6cbefa537a66f16d
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.3"
+    version: "2.3.3+1"
   sqflite_common:
     dependency: transitive
     description:
@@ -931,26 +955,26 @@ packages:
     dependency: "direct main"
     description:
       name: talker
-      sha256: "7fd2118fbdd35ee9004d1ed326d101cdbabe5fed3575e9e9aa050535e019e885"
+      sha256: edd1ec2d1e941ac1569f27d820cd896e0dc9bc4e4160963e3c8c192079f08da0
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.5"
+    version: "4.2.0"
   talker_flutter:
     dependency: "direct main"
     description:
       name: talker_flutter
-      sha256: "981da0bb1501a9937f914574b5987f839e363a8402f613addbbf9ebe7e8393c1"
+      sha256: "8b10ea148e16410abc950ab596a9cb9b2ae4380640dec9a88dc80503f41902b8"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.5"
+    version: "4.2.0"
   talker_logger:
     dependency: transitive
     description:
       name: talker_logger
-      sha256: d09f459ff09ab510f74f4384d674dccce0a85ecf8b5733258ffdc9869d082505
+      sha256: "777c62bb8019ec26f5b99626fe0bd28e169bae724ffde8438a5e4ad28e2c20df"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.5"
+    version: "4.2.0"
   term_glyph:
     dependency: transitive
     description:
@@ -967,6 +991,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.1"
+  toastification:
+    dependency: "direct main"
+    description:
+      name: toastification
+      sha256: "5e751acc2fb5b8d008138dac255d62290fde4e5a24824f29809ac098c3dfe395"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   typed_data:
     dependency: transitive
     description:

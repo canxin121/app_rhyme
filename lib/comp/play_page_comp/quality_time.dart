@@ -4,8 +4,8 @@ import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
-import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:app_rhyme/util/time_parse.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:glassmorphism_ui/glassmorphism_ui.dart';
@@ -37,7 +37,7 @@ class QualityTimeState extends State<QualityTime> {
                   color: CupertinoColors.systemGrey6,
                   fontWeight: FontWeight.w300,
                   fontSize: widget.fontHeight,
-                ),
+                ).useSystemChineseFont(),
               )),
           // 音质信息按钮
           GestureDetector(
@@ -78,7 +78,7 @@ class QualityTimeState extends State<QualityTime> {
                         color: CupertinoColors.white,
                         fontSize: widget.fontHeight,
                         fontWeight: FontWeight.normal,
-                      ),
+                      ).useSystemChineseFont(),
                     ),
                   ));
             }),
@@ -91,10 +91,30 @@ class QualityTimeState extends State<QualityTime> {
                   color: CupertinoColors.systemGrey6,
                   fontWeight: FontWeight.w300,
                   fontSize: widget.fontHeight,
-                ),
+                ).useSystemChineseFont(),
               )),
         ],
       ),
     );
   }
 }
+
+// 选择变更后的quality的触发操作
+List<PullDownMenuEntry> qualitySelectPullDown(
+        BuildContext context,
+        List<Quality> qualitys,
+        Future<void> Function(Quality selectQuality) onSelect) =>
+    [
+      PullDownMenuTitle(
+          title: Text(
+        "选择一个音质",
+        style: const TextStyle().useSystemChineseFont(),
+      )),
+      ...qualitys.map(
+        (quality) => PullDownMenuItem(
+            title: quality.short,
+            onTap: () async {
+              await onSelect(quality);
+            }),
+      )
+    ];

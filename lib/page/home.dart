@@ -7,10 +7,40 @@ import 'package:app_rhyme/page/search_page.dart';
 import 'package:app_rhyme/page/setting.dart';
 import 'package:app_rhyme/page/user_agreement.dart';
 import 'package:app_rhyme/util/colors.dart';
+import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
-final TopUiController globalTopUiController = Get.put(TopUiController());
+class FloatWidgetController extends GetxController {
+  final Map msgs = {};
+  int index = 0;
+  var isVisible = false.obs; // Observable for visibility.
+
+  int addMsg(String msg) {
+    index++;
+    msgs[index] = msg;
+    show();
+    return index;
+  }
+
+  void delMsg(int index) {
+    msgs.remove(index);
+    if (msgs.isEmpty) {
+      hide();
+    }
+  }
+
+  void show() {
+    isVisible.value = true; // Update visibility.
+    update();
+  }
+
+  void hide() {
+    isVisible.value = false; // Update visibility.
+    update();
+  }
+}
 
 class TopUiController extends GetxController {
   var currentIndex = 0.obs;
@@ -44,6 +74,10 @@ class TopUiController extends GetxController {
   }
 }
 
+final TopUiController globalTopUiController = Get.put(TopUiController());
+
+final globalFloatWidgetContoller = FloatWidgetController();
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -52,11 +86,11 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  bool isKeyboardVisible = false;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      globalFloatWidgetContoller.hide();
       if (!globalConfig.userAgreement) {
         showUserAgreement(context);
       }
@@ -73,13 +107,37 @@ class HomePageState extends State<HomePage> {
             child: Obx(() => globalTopUiController.currentWidget.value),
           ),
 
-          // 以下内容改成固定在页面底部的
           // 使用MediaQuery检测键盘是否可见
           Align(
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment.bottomLeft,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // 用来指示是否有异步任务在进行中
+                Obx(() => Visibility(
+                      // Use Obx to listen to changes.
+                      visible: globalFloatWidgetContoller.isVisible.value,
+                      child: GestureDetector(
+                        child: Container(
+                            constraints: const BoxConstraints(
+                                maxWidth: 50, maxHeight: 50),
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.black.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.all(5),
+                            child: const Icon(CupertinoIcons
+                                .square_stack_3d_down_right_fill)),
+                        onTapDown: (details) {
+                          var position = details.globalPosition & Size.zero;
+                          showPullDownMenu(
+                              context: context,
+                              items: floatWidgetPullDown(position),
+                              position: position);
+                        },
+                      ),
+                    )),
                 // 音乐播放控制栏
                 MusicPlayBar(
                   maxHeight: min(60, MediaQuery.of(context).size.height * 0.1),

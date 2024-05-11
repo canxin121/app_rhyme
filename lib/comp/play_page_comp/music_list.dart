@@ -1,5 +1,12 @@
 import 'package:app_rhyme/comp/card/music_card.dart';
+import 'package:app_rhyme/comp/form/music_list_table_form.dart';
+import 'package:app_rhyme/main.dart';
+import 'package:app_rhyme/src/rust/api/cache.dart';
+import 'package:app_rhyme/src/rust/api/mirror.dart';
+import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
+import 'package:app_rhyme/util/default.dart';
+import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/pull_down_selection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +40,8 @@ class PlayMusicList extends StatelessWidget {
                   endIndent: 50,
                 ),
                 itemBuilder: (context, index) => MusicCard(
+                  titleBold: false,
+                  fontColor: CupertinoColors.white,
                   height: itemHeight,
                   showQualityBackGround: false,
                   padding: Padding(padding: picPadding),
@@ -62,3 +71,110 @@ class PlayMusicList extends StatelessWidget {
     });
   }
 }
+
+// 播放展示界面的列表中的音乐卡片的长按触发操作
+List<PullDownMenuEntry> displayListMusicCardPullDown(
+  BuildContext context,
+  PlayMusic music,
+  Future<void> Function() onDelete,
+  Rect position,
+) =>
+    [
+      PullDownMenuHeader(
+          leading: AspectRatio(
+            aspectRatio: 1.0,
+            child: FutureBuilder<Image>(
+              future: useCacheImage(music.info.artPic),
+              builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting ||
+                    snapshot.hasError) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: defaultArtPic.image,
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        color: CupertinoColors.systemGrey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  );
+                } else {
+                  return Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: snapshot.data?.image ?? defaultArtPic.image,
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(
+                        color: CupertinoColors.systemGrey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          title: music.info.name,
+          subtitle: music.info.artist.join(","),
+          iconWidget: CupertinoButton(
+            onPressed: () {},
+            padding: EdgeInsets.zero,
+            child: const Icon(CupertinoIcons.profile_circled),
+          )),
+      const PullDownMenuDivider.large(),
+      PullDownMenuItem(
+        title: "删除",
+        onTap: () async {
+          await onDelete();
+        },
+        icon: CupertinoIcons.delete_solid,
+      ),
+      PullDownMenuItem(
+        title: "添加到歌单",
+        onTap: () async {
+          var musicLists = await globalSqlMusicFactory.readMusicLists();
+          if (context.mounted) {
+            await showPullDownMenu(
+                context: context,
+                items: addToMusicListPullDown(
+                    context,
+                    musicLists,
+                    Future.value([DisplayMusic(music.ref, info_: music.info)]),
+                    position),
+                position: position);
+          }
+        },
+        icon: CupertinoIcons.add_circled,
+      ),
+      PullDownMenuItem(
+        title: '创建新歌单',
+        onTap: () async {
+          var table = MusicList(
+              name: music.info.artist.join(","),
+              artPic: music.info.artPic ?? "",
+              desc: "");
+          createMusicListTableForm(context, table).then((newTable) {
+            if (newTable != null) {
+              globalSqlMusicFactory
+                  .createMusicListTable(musicLists: [newTable]).then((_) {
+                globalSqlMusicFactory
+                    .insertMusic(musicList: newTable, musics: [music.ref]);
+              });
+
+              if (music.info.artPic != null) {
+                cacheFile(
+                  file: music.info.artPic!,
+                  cachePath: picCachePath,
+                );
+              }
+            }
+          });
+        },
+        icon: CupertinoIcons.create,
+      ),
+    ];

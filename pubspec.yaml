@@ -44,6 +44,7 @@ dependencies:
   talker_flutter: ^4.1.5
   pull_down_button: ^0.9.4
   glassmorphism_ui: ^0.3.0
+  toastification: ^2.0.0
 
 dev_dependencies:
   flutter_test:

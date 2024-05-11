@@ -3,6 +3,7 @@ import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/util/default.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -42,18 +43,18 @@ class SettingsPageState extends State<SettingsPage> {
       child: SafeArea(
         child: ListView(
           children: [
-            const CupertinoNavigationBar(
+            CupertinoNavigationBar(
               // 界面最上面的 编辑选项
               leading: Padding(
-                padding: EdgeInsets.only(left: 0.0),
+                padding: const EdgeInsets.only(left: 0.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     '设置',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
-                    ),
+                    ).useSystemChineseFont(),
                   ),
                 ),
               ),
@@ -62,12 +63,12 @@ class SettingsPageState extends State<SettingsPage> {
             CupertinoFormSection.insetGrouped(
               children: [
                 CupertinoFormRow(
-                  prefix: const Text(
+                  prefix: Text(
                     '第三方音乐源',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: CupertinoColors.black,
                       fontSize: 16.0,
-                    ),
+                    ).useSystemChineseFont(),
                   ),
                   child: CupertinoSwitch(
                     value: globalExternApi != null,
@@ -86,12 +87,12 @@ class SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 CupertinoFormRow(
-                  prefix: const Text(
+                  prefix: Text(
                     '状态',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: CupertinoColors.black,
                       fontSize: 16.0,
-                    ),
+                    ).useSystemChineseFont(),
                   ),
                   child: globalExternApi != null
                       ? Container(
@@ -103,11 +104,11 @@ class SettingsPageState extends State<SettingsPage> {
                           ))
                       : CupertinoButton(
                           onPressed: _pickMusicSource,
-                          child: const Text(
+                          child: Text(
                             '请选择第三方音乐源文件',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: CupertinoColors.activeBlue,
-                            ),
+                            ).useSystemChineseFont(),
                           ),
                         ),
                 ),
@@ -122,6 +123,20 @@ class SettingsPageState extends State<SettingsPage> {
                           Navigator.of(context).push(CupertinoPageRoute(
                             builder: (context) => TalkerScreen(talker: talker),
                           ));
+                        })),
+                CupertinoFormRow(
+                    prefix: const Text("清除冗余歌曲数据"),
+                    child: CupertinoButton(
+                        child: const Icon(
+                          CupertinoIcons.bin_xmark,
+                          color: CupertinoColors.systemRed,
+                        ),
+                        onPressed: () {
+                          globalSqlMusicFactory
+                              .cleanUnusedMusicData()
+                              .then((value) {
+                            // TODO: toast success
+                          });
                         }))
               ],
             ),

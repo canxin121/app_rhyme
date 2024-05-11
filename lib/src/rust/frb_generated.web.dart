@@ -122,6 +122,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Quality> dco_decode_list_quality(dynamic raw);
 
   @protected
+  List<(String, MusicList)> dco_decode_list_record_string_music_list(
+      dynamic raw);
+
+  @protected
   MusicInfo dco_decode_music_info(dynamic raw);
 
   @protected
@@ -145,6 +149,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     Config
   ) dco_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generatedrust_async_rw_lock_sql_music_factory_w_config(
       dynamic raw);
+
+  @protected
+  (
+    MusicList,
+    List<MusicW>
+  ) dco_decode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generatedrust_async_rw_lock_music_w(
+      dynamic raw);
+
+  @protected
+  (String, MusicList) dco_decode_record_string_music_list(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -249,6 +263,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Quality> sse_decode_list_quality(SseDeserializer deserializer);
 
   @protected
+  List<(String, MusicList)> sse_decode_list_record_string_music_list(
+      SseDeserializer deserializer);
+
+  @protected
   MusicInfo sse_decode_music_info(SseDeserializer deserializer);
 
   @protected
@@ -271,6 +289,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     SqlMusicFactoryW,
     Config
   ) sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generatedrust_async_rw_lock_sql_music_factory_w_config(
+      SseDeserializer deserializer);
+
+  @protected
+  (
+    MusicList,
+    List<MusicW>
+  ) sse_decode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generatedrust_async_rw_lock_music_w(
+      SseDeserializer deserializer);
+
+  @protected
+  (String, MusicList) sse_decode_record_string_music_list(
       SseDeserializer deserializer);
 
   @protected
@@ -385,6 +414,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_quality(List<Quality> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_string_music_list(
+      List<(String, MusicList)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_music_info(MusicInfo self, SseSerializer serializer);
 
   @protected
@@ -407,6 +440,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void
       sse_encode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generatedrust_async_rw_lock_sql_music_factory_w_config(
           (SqlMusicFactoryW, Config) self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generatedrust_async_rw_lock_music_w(
+          (MusicList, List<MusicW>) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_string_music_list(
+      (String, MusicList) self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);

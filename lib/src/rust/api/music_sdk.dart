@@ -9,6 +9,26 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // The type `POOL` is not used by any `pub` functions, thus it is ignored.
 
+Future<List<(String, MusicList)>> searchMusicList(
+        {required String content,
+        required int page,
+        required String source,
+        dynamic hint}) =>
+    RustLib.instance.api.searchMusicList(
+        content: content, page: page, source: source, hint: hint);
+
+Future<List<MusicW>> getMusicsFromMusicList(
+        {required String payload,
+        required int page,
+        required String source,
+        dynamic hint}) =>
+    RustLib.instance.api.getMusicsFromMusicList(
+        payload: payload, page: page, source: source, hint: hint);
+
+Future<(MusicList, List<MusicW>)> searchAlbum(
+        {required MusicW music, required int page, dynamic hint}) =>
+    RustLib.instance.api.searchAlbum(music: music, page: page, hint: hint);
+
 Future<List<MusicW>> searchMusic(
         {required String content,
         required int page,

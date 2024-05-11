@@ -1,10 +1,21 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use super::ROOT_PATH;
 use futures::StreamExt as _;
+use lazy_static::lazy_static;
+use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
+use reqwest_retry::policies::ExponentialBackoff;
+use reqwest_retry::RetryTransientMiddleware;
 use tokio::io::AsyncWriteExt as _;
 
-use super::ROOT_PATH;
+lazy_static! {
+    pub static ref CLIENT: ClientWithMiddleware = ClientBuilder::new(reqwest::Client::new())
+        .with(RetryTransientMiddleware::new_with_policy(
+            ExponentialBackoff::builder().build_with_max_retries(5),
+        ))
+        .build();
+}
 
 // 生成哈希值作为文件名
 #[flutter_rust_bridge::frb]
@@ -35,7 +46,7 @@ pub async fn cache_file(
     let filepath = root_path.join(&filename);
 
     if file.starts_with("http") {
-        let response = reqwest::get(file).await?;
+        let response = CLIENT.get(file).send().await?;
         let mut stream = response.bytes_stream();
 
         let mut file = tokio::fs::File::create(&filepath).await?;

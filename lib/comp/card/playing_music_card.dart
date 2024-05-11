@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -80,9 +81,10 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                         () => Text(
                           playingMusicName,
                           style: const TextStyle(
+                            color: CupertinoColors.white,
                             fontSize: 14.0,
                             fontWeight: FontWeight.bold,
-                          ),
+                          ).useSystemChineseFont(),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -90,9 +92,10 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                       Obx(() => Text(
                             playingMusicArtist,
                             style: const TextStyle(
-                                fontSize: 12.0,
-                                color: CupertinoColors.black,
-                                fontWeight: FontWeight.w500),
+                                    fontSize: 12.0,
+                                    color: CupertinoColors.white,
+                                    fontWeight: FontWeight.w500)
+                                .useSystemChineseFont(),
                             overflow: TextOverflow.ellipsis,
                           )),
                     ],

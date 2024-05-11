@@ -4,6 +4,7 @@ import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/time_parse.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lyric/lyrics_reader.dart';
@@ -86,7 +87,7 @@ class LyricDisplayState extends State<LyricDisplay> {
                 ),
                 Text(
                   formatDuration(Duration(milliseconds: progress).inSeconds),
-                  style: const TextStyle(color: CupertinoColors.white),
+                  style: const TextStyle(color: CupertinoColors.white).useSystemChineseFont(),
                 )
               ],
             );

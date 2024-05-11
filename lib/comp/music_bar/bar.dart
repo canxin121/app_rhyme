@@ -5,6 +5,7 @@ import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:glassmorphism_ui/glassmorphism_ui.dart';
@@ -83,7 +84,7 @@ class MusicPlayBar extends StatelessWidget {
                 child: Obx(
                   () => Text(
                     playingMusicName,
-                    style: const TextStyle(fontSize: 15.0),
+                    style: const TextStyle(fontSize: 15.0).useSystemChineseFont(),
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
