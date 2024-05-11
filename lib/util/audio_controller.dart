@@ -1,12 +1,16 @@
 import 'dart:io';
 
 import 'package:app_rhyme/main.dart';
+import 'package:app_rhyme/page/home.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/time_parse.dart';
+import 'package:app_rhyme/util/toast.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:toastification/toastification.dart';
 
 bool isWindowsFirstPlay = true;
 
@@ -157,48 +161,75 @@ class AudioHandler extends GetxController {
     }
   }
 
-  Future<void> clearReplaceMusicAll(List<DisplayMusic> musics) async {
-    if (musics.isEmpty) {
+  bool _isClearReplaceMusicAllRunning = false;
+
+  Future<void> clearReplaceMusicAll(
+      BuildContext context, List<DisplayMusic> musics) async {
+    if (_isClearReplaceMusicAllRunning) {
+      toast(context, "Music Player", "上一全部播放还未结束", ToastificationType.error);
       return;
     }
-    talker.info(
-        "[Music Handler] Request to add all musics of length: ${musics.length}");
-    List<PlayMusic> newPlayMusics = [];
-    List<AudioSource> newAudioSources = [];
-    List<Future<PlayMusic?>> futures = [];
 
-    // 首先创建所有的future，但不等待它们
-    for (var music in musics) {
-      futures.add(display2PlayMusic(music));
-    }
+    _isClearReplaceMusicAllRunning = true;
+    int index = -1;
 
-    // 然后等待所有future完成，并按顺序处理结果
-    List<PlayMusic?> playMusicsResults = await Future.wait(futures);
-    for (var playMusic in playMusicsResults) {
-      if (playMusic == null) continue;
-      newPlayMusics.add(playMusic);
-      newAudioSources.add(playMusic.toAudioSource());
-    }
-    if (newAudioSources.isEmpty) return;
-
-    if (_player.playing) {
-      await pause();
-    }
-
-    await clear();
-
-    playMusicList.addAll(newPlayMusics);
-    updateRx(music: newPlayMusics[0]);
     try {
-      await playSourceList.addAll(newAudioSources);
-    } catch (e) {
-      talker.error("[Music Handler] In clearReplaceMusicAll, Error occur: $e");
+      index = globalFloatWidgetContoller.addMsg("播放全部音乐");
+      if (musics.isEmpty) {
+        return;
+      }
+      talker.info(
+          "[Music Handler] Request to add all musics of length: ${musics.length}");
+      if (_player.playing) {
+        await pause();
+      }
+      await clear();
+
+      if (Platform.isWindows) {
+        isWindowsFirstPlay = false;
+      }
+
+      var firstMusic = await display2PlayMusic(musics.removeAt(0));
+      if (firstMusic == null) return;
+      playMusicList.add(firstMusic);
+      await playSourceList.add(firstMusic.toAudioSource());
+      updateRx(music: firstMusic);
+      await seek(Duration.zero, index: 0);
+      play();
+
+      List<PlayMusic> newPlayMusics = [];
+      List<AudioSource> newAudioSources = [];
+      List<Future<PlayMusic?>> futures = [];
+
+      for (var music in musics) {
+        futures.add(display2PlayMusic(music));
+      }
+
+      List<PlayMusic?> playMusicsResults = await Future.wait(futures);
+      for (var playMusic in playMusicsResults) {
+        if (playMusic == null) continue;
+        newPlayMusics.add(playMusic);
+        newAudioSources.add(playMusic.toAudioSource());
+      }
+
+      if (newAudioSources.isEmpty || newPlayMusics.isEmpty) return;
+
+      playMusicList.addAll(newPlayMusics);
+      try {
+        await playSourceList.addAll(newAudioSources);
+      } catch (e) {
+        talker
+            .error("[Music Handler] In clearReplaceMusicAll, Error occur: $e");
+      }
+
+      log2List("After add all");
+      await play();
+    } finally {
+      if (index != -1) {
+        globalFloatWidgetContoller.delMsg(index);
+      }
+      _isClearReplaceMusicAllRunning = false;
     }
-
-    await seek(Duration.zero, index: 0);
-
-    log2List("After add all");
-    await play();
   }
 
   Future<void> _insert(int index, PlayMusic music) async {

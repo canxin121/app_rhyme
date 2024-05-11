@@ -13,14 +13,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
-class MusicTablesPage extends StatefulWidget {
-  const MusicTablesPage({super.key});
+class MusicListsPage extends StatefulWidget {
+  const MusicListsPage({super.key});
 
   @override
-  MusicTablesPageState createState() => MusicTablesPageState();
+  MusicListsPageState createState() => MusicListsPageState();
 }
 
-class MusicTablesPageState extends State<MusicTablesPage> {
+class MusicListsPageState extends State<MusicListsPage> {
   Future<List<MusicList>>? musicLists;
 
   @override
@@ -60,7 +60,8 @@ class MusicTablesPageState extends State<MusicTablesPage> {
                 trailing: GestureDetector(
                   child: Text(
                     '编辑',
-                    style: TextStyle(color: activeIconColor).useSystemChineseFont(),
+                    style: TextStyle(color: activeIconColor)
+                        .useSystemChineseFont(),
                   ),
                   onTapDown: (details) {
                     showPullDownMenu(

@@ -80,10 +80,13 @@ List<PullDownMenuEntry> addToMusicListPullDown(
 
 // 添加到已存在的音乐歌单的触发操作
 List<PullDownMenuEntry> floatWidgetPullDown(Rect position) => [
-      const PullDownMenuHeader(
+      PullDownMenuHeader(
         onTap: null,
         title: "进行中的任务",
-        leading: Icon(CupertinoIcons.arrow_clockwise_circle_fill),
+        leading: Container(
+            constraints: const BoxConstraints(maxWidth: 50, maxHeight: 50),
+            alignment: Alignment.center,
+            child: const Icon(CupertinoIcons.square_stack_3d_down_right_fill)),
       ),
       ...globalFloatWidgetContoller.msgs.values.map(
         (msg) => PullDownMenuItem(onTap: null, title: msg),

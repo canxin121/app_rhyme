@@ -44,16 +44,18 @@ class FloatWidgetController extends GetxController {
 
 class TopUiController extends GetxController {
   var currentIndex = 0.obs;
-  Rx<Widget> currentWidget = Rx<Widget>(const MusicTablesPage());
-
+  Rx<Widget> currentWidget = Rx<Widget>(const MusicListsPage());
+  Widget musicListsPageWidget = const MusicListsPage();
+  Widget searchPageWidget = const SearchPage();
   void changeTabIndex(int index) {
     currentIndex.value = index;
+    update();
     switch (index) {
       case 0:
-        currentWidget.value = const MusicTablesPage();
+        currentWidget.value = musicListsPageWidget;
         break;
       case 1:
-        currentWidget.value = const SearchPage();
+        currentWidget.value = searchPageWidget;
         break;
       case 2:
         currentWidget.value = const SettingsPage();
@@ -65,11 +67,30 @@ class TopUiController extends GetxController {
   }
 
   void updateWidget(Widget widget) {
-    currentWidget.value = widget;
-    update();
+    switch (currentIndex.value) {
+      case 0:
+        musicListsPageWidget = widget;
+        break;
+      case 1:
+        searchPageWidget = widget;
+        break;
+      default:
+        currentWidget.value = widget;
+    }
+    changeTabIndex(currentIndex.value);
   }
 
   void backToOriginWidget() {
+    switch (currentIndex.value) {
+      case 0:
+        musicListsPageWidget = const MusicListsPage();
+        break;
+      case 1:
+        searchPageWidget = const SearchPage();
+        break;
+      default:
+    }
+
     changeTabIndex(currentIndex.value);
   }
 }
@@ -104,40 +125,44 @@ class HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           SafeArea(
-            child: Obx(() => globalTopUiController.currentWidget.value),
+            child: Obx(() {
+              return globalTopUiController.currentWidget.value;
+            }),
           ),
 
           // 使用MediaQuery检测键盘是否可见
           Align(
-            alignment: Alignment.bottomLeft,
+            alignment: Alignment.bottomCenter,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 用来指示是否有异步任务在进行中
                 Obx(() => Visibility(
-                      // Use Obx to listen to changes.
-                      visible: globalFloatWidgetContoller.isVisible.value,
-                      child: GestureDetector(
-                        child: Container(
-                            constraints: const BoxConstraints(
-                                maxWidth: 50, maxHeight: 50),
-                            decoration: BoxDecoration(
-                              color: CupertinoColors.black.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            alignment: Alignment.center,
-                            padding: const EdgeInsets.all(5),
-                            child: const Icon(CupertinoIcons
-                                .square_stack_3d_down_right_fill)),
-                        onTapDown: (details) {
-                          var position = details.globalPosition & Size.zero;
-                          showPullDownMenu(
-                              context: context,
-                              items: floatWidgetPullDown(position),
-                              position: position);
-                        },
-                      ),
-                    )),
+                    visible: globalFloatWidgetContoller.isVisible.value,
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          child: Container(
+                              margin: const EdgeInsets.only(left: 5, bottom: 5),
+                              constraints: const BoxConstraints(
+                                  maxWidth: 50, maxHeight: 50),
+                              decoration: BoxDecoration(
+                                color: CupertinoColors.black.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(CupertinoIcons
+                                  .square_stack_3d_down_right_fill)),
+                          onTapDown: (details) {
+                            var position = details.globalPosition & Size.zero;
+                            showPullDownMenu(
+                                context: context,
+                                items: floatWidgetPullDown(position),
+                                position: position);
+                          },
+                        ),
+                      ],
+                    ))),
                 // 音乐播放控制栏
                 MusicPlayBar(
                   maxHeight: min(60, MediaQuery.of(context).size.height * 0.1),

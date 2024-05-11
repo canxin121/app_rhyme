@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
       title: 'AppRhyme',
       theme: CupertinoThemeData(
           brightness: Brightness.light,
-          primaryColor: CupertinoColors.white,
+          primaryColor: CupertinoColors.black,
           textTheme: CupertinoTextThemeData(
               textStyle: const TextStyle(color: CupertinoColors.black)
                   .useSystemChineseFont()),

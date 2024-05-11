@@ -80,8 +80,8 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             child: Text(
               '待播清单',
               style: const TextStyle(
+                color: CupertinoColors.systemGrey6,
                 fontSize: 16.0,
-                fontWeight: FontWeight.bold,
               ).useSystemChineseFont(),
             ),
           ),

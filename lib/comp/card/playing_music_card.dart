@@ -81,9 +81,8 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                         () => Text(
                           playingMusicName,
                           style: const TextStyle(
-                            color: CupertinoColors.white,
+                            color: CupertinoColors.systemGrey6,
                             fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
                           ).useSystemChineseFont(),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -93,7 +92,7 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                             playingMusicArtist,
                             style: const TextStyle(
                                     fontSize: 12.0,
-                                    color: CupertinoColors.white,
+                                    color: CupertinoColors.systemGrey5,
                                     fontWeight: FontWeight.w500)
                                 .useSystemChineseFont(),
                             overflow: TextOverflow.ellipsis,

@@ -47,10 +47,20 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
     talker.error("[Display2PlayMusic] 无第三方音乐源,无法获取播放信息");
   }
 
-  var playinfo =
-      await globalExternApi!.getMusicPlayInfo(music.info.source, extra);
+  PlayInfo? playinfo;
+  for (int attempt = 0; attempt < 3; attempt++) {
+    try {
+      playinfo =
+          await globalExternApi!.getMusicPlayInfo(music.info.source, extra);
+      if (playinfo != null) break;
+    } catch (e) {
+      if (attempt == 2) {
+        playinfo = null;
+      }
+    }
+  }
 
-  // 如果第三方api夜叉找不到，直接返回null
+  // 如果第三方api查找不到，直接返回null
   if (playinfo == null) {
     talker.error("[Display2PlayMusic] 第三方音乐源无法获取到playinfo: ${music.info.name}");
     return null;

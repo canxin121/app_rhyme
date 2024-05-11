@@ -1,6 +1,8 @@
 import 'package:app_rhyme/comp/card/music_card.dart';
 import 'package:app_rhyme/comp/form/music_list_table_form.dart';
 import 'package:app_rhyme/main.dart';
+import 'package:app_rhyme/page/home.dart';
+import 'package:app_rhyme/page/in_music_album.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/types/music.dart';
@@ -41,7 +43,7 @@ class PlayMusicList extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) => MusicCard(
                   titleBold: false,
-                  fontColor: CupertinoColors.white,
+                  darkFontColor: true,
                   height: itemHeight,
                   showQualityBackGround: false,
                   padding: Padding(padding: picPadding),
@@ -176,5 +178,14 @@ List<PullDownMenuEntry> displayListMusicCardPullDown(
           });
         },
         icon: CupertinoIcons.create,
+      ),
+      PullDownMenuItem(
+        onTap: () async {
+          globalTopUiController.updateWidget(InMusicAlbumListPage(
+              key: UniqueKey(),
+              music: DisplayMusic(music.ref, info_: music.info)));
+        },
+        title: "查看专辑",
+        icon: CupertinoIcons.music_albums,
       ),
     ];

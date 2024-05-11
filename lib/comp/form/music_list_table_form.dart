@@ -4,6 +4,7 @@ import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -103,7 +104,11 @@ class MusicListDialogState extends State<MusicListDialog> {
       ),
       actions: <CupertinoDialogAction>[
         CupertinoDialogAction(
-          child: const Text('取消'),
+          child: Text(
+            '取消',
+            style: const TextStyle(color: CupertinoColors.black)
+                .useSystemChineseFont(),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -119,7 +124,11 @@ class MusicListDialogState extends State<MusicListDialog> {
               ));
             }
           },
-          child: const Text('完成'),
+          child: Text(
+            '完成',
+            style: const TextStyle(color: CupertinoColors.black)
+                .useSystemChineseFont(),
+          ),
         ),
       ],
     );

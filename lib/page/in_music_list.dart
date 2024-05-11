@@ -106,7 +106,8 @@ class InMusicListPageState extends State<InMusicListPage> {
                       icon: CupertinoIcons.play_fill,
                       label: '播放全部',
                       onPressed: () {
-                        globalAudioHandler.clearReplaceMusicAll(musics);
+                        globalAudioHandler.clearReplaceMusicAll(
+                            context, musics);
                       },
                     ),
                     _buildButton(
@@ -116,8 +117,8 @@ class InMusicListPageState extends State<InMusicListPage> {
                       onPressed: () {
                         var musics_ = musics.toList();
                         musics_.shuffle();
-                        globalAudioHandler
-                            .clearReplaceMusicAll(shuffleList(musics_));
+                        globalAudioHandler.clearReplaceMusicAll(
+                            context, shuffleList(musics_));
                       },
                     ),
                   ],
@@ -370,8 +371,8 @@ List<PullDownMenuEntry> inListMusicCardPullDown(
       const PullDownMenuDivider.large(),
       PullDownMenuItem(
         onTap: () async {
-          globalTopUiController
-              .updateWidget(InMusicAlbumListPage(music: music));
+          globalTopUiController.updateWidget(
+              InMusicAlbumListPage(key: UniqueKey(), music: music));
         },
         title: "查看专辑",
         icon: CupertinoIcons.music_albums,

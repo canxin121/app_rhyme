@@ -13,12 +13,14 @@ import 'package:app_rhyme/util/colors.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/pull_down_selection.dart';
+import 'package:app_rhyme/util/toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
+import 'package:toastification/toastification.dart';
 
 enum SearchTarget { music, musicList }
 
@@ -392,7 +394,10 @@ List<PullDownMenuEntry> searchMusicListCardPullDown(
                 musics: musics.map((e) => e.ref).toList());
             talker.info("[MusicList Search] succeed to add  musiclist");
           } catch (e) {
-            // TODO: toast error
+            if (context.mounted) {
+              toast(
+                  context, "Music Album", "添加失败: $e", ToastificationType.error);
+            }
           } finally {
             globalFloatWidgetContoller.delMsg(index);
           }
@@ -415,7 +420,10 @@ List<PullDownMenuEntry> searchMusicListCardPullDown(
                   position: position);
             }
           } catch (e) {
-            // TODO: toast error
+            if (context.mounted) {
+              toast(
+                  context, "Music Album", "添加失败: $e", ToastificationType.error);
+            }
           } finally {
             globalFloatWidgetContoller.delMsg(index);
           }

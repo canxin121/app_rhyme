@@ -3,10 +3,12 @@ import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/util/default.dart';
+import 'package:app_rhyme/util/toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:toastification/toastification.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -135,7 +137,8 @@ class SettingsPageState extends State<SettingsPage> {
                           globalSqlMusicFactory
                               .cleanUnusedMusicData()
                               .then((value) {
-                            // TODO: toast success
+                            toast(context, "设置", "成功清除冗余歌曲数据",
+                                ToastificationType.success);
                           });
                         }))
               ],
