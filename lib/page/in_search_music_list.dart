@@ -415,6 +415,7 @@ List<PullDownMenuEntry> musicListActionPullDown(
                 cacheFile(file: music.info.artPic!, cachePath: picCachePath);
               }
             }
+            cacheFile(file: musiclist.artPic, cachePath: picCachePath);
             await globalSqlMusicFactory
                 .createMusicListTable(musicLists: [musiclist]);
             await globalSqlMusicFactory.insertMusic(

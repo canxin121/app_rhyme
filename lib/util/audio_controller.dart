@@ -194,8 +194,8 @@ class AudioHandler extends GetxController {
       playMusicList.add(firstMusic);
       await playSourceList.add(firstMusic.toAudioSource());
       updateRx(music: firstMusic);
-      await seek(Duration.zero, index: 0);
-      play();
+
+      await play();
 
       List<PlayMusic> newPlayMusics = [];
       List<AudioSource> newAudioSources = [];
@@ -295,7 +295,7 @@ class AudioHandler extends GetxController {
 
   Future<void> play() async {
     try {
-      await _player.play();
+      Future.microtask(() => _player.play());
       // talker.info("[Music Handler] In play, succeed");
     } catch (e) {
       talker.error("[Music Handler] In play. error occur: $e");

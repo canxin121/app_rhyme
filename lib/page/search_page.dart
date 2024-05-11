@@ -389,6 +389,7 @@ List<PullDownMenuEntry> searchMusicListCardPullDown(
                 cacheFile(file: music.info.artPic!, cachePath: picCachePath);
               }
             }
+            cacheFile(file: musiclist.artPic, cachePath: picCachePath);
             await globalSqlMusicFactory.insertMusic(
                 musicList: musiclist,
                 musics: musics.map((e) => e.ref).toList());

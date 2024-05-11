@@ -7,7 +7,9 @@ use lazy_static::lazy_static;
 use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
 use reqwest_retry::policies::ExponentialBackoff;
 use reqwest_retry::RetryTransientMiddleware;
+use std::sync::Arc;
 use tokio::io::AsyncWriteExt as _;
+use tokio::sync::Semaphore;
 
 lazy_static! {
     pub static ref CLIENT: ClientWithMiddleware = ClientBuilder::new(reqwest::Client::new())
@@ -15,6 +17,7 @@ lazy_static! {
             ExponentialBackoff::builder().build_with_max_retries(5),
         ))
         .build();
+    static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(100));
 }
 
 // 生成哈希值作为文件名
@@ -31,6 +34,7 @@ pub async fn cache_file(
     cache_path: &str,
     filename: Option<String>,
 ) -> Result<String, anyhow::Error> {
+    let _ = FILE_OP_SEMAPHORE.acquire().await?;
     let filename = match filename {
         None => gen_hash(file),
         Some(filename) => filename.to_string(),
@@ -68,6 +72,8 @@ pub async fn use_cache_file(
     cache_path: &str,
     filename: Option<String>,
 ) -> Option<String> {
+    let _ = FILE_OP_SEMAPHORE.acquire().await;
+
     let filename = match filename {
         None => gen_hash(file),
         Some(filename) => filename.to_string(),
@@ -90,6 +96,8 @@ pub async fn delete_cache_file(
     cache_path: &str,
     filename: Option<String>,
 ) -> Result<(), anyhow::Error> {
+    let _ = FILE_OP_SEMAPHORE.acquire().await?;
+
     let filename = match filename {
         None => gen_hash(file),
         Some(filename) => filename.to_string(),
