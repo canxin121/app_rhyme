@@ -32,13 +32,13 @@ jobs:
           mkdir -p Payload
           mv ./build/ios/iphoneos/Runner.app Payload
           zip -r -y Payload.zip Payload/Runner.app
-          mv Payload.zip AppRhyme.ipa
+          mv Payload.zip AppRhyme-ios-release-unknown.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme.ipa
-          path: AppRhyme.ipa
+          name: AppRhyme-ios-release-unknown.ipa
+          path: AppRhyme-ios-release-unknown.ipa
           compression-level: 9
 
       - name: Release Ios
@@ -66,13 +66,12 @@ jobs:
       
       - name: Package Executable
         run: 
-          mkdir -p build/app/
-          zip -r "build/app/AppRhyme-macos-release-unknown.zip" "build/macos/Build/Products/Release/AppRhyme.app"
+          zip -r "AppRhyme-macos-release-unknown.zip" "build/macos/Build/Products/Release/AppRhyme.app"
 
       - name: Release Macos
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/AppRhyme-macos-release-unknown.zip
+          files: AppRhyme-macos-release-unknown.zip
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
@@ -211,19 +210,19 @@ jobs:
 
       - name: Rename APKs
         run: |
-          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-arm64-v8a-release.apk
-          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-armeabi-v7a-release.apk
-          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-x86_64-release.apk
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-unknown-release.apk
+          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-android-arm64-v8a-release.apk
+          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-android-armeabi-v7a-release.apk
+          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-android-x86_64-release.apk
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-android-unknown-release.apk
   
       - name: Release Apks
         uses: softprops/action-gh-release@v1
         with:
           files: >
-            build/app/outputs/flutter-apk/AppRhyme-arm64-v8a-release.apk,
-            build/app/outputs/flutter-apk/AppRhyme-armeabi-v7a-release.apk,
-            build/app/outputs/flutter-apk/AppRhyme-x86_64-release.apk
-            build/app/outputs/flutter-apk/AppRhyme-unknown-release.apk
+            build/app/outputs/flutter-apk/AppRhyme-android-arm64-v8a-release.apk,
+            build/app/outputs/flutter-apk/AppRhyme-android-armeabi-v7a-release.apk,
+            build/app/outputs/flutter-apk/AppRhyme-android-x86_64-release.apk,
+            build/app/outputs/flutter-apk/AppRhyme-android-unknown-release.apk,
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
