@@ -15,7 +15,6 @@ import 'package:toastification/toastification.dart';
 // Windows 平台的just_audio实现存在bug
 bool isWindowsFirstPlay = true;
 
-
 late AudioHandler globalAudioHandler;
 late AudioUiController globalAudioUiController;
 
@@ -165,6 +164,8 @@ class AudioHandler extends GetxController {
 
   Future<void> clearReplaceMusicAll(
       BuildContext context, List<DisplayMusic> musics) async {
+    // 这个函数功能无法承受并发，必须上锁
+    var startTime = DateTime.now();
     if (_isClearReplaceMusicAllRunning) {
       toast(context, "Music Player", "上一全部播放还未结束", ToastificationType.error);
       return;
@@ -229,6 +230,9 @@ class AudioHandler extends GetxController {
         globalFloatWidgetContoller.delMsg(index);
       }
       _isClearReplaceMusicAllRunning = false;
+      var endTime = DateTime.now();
+      talker.log(
+          "[Music Handler] 播放全部耗时: ${endTime.difference(startTime).inSeconds}s");
     }
   }
 
@@ -295,6 +299,7 @@ class AudioHandler extends GetxController {
 
   Future<void> play() async {
     try {
+      // 直接运行在某些平台会导致完全无理由的中断后续代码执行，甚至没有任何报错或者返回(当然也不是阻塞)
       Future.microtask(() => _player.play());
       // talker.info("[Music Handler] In play, succeed");
     } catch (e) {
