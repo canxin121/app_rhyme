@@ -10,10 +10,7 @@ pub async fn send_request(
     payload: &str,
 ) -> String {
     let method = method.to_uppercase();
-    let headers = match (&headers).try_into() {
-        Ok(h) => h,
-        Err(_) => return "".to_string(),
-    };
+    let headers: HeaderMap = (&headers).try_into().unwrap_or_default();
 
     let response = match method.as_str() {
         "GET" => send(method, url, headers, None).await,

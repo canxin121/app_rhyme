@@ -39,16 +39,7 @@ class AudioHandler extends GetxController {
   final RxList<PlayMusic> playMusicList = RxList<PlayMusic>([]);
   final Rx<PlayMusic?> playingMusic = Rx<PlayMusic?>(null);
   final ConcatenatingAudioSource playSourceList =
-      ConcatenatingAudioSource(children: [
-    if (Platform.isWindows)
-      AudioSource.asset(
-        "assets/nature.mp3",
-        tag: const MediaItem(
-          title: "Empty",
-          id: 'default',
-        ),
-      ),
-  ]);
+      ConcatenatingAudioSource(children: []);
 
   Future<void> _init() async {
     // 先默认开启所有的循环
@@ -62,7 +53,9 @@ class AudioHandler extends GetxController {
       talker.error('[PlaybackEventStream Error] $e');
     });
     // 将playSourceList交给player作为列表，不过目前是空的
-    _player.setAudioSource(playSourceList);
+    if (!Platform.isWindows) {
+      _player.setAudioSource(playSourceList);
+    }
 
     _player.currentIndexStream.listen((event) {
       talker.info("[Music Handler] currentIndexStream updated");
@@ -76,10 +69,6 @@ class AudioHandler extends GetxController {
 
   Future<void> addMusicPlay(DisplayMusic music) async {
     try {
-      if (Platform.isWindows && isWindowsFirstPlay) {
-        isWindowsFirstPlay = false;
-        await clear();
-      }
       PlayMusic? playMusic;
       var index = -1;
       if (music.info.defaultQuality != null) {
@@ -104,6 +93,11 @@ class AudioHandler extends GetxController {
       playMusicList.add(playMusic);
       updateRx(music: playMusic);
       await playSourceList.add(playMusic.toAudioSource());
+
+      if (Platform.isWindows && isWindowsFirstPlay) {
+        await _player.setAudioSource(playSourceList);
+        isWindowsFirstPlay = false;
+      }
 
       // 播放新的音乐
       await seek(Duration.zero, index: playSourceList.length - 1);
@@ -186,15 +180,16 @@ class AudioHandler extends GetxController {
       }
       await clear();
 
-      if (Platform.isWindows) {
-        isWindowsFirstPlay = false;
-      }
-
       var firstMusic = await display2PlayMusic(musics[0]);
       if (firstMusic == null) return;
       playMusicList.add(firstMusic);
       await playSourceList.add(firstMusic.toAudioSource());
       updateRx(music: firstMusic);
+
+      if (Platform.isWindows && isWindowsFirstPlay) {
+        await _player.setAudioSource(playSourceList);
+        isWindowsFirstPlay = false;
+      }
 
       await play();
 
@@ -248,7 +243,6 @@ class AudioHandler extends GetxController {
     }
     if (playSourceList.length > 0) {
       await playSourceList.clear();
-      update();
     }
     updateRx();
     log2List("Afer Clear all musics");

@@ -33,32 +33,26 @@ Future<PlayMusic?> display2PlayMusic(DisplayMusic music,
     return null;
   }
   var (cacheFileName, extra) = result;
+
   // 尝试获取本地缓存
   var cache = await useCacheFile(
       file: "", cachePath: musicCachePath, filename: cacheFileName);
+
   // 有本地缓存直接返回
   if (cache != null) {
     talker.info("[Display2PlayMusic] 使用本地歌曲缓存转化歌曲: ${music.info.name}");
     return PlayMusic(music.ref, music.info, PlayInfo(cache, finalQuality),
         music.ref.getExtraInto(quality: finalQuality));
   }
+
   // 没有本地缓存，也没有第三方api，直接返回null
   if (globalExternApi == null) {
     talker.error("[Display2PlayMusic] 无第三方音乐源,无法获取播放信息");
   }
 
-  PlayInfo? playinfo;
-  for (int attempt = 0; attempt < 3; attempt++) {
-    try {
-      playinfo =
-          await globalExternApi!.getMusicPlayInfo(music.info.source, extra);
-      if (playinfo != null) break;
-    } catch (e) {
-      if (attempt == 2) {
-        playinfo = null;
-      }
-    }
-  }
+  // 有第三方api，使用api进行请求
+  var playinfo =
+      await globalExternApi!.getMusicPlayInfo(music.info.source, extra);
 
   // 如果第三方api查找不到，直接返回null
   if (playinfo == null) {
