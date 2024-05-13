@@ -4,19 +4,12 @@ use std::hash::{Hash, Hasher};
 use super::ROOT_PATH;
 use futures::StreamExt as _;
 use lazy_static::lazy_static;
-use reqwest_middleware::{ClientBuilder, ClientWithMiddleware};
-use reqwest_retry::policies::ExponentialBackoff;
-use reqwest_retry::RetryTransientMiddleware;
+use music_api::search_factory::CLIENT;
 use std::sync::Arc;
 use tokio::io::AsyncWriteExt as _;
 use tokio::sync::Semaphore;
 
 lazy_static! {
-    pub static ref CLIENT: ClientWithMiddleware = ClientBuilder::new(reqwest::Client::new())
-        .with(RetryTransientMiddleware::new_with_policy(
-            ExponentialBackoff::builder().build_with_max_retries(5),
-        ))
-        .build();
     static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(100));
 }
 

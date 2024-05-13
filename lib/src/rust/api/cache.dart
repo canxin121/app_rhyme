@@ -6,6 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// The type `FILE_OP_SEMAPHORE` is not used by any `pub` functions, thus it is ignored.
+
 Future<String> genHash({required String str, dynamic hint}) =>
     RustLib.instance.api.genHash(str: str, hint: hint);
 

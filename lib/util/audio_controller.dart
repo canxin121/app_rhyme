@@ -12,9 +12,9 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:toastification/toastification.dart';
 
+// Windows 平台的just_audio实现存在bug
 bool isWindowsFirstPlay = true;
 
-DateTime lastComplete = DateTime(1999);
 
 late AudioHandler globalAudioHandler;
 late AudioUiController globalAudioUiController;
@@ -189,7 +189,7 @@ class AudioHandler extends GetxController {
         isWindowsFirstPlay = false;
       }
 
-      var firstMusic = await display2PlayMusic(musics.removeAt(0));
+      var firstMusic = await display2PlayMusic(musics[0]);
       if (firstMusic == null) return;
       playMusicList.add(firstMusic);
       await playSourceList.add(firstMusic.toAudioSource());
@@ -201,7 +201,7 @@ class AudioHandler extends GetxController {
       List<AudioSource> newAudioSources = [];
       List<Future<PlayMusic?>> futures = [];
 
-      for (var music in musics) {
+      for (var music in musics.sublist(1)) {
         futures.add(display2PlayMusic(music));
       }
 

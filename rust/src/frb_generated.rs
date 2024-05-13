@@ -34,7 +34,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.0.0-dev.32";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1747152022;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1960931803;
 
 // Section: executor
 
@@ -257,6 +257,53 @@ fn wire_config_save_impl(
                 transform_result_sse(
                     (move || async move { crate::api::config::Config::save(&api_that).await })()
                         .await,
+                )
+            }
+        },
+    )
+}
+fn wire_send_request_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "send_request",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_method = <String>::sse_decode(&mut deserializer);
+            let api_headers =
+                <std::collections::HashMap<String, String>>::sse_decode(&mut deserializer);
+            let api_url = <String>::sse_decode(&mut deserializer);
+            let api_payload = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse(
+                    (move || async move {
+                        Result::<_, ()>::Ok(
+                            crate::api::http_helper::send_request(
+                                &api_method,
+                                api_headers,
+                                &api_url,
+                                &api_payload,
+                            )
+                            .await,
+                        )
+                    })()
+                    .await,
                 )
             }
         },
@@ -655,8 +702,7 @@ fn wire_SqlMusicFactoryW_create_music_list_table_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::rust_async::RwLock<SqlMusicFactoryW>,
             >>::sse_decode(&mut deserializer);
-            let api_music_lists =
-                <Vec<MusicList>>::sse_decode(&mut deserializer);
+            let api_music_lists = <Vec<MusicList>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse(
@@ -744,8 +790,7 @@ fn wire_SqlMusicFactoryW_del_music_list_table_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::rust_async::RwLock<SqlMusicFactoryW>,
             >>::sse_decode(&mut deserializer);
-            let api_music_lists =
-                <Vec<MusicList>>::sse_decode(&mut deserializer);
+            let api_music_lists = <Vec<MusicList>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse(
@@ -1263,6 +1308,14 @@ impl SseDecode for SqlMusicFactoryW {
     }
 }
 
+impl SseDecode for std::collections::HashMap<String, String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <Vec<(String, String)>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
 impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::rust_async::RwLock<MusicW>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1415,9 +1468,19 @@ impl SseDecode for Vec<(String, MusicList)> {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<(String, MusicList)>::sse_decode(
-                deserializer,
-            ));
+            ans_.push(<(String, MusicList)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(String, String)>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -1433,8 +1496,7 @@ impl SseDecode for MusicInfo {
         let mut var_duration = <Option<u32>>::sse_decode(deserializer);
         let mut var_album = <Option<String>>::sse_decode(deserializer);
         let mut var_qualities = <Vec<Quality>>::sse_decode(deserializer);
-        let mut var_defaultQuality =
-            <Option<Quality>>::sse_decode(deserializer);
+        let mut var_defaultQuality = <Option<Quality>>::sse_decode(deserializer);
         let mut var_artPic = <Option<String>>::sse_decode(deserializer);
         let mut var_lyric = <Option<String>>::sse_decode(deserializer);
         return MusicInfo {
@@ -1544,6 +1606,15 @@ impl SseDecode for (String, MusicList) {
     }
 }
 
+impl SseDecode for (String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <String>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
 impl SseDecode for u32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1592,33 +1663,34 @@ fn pde_ffi_dispatcher_primary_impl(
         3 => wire_use_cache_file_impl(port, ptr, rust_vec_len, data_len),
         6 => wire_config_load_impl(port, ptr, rust_vec_len, data_len),
         5 => wire_config_save_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire_init_app_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire_init_store_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire_SqlMusicFactoryW_build_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire_SqlMusicFactoryW_change_music_data_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire_SqlMusicFactoryW_change_music_default_source_impl(
+        7 => wire_send_request_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire_init_app_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire_init_store_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire_SqlMusicFactoryW_build_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire_SqlMusicFactoryW_change_music_data_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire_SqlMusicFactoryW_change_music_default_source_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        19 => {
+        20 => {
             wire_SqlMusicFactoryW_change_music_list_metadata_impl(port, ptr, rust_vec_len, data_len)
         }
-        29 => wire_SqlMusicFactoryW_clean_unused_music_data_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire_SqlMusicFactoryW_create_music_list_table_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire_SqlMusicFactoryW_del_music_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire_SqlMusicFactoryW_del_music_list_table_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire_SqlMusicFactoryW_init_create_table_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire_SqlMusicFactoryW_insert_music_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire_SqlMusicFactoryW_read_music_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire_SqlMusicFactoryW_read_music_data_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire_SqlMusicFactoryW_read_music_lists_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire_SqlMusicFactoryW_reorder_music_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire_get_musics_from_music_list_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire_search_album_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire_search_music_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire_search_music_list_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire_SqlMusicFactoryW_clean_unused_music_data_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire_SqlMusicFactoryW_create_music_list_table_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire_SqlMusicFactoryW_del_music_impl(port, ptr, rust_vec_len, data_len),
+        22 => wire_SqlMusicFactoryW_del_music_list_table_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire_SqlMusicFactoryW_init_create_table_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire_SqlMusicFactoryW_insert_music_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire_SqlMusicFactoryW_read_music_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire_SqlMusicFactoryW_read_music_data_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire_SqlMusicFactoryW_read_music_lists_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire_SqlMusicFactoryW_reorder_music_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire_get_musics_from_music_list_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire_search_album_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire_search_music_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire_search_music_list_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1631,9 +1703,9 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        15 => wire_MusicW_get_extra_into_impl(ptr, rust_vec_len, data_len),
-        13 => wire_MusicW_get_music_id_impl(ptr, rust_vec_len, data_len),
-        14 => wire_MusicW_get_music_info_impl(ptr, rust_vec_len, data_len),
+        16 => wire_MusicW_get_extra_into_impl(ptr, rust_vec_len, data_len),
+        14 => wire_MusicW_get_music_id_impl(ptr, rust_vec_len, data_len),
+        15 => wire_MusicW_get_music_info_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1719,13 +1791,8 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<MusicInfo> {
         .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<MusicInfo>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<MusicInfo>>
-    for MusicInfo
-{
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<MusicInfo> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<MusicInfo>> for MusicInfo {
     fn into_into_dart(self) -> FrbWrapper<MusicInfo> {
         self.into()
     }
@@ -1741,13 +1808,8 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<MusicList> {
         .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<MusicList>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<MusicList>>
-    for MusicList
-{
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<MusicList> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<MusicList>> for MusicList {
     fn into_into_dart(self) -> FrbWrapper<MusicList> {
         self.into()
     }
@@ -1765,13 +1827,8 @@ impl flutter_rust_bridge::IntoDart for FrbWrapper<Quality> {
         .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<Quality>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Quality>>
-    for Quality
-{
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<Quality> {}
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Quality>> for Quality {
     fn into_into_dart(self) -> FrbWrapper<Quality> {
         self.into()
     }
@@ -1805,6 +1862,13 @@ impl SseEncode for SqlMusicFactoryW {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <RustOpaqueMoi<flutter_rust_bridge::for_generated::rust_async::RwLock<SqlMusicFactoryW>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
+    }
+}
+
+impl SseEncode for std::collections::HashMap<String, String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(String, String)>>::sse_encode(self.into_iter().collect(), serializer);
     }
 }
 
@@ -1948,6 +2012,16 @@ impl SseEncode for Vec<(String, MusicList)> {
     }
 }
 
+impl SseEncode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, String)>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for MusicInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2035,6 +2109,14 @@ impl SseEncode for (String, MusicList) {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.0, serializer);
         <MusicList>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for (String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.0, serializer);
+        <String>::sse_encode(self.1, serializer);
     }
 }
 
