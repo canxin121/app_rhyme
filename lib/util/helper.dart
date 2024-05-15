@@ -52,8 +52,8 @@ Future<Hero> playingMusicImage() async {
 String get playingMusicQualityShort {
   late Quality quality;
   var playingMusic = globalAudioHandler.playingMusic.value;
-  if (playingMusic != null) {
-    quality = playingMusic.playInfo.quality;
+  if (playingMusic != null && playingMusic.useQuality != null) {
+    quality = playingMusic.useQuality!;
   } else {
     quality = const Quality(short: "Quality");
   }

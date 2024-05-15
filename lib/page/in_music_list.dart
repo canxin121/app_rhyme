@@ -20,7 +20,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 
 class InMusicListPage extends StatefulWidget {
   final MusicList musicList;
-  final Future<List<DisplayMusic>>? musicsFuture;
+  final Future<List<Music>>? musicsFuture;
 
   const InMusicListPage({
     super.key,
@@ -34,7 +34,7 @@ class InMusicListPage extends StatefulWidget {
 
 class InMusicListPageState extends State<InMusicListPage> {
   late MusicList musicList;
-  late Future<List<DisplayMusic>> musicsFuture;
+  late Future<List<Music>> musicsFuture;
 
   @override
   void initState() {
@@ -43,15 +43,15 @@ class InMusicListPageState extends State<InMusicListPage> {
     musicsFuture = widget.musicsFuture ?? getMusicsFromSQL();
   }
 
-  Future<List<DisplayMusic>> getMusicsFromSQL() async {
+  Future<List<Music>> getMusicsFromSQL() async {
     var results = await globalSqlMusicFactory.readMusic(musicList: musicList);
-    return results.map((m) => DisplayMusic(m)).toList();
+    return results.map((m) => Music(m)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    List<DisplayMusic> musics = [];
+    List<Music> musics = [];
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         padding: const EdgeInsetsDirectional.only(end: 16),
@@ -132,7 +132,7 @@ class InMusicListPageState extends State<InMusicListPage> {
                 height: 1,
               ),
             ),
-            FutureBuilder<List<DisplayMusic>>(
+            FutureBuilder<List<Music>>(
               future: musicsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -164,27 +164,24 @@ class InMusicListPageState extends State<InMusicListPage> {
                               items: inListMusicCardPullDown(context, music,
                                   () async {
                                 // 缓存
-                                var playMusic = await display2PlayMusic(music);
-                                if (playMusic == null) return;
+                                var playInfo = await music.getPlayInfo();
+                                if (playInfo == null) return;
                                 cacheFile(
-                                        file: playMusic.playInfo.file,
+                                        file: playInfo.file,
                                         cachePath: musicCachePath,
-                                        filename: playMusic.toCacheFileName())
+                                        filename: music.toCacheFileName())
                                     .then((file) {
                                   // 下载完成之后设置本地路径为新的播放文件
-                                  playMusic.playInfo.file = file;
+                                  playInfo.file = file;
                                   // 如果这首歌正在播放列表中，替换他，防止继续在线播放
-                                  globalAudioHandler.replaceMusic(playMusic);
+                                  globalAudioHandler.replaceMusic(music);
                                   // 在这里需要重新判断是否 hasCache,所以直接setState解决
                                   setState(() {});
                                 });
                               }, () async {
                                 // 删除缓存
                                 if (music.info.defaultQuality == null) return;
-                                var result = music.toCacheFileNameAndExtra(
-                                    music.info.defaultQuality!);
-                                if (result == null) return;
-                                var (cacheFileName, _) = result;
+                                var cacheFileName = music.toCacheFileName();
                                 deleteCacheFile(
                                         file: "",
                                         cachePath: musicCachePath,
@@ -195,10 +192,8 @@ class InMusicListPageState extends State<InMusicListPage> {
                                   if (kDebugMode) {
                                     print("成功删除缓存:${music.info.name}");
                                   }
-                                  display2PlayMusic(music).then((value) {
-                                    if (value == null) return;
-                                    globalAudioHandler.replaceMusic(value);
-                                  });
+
+                                  globalAudioHandler.replaceMusic(music);
                                 });
                               }, () async {
                                 // 删除音乐
@@ -289,7 +284,7 @@ Widget _buildButton(BuildContext context,
 // 在自定义歌单内的音乐卡片的长按触发操作
 List<PullDownMenuEntry> inListMusicCardPullDown(
         BuildContext context,
-        DisplayMusic music,
+        Music music,
         Future<void> Function() onSave,
         Future<void> Function() onUnSave,
         Future<void> Function() onDelete,
@@ -396,7 +391,7 @@ List<PullDownMenuEntry> inListMusicCardPullDown(
 // 资料库界面自定义歌单内部右上角的编辑触发的的长按触发操作
 List<PullDownMenuEntry> musicListActionPullDown(
   BuildContext context,
-  List<DisplayMusic> displayMusics,
+  List<Music> displayMusics,
   void Function() refresh,
 ) =>
     [
@@ -405,12 +400,12 @@ List<PullDownMenuEntry> musicListActionPullDown(
         onTap: () async {
           for (var music in displayMusics) {
             if (await music.hasCache()) continue;
-            var playMusic = await display2PlayMusic(music);
-            if (playMusic != null) {
+            var playInfo = await music.getPlayInfo();
+            if (playInfo != null) {
               await cacheFile(
-                  file: playMusic.playInfo.file,
+                  file: playInfo.file,
                   cachePath: musicCachePath,
-                  filename: playMusic.toCacheFileName());
+                  filename: music.toCacheFileName(quality_: playInfo.quality));
             }
             refresh();
           }
@@ -422,10 +417,7 @@ List<PullDownMenuEntry> musicListActionPullDown(
         onTap: () async {
           for (var music in displayMusics) {
             if (music.info.defaultQuality != null) {
-              var result =
-                  music.toCacheFileNameAndExtra(music.info.defaultQuality!);
-              if (result == null) return;
-              var (cacheFileName, _) = result;
+              var cacheFileName = music.toCacheFileName();
               await deleteCacheFile(
                   file: "", cachePath: musicCachePath, filename: cacheFileName);
               refresh();

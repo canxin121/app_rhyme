@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/mirror.dart';
-import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/helper.dart';
 import 'package:app_rhyme/util/audio_controller.dart';
 import 'package:app_rhyme/util/time_parse.dart';
@@ -49,16 +48,8 @@ class QualityTimeState extends State<QualityTime> {
                     context: context,
                     items: qualitySelectPullDown(context, qualityOptions,
                         (selectQuality) async {
-                      var playingMusic = globalAudioHandler.playingMusic.value;
-                      if (playingMusic != null) {
-                        var displayData = DisplayMusic(playingMusic.ref,
-                            info_: playingMusic.info);
-                        var newPlayMusic =
-                            await display2PlayMusic(displayData, selectQuality);
-                        if (newPlayMusic == null) return;
-                        await globalAudioHandler
-                            .replacePlayingMusic(newPlayMusic);
-                      }
+                      await globalAudioHandler
+                          .replacePlayingMusic(selectQuality);
                     }),
                     position: details.globalPosition & Size.zero);
               }

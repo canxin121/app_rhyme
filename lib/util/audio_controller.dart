@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:app_rhyme/main.dart';
 import 'package:app_rhyme/page/home.dart';
+import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/time_parse.dart';
-import 'package:app_rhyme/util/toast.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:toastification/toastification.dart';
+import 'package:synchronized/synchronized.dart';
 
 // Windows 平台的just_audio实现存在bug
 bool isWindowsFirstPlay = true;
@@ -36,10 +36,15 @@ Future<void> initGlobalAudioHandler() async {
 
 class AudioHandler extends GetxController {
   final AudioPlayer _player = AudioPlayer();
-  final RxList<PlayMusic> playMusicList = RxList<PlayMusic>([]);
-  final Rx<PlayMusic?> playingMusic = Rx<PlayMusic?>(null);
-  final ConcatenatingAudioSource playSourceList =
+  final RxList<Music> musicList = RxList<Music>([]);
+  final Rx<Music?> playingMusic = Rx<Music?>(null);
+  final ConcatenatingAudioSource audioSourceList =
       ConcatenatingAudioSource(children: []);
+  final audioSourceListLock = Lock();
+
+  AudioHandler() {
+    _init();
+  }
 
   Future<void> _init() async {
     // 先默认开启所有的循环
@@ -47,106 +52,159 @@ class AudioHandler extends GetxController {
     // 关闭随机播放
     _player.setShuffleModeEnabled(false);
     // 监听错误事件并用talker来log
-
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
       talker.error('[PlaybackEventStream Error] $e');
     });
+
     // 将playSourceList交给player作为列表，不过目前是空的
+    // 在windows平台无法提供一个空白的列表，会造成崩溃，故见后续特殊处理
     if (!Platform.isWindows) {
-      _player.setAudioSource(playSourceList);
+      _player.setAudioSource(audioSourceList);
     }
 
-    _player.currentIndexStream.listen((event) {
-      talker.info("[Music Handler] currentIndexStream updated");
-      updateRx();
+    // 监听播放变化，当获取到一个index时(如歌曲播放下一首时，这里的index将是下一首的index
+    _player.currentIndexStream.listen((index) async {
+      if (index == null || musicList.isEmpty) return;
+      // 先尝试LazyLoad这首歌
+      await tryLazyLoadMusic(index);
+      // 如果这首即将播放的音乐并仍没有正常LazyLoad，直接尝试播放下一首
+      if (musicList[index].shouldUpdate()) {
+        await seekToNext();
+        return;
+      }
+      updatePlayingMusic();
     });
   }
 
-  AudioHandler() {
-    _init();
+  var lazyLoadLock = Lock();
+  // 用于lazyLoad audioSourceList中的音乐文件
+  // 这个函数运行前后必须确保结束后歌曲仍播放正确的index
+  // 这个函数只会在歌曲需要更新连接时更新，这取决于歌曲是否是一个空白状态抑或超出30分钟
+  Future<void> tryLazyLoadMusic(int index) async {
+    if (musicList.isEmpty ||
+        index > musicList.length - 1 ||
+        !musicList[index].shouldUpdate()) return;
+    try {
+      // 确保同时只有一个LazyLoad运行
+      await lazyLoadLock.synchronized(() async {
+        var current = _player.currentIndex;
+        var position = _player.position;
+        if (!await musicList[index].updateAudioSource()) {
+          talker.info(
+              "[Music Handler] LazyLoad Music Failed to updateAudioSource: ${musicList[index].info.name}");
+          return;
+        }
+        // 先将播放器暂停下来
+        if (_player.playing) await pause();
+        // 确保音频资源不会被两个并发函数同时使用
+        await audioSourceListLock.synchronized(() async {
+          if (audioSourceListLock.inLock) {
+            await audioSourceList.clear();
+            await audioSourceList
+                .addAll(musicList.map((e) => e.audioSource).toList());
+          } else {
+            await audioSourceListLock.synchronized(() async {
+              await audioSourceList.clear();
+              await audioSourceList
+                  .addAll(musicList.map((e) => e.audioSource).toList());
+            });
+          }
+          // 更新音频资源后恢复原来的播放状态
+          await _player.seek(position, index: current);
+          play();
+          talker.info(
+              "[Music Hanlder] LazyLoad Music Succeed: ${musicList[index].info.name}");
+        });
+      });
+    } catch (e) {
+      talker.error("[Music Handler] In LazyLoadMusic, Unknown Error: $e");
+    }
   }
 
-  Future<void> addMusicPlay(DisplayMusic music) async {
+  // App内的手动执行的函数,可能出现首次播放不触发index流,故选择直接获取播放信息
+  Future<void> addMusicPlay(Music music) async {
     try {
-      PlayMusic? playMusic;
-      var index = -1;
-      if (music.info.defaultQuality != null) {
-        index = playMusicList.indexWhere((element) =>
+      // 由于是手动添加新的音乐，我们直接获取音乐链接并且添加到系统播放资源即可(直接添加到最后面)
+      // 添加新的音乐到待播列表(直接添加到最后面)
+      if (!await music.updateAudioSource()) {
+        talker.info(
+            "[Music Handler] In addMusicPlay, Failed to updateAudioSource: ${music.info.name}");
+        return;
+      }
+      // 先暂停播放
+      if (_player.playing) await pause();
+      // 删去原来的相同音乐并添加新的音乐到最后
+      await audioSourceListLock.synchronized(() async {
+        var index = musicList.indexWhere((element) =>
             element.extra ==
             music.ref.getExtraInto(quality: music.info.defaultQuality!));
-      }
-      if (index != -1) {
-        playMusic = playMusicList.removeAt(index);
-        playSourceList.removeAt(index);
-      } else {
-        playMusic = await display2PlayMusic(music);
-      }
+        if (index != -1) {
+          musicList.removeAt(index);
+          await audioSourceList.removeAt(index);
+        }
+        musicList.add(music);
+        await audioSourceList.add(music.audioSource);
+      });
+      updatePlayingMusic(music: music);
 
-      if (playMusic == null) return;
-
-      if (_player.playing) {
-        await pause();
-      }
-
-      // 添加新的音乐
-      playMusicList.add(playMusic);
-      updateRx(music: playMusic);
-      await playSourceList.add(playMusic.toAudioSource());
-
+      // windows平台的bug，不能添加空的audioSourceList
       if (Platform.isWindows && isWindowsFirstPlay) {
-        await _player.setAudioSource(playSourceList);
+        await _player.setAudioSource(audioSourceList);
         isWindowsFirstPlay = false;
       }
 
       // 播放新的音乐
-      await seek(Duration.zero, index: playSourceList.length - 1);
-
-      await play();
+      await seek(Duration.zero, index: audioSourceList.length - 1);
     } catch (e) {
       talker.error("[Music Handler] In addMusicPlay, Error occur: $e");
     }
   }
 
-  Future<void> replacePlayingMusic(PlayMusic playMusic) async {
+  // App内手动触发，切换音质，主动更新播放资源
+  Future<void> replacePlayingMusic(Quality quality_) async {
     try {
       if (playingMusic.value == null) return;
-      int index = playMusicList
+      int index = musicList
           .indexWhere((element) => element.extra == playingMusic.value!.extra);
+
       if (index != -1) {
-        // 删除对应位置的音乐
+        var music = musicList[index];
+        if (!await music.updateAudioSource()) {
+          talker.error(
+              "[Music Handler] In replacePlayingMusic, Failed to updateAudioSource: ${music.info.name}");
+          return;
+        }
         await removeAt(index);
-        // 插入新音乐到对应位置
-        await _insert(index, playMusic);
-        // 重新播放这个位置的音乐
+        await _insert(index, music, music.audioSource);
         await seek(Duration.zero, index: index);
-        updateRx(music: playMusic);
-        await play();
+        // 不确定是否会触发index流，姑且手动更新
+        updatePlayingMusic(music: music);
+        play();
       }
     } catch (e) {
       talker.error("[Music Handler]  In replacePlayingMusic, error occur: $e");
     }
   }
 
-  Future<void> replaceMusic(PlayMusic playMusic) async {
+  // App内手动触发, 但选择使用index流来LazyLoad
+  // 此函数用在下载/删除缓存时，对应替换musicList中的歌曲，因此出现不会首次播放的情况
+  Future<void> replaceMusic(Music music) async {
     try {
-      int index = playMusicList
-          .indexWhere((element) => element.extra == playMusic.extra);
+      int index =
+          musicList.indexWhere((element) => element.extra == music.extra);
       bool shouldPlay = index == _player.currentIndex;
       if (index != -1) {
         if (shouldPlay && _player.playing) {
           await pause();
           await seek(Duration.zero);
         }
-        // 删除对应位置的音乐
         await removeAt(index);
-        // 插入新音乐到对应位置
-        await _insert(index, playMusic);
+        await _insert(index, music);
         if (shouldPlay) {
-          // 重新播放这个位置的音乐
           await seek(Duration.zero, index: index);
-          updateRx();
-          await play();
+          updatePlayingMusic();
+          play();
         }
       }
     } catch (e) {
@@ -154,144 +212,131 @@ class AudioHandler extends GetxController {
     }
   }
 
-  bool _isClearReplaceMusicAllRunning = false;
-
+  final Lock _clearReplaceMusicAllock = Lock();
+  // App内手动触发，必定出现首次播放不触发index流的情况，故手动更新播放资源
   Future<void> clearReplaceMusicAll(
-      BuildContext context, List<DisplayMusic> musics) async {
-    // 这个函数功能无法承受并发，必须上锁
-    var startTime = DateTime.now();
-    if (_isClearReplaceMusicAllRunning) {
-      toast(context, "Music Player", "上一全部播放还未结束", ToastificationType.error);
+      BuildContext context, List<Music> musics) async {
+    if (musics.isEmpty) {
       return;
     }
-
-    _isClearReplaceMusicAllRunning = true;
-    int index = -1;
-
-    try {
-      index = globalFloatWidgetContoller.addMsg("播放全部音乐");
-      if (musics.isEmpty) {
-        return;
-      }
-      talker.info(
-          "[Music Handler] Request to add all musics of length: ${musics.length}");
-      if (_player.playing) {
-        await pause();
-      }
-      await clear();
-
-      var firstMusic = await display2PlayMusic(musics[0]);
-      if (firstMusic == null) return;
-      playMusicList.add(firstMusic);
-      await playSourceList.add(firstMusic.toAudioSource());
-      updateRx(music: firstMusic);
-
-      if (Platform.isWindows && isWindowsFirstPlay) {
-        await _player.setAudioSource(playSourceList);
-        isWindowsFirstPlay = false;
-      }
-
-      await play();
-
-      List<PlayMusic> newPlayMusics = [];
-      List<AudioSource> newAudioSources = [];
-      List<Future<PlayMusic?>> futures = [];
-
-      for (var music in musics.sublist(1)) {
-        futures.add(display2PlayMusic(music));
-      }
-
-      List<PlayMusic?> playMusicsResults = await Future.wait(futures);
-      for (var playMusic in playMusicsResults) {
-        if (playMusic == null) continue;
-        newPlayMusics.add(playMusic);
-        newAudioSources.add(playMusic.toAudioSource());
-      }
-
-      if (newAudioSources.isEmpty || newPlayMusics.isEmpty) return;
-
-      playMusicList.addAll(newPlayMusics);
+    await _clearReplaceMusicAllock.synchronized(() async {
+      int index = globalFloatWidgetContoller.addMsg("播放全部音乐");
       try {
-        await playSourceList.addAll(newAudioSources);
-      } catch (e) {
-        talker
-            .error("[Music Handler] In clearReplaceMusicAll, Error occur: $e");
-      }
+        // 先暂停
+        if (_player.playing) {
+          await pause();
+        }
+        // 清空已有的列表
+        await clear();
 
-      log2List("After add all");
-      await play();
-    } finally {
-      if (index != -1) {
-        globalFloatWidgetContoller.delMsg(index);
+        // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)
+        await musics[0].updateAudioSource();
+        musicList.add(musics[0]);
+        await audioSourceListLock.synchronized(() async {
+          await audioSourceList.add(musics[0].audioSource);
+        });
+        updatePlayingMusic(music: musics[0]);
+        // windows bug bypass
+        if (Platform.isWindows && isWindowsFirstPlay) {
+          await _player.setAudioSource(audioSourceList);
+          isWindowsFirstPlay = false;
+        }
+
+        play();
+        // 接下来将剩下的所有的音乐添加进去，但是先不获取链接，使用lazy load
+        musicList.addAll(musics.sublist(1));
+
+        try {
+          await audioSourceListLock.synchronized(() async {
+            await audioSourceList
+                .addAll(musics.sublist(1).map((e) => e.audioSource).toList());
+          });
+        } catch (e) {
+          talker.error(
+              "[Music Handler] In clearReplaceMusicAll, Error occur: $e");
+        }
+        log2List("In clearReplaceMusicAll, After add all");
+      } finally {
+        if (index != -1) {
+          globalFloatWidgetContoller.delMsg(index);
+        }
       }
-      _isClearReplaceMusicAllRunning = false;
-      var endTime = DateTime.now();
-      talker.log(
-          "[Music Handler] 播放全部耗时: ${endTime.difference(startTime).inSeconds}s");
-    }
+    });
   }
 
-  Future<void> _insert(int index, PlayMusic music) async {
-    playMusicList.insert(index, music);
-    await playSourceList.insert(index, music.toAudioSource());
+  Future<void> _insert(int index, Music music,
+      [AudioSource? audioSource]) async {
+    musicList.insert(index, music);
+    await audioSourceList.insert(index, audioSource ?? music.audioSource);
   }
 
   Future<void> clear() async {
     // talker.info("[Music Handler] Request to clear all musics");
-    if (playMusicList.isNotEmpty) {
-      playMusicList.clear();
+    if (musicList.isNotEmpty) {
+      musicList.clear();
     }
-    if (playSourceList.length > 0) {
-      await playSourceList.clear();
+    if (audioSourceList.length > 0) {
+      await audioSourceListLock.synchronized(() async {
+        talker.info("[Music Handler] clear获取锁");
+        await audioSourceList.clear();
+        talker.info("[Music Handler] clear释放锁");
+      });
     }
-    updateRx();
+    updatePlayingMusic();
     log2List("Afer Clear all musics");
   }
 
+  final _removeLock = Lock();
   Future<void> removeAt(int index) async {
-    // talker.info("[Music Handler] Request to remove music of index:$index");
-    if (_player.playing &&
-        _player.currentIndex != null &&
-        _player.currentIndex! == index) {
-      await _player.pause();
-    }
-    playMusicList.removeAt(index);
-    await playSourceList.removeAt(index);
-    updateRx();
+    await _removeLock.synchronized(() async {
+      if (_player.playing &&
+          _player.currentIndex != null &&
+          _player.currentIndex! == index) {
+        await _player.pause();
+      }
+      musicList.removeAt(index);
+      await audioSourceList.removeAt(index);
+    });
+    updatePlayingMusic();
   }
 
+  final _seekToNextLock = Lock();
   Future<void> seekToNext() async {
     try {
-      await _player.seekToNext();
-      // talker.info("[Music Handler] In seekToNext, Succeed");
+      if (_player.nextIndex == null) return;
+      await _seekToNextLock.synchronized(() async {
+        await _player.seekToNext();
+      });
     } catch (e) {
       talker.error("[Music Handler] In seekToNext, error occur: $e");
     }
-    updateRx();
-    await play();
+    updatePlayingMusic();
+    play();
   }
 
+  final _seekToPreviousLock = Lock();
   Future<void> seekToPrevious() async {
     try {
-      await _player.seekToPrevious();
-      // talker.info("[Music Handler] In seekToPrevious, Succeed");
+      if (_player.previousIndex == null) return;
+      await _seekToPreviousLock.synchronized(() async {
+        await _player.seekToPrevious();
+      });
     } catch (e) {
       talker.error("[Music Handler] In seekToPrevious, error occur: $e");
     }
-    updateRx();
-    await play();
+    updatePlayingMusic();
+    play();
   }
 
   Future<void> pause() async {
     try {
       await _player.pause();
-      // talker.info("[Music Handler] In pause, succeed");
     } catch (e) {
       talker.error("[Music Handler] In pause, error occur: $e");
     }
   }
 
-  Future<void> play() async {
+  void play() async {
     try {
       // 直接运行在某些平台会导致完全无理由的中断后续代码执行，甚至没有任何报错或者返回(当然也不是阻塞)
       Future.microtask(() => _player.play());
@@ -301,28 +346,39 @@ class AudioHandler extends GetxController {
     }
   }
 
+  final _seekLock = Lock();
   Future<void> seek(Duration position, {int? index}) async {
     try {
-      if (_player.playing) {
-        await pause();
-      }
-      await _player.seek(position, index: index);
-      await play();
-      talker.info(
-          "[Music Handler] In seek, Succeed; Seek to ${formatDuration(position.inSeconds)} of ${index ?? "current"}");
+      await _seekLock.synchronized(() async {
+        if (_player.playing) {
+          await pause();
+        }
+        String name;
+        if (index != null) {
+          name = musicList[index].info.name;
+          await tryLazyLoadMusic(index);
+        } else {
+          name = playingMusic.value?.info.name ?? "No Music";
+        }
+        await _player.seek(position, index: index);
+        play();
+        talker.info(
+            "[Music Handler] In seek, Succeed; Seek to ${formatDuration(position.inSeconds)} of $name");
+      });
     } catch (e) {
       talker.error("[Music Handler] In seek, error occur: $e");
     }
   }
 
-  void updateRx({PlayMusic? music}) {
+  void updatePlayingMusic({Music? music}) {
+    if (lazyLoadLock.locked) return;
     if (music != null) {
       playingMusic.value = music;
-    } else if (playMusicList.isNotEmpty &&
+    } else if (musicList.isNotEmpty &&
         _player.currentIndex != null &&
         _player.currentIndex! >= 0) {
       try {
-        playingMusic.value = playMusicList[_player.currentIndex!];
+        playingMusic.value = musicList[_player.currentIndex!];
       } catch (e) {
         talker.error("[Music Handler] Failed to updateRx,set null");
         playingMusic.value = null;
@@ -337,19 +393,19 @@ class AudioHandler extends GetxController {
 
   void log2List(String prefix) {
     String playListStr =
-        playMusicList.map((element) => element.info.name).join(",");
+        musicList.map((element) => element.info.name).join(",");
     String sourceListStr =
-        playSourceList.sequence.map((e) => e.tag.title).join(",");
+        audioSourceList.sequence.map((e) => e.tag.title).join(",");
     if (playListStr == sourceListStr) {
       talker.log(
-          "[Music Handler] $prefix: PlayList = PlaySourceList, length = ${playMusicList.length}, content = [$playListStr]");
+          "[Music Handler] $prefix: PlayList = PlaySourceList, length = ${musicList.length}, content = [$playListStr]");
     } else {
       talker.error(
-          "[Music Handler] $prefix: PlayList != PlaySourceList\nPlayList = length: ${playMusicList.length}, content = [$playListStr]\nPlaySourceList: length = ${playSourceList.length},content = [$playSourceList]");
+          "[Music Handler] $prefix: PlayList != PlaySourceList\nPlayList = length: ${musicList.length}, content = [$playListStr]\nPlaySourceList: length = ${audioSourceList.length},content = [$audioSourceList]");
     }
   }
 
-  bool isPlaying() {
+  bool get isPlaying {
     return _player.playing;
   }
 }

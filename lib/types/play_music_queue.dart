@@ -4,18 +4,18 @@
 // import 'package:app_rhyme/types/music.dart';
 // import 'package:get/get.dart';
 
-// class PlayMusicQueue extends GetxController {
-//   final RxList<PlayMusic> musicList = RxList<PlayMusic>([]);
-//   final Rx<PlayMusic?> currentlyPlaying = Rx<PlayMusic?>(null);
+// class MusicQueue extends GetxController {
+//   final RxList<Music> musicList = RxList<Music>([]);
+//   final Rx<Music?> currentlyPlaying = Rx<Music?>(null);
 //   final Rx<PlayInfo?> currentlyPlayingPlayinfo = Rx<PlayInfo?>(null);
-//   PlayMusicQueue();
+//   MusicQueue();
 
 //   // 添加播放新音乐(已存在则调整至最后)
-//   Future<PlayMusic?> addMusic(
-//     DisplayMusic music,
+//   Future<Music?> addMusic(
+//     Music music,
 //   ) async {
-//     // 需要将DisplayMusicTuple扩充成MusicTuple，才具备播放能力
-//     PlayMusic? newMusic = await display2PlayMusic(music);
+//     // 需要将MusicTuple扩充成MusicTuple，才具备播放能力
+//     Music? newMusic = await display2Music(music);
 //     if (newMusic == null) {
 //       return null;
 //     }
@@ -30,7 +30,7 @@
 //     } else {
 //       // 如果音乐不存在，添加到列表并设置为当前播放
 //       try {
-//         var newMusic = await display2PlayMusic(music);
+//         var newMusic = await display2Music(music);
 //         musicList.add(newMusic);
 //         currentlyPlaying.value = newMusic;
 //         currentlyPlayingPlayinfo.value = newMusic.playInfo;
@@ -43,17 +43,17 @@
 //     return currentlyPlaying.value;
 //   }
 
-//   Future<PlayMusic?> replaceMusic(PlayMusic newPlayMusic) async {
+//   Future<Music?> replaceMusic(Music newMusic) async {
 //     try {
 //       // 查找具有相同extra的音乐索引
-//       int index = musicList.indexWhere((m) => m.extra == newPlayMusic.extra);
+//       int index = musicList.indexWhere((m) => m.extra == newMusic.extra);
 //       if (index != -1) {
-//         // 如果找到，替换旧的PlayMusic
-//         musicList[index] = newPlayMusic;
+//         // 如果找到，替换旧的Music
+//         musicList[index] = newMusic;
 //         // 检查是否正在播放这首音乐
-//         if (currentlyPlaying.value?.extra == newPlayMusic.extra) {
-//           currentlyPlaying.value = newPlayMusic;
-//           currentlyPlayingPlayinfo.value = newPlayMusic.playInfo;
+//         if (currentlyPlaying.value?.extra == newMusic.extra) {
+//           currentlyPlaying.value = newMusic;
+//           currentlyPlayingPlayinfo.value = newMusic.playInfo;
 //         }
 //         update();
 //         return currentlyPlaying.value;
@@ -67,13 +67,13 @@
 //     }
 //   }
 
-//   Future<PlayMusic?> replaceAllMusics(
-//     List<DisplayMusic> musics,
+//   Future<Music?> replaceAllMusics(
+//     List<Music> musics,
 //   ) async {
 //     musicList.clear();
 //     update();
 //     for (var music in musics) {
-//       musicList.add(await display2PlayMusic(music));
+//       musicList.add(await display2Music(music));
 //     }
 //     var firstMusic = _getIndex(0);
 //     currentlyPlaying.value = firstMusic;
@@ -83,7 +83,7 @@
 //   }
 
 //   // 这里我们认为跳到同一首歌也是改变了(改变进度从头开始)
-//   PlayMusic? skipToMusic(int index) {
+//   Music? skipToMusic(int index) {
 //     var music = _getIndex(index);
 //     if (music != null) {
 //       currentlyPlaying.value = music;
@@ -97,7 +97,7 @@
 //   }
 
 //   // 播放下一首音乐
-//   PlayMusic? skipToNext() {
+//   Music? skipToNext() {
 //     if (musicList.isNotEmpty) {
 //       int currentIndex = currentlyPlaying.value != null
 //           ? musicList.indexOf(currentlyPlaying.value!)
@@ -114,7 +114,7 @@
 //   }
 
 //   // 播放上一首音乐
-//   PlayMusic? skipToPrevious() {
+//   Music? skipToPrevious() {
 //     if (musicList.isNotEmpty) {
 //       int currentIndex = currentlyPlaying.value != null
 //           ? musicList.indexOf(currentlyPlaying.value!)
@@ -132,7 +132,7 @@
 //   }
 
 //   // 删除指定索引的音乐
-//   PlayMusic? delIndex(int index) {
+//   Music? delIndex(int index) {
 //     try {
 //       if (currentlyPlaying.value == musicList[index]) {
 //         currentlyPlaying.value = null;
@@ -149,7 +149,7 @@
 //     return null;
 //   }
 
-//   Future<PlayMusic?> _changePlayingMusicQuality(
+//   Future<Music?> _changePlayingMusicQuality(
 //     int index,
 //     Quality quality,
 //   ) async {
@@ -183,13 +183,13 @@
 //     if (oldIndex < newIndex) {
 //       newIndex -= 1;
 //     }
-//     final PlayMusic music = musicList.removeAt(oldIndex);
+//     final Music music = musicList.removeAt(oldIndex);
 //     musicList.insert(newIndex, music);
 //     update();
 //   }
 
 //   // 改变当前正在播放的音乐的音质
-//   Future<PlayMusic?> changeCurrentPlayingQuality(Quality quality) async {
+//   Future<Music?> changeCurrentPlayingQuality(Quality quality) async {
 //     if (currentlyPlaying.value != null) {
 //       return await _changePlayingMusicQuality(
 //           musicList.indexOf(currentlyPlaying.value!), quality);
@@ -199,7 +199,7 @@
 //   }
 
 //   // 私有方法，用于获取指定索引的音乐
-//   PlayMusic? _getIndex(int index) {
+//   Music? _getIndex(int index) {
 //     try {
 //       return musicList[index];
 //     } catch (_) {
@@ -207,15 +207,15 @@
 //     }
 //   }
 
-//   List<DisplayMusic> downCast() {
-//     List<DisplayMusic> rst = [];
+//   List<Music> downCast() {
+//     List<Music> rst = [];
 //     for (var m in musicList) {
-//       rst.add(DisplayMusic(m.ref));
+//       rst.add(Music(m.ref));
 //     }
 //     return rst;
 //   }
 
 //   // 公共属性和方法
 //   int get length => musicList.length;
-//   RxList<PlayMusic> get allMusic => musicList;
+//   RxList<Music> get allMusic => musicList;
 // }

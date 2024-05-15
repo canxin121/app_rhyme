@@ -86,7 +86,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             ),
           ),
           // 应当占据剩下的所有高度
-          PlayMusicList(
+          MusicListComp(
             maxHeight: Platform.isIOS
                 ? screenHeight * 0.87 - 350
                 : screenHeight * 0.87 - 300,
