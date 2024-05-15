@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:app_rhyme/main.dart';
-import 'package:app_rhyme/page/home.dart';
 import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/types/music.dart';
 import 'package:app_rhyme/util/time_parse.dart';
@@ -72,6 +71,7 @@ class AudioHandler extends GetxController {
       await tryLazyLoadMusic(index);
       // 如果这首即将播放的音乐并仍没有正常LazyLoad，直接尝试播放下一首
       if (musicList[index].shouldUpdate()) {
+        if (isPlaying) await pause();
         await seekToNext();
         return;
       }
@@ -85,11 +85,12 @@ class AudioHandler extends GetxController {
   // 用于lazyLoad audioSourceList中的音乐文件
   // 这个函数运行前后必须确保结束后歌曲仍播放正确的index
   // 这个函数只会在歌曲需要更新连接时更新，这取决于歌曲是否是一个空白状态抑或超出30分钟
-  Future<void> tryLazyLoadMusic(int index, [Quality? quality]) async {
-    if (quality == null &&
-        (musicList.isEmpty ||
-            index > musicList.length - 1 ||
-            !musicList[index].shouldUpdate())) return;
+  Future<void> tryLazyLoadMusic(int index,
+      {Quality? quality, bool force = false}) async {
+    if (musicList.isEmpty || index > musicList.length - 1) return;
+    if (force == false && quality == null && !musicList[index].shouldUpdate()) {
+      return;
+    }
     try {
       // 确保同时只有一个LazyLoad运行
       await lazyLoadLock.synchronized(() async {
@@ -173,7 +174,7 @@ class AudioHandler extends GetxController {
           .indexWhere((element) => element.extra == playingMusic.value!.extra);
 
       if (index != -1) {
-        await tryLazyLoadMusic(index, quality_);
+        await tryLazyLoadMusic(index, quality: quality_, force: true);
         update();
       }
     } catch (e) {
@@ -187,18 +188,11 @@ class AudioHandler extends GetxController {
     try {
       int index =
           musicList.indexWhere((element) => element.extra == music.extra);
-      bool shouldPlay = index == _player.currentIndex;
       if (index != -1) {
-        if (shouldPlay && _player.playing) {
-          await pause();
-          await seek(Duration.zero);
-        }
-        await removeAt(index);
-        await _insert(index, music);
-        if (shouldPlay) {
-          await seek(Duration.zero, index: index);
-          updatePlayingMusic();
-          play();
+        if (index == _player.currentIndex) {
+          await tryLazyLoadMusic(index, force: true);
+        } else {
+          musicList[index].empty = true;
         }
       }
     } catch (e) {
@@ -222,7 +216,7 @@ class AudioHandler extends GetxController {
       await clear();
 
       // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)
-      await musics[0].updateAudioSource();
+      bool shouldSeekNext = !await musics[0].updateAudioSource();
       musicList.add(musics[0]);
       await audioSourceListLock.synchronized(() async {
         await audioSourceList.add(musics[0].audioSource);
@@ -247,14 +241,9 @@ class AudioHandler extends GetxController {
         talker
             .error("[Music Handler] In clearReplaceMusicAll, Error occur: $e");
       }
+      if (shouldSeekNext) await seekToNext();
       log2List("In clearReplaceMusicAll, After add all");
     });
-  }
-
-  Future<void> _insert(int index, Music music,
-      [AudioSource? audioSource]) async {
-    musicList.insert(index, music);
-    await audioSourceList.insert(index, audioSource ?? music.audioSource);
   }
 
   Future<void> clear() async {
