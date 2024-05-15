@@ -1,9 +1,9 @@
 import 'package:app_rhyme/src/rust/api/music_sdk.dart';
 import 'package:app_rhyme/types/music.dart';
 
-Future<List<DisplayMusic>> getAllMusicFromMusicList(
+Future<List<Music>> getAllMusicFromMusicList(
     String payload, String source) async {
-  List<DisplayMusic> musics = [];
+  List<Music> musics = [];
   int currentPage = 1;
   bool isEmptyPage = false;
 
@@ -19,11 +19,11 @@ Future<List<DisplayMusic>> getAllMusicFromMusicList(
 
     // 等待所有请求完成
     List<List<MusicW>> results = await Future.wait(pageRequests);
-    List<DisplayMusic> newMusics = [];
+    List<Music> newMusics = [];
     for (var result in results) {
       for (var music in result) {
         bool exist = false;
-        var newMusic = DisplayMusic(music);
+        var newMusic = Music(music);
         for (var existMusic in musics) {
           if (newMusic.info.name == existMusic.info.name &&
               newMusic.info.artist.join(",") ==

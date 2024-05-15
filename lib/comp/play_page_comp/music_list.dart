@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
-// PlayMusicList组件
-class PlayMusicList extends StatelessWidget {
+// MusicList组件
+class MusicListComp extends StatelessWidget {
   final double maxHeight;
   final EdgeInsets picPadding;
   final double itemHeight;
-  const PlayMusicList(
+  const MusicListComp(
       {super.key,
       required this.maxHeight,
       required this.picPadding,
@@ -29,7 +29,7 @@ class PlayMusicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      var musics = globalAudioHandler.playMusicList;
+      var musics = globalAudioHandler.musicList;
 
       return Container(
           constraints: BoxConstraints(maxHeight: maxHeight),
@@ -77,7 +77,7 @@ class PlayMusicList extends StatelessWidget {
 // 播放展示界面的列表中的音乐卡片的长按触发操作
 List<PullDownMenuEntry> displayListMusicCardPullDown(
   BuildContext context,
-  PlayMusic music,
+  Music music,
   Future<void> Function() onDelete,
   Rect position,
 ) =>
@@ -143,11 +143,8 @@ List<PullDownMenuEntry> displayListMusicCardPullDown(
           if (context.mounted) {
             await showPullDownMenu(
                 context: context,
-                items: addToMusicListPullDown(
-                    context,
-                    musicLists,
-                    Future.value([DisplayMusic(music.ref, info_: music.info)]),
-                    position),
+                items: addToMusicListPullDown(context, musicLists,
+                    Future.value([Music(music.ref)]), position),
                 position: position);
           }
         },
@@ -181,9 +178,8 @@ List<PullDownMenuEntry> displayListMusicCardPullDown(
       ),
       PullDownMenuItem(
         onTap: () async {
-          globalTopUiController.updateWidget(InMusicAlbumListPage(
-              key: UniqueKey(),
-              music: DisplayMusic(music.ref, info_: music.info)));
+          globalTopUiController.updateWidget(
+              InMusicAlbumListPage(key: UniqueKey(), music: Music(music.ref)));
         },
         title: "查看专辑",
         icon: CupertinoIcons.music_albums,

@@ -120,16 +120,16 @@ class SearchController extends GetxController {
         source: 'KuWo',
       );
 
-      List<DisplayMusic> newItems = [];
+      List<Music> newItems = [];
       for (MusicW result in results) {
-        newItems.add(DisplayMusic(result));
+        newItems.add(Music(result));
       }
-      List<DisplayMusic> uniqueItems = [];
+      List<Music> uniqueItems = [];
 
       if (pagingController.value.itemList != null) {
-        for (DisplayMusic newItem in newItems) {
+        for (Music newItem in newItems) {
           bool exist = false;
-          for (DisplayMusic existItem in pagingController.value.itemList!) {
+          for (Music existItem in pagingController.value.itemList!) {
             if (existItem.info.name == newItem.info.name &&
                 existItem.info.artist.join("") ==
                     newItem.info.artist.join("")) {
@@ -242,7 +242,7 @@ class SearchPage extends StatelessWidget {
                     music: displayMusic,
                     onClick: () {
                       globalAudioHandler.addMusicPlay(
-                        displayMusic as DisplayMusic,
+                        displayMusic as Music,
                       );
                     },
                     onPress: (details) async {
@@ -250,7 +250,7 @@ class SearchPage extends StatelessWidget {
                       await showPullDownMenu(
                           context: context,
                           items: searchMusicCardPullDown(
-                              context, displayMusic as DisplayMusic, position),
+                              context, displayMusic as Music, position),
                           position: position);
                     },
                   ),

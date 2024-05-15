@@ -44,6 +44,7 @@ dependencies:
   pull_down_button: ^0.9.4
   glassmorphism_ui: ^0.3.0
   toastification: ^2.0.0
+  synchronized: ^3.1.0+1
 
 dev_dependencies:
   flutter_test:

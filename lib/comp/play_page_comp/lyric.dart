@@ -22,7 +22,7 @@ class LyricDisplayState extends State<LyricDisplay> {
   var lyricModel =
       LyricsModelBuilder.create().bindLyricToMain("[00:00.00]无歌词").getModel();
   var lyricUI = UINetease(lyricAlign: LyricAlign.CENTER, highlight: true);
-  late StreamSubscription<PlayMusic?> stream;
+  late StreamSubscription<Music?> stream;
   @override
   void initState() {
     super.initState();
@@ -70,7 +70,7 @@ class LyricDisplayState extends State<LyricDisplay> {
                       globalAudioHandler.seek(toSeek).then((value) {
                         confirm.call();
                         // 这里是考虑到在暂停状态下。需要开启播放
-                        if (!globalAudioHandler.isPlaying()) {
+                        if (!globalAudioHandler.isPlaying) {
                           globalAudioHandler.play();
                         }
                       });
@@ -87,7 +87,8 @@ class LyricDisplayState extends State<LyricDisplay> {
                 ),
                 Text(
                   formatDuration(Duration(milliseconds: progress).inSeconds),
-                  style: const TextStyle(color: CupertinoColors.white).useSystemChineseFont(),
+                  style: const TextStyle(color: CupertinoColors.white)
+                      .useSystemChineseFont(),
                 )
               ],
             );
