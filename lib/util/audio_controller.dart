@@ -8,7 +8,6 @@ import 'package:app_rhyme/util/time_parse.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:synchronized/synchronized.dart';
@@ -86,16 +85,16 @@ class AudioHandler extends GetxController {
   // 用于lazyLoad audioSourceList中的音乐文件
   // 这个函数运行前后必须确保结束后歌曲仍播放正确的index
   // 这个函数只会在歌曲需要更新连接时更新，这取决于歌曲是否是一个空白状态抑或超出30分钟
-  Future<void> tryLazyLoadMusic(int index) async {
-    if (musicList.isEmpty ||
-        index > musicList.length - 1 ||
-        !musicList[index].shouldUpdate()) return;
+  Future<void> tryLazyLoadMusic(int index, [Quality? quality]) async {
+    if (quality == null &&
+        (musicList.isEmpty ||
+            index > musicList.length - 1 ||
+            !musicList[index].shouldUpdate())) return;
     try {
       // 确保同时只有一个LazyLoad运行
       await lazyLoadLock.synchronized(() async {
         var current = _player.currentIndex;
-        var position = _player.position;
-        if (!await musicList[index].updateAudioSource()) {
+        if (!await musicList[index].updateAudioSource(quality)) {
           talker.info(
               "[Music Handler] LazyLoad Music Failed to updateAudioSource: ${musicList[index].info.name}");
           return;
@@ -116,7 +115,7 @@ class AudioHandler extends GetxController {
             });
           }
           // 更新音频资源后恢复原来的播放状态
-          await _player.seek(position, index: current);
+          await _player.seek(Duration.zero, index: current);
           play();
           talker.info(
               "[Music Hanlder] LazyLoad Music Succeed: ${musicList[index].info.name}");
@@ -174,18 +173,8 @@ class AudioHandler extends GetxController {
           .indexWhere((element) => element.extra == playingMusic.value!.extra);
 
       if (index != -1) {
-        var music = musicList[index];
-        // 不确定是否会触发index流，姑且手动更新
-        if (!await music.updateAudioSource()) {
-          talker.error(
-              "[Music Handler] In replacePlayingMusic, Failed to updateAudioSource: ${music.info.name}");
-          return;
-        }
-        await removeAt(index);
-        await _insert(index, music, music.audioSource);
-        await seek(Duration.zero, index: index);
-        updatePlayingMusic(music: music);
-        play();
+        await tryLazyLoadMusic(index, quality_);
+        update();
       }
     } catch (e) {
       talker.error("[Music Handler]  In replacePlayingMusic, error occur: $e");
@@ -225,47 +214,40 @@ class AudioHandler extends GetxController {
       return;
     }
     await _clearReplaceMusicAllock.synchronized(() async {
-      int index = globalFloatWidgetContoller.addMsg("播放全部音乐");
-      try {
-        // 先暂停
-        if (_player.playing) {
-          await pause();
-        }
-        // 清空已有的列表
-        await clear();
-
-        // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)
-        await musics[0].updateAudioSource();
-        musicList.add(musics[0]);
-        await audioSourceListLock.synchronized(() async {
-          await audioSourceList.add(musics[0].audioSource);
-        });
-        updatePlayingMusic(music: musics[0]);
-        // windows bug bypass
-        if (Platform.isWindows && isWindowsFirstPlay) {
-          await _player.setAudioSource(audioSourceList);
-          isWindowsFirstPlay = false;
-        }
-
-        play();
-        // 接下来将剩下的所有的音乐添加进去，但是先不获取链接，使用lazy load
-        musicList.addAll(musics.sublist(1));
-
-        try {
-          await audioSourceListLock.synchronized(() async {
-            await audioSourceList
-                .addAll(musics.sublist(1).map((e) => e.audioSource).toList());
-          });
-        } catch (e) {
-          talker.error(
-              "[Music Handler] In clearReplaceMusicAll, Error occur: $e");
-        }
-        log2List("In clearReplaceMusicAll, After add all");
-      } finally {
-        if (index != -1) {
-          globalFloatWidgetContoller.delMsg(index);
-        }
+      // 先暂停
+      if (_player.playing) {
+        await pause();
       }
+      // 清空已有的列表
+      await clear();
+
+      // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)
+      await musics[0].updateAudioSource();
+      musicList.add(musics[0]);
+      await audioSourceListLock.synchronized(() async {
+        await audioSourceList.add(musics[0].audioSource);
+      });
+      updatePlayingMusic(music: musics[0]);
+      // windows bug bypass
+      if (Platform.isWindows && isWindowsFirstPlay) {
+        await _player.setAudioSource(audioSourceList);
+        isWindowsFirstPlay = false;
+      }
+
+      play();
+      // 接下来将剩下的所有的音乐添加进去，但是先不获取链接，使用lazy load
+      musicList.addAll(musics.sublist(1));
+
+      try {
+        await audioSourceListLock.synchronized(() async {
+          await audioSourceList
+              .addAll(musics.sublist(1).map((e) => e.audioSource).toList());
+        });
+      } catch (e) {
+        talker
+            .error("[Music Handler] In clearReplaceMusicAll, Error occur: $e");
+      }
+      log2List("In clearReplaceMusicAll, After add all");
     });
   }
 

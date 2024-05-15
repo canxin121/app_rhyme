@@ -6,6 +6,7 @@ import 'package:app_rhyme/src/rust/api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_sdk.dart';
 import 'package:app_rhyme/util/default.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
 class PlayInfo {
@@ -31,7 +32,7 @@ class Music {
   late MusicW ref;
   late MusicInfo info;
   late String extra;
-  Quality? useQuality;
+  late Rx<Quality?> useQuality;
   late AudioSource audioSource;
   bool empty = true;
   DateTime lastUpdate = DateTime(1999);
@@ -40,6 +41,7 @@ class Music {
     info = musicRef_.getMusicInfo();
     extra = musicRef_.getExtraInto(quality: info.defaultQuality!);
     audioSource = AudioSource.asset("assets/blank.mp3", tag: toMediaItem());
+    useQuality = info.defaultQuality!.obs;
   }
 
   bool shouldUpdate() {
@@ -86,9 +88,10 @@ class Music {
   Future<bool> updateAudioSource([Quality? quality]) async {
     empty = false;
     lastUpdate = DateTime.now();
+    if (quality != null) extra = ref.getExtraInto(quality: quality);
     var playInfo = await getPlayInfo(quality);
     if (playInfo == null) return false;
-    useQuality = playInfo.quality;
+    useQuality.value = playInfo.quality;
     if (playInfo.file.contains("http")) {
       if ((Platform.isIOS || Platform.isMacOS) &&
           playInfo.quality.short.contains("flac")) {
