@@ -39,12 +39,20 @@ class Music {
     ref = musicRef_;
     info = musicRef_.getMusicInfo();
     extra = musicRef_.getExtraInto(quality: info.defaultQuality!);
-    audioSource = AudioSource.asset("assets/nature.mp3", tag: toMediaItem());
+    audioSource = AudioSource.asset("assets/blank.mp3", tag: toMediaItem());
   }
 
   bool shouldUpdate() {
-    return empty ||
-        DateTime.now().difference(lastUpdate).abs().inSeconds >= 1800;
+    try {
+      return (audioSource as ProgressiveAudioSource)
+              .uri
+              .path
+              .contains("/assets/") ||
+          empty ||
+          DateTime.now().difference(lastUpdate).abs().inSeconds >= 1800;
+    } catch (_) {
+      return true;
+    }
   }
 
   String toCacheFileName({Quality? quality_}) {

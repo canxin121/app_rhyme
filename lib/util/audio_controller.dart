@@ -8,6 +8,7 @@ import 'package:app_rhyme/util/time_parse.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:synchronized/synchronized.dart';
@@ -66,6 +67,8 @@ class AudioHandler extends GetxController {
     // 监听播放变化，当获取到一个index时(如歌曲播放下一首时，这里的index将是下一首的index
     _player.currentIndexStream.listen((index) async {
       if (index == null || musicList.isEmpty) return;
+      var shouldUpdate = true;
+      if (index == 0 && lazyLoadLock.locked) shouldUpdate = false;
       // 先尝试LazyLoad这首歌
       await tryLazyLoadMusic(index);
       // 如果这首即将播放的音乐并仍没有正常LazyLoad，直接尝试播放下一首
@@ -73,7 +76,9 @@ class AudioHandler extends GetxController {
         await seekToNext();
         return;
       }
-      updatePlayingMusic();
+      if (shouldUpdate) {
+        updatePlayingMusic(music: musicList[index]);
+      }
     });
   }
 
@@ -170,6 +175,7 @@ class AudioHandler extends GetxController {
 
       if (index != -1) {
         var music = musicList[index];
+        // 不确定是否会触发index流，姑且手动更新
         if (!await music.updateAudioSource()) {
           talker.error(
               "[Music Handler] In replacePlayingMusic, Failed to updateAudioSource: ${music.info.name}");
@@ -178,7 +184,6 @@ class AudioHandler extends GetxController {
         await removeAt(index);
         await _insert(index, music, music.audioSource);
         await seek(Duration.zero, index: index);
-        // 不确定是否会触发index流，姑且手动更新
         updatePlayingMusic(music: music);
         play();
       }
@@ -282,7 +287,6 @@ class AudioHandler extends GetxController {
         talker.info("[Music Handler] clear释放锁");
       });
     }
-    updatePlayingMusic();
     log2List("Afer Clear all musics");
   }
 
@@ -297,7 +301,6 @@ class AudioHandler extends GetxController {
       musicList.removeAt(index);
       await audioSourceList.removeAt(index);
     });
-    updatePlayingMusic();
   }
 
   final _seekToNextLock = Lock();
@@ -310,7 +313,6 @@ class AudioHandler extends GetxController {
     } catch (e) {
       talker.error("[Music Handler] In seekToNext, error occur: $e");
     }
-    updatePlayingMusic();
     play();
   }
 
@@ -324,7 +326,6 @@ class AudioHandler extends GetxController {
     } catch (e) {
       talker.error("[Music Handler] In seekToPrevious, error occur: $e");
     }
-    updatePlayingMusic();
     play();
   }
 
@@ -371,13 +372,16 @@ class AudioHandler extends GetxController {
   }
 
   void updatePlayingMusic({Music? music}) {
-    if (lazyLoadLock.locked) return;
-    if (music != null) {
+    // 再LazyLoad中触发的是不可信的，因为可能是在clear后触发的
+    if (lazyLoadLock.locked ||
+        (musicList.length > 1 && _player.nextIndex == null)) return;
+    if (music != null && !music.shouldUpdate()) {
       playingMusic.value = music;
     } else if (musicList.isNotEmpty &&
         _player.currentIndex != null &&
         _player.currentIndex! >= 0) {
       try {
+        if (musicList[_player.currentIndex!].shouldUpdate()) return;
         playingMusic.value = musicList[_player.currentIndex!];
       } catch (e) {
         talker.error("[Music Handler] Failed to updateRx,set null");

@@ -152,7 +152,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                     const MusicInfo(
                       titleHeight: 20,
                       artistHeight: 16,
-                      padding: EdgeInsets.only(left: 40),
+                      padding: EdgeInsets.only(left: 40, right: 40),
                     ),
                   // 占据约35的高度
                   const ProgressSlider(
