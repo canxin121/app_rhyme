@@ -190,7 +190,8 @@ class AudioHandler extends GetxController {
           musicList.indexWhere((element) => element.extra == music.extra);
       if (index != -1) {
         if (index == _player.currentIndex) {
-          await tryLazyLoadMusic(index, force: true);
+          await replacePlayingMusic(musicList[index].info.defaultQuality!);
+          // await tryLazyLoadMusic(index, force: true);
         } else {
           musicList[index].empty = true;
         }
