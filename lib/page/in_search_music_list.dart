@@ -39,7 +39,7 @@ class InSearchMusicListPage extends StatefulWidget {
 class InSearchMusicListPageState extends State<InSearchMusicListPage> {
   late MusicList musicList;
   var allowEmptyTime = 3;
-  var pagingController = PagingController<int, DisplayMusic>(firstPageKey: 1);
+  var pagingController = PagingController<int, Music>(firstPageKey: 1);
 
   @override
   void initState() {
@@ -57,14 +57,14 @@ class InSearchMusicListPageState extends State<InSearchMusicListPage> {
         source: 'KuWo',
         payload: widget.payload,
       ))
-          .map((i) => DisplayMusic(i));
+          .map((i) => Music(i));
 
-      List<DisplayMusic> uniqueItems = [];
+      List<Music> uniqueItems = [];
 
       if (pagingController.value.itemList != null) {
         for (var newItem in newItems) {
           bool exist = false;
-          for (DisplayMusic existItem in pagingController.value.itemList!) {
+          for (Music existItem in pagingController.value.itemList!) {
             if (existItem.info.name == newItem.info.name &&
                 existItem.info.artist.join(",") ==
                     newItem.info.artist.join(",")) {
@@ -192,7 +192,7 @@ class InSearchMusicListPageState extends State<InSearchMusicListPage> {
                   music: displayMusic,
                   onClick: () {
                     globalAudioHandler.addMusicPlay(
-                      displayMusic as DisplayMusic,
+                      displayMusic as Music,
                     );
                   },
                   onPress: (details) async {
@@ -200,7 +200,7 @@ class InSearchMusicListPageState extends State<InSearchMusicListPage> {
                     await showPullDownMenu(
                         context: context,
                         items: searchMusicCardPullDown(
-                            context, displayMusic as DisplayMusic, position),
+                            context, displayMusic as Music, position),
                         position: position);
                   },
                 ),
@@ -247,7 +247,7 @@ Widget _buildButton(BuildContext context,
 // 搜索界面的音乐卡片的长按触发操作
 List<PullDownMenuEntry> searchMusicCardPullDown(
   BuildContext context,
-  DisplayMusic music,
+  Music music,
   Rect position,
 ) =>
     [

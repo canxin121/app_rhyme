@@ -86,7 +86,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             ),
           ),
           // 应当占据剩下的所有高度
-          PlayMusicList(
+          MusicListComp(
             maxHeight: Platform.isIOS
                 ? screenHeight * 0.87 - 350
                 : screenHeight * 0.87 - 300,
@@ -152,7 +152,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                     const MusicInfo(
                       titleHeight: 20,
                       artistHeight: 16,
-                      padding: EdgeInsets.only(left: 40),
+                      padding: EdgeInsets.only(left: 40, right: 40),
                     ),
                   // 占据约35的高度
                   const ProgressSlider(

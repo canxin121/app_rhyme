@@ -22,7 +22,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 import 'package:toastification/toastification.dart';
 
 class InMusicAlbumListPage extends StatefulWidget {
-  final DisplayMusic music;
+  final Music music;
   const InMusicAlbumListPage({
     super.key,
     required this.music,
@@ -35,7 +35,7 @@ class InMusicAlbumListPage extends StatefulWidget {
 class InMusicAlbumListPageState extends State<InMusicAlbumListPage> {
   MusicList musicList = const MusicList(name: "Album", artPic: "", desc: "");
   var allowEmptyTime = 3;
-  var pagingController = PagingController<int, DisplayMusic>(firstPageKey: 1);
+  var pagingController = PagingController<int, Music>(firstPageKey: 1);
 
   @override
   void initState() {
@@ -64,13 +64,13 @@ class InMusicAlbumListPageState extends State<InMusicAlbumListPage> {
           musicList = musicList_;
         });
       }
-      var newMusics = newMusicsRefs.map((e) => DisplayMusic(e));
-      List<DisplayMusic> uniqueItems = [];
+      var newMusics = newMusicsRefs.map((e) => Music(e));
+      List<Music> uniqueItems = [];
 
       if (pagingController.value.itemList != null) {
         for (var newMusic in newMusics) {
           bool exist = false;
-          for (DisplayMusic existItem in pagingController.value.itemList!) {
+          for (Music existItem in pagingController.value.itemList!) {
             if (existItem.info.name == newMusic.info.name &&
                 existItem.info.artist.join(",") ==
                     newMusic.info.artist.join(",")) {
@@ -198,7 +198,7 @@ class InMusicAlbumListPageState extends State<InMusicAlbumListPage> {
                   music: displayMusic,
                   onClick: () {
                     globalAudioHandler.addMusicPlay(
-                      displayMusic as DisplayMusic,
+                      displayMusic as Music,
                     );
                   },
                   onPress: (details) async {
@@ -206,7 +206,7 @@ class InMusicAlbumListPageState extends State<InMusicAlbumListPage> {
                     await showPullDownMenu(
                         context: context,
                         items: inMusicAlbumMusicCardPullDown(
-                            context, displayMusic as DisplayMusic, position),
+                            context, displayMusic as Music, position),
                         position: position);
                   },
                 ),
@@ -253,7 +253,7 @@ Widget _buildButton(BuildContext context,
 // 专辑界面的音乐卡片的长按触发操作
 List<PullDownMenuEntry> inMusicAlbumMusicCardPullDown(
   BuildContext context,
-  DisplayMusic music,
+  Music music,
   Rect position,
 ) =>
     [
@@ -349,7 +349,7 @@ List<PullDownMenuEntry> musicAlbumActionPullDown(
   BuildContext context,
   Future<void> Function() fetchAllMusic,
   MusicList musiclist,
-  PagingController<int, DisplayMusic> pagingController,
+  PagingController<int, Music> pagingController,
   Rect position,
 ) =>
     [
@@ -448,7 +448,7 @@ List<PullDownMenuEntry> musicAlbumActionPullDown(
                     if (pagingController.itemList != null) {
                       return pagingController.itemList!;
                     }
-                  }(), // 这里传递Future<List<DisplayMusic>>
+                  }(), // 这里传递Future<List<Music>>
                       position),
                   position: position);
             }

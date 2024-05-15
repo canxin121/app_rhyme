@@ -14,7 +14,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 List<PullDownMenuEntry> addToMusicListPullDown(
         BuildContext context,
         List<MusicList> musicLists,
-        Future<List<DisplayMusic>?> musicsFuture,
+        Future<List<Music>?> musicsFuture,
         Rect position) =>
     musicLists
         .map(
