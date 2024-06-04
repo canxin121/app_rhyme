@@ -989,7 +989,7 @@ dependencies = [
 [[package]]
 name = "music_api"
 version = "0.1.0"
-source = "git+https://github.com/canxin121/music_api#b5c28498da5889a1a8a33e1ac2d80802b133953e"
+source = "git+https://github.com/canxin121/music_api#1d00d2a36d6d6d1e1c340c45b672679eed233691"
 dependencies = [
  "anyhow",
  "futures",
