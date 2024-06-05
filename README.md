@@ -25,6 +25,16 @@
 本项目无力提供音乐播放链接或音频文件，只具备从各官方音乐平台的官方公开数据库中检索和提供音乐的基本信息和自定义歌单存储的功能。
 如需音乐播放和缓存功能，请自行制作和使用音源链接自己的音乐库，用户的第三方音源内容与本项目无关，本项目无法提供相关支持。
 
+## Star 历史
+
+<a href="https://star-history.com/#canxin121/app_rhyme&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date" />
+ </picture>
+</a>
+
 # 数据源
 
 本项目的所有官方音乐数据均从各官方音乐平台的公开数据库中获取，所获得数据和未登录状态下各官方平台数据相同，仅对数据做简单处理和抽象综合，因此本项目无力为数据的合法性和正确性负责。
