@@ -169,7 +169,7 @@ jobs:
       - name: Install Flutter Dependency
         run: flutter pub get
 
-      - name: Install Rust
+      - name: Install Rusti
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Cargo-Ndk
@@ -181,7 +181,7 @@ jobs:
         with:
           ndk-version: r22b
 
-      - name: Install Dependencies
+      - name: Activate Dependencies
         shell: pwsh
         run: dart pub global activate flutter_distributor
 
