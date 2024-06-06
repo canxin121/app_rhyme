@@ -170,16 +170,17 @@ class InMusicListPageState extends State<InMusicListPage> {
                               items: inListMusicCardPullDown(context, music,
                                   () async {
                                 // 缓存
-                                var index = globalFloatWidgetContoller
+                                var floatIndex = globalFloatWidgetContoller
                                     .addMsg("缓存音乐: ${music.info.name}");
                                 try {
                                   if (await music.hasCache()) return;
                                   var playInfo = await music.getPlayInfo();
                                   if (playInfo == null) return;
+                                  String fileName = music.toCacheFileName();
                                   await cacheFile(
                                       file: playInfo.file,
                                       cachePath: musicCachePath,
-                                      filename: music.toCacheFileName());
+                                      filename: fileName);
                                   // 如果这首歌正在播放列表中，替换他，防止继续在线播放
                                   globalAudioHandler.replaceMusic(music);
                                   // 在这里需要重新判断是否 hasCache,所以直接setState解决
@@ -187,7 +188,7 @@ class InMusicListPageState extends State<InMusicListPage> {
                                     hasCache[index] = Future.value(true);
                                   });
                                 } finally {
-                                  globalFloatWidgetContoller.delMsg(index);
+                                  globalFloatWidgetContoller.delMsg(floatIndex);
                                 }
                               }, () async {
                                 // 删除缓存
@@ -419,11 +420,12 @@ List<PullDownMenuEntry> musicListActionPullDown(
               if (await music.hasCache()) continue;
               var playInfo = await music.getPlayInfo();
               if (playInfo != null) {
+                String fileName =
+                    music.toCacheFileName(quality_: playInfo.quality);
                 await cacheFile(
                     file: playInfo.file,
                     cachePath: musicCachePath,
-                    filename:
-                        music.toCacheFileName(quality_: playInfo.quality));
+                    filename: fileName);
                 await globalAudioHandler.replaceMusic(music);
                 refresh(i, true);
               }

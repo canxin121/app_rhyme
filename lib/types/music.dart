@@ -59,7 +59,8 @@ class Music {
 
   String toCacheFileName({Quality? quality_}) {
     var quality = quality_ ?? info.defaultQuality!;
-    return "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}_${quality.short}.${quality.format ?? "unknown"}";
+    return "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}_${quality.short}.${quality.format ?? "unknown"}"
+        .replaceAll("\r", "");
   }
 
   Future<bool> hasCache() async {
