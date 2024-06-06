@@ -220,10 +220,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: >
-            build/app/outputs/flutter-apk/AppRhyme-android-arm64-v8a-release.apk,
-            build/app/outputs/flutter-apk/AppRhyme-android-armeabi-v7a-release.apk,
-            build/app/outputs/flutter-apk/AppRhyme-android-x86_64-release.apk,
-            build/app/outputs/flutter-apk/AppRhyme-android-unknown-release.apk,
+            build/app/outputs/flutter-apk/AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk,
+            build/app/outputs/flutter-apk/AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.apk,
+            build/app/outputs/flutter-apk/AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.apk,
+            build/app/outputs/flutter-apk/AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.apk,
           prerelease: false
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
