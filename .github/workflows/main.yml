@@ -65,7 +65,7 @@ jobs:
 
       - name: Pack DMG Installer
         run: |-
-          dart pub global activate -s path tool/flutter_distributor/packages/flutter_distributor
+          dart pub global activate -s path tools/flutter_distributor/packages/flutter_distributor
           flutter_distributor package --platform macos --target dmg
 
       - name: Rename
@@ -113,7 +113,7 @@ jobs:
       
       - name: Pack Installers
         run: |-
-          dart pub global activate -s path tool/flutter_distributor/packages/flutter_distributor
+          dart pub global activate -s path tools/flutter_distributor/packages/flutter_distributor
           flutter_distributor package --platform linux --targets appimage,deb,rpm
 
       - name: Rename
