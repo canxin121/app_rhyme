@@ -6,7 +6,10 @@ maintainer:
   name: canxin121
   email: q1969730106@gmail.com
 
+installed_size: 6604
+
 priority: optional
+
 section: x11
 
 essential: false
