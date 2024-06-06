@@ -1,0 +1,30 @@
+icon: assets/log-0.1.0.png
+
+summary: 使用Flutter和Rust构建的开源免费音乐软件
+
+group: Amusements/Music
+
+vendor: canxin121
+
+packager: canxin121
+
+packagerEmail: q1969730106@gmail.com
+
+license: MIT or Apache-2.0
+
+url: https://github.com/canxin121/app_rhyme
+build_arch: x86_64
+
+display_name: AppRhyme
+
+keywords:
+  - Music
+  - Player
+
+generic_name: AppRhyme
+
+categories:
+  - Music
+  - Player
+
+startup_notify: true

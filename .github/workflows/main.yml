@@ -3,25 +3,53 @@ on:
   workflow_dispatch:
     
 jobs:
+  get_version:
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.fetch_version.outputs.app_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Fetch Version
+        id: fetch_version
+        run: |
+          sudo snap install yq
+          app_version=$(yq eval '.version' pubspec.yaml)
+          echo "::set-output name=app_version::$app_version"
+
+          
   build_on_macos:
+    needs: get_version
     runs-on: macos-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+  
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: "beta"
 
-      - name: Install Flutter Dependency
-        run: flutter pub get
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+  
+      - name: Install Dependencies
+        run: |-
+          flutter pub get
+          npm install -g appdmg
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Flutter build ios
-        run: |
+        run: |-
           flutter build ios --release --no-codesign --verbose
 
           chmod 777 unbitcode.sh
@@ -30,39 +58,39 @@ jobs:
           mkdir -p Payload
           mv ./build/ios/iphoneos/Runner.app Payload
           zip -r -y Payload.zip Payload/Runner.app
-          mv Payload.zip AppRhyme.ipa
+          mv Payload.zip AppRhyme-release-ios-unknown-${{ needs.get_version.outputs.app_version }}.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme.ipa
-          path: AppRhyme.ipa
+          name: AppRhyme-release-ios-unknown-${{ needs.get_version.outputs.app_version }}.ipa
+          path: AppRhyme-release-ios-unknown-${{ needs.get_version.outputs.app_version }}.ipa
           compression-level: 9
 
-      - name: Flutter build macos
-        run: flutter build macos --release --verbose
+      - name: Pack DMG Installer
+        run: |-
+          dart pub global activate -s path tools/flutter_distributor/packages/flutter_distributor
+          flutter_distributor package --platform macos --target dmg
 
+      - name: Rename
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.dmg ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.dmg
+          
       - name: Upload Macos app
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-macos-release-unknown.zip
-          path: build/macos/Build/Products/Release/*.app
-      
-      - name: Install tree
-        run: brew install tree
-        
-      - name: Print directory tree
-        run: tree build/macos/Build/Products/
-      
-      - name: Package Executable
-        run: 
-          mkdir -p build/app/
-          zip -r "build/app/AppRhyme-macos-release-unknown.zip" "build/macos/Build/Products/Release/AppRhyme.app"
-  
+          name: AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.zip
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.dmg
+          compression-level: 9
+
   build_on_linux:
+    needs: get_version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: subosito/flutter-action@v2
         with:
@@ -79,26 +107,54 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt install libwebkit2gtk-4.1-dev
-          sudo apt-get install -y ninja-build libgtk-3-dev
+          sudo apt-get install -y ninja-build libgtk-3-dev libfuse2
           sudo apt-get install libasound2-dev
+      
+      - name: Setup AppImageTool
+        run: |-
+          sudo mv tools/appimagetool-x86_64.AppImage /usr/local/bin/appimagetool
+          sudo chmod a+x /usr/local/bin/appimagetool
+      
+      - name: Pack Installers
+        run: |-
+          dart pub global activate -s path tools/flutter_distributor/packages/flutter_distributor
+          flutter_distributor package --platform linux --targets appimage,deb,rpm
 
-      - name: Flutter build linux
-        run: flutter build linux --release --verbose
-
-      - name: Package Executable
-        run: 7z a -r "../../../../../build/app/AppRhyme-linux-release-amd64.zip" *
-        working-directory: build/linux/x64/release/bundle
+      - name: Rename
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.deb ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.deb
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.rpm ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.rpm
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.AppImage ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.AppImage
 
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-linux-release-amd64
-          path: build/app/AppRhyme-linux-release-amd64.zip
+          name: AppRhyme-release-linux-x86_64-AppImage-${{ needs.get_version.outputs.app_version }}.zip
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.AppImage
+          compression-level: 9
+
+      - name: Upload Linux app
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-release-linux-x86_64-rpm-${{ needs.get_version.outputs.app_version }}.zip
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.rpm
+          compression-level: 9
+
+      - name: Upload Linux app
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppRhyme-release-linux-x86_64-deb-${{ needs.get_version.outputs.app_version }}.zip
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.deb
+          compression-level: 9
 
   build_on_windows:
+    needs: get_version
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - uses: subosito/flutter-action@v2
         with:
@@ -116,7 +172,7 @@ jobs:
       - name: Install Flutter Dependency
         run: flutter pub get
 
-      - name: Install Rust
+      - name: Install Rusti
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Cargo-Ndk
@@ -128,18 +184,29 @@ jobs:
         with:
           ndk-version: r22b
 
-      - name: Flutter build windows
-        run: flutter build windows --release --verbose
+      - name: Activate Dependencies
+        shell: pwsh
+        run: dart pub global activate flutter_distributor
 
-      - name: Package Executable
-        run: 7z a -r -sse "..\..\..\..\..\build\app\AppRhyme-win-release-amd64.zip" *
-        working-directory: build\windows\x64\runner\Release
+      - name: Setup Inno Setup 6
+        shell: pwsh
+        run: |-
+          ./tools/is.exe /VERYSLIENT
+          Copy-Item "./tools/ChineseSimplified.isl" -Destination "C:\Program Files (x86)\Inno Setup 6\Languages"
 
+      - name: Pack EXE Installer
+        run: flutter_distributor package --platform windows --target exe
+
+      - name: Rename
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.exe
+      
       - name: Upload files
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-win-release-amd64
-          path: build/app/AppRhyme-win-release-amd64.zip
+          name: AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.zip
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.exe
+          compression-level: 9
 
       - name: Flutter build apk abi
         run: flutter build apk --release --split-per-abi --verbose
@@ -150,36 +217,36 @@ jobs:
       - name: Upload APK1
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-arm64-v8a-release.apk
+          name: AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk
           path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           compression-level: 9
 
       - name: Upload APK2
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-armeabi-v7a-release.apk
+          name: AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.zip
           path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
           compression-level: 9
 
       - name: Upload APK3
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-x86_64-release.apk
+          name: AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.zip
           path: build/app/outputs/flutter-apk/app-x86_64-release.apk
           compression-level: 9
 
       - name: Upload APK4
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-unknown-release.apk
+          name: AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.zip
           path: build/app/outputs/flutter-apk/app-release.apk
           compression-level: 9            
 
       - name: Rename APKs
         run: |
-          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-arm64-v8a-release.apk
-          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-armeabi-v7a-release.apk
-          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-x86_64-release.apk
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-unknown-release.apk
+          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk
+          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.apk
+          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.apk
   
 

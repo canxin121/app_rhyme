@@ -1,0 +1,20 @@
+display_name: AppRhyme
+app_binary_name: AppRhyme
+
+icon: assets/log-0.1.0.png
+
+keywords:
+  - Music
+  - Player
+
+generic_name: AppRhyme
+
+actions: []
+
+categories:
+  - Music
+  - Player
+
+startup_notify: true
+
+include: []

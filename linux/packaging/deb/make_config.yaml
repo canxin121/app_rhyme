@@ -1,0 +1,31 @@
+display_name: AppRhyme
+
+package_name: AppRhyme
+
+maintainer:
+  name: canxin121
+  email: q1969730106@gmail.com
+
+installed_size: 6604
+
+priority: optional
+
+section: x11
+
+essential: false
+icon: assets/log-0.1.0.png
+
+postinstall_scripts: []
+postuninstall_scripts: []
+
+keywords:
+  - Music
+  - Player
+
+generic_name: AppRhyme
+
+categories:
+  - Music
+  - Player
+
+startup_notify: true
