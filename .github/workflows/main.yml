@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
     
 jobs:
-  build_on_macos:
-    runs-on: macos-latest
+  get_version:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,6 +16,15 @@ jobs:
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
           echo "APPVERSION=$app_version" >> $GITHUB_ENV
+          
+  build_on_macos:
+    needs: get_version
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
   
       - name: Install Flutter
         uses: subosito/flutter-action@v2
@@ -71,18 +80,13 @@ jobs:
           compression-level: 9
 
   build_on_linux:
+    needs: get_version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
-      
-      - name: Fetch Version
-        run: |
-          sudo snap install yq
-          app_version=$(yq eval '.version' pubspec.yaml)
-          echo "APPVERSION=$app_version" >> $GITHUB_ENV
 
       - uses: subosito/flutter-action@v2
         with:
@@ -140,18 +144,13 @@ jobs:
           compression-level: 9
 
   build_on_windows:
+    needs: get_version
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
-          
-      - name: Fetch Version
-        run: |
-          sudo snap install yq
-          app_version=$(yq eval '.version' pubspec.yaml)
-          echo "APPVERSION=$app_version" >> $GITHUB_ENV
 
       - uses: subosito/flutter-action@v2
         with:
