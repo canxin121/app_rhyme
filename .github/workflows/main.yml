@@ -5,6 +5,8 @@ on:
 jobs:
   get_version:
     runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.fetch_version.outputs.app_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -12,10 +14,12 @@ jobs:
           submodules: true
 
       - name: Fetch Version
+        id: fetch_version
         run: |
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
-          echo "APPVERSION=$app_version" >> $GITHUB_ENV
+          echo "::set-output name=app_version::$app_version"
+
           
   build_on_macos:
     needs: get_version
@@ -54,13 +58,13 @@ jobs:
           mkdir -p Payload
           mv ./build/ios/iphoneos/Runner.app Payload
           zip -r -y Payload.zip Payload/Runner.app
-          mv Payload.zip AppRhyme-release-ios-unknown-${{ env.APPVERSION }}.ipa
+          mv Payload.zip AppRhyme-release-ios-unknown-${{ needs.get_version.outputs.app_version }}.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-ios-unknown-${{ env.APPVERSION }}.ipa
-          path: AppRhyme-release-ios-unknown-${{ env.APPVERSION }}.ipa
+          name: AppRhyme-release-ios-unknown-${{ needs.get_version.outputs.app_version }}.ipa
+          path: AppRhyme-release-ios-unknown-${{ needs.get_version.outputs.app_version }}.ipa
           compression-level: 9
 
       - name: Pack DMG Installer
@@ -70,13 +74,13 @@ jobs:
 
       - name: Rename
         run: |
-          mv ./dist/${{ env.APPVERSION }}/*.dmg ./dist/${{ env.APPVERSION }}/AppRhyme-release-macos-unknown-${{ env.APPVERSION }}.dmg
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.dmg ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.dmg
           
       - name: Upload Macos app
         uses: actions/upload-artifact@v4
         with:
           name: AppRhyme-release-macos-unknown.zip
-          path: ./dist/${{ env.APPVERSION }}/AppRhyme-release-macos-unknown-${{ env.APPVERSION }}.dmg
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.dmg
           compression-level: 9
 
   build_on_linux:
@@ -118,29 +122,29 @@ jobs:
 
       - name: Rename
         run: |
-          mv ./dist/${{ env.APPVERSION }}/*.deb ./dist/${{ env.APPVERSION }}/AppRhyme-release-linux-x86_64-${{ env.APPVERSION }}.deb
-          mv ./dist/${{ env.APPVERSION }}/*.rpm ./dist/${{ env.APPVERSION }}/AppRhyme-release-linux-x86_64-${{ env.APPVERSION }}.rpm
-          mv ./dist/${{ env.APPVERSION }}/*.AppImage ./dist/${{ env.APPVERSION }}/AppRhyme-release-linux-x86_64-${{ env.APPVERSION }}.AppImage
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.deb ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.deb
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.rpm ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.rpm
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.AppImage ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.AppImage
 
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
           name: AppRhyme-release-linux-x86_64-AppImage.zip
-          path: ./dist/${{ env.APPVERSION }}/AppRhyme-release-linux-x86_64-${{ env.APPVERSION }}.AppImage
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.AppImage
           compression-level: 9
 
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
           name: AppRhyme-release-linux-x86_64-rpm.zip
-          path: ./dist/${{ env.APPVERSION }}/AppRhyme-release-linux-x86_64-${{ env.APPVERSION }}.rpm
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.rpm
           compression-level: 9
 
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
           name: AppRhyme-release-linux-x86_64-deb.zip
-          path: ./dist/${{ env.APPVERSION }}/AppRhyme-release-linux-x86_64-${{ env.APPVERSION }}.deb
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.deb
           compression-level: 9
 
   build_on_windows:
@@ -195,13 +199,13 @@ jobs:
 
       - name: Rename
         run: |
-          mv ./dist/${{ env.APPVERSION }}/*.exe ./dist/${{ env.APPVERSION }}/AppRhyme-release-windows-x86_64-${{ env.APPVERSION }}-setup.exe
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.exe
       
       - name: Upload files
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-windows-x86_64-${{ env.APPVERSION }}-setup.zip
-          path: ./dist/${{ env.APPVERSION }}/AppRhyme-release-windows-x86_64-${{ env.APPVERSION }}-setup.exe
+          name: AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.zip
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.exe
           compression-level: 9
 
       - name: Flutter build apk abi
@@ -213,36 +217,36 @@ jobs:
       - name: Upload APK1
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-android-arm64_v8a-${{env.APPVERSION}}.apk
+          name: AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk
           path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
           compression-level: 9
 
       - name: Upload APK2
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-android-armeabi_v7a-${{env.APPVERSION}}.zip
+          name: AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.zip
           path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
           compression-level: 9
 
       - name: Upload APK3
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-android-x86_64-${{env.APPVERSION}}.zip
+          name: AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.zip
           path: build/app/outputs/flutter-apk/app-x86_64-release.apk
           compression-level: 9
 
       - name: Upload APK4
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-android-unknown-${{env.APPVERSION}}.zip
+          name: AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.zip
           path: build/app/outputs/flutter-apk/app-release.apk
           compression-level: 9            
 
       - name: Rename APKs
         run: |
-          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-arm64_v8a-${{env.APPVERSION}}.apk
-          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-armeabi_v7a-${{env.APPVERSION}}.apk
-          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-x86_64-${{env.APPVERSION}}.apk
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-unknown-${{env.APPVERSION}}.apk
+          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk
+          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.apk
+          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.apk
   
 
