@@ -79,7 +79,7 @@ jobs:
       - name: Upload Macos app
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-macos-unknown.zip
+          name: AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.zip
           path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-macos-unknown-${{ needs.get_version.outputs.app_version }}.dmg
           compression-level: 9
 
@@ -129,21 +129,21 @@ jobs:
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-linux-x86_64-AppImage.zip
+          name: AppRhyme-release-linux-x86_64-AppImage-${{ needs.get_version.outputs.app_version }}.zip
           path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.AppImage
           compression-level: 9
 
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-linux-x86_64-rpm.zip
+          name: AppRhyme-release-linux-x86_64-rpm-${{ needs.get_version.outputs.app_version }}.zip
           path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.rpm
           compression-level: 9
 
       - name: Upload Linux app
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme-release-linux-x86_64-deb.zip
+          name: AppRhyme-release-linux-x86_64-deb-${{ needs.get_version.outputs.app_version }}.zip
           path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.deb
           compression-level: 9
 
