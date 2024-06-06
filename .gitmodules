@@ -1,0 +1,3 @@
+[submodule "tool/flutter_distributor"]
+	path = tool/flutter_distributor
+	url = https://github.com/Muska-Ami/flutter_distributor
