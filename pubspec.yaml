@@ -46,6 +46,8 @@ dependencies:
   toastification: ^2.0.0
   synchronized: ^3.1.0+1
 
+  just_audio_media_kit: ^2.0.0
+  media_kit_libs_linux: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
