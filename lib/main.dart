@@ -32,6 +32,7 @@ Future<void> main() async {
     talker.error("[PlatForm Error] Error: $error\nStackTrace: $stack");
     return true;
   };
+
   String rootPath = (await getApplicationDocumentsDirectory()).path;
   var stores = await initStore(storeRoot: rootPath);
   globalSqlMusicFactory = stores.$1;

@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-flutter_rust_bridge = "=2.0.0-dev.32"
+flutter_rust_bridge = "=2.0.0"
 anyhow = "1.0.82"
 serde = { version = "1.0.198", features = ["derive"] }
 serde_json = "1.0.116"

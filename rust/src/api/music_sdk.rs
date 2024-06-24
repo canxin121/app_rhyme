@@ -11,7 +11,7 @@ lazy_static::lazy_static! {
 
 #[flutter_rust_bridge::frb]
 pub struct MusicW {
-    pub inner: Music,
+    inner: Music,
 }
 
 unsafe impl Send for MusicW {}

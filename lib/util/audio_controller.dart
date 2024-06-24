@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:synchronized/synchronized.dart';
 
 // Windows 平台的just_audio实现存在bug
@@ -19,6 +20,17 @@ late AudioUiController globalAudioUiController;
 
 // 初始化所有和Audio相关的内容
 Future<void> initGlobalAudioHandler() async {
+  if (Platform.isLinux) {
+    JustAudioMediaKit.ensureInitialized(
+      linux: true,
+      windows: false,
+      android: false,
+      iOS: false,
+      macOS: false,
+    );
+  }
+
+  // 测试后windows上，just_audio_background会导致播放异常，不使用表现反而更加正常
   if (!Platform.isWindows) {
     await JustAudioBackground.init(
       androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
@@ -27,6 +39,7 @@ Future<void> initGlobalAudioHandler() async {
     );
   }
 
+  // 将AudioSession配置为音乐模式
   final session = await AudioSession.instance;
   await session.configure(const AudioSessionConfiguration.music());
 
