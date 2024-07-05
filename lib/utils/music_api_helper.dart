@@ -68,7 +68,7 @@ Future<void> cacheMusic(MusicContainer musicContainer) async {
     }
     var playinfo = musicContainer.playInfo;
     await cacheFile(
-        file: playinfo!.file,
+        file: playinfo!.uri,
         cachePath: musicCacheRoot,
         filename: musicContainer.toCacheFileName());
     await globalMusicContainerListPageRefreshFunction();

@@ -37,40 +37,44 @@ Future<void> checkVersionUpdate(BuildContext context) async {
 
 Future<void> checkExternApiUpdate(BuildContext context) async {
   try {
-    toastification.show(
-        type: ToastificationType.info,
-        autoCloseDuration: const Duration(seconds: 2),
-        title: Text(
-          "检查自定义源更新",
-          style: const TextStyle().useSystemChineseFont(),
-        ),
-        description: Text(
-          "正在加载数据,请稍等",
-          style: const TextStyle().useSystemChineseFont(),
-        ));
-    var externApi = await globalConfig.externApi!.fetchUpdate();
-    if (externApi != null) {
-      if (context.mounted) {
-        if (await showExternApiUpdateDialog(context)) {
-          globalConfig.externApi = externApi;
-          await globalConfig.save();
-          toastification.show(
-              type: ToastificationType.success,
-              autoCloseDuration: const Duration(seconds: 3),
-              title: Text("自定义音源更新",
-                  style: const TextStyle().useSystemChineseFont()),
-              description: Text("更新自定义音源成功",
-                  style: const TextStyle().useSystemChineseFont()));
-        }
-      }
-    } else {
+    if (globalConfig.externApi != null &&
+        globalConfig.externApi!.url != null &&
+        globalConfig.externApi!.url!.isNotEmpty) {
       toastification.show(
           type: ToastificationType.info,
           autoCloseDuration: const Duration(seconds: 2),
-          title:
-              Text("自定义音源更新", style: const TextStyle().useSystemChineseFont()),
-          description: Text("当前自定义源无需更新",
-              style: const TextStyle().useSystemChineseFont()));
+          title: Text(
+            "检查自定义源更新",
+            style: const TextStyle().useSystemChineseFont(),
+          ),
+          description: Text(
+            "正在加载数据,请稍等",
+            style: const TextStyle().useSystemChineseFont(),
+          ));
+      var externApi = await globalConfig.externApi!.fetchUpdate();
+      if (externApi != null) {
+        if (context.mounted) {
+          if (await showExternApiUpdateDialog(context)) {
+            globalConfig.externApi = externApi;
+            await globalConfig.save();
+            toastification.show(
+                type: ToastificationType.success,
+                autoCloseDuration: const Duration(seconds: 3),
+                title: Text("自定义音源更新",
+                    style: const TextStyle().useSystemChineseFont()),
+                description: Text("更新自定义音源成功",
+                    style: const TextStyle().useSystemChineseFont()));
+          }
+        }
+      } else {
+        toastification.show(
+            type: ToastificationType.info,
+            autoCloseDuration: const Duration(seconds: 2),
+            title: Text("自定义音源更新",
+                style: const TextStyle().useSystemChineseFont()),
+            description: Text("当前自定义源无需更新",
+                style: const TextStyle().useSystemChineseFont()));
+      }
     }
   } catch (e) {
     toastification.show(

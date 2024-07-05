@@ -54,6 +54,8 @@ class AudioHandler extends GetxController {
       ConcatenatingAudioSource(children: []);
   final audioSourceListLock = Lock();
 
+  // 记录播放失败的次数，超过3次则暂停播放
+  int allowFailedTimes = 3;
   AudioHandler() {
     _init();
   }
@@ -84,9 +86,23 @@ class AudioHandler extends GetxController {
       await tryLazyLoadMusic(index);
       // 如果这首即将播放的音乐并仍没有正常LazyLoad，直接尝试播放下一首
       if (musicList[index].shouldUpdate()) {
-        if (isPlaying) await pause();
-        await seekToNext();
-        return;
+        // 播放失败次数超过3次，暂停播放
+        allowFailedTimes--;
+        if (allowFailedTimes == 0) {
+          // 重置失败次数
+          allowFailedTimes = 3;
+          if (isPlaying) await pause();
+          toastification.show(
+              type: ToastificationType.error,
+              title: const Text("播放失败!"),
+              description: const Text("播放失败次数过多，暂停播放!"),
+              autoCloseDuration: const Duration(seconds: 4));
+          return;
+        } else {
+          if (isPlaying) await pause();
+          await seekToNext();
+          return;
+        }
       }
       if (shouldUpdate) {
         updatePlayingMusic(music: musicList[index]);
@@ -146,13 +162,13 @@ class AudioHandler extends GetxController {
       // 由于是手动添加新的音乐，我们直接获取音乐链接并且添加到系统播放资源即可(直接添加到最后面)
       // 添加新的音乐到待播列表(直接添加到最后面)
       if (!await musicContainer.updateAll()) {
-        toastification.show(
-            autoCloseDuration: const Duration(seconds: 2),
-            title: Text("播放音乐失败!",
-                style: const TextStyle().useSystemChineseFont()),
-            description: Text("获取播放资源失败!",
-                style: const TextStyle().useSystemChineseFont()),
-            type: ToastificationType.error);
+        // toastification.show(
+        //     autoCloseDuration: const Duration(seconds: 2),
+        //     title: Text("播放音乐失败!",
+        //         style: const TextStyle().useSystemChineseFont()),
+        //     description: Text("获取播放资源失败!",
+        //         style: const TextStyle().useSystemChineseFont()),
+        //     type: ToastificationType.error);
         globalTalker.info(
             "[Music Handler] In addMusicPlay, Failed to updateAudioSource: ${musicContainer.info.name}");
         return;

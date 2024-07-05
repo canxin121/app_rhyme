@@ -41,8 +41,9 @@ class MusicInfoState extends State<MusicInfo> {
                           .useSystemChineseFont(),
                     ),
                     TextSpan(
-                      text: globalAudioHandler.playingMusic.value?.info.album ??
-                          "Album",
+                      text: globalAudioHandler.playingMusic.value?.info.artist
+                              .join(", ") ??
+                          "Artist",
                       style: TextStyle(
                               fontSize: widget.artistHeight,
                               color: CupertinoColors.systemGrey5)

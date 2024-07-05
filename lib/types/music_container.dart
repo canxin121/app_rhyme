@@ -16,11 +16,11 @@ import 'package:just_audio/just_audio.dart';
 import 'package:toastification/toastification.dart';
 
 class PlayInfo {
-  late String file;
+  late String uri;
   late Quality quality;
 
   PlayInfo(
-    this.file,
+    this.uri,
     this.quality,
   );
 
@@ -100,17 +100,22 @@ class MusicContainer {
 
   Future<PlayInfo?> getCurrentMusicPlayInfo([Quality? quality]) async {
     // 更新当前音质
-    try {
-      _updateQuality();
-    } catch (e) {
-      globalTalker.error("[getCurrentMusicPlayInfo]获取音质失败:$e");
-      return null;
-    }
+    _updateQuality();
+
     late Quality finalQuality;
     if (quality != null) {
       finalQuality = quality;
     } else if (currentQuality.value != null) {
       finalQuality = currentQuality.value!;
+    } else {
+      toastification.show(
+          title:
+              Text("获取播放信息失败", style: const TextStyle().useSystemChineseFont()),
+          description:
+              Text("未找到可用音质", style: const TextStyle().useSystemChineseFont()),
+          type: ToastificationType.error,
+          autoCloseDuration: const Duration(seconds: 2));
+      return null;
     }
 
     // 尝试获取本地缓存
@@ -131,9 +136,12 @@ class MusicContainer {
       toastification.show(
           autoCloseDuration: const Duration(seconds: 2),
           type: ToastificationType.error,
-          title: const Text('获取播放信息失败'),
-          description:
-              RichText(text: const TextSpan(text: '未导入第三方音乐源，无法在线获取播放信息')));
+          title: Text(
+            '获取播放信息失败',
+            style: const TextStyle().useSystemChineseFont(),
+          ),
+          description: Text('未导入第三方音乐源，无法在线获取播放信息',
+              style: const TextStyle().useSystemChineseFont()));
 
       globalTalker.error("[getCurrentMusicPlayInfo] 无第三方音乐源,无法获取播放信息");
       return null;
@@ -152,7 +160,7 @@ class MusicContainer {
       currentQuality.value = playinfo.quality;
       globalTalker.info(
           "[getCurrentMusicPlayInfo] 使用第三方Api请求获取playinfo: [${info.source}]${info.name}");
-      return PlayInfo(playinfo.file, playinfo.quality);
+      return PlayInfo(playinfo.uri, playinfo.quality);
     }
   }
 
@@ -204,28 +212,28 @@ class MusicContainer {
         // 更新当前音质
         currentQuality.value = playInfo!.quality;
 
-        if (playInfo!.file.contains("http")) {
+        if (playInfo!.uri.contains("http")) {
           if ((Platform.isIOS || Platform.isMacOS) &&
               playInfo!.quality.short.contains("flac")) {
-            audioSource = ProgressiveAudioSource(Uri.parse(playInfo!.file),
+            audioSource = ProgressiveAudioSource(Uri.parse(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
                     darwinAssetOptions: DarwinAssetOptions(
                         preferPreciseDurationAndTiming: true)));
           } else {
             audioSource =
-                AudioSource.uri(Uri.parse(playInfo!.file), tag: _toMediaItem());
+                AudioSource.uri(Uri.parse(playInfo!.uri), tag: _toMediaItem());
           }
         } else {
           if ((Platform.isIOS || Platform.isMacOS) &&
               playInfo!.quality.short.contains("flac")) {
-            audioSource = ProgressiveAudioSource(Uri.file(playInfo!.file),
+            audioSource = ProgressiveAudioSource(Uri.file(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
                     darwinAssetOptions: DarwinAssetOptions(
                         preferPreciseDurationAndTiming: true)));
           } else {
-            audioSource = AudioSource.file(playInfo!.file, tag: _toMediaItem());
+            audioSource = AudioSource.file(playInfo!.uri, tag: _toMediaItem());
           }
         }
         globalTalker.info("[MusicContainer] 更新 '${info.name}' 音频资源成功");
@@ -284,7 +292,8 @@ class MusicContainer {
       currentQuality = autoPickQuality(info.qualities).obs;
       extra = currentMusic.getExtraInfo(quality: currentQuality.value!);
     } else {
-      throw "没有可选音质";
+      currentQuality = null.obs;
+      extra = null;
     }
   }
 }

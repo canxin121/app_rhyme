@@ -95,7 +95,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage> {
                   // Display music lists grid view
                   Expanded(
                     child: musicLists.isEmpty
-                        ? const Center(child: CircularProgressIndicator())
+                        ? const Center(child: Text("没有歌单"))
                         : GridView.builder(
                             padding: const EdgeInsets.only(
                                 top: 30, bottom: 150, right: 10, left: 10),
