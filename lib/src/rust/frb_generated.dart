@@ -4,11 +4,14 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/cache.dart';
+import 'api/check_update.dart';
 import 'api/config.dart';
+import 'api/extern_api.dart';
+import 'api/factory_bind.dart';
 import 'api/http_helper.dart';
 import 'api/init.dart';
-import 'api/mirror.dart';
-import 'api/music_sdk.dart';
+import 'api/mirrors.dart';
+import 'api/type_bind.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -52,7 +55,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   @override
   Future<void> executeRustInitializers() async {
-    await api.crateApiInitInitApp();
+    await api.crateApiInitInit();
   }
 
   @override
@@ -63,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.0.0';
 
   @override
-  int get rustContentHash => -1960931803;
+  int get rustContentHash => -266941569;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -82,12 +85,94 @@ abstract class RustLibApi extends BaseApi {
 
   Future<String> crateApiCacheGenHash({required String str});
 
-  Future<String?> crateApiCacheUseCacheFile(
+  String? crateApiCacheUseCacheFile(
       {required String file, required String cachePath, String? filename});
+
+  Future<Release?> crateApiCheckUpdateCheckUpdate(
+      {required String currentVersion});
+
+  Future<Release> crateApiCheckUpdateGetRelease();
 
   Future<Config> crateApiConfigConfigLoad();
 
   Future<void> crateApiConfigConfigSave({required Config that});
+
+  Future<ExternApi?> crateApiExternApiExternApiFetchUpdate(
+      {required ExternApi that});
+
+  Future<ExternApi> crateApiExternApiExternApiFromPath({required String path});
+
+  Future<ExternApi> crateApiExternApiExternApiFromUrl({required String url});
+
+  Future<List<MusicAggregatorW>>
+      crateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
+          {required List<MusicAggregatorW> aggregators,
+          required List<String> sources,
+          required String content,
+          required int page,
+          required int limit,
+          MusicFuzzFilter? filter});
+
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiFactoryBindOnlineFactoryWGetMusiclistFromShare(
+          {required String shareUrl});
+
+  Future<List<MusicListW>> crateApiFactoryBindOnlineFactoryWSearchMusiclist(
+      {required List<String> sources,
+      required String content,
+      required int page,
+      required int limit});
+
+  Future<void> crateApiFactoryBindSqlFactoryWAddMusics(
+      {required String musicsListName, required List<MusicAggregatorW> musics});
+
+  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicDefaultSource(
+      {required String musicListName,
+      required Int64List ids,
+      required List<String> newDefaultSources});
+
+  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicInfo(
+      {required List<MusicW> musics, required List<MusicInfo> newInfos});
+
+  Future<void> crateApiFactoryBindSqlFactoryWChangeMusiclistInfo(
+      {required List<MusicListInfo> old, required List<MusicListInfo> new_});
+
+  Future<void> crateApiFactoryBindSqlFactoryWCleanUnusedMusicData();
+
+  Future<void> crateApiFactoryBindSqlFactoryWCreateMusiclist(
+      {required List<MusicListInfo> musicListInfos});
+
+  Future<void> crateApiFactoryBindSqlFactoryWDelMusiclist(
+      {required List<String> musiclistNames});
+
+  Future<void> crateApiFactoryBindSqlFactoryWDelMusics(
+      {required String musicListName, required Int64List ids});
+
+  Future<List<MusicListW>> crateApiFactoryBindSqlFactoryWGetAllMusiclists();
+
+  Future<List<MusicAggregatorW>> crateApiFactoryBindSqlFactoryWGetAllMusics(
+      {required MusicListInfo musiclistInfo});
+
+  Future<MusicAggregatorW> crateApiFactoryBindSqlFactoryWGetMusicById(
+      {required MusicListInfo musicListInfo,
+      required PlatformInt64 id,
+      required List<String> sources});
+
+  Future<void> crateApiFactoryBindSqlFactoryWInitFromPath(
+      {required String filepath});
+
+  Future<List<MusicW>> crateApiFactoryBindSqlFactoryWReadMusicData(
+      {required String source});
+
+  Future<void> crateApiFactoryBindSqlFactoryWReorderMusics(
+      {required String musicListName,
+      required Int64List newFullIndex,
+      required Int64List fullIdsInOrder});
+
+  Future<void> crateApiFactoryBindSqlFactoryWReplaceMusics(
+      {required String musicListName,
+      required Int64List ids,
+      required List<MusicAggregatorW> musics});
 
   Future<String> crateApiHttpHelperSendRequest(
       {required String method,
@@ -95,106 +180,115 @@ abstract class RustLibApi extends BaseApi {
       required String url,
       required String payload});
 
-  Future<void> crateApiInitInitApp();
+  Future<void> crateApiInitInit();
 
-  Future<(SqlMusicFactoryW, Config)> crateApiInitInitStore(
-      {required String storeRoot});
+  Future<Config> crateApiInitInitBackend({required String storeRoot});
 
-  String crateApiMusicSdkMusicWGetExtraInto(
+  Future<void> crateApiTypeBindMusicAggregatorWAddMusic(
+      {required MusicAggregatorW that, required MusicW music});
+
+  bool crateApiTypeBindMusicAggregatorWBelongTo(
+      {required MusicAggregatorW that, required MusicW music});
+
+  MusicAggregatorW crateApiTypeBindMusicAggregatorWClone(
+      {required MusicAggregatorW that});
+
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiTypeBindMusicAggregatorWFetchAlbum(
+          {required MusicAggregatorW that,
+          required int page,
+          required int limit});
+
+  Future<String> crateApiTypeBindMusicAggregatorWFetchLyric(
+      {required MusicAggregatorW that});
+
+  Future<List<MusicW>> crateApiTypeBindMusicAggregatorWFetchMusics(
+      {required MusicAggregatorW that, required List<String> sources});
+
+  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusics(
+      {required MusicAggregatorW that});
+
+  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusicsOwned(
+      {required MusicAggregatorW that});
+
+  List<String> crateApiTypeBindMusicAggregatorWGetAvailableSources(
+      {required MusicAggregatorW that});
+
+  MusicW crateApiTypeBindMusicAggregatorWGetDefaultMusic(
+      {required MusicAggregatorW that});
+
+  String crateApiTypeBindMusicAggregatorWGetDefaultSource(
+      {required MusicAggregatorW that});
+
+  Future<MusicW?> crateApiTypeBindMusicAggregatorWGetMusic(
+      {required MusicAggregatorW that, required String source});
+
+  PlatformInt64 crateApiTypeBindMusicAggregatorWGetMusicId(
+      {required MusicAggregatorW that});
+
+  bool crateApiTypeBindMusicAggregatorWMatchFilter(
+      {required MusicAggregatorW that, required MusicFuzzFilter filter});
+
+  Future<void> crateApiTypeBindMusicAggregatorWSetDefaultSource(
+      {required MusicAggregatorW that, required String source});
+
+  String crateApiTypeBindMusicAggregatorWToString(
+      {required MusicAggregatorW that});
+
+  Future<List<MusicAggregatorW>>
+      crateApiTypeBindMusicListWFetchAllMusicAggregators(
+          {required MusicListW that,
+          required int pagesPerBatch,
+          required int limit});
+
+  Future<List<MusicAggregatorW>> crateApiTypeBindMusicListWGetMusicAggregators(
+      {required MusicListW that, required int page, required int limit});
+
+  MusicListInfo crateApiTypeBindMusicListWGetMusiclistInfo(
+      {required MusicListW that});
+
+  String crateApiTypeBindMusicListWSource({required MusicListW that});
+
+  String crateApiTypeBindMusicListWToString({required MusicListW that});
+
+  Future<(MusicListW, List<MusicAggregatorW>)> crateApiTypeBindMusicWFetchAlbum(
+      {required MusicW that, required int page, required int limit});
+
+  Future<String> crateApiTypeBindMusicWFetchLyric({required MusicW that});
+
+  String crateApiTypeBindMusicWGetExtraInfo(
       {required MusicW that, required Quality quality});
 
-  PlatformInt64 crateApiMusicSdkMusicWGetMusicId({required MusicW that});
+  MusicInfo crateApiTypeBindMusicWGetMusicInfo({required MusicW that});
 
-  MusicInfo crateApiMusicSdkMusicWGetMusicInfo({required MusicW that});
+  (String, String) crateApiTypeBindMusicWGetPrimaryKv({required MusicW that});
 
-  Future<SqlMusicFactoryW> crateApiMusicSdkSqlMusicFactoryWBuild(
-      {required PoolAny pool});
+  String crateApiTypeBindMusicWSource({required MusicW that});
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWChangeMusicData(
-      {required SqlMusicFactoryW that,
-      required List<MusicW> musics,
-      required List<MusicInfo> infos});
+  String crateApiTypeBindMusicWToString({required MusicW that});
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWChangeMusicDefaultSource(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required Int64List ids,
-      required List<String> defaultSources});
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_MusicAggregatorW;
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWChangeMusicListMetadata(
-      {required SqlMusicFactoryW that,
-      required List<MusicList> oldList,
-      required List<MusicList> newList});
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_MusicAggregatorW;
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWCleanUnusedMusicData(
-      {required SqlMusicFactoryW that});
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_MusicAggregatorWPtr;
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWCreateMusicListTable(
-      {required SqlMusicFactoryW that, required List<MusicList> musicLists});
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_MusicListW;
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWDelMusic(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required Int64List ids});
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_MusicListW;
 
-  Future<void> crateApiMusicSdkSqlMusicFactoryWDelMusicListTable(
-      {required SqlMusicFactoryW that, required List<MusicList> musicLists});
-
-  Future<void> crateApiMusicSdkSqlMusicFactoryWInitCreateTable(
-      {required SqlMusicFactoryW that});
-
-  Future<void> crateApiMusicSdkSqlMusicFactoryWInsertMusic(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required List<MusicW> musics});
-
-  Future<List<MusicW>> crateApiMusicSdkSqlMusicFactoryWReadMusic(
-      {required SqlMusicFactoryW that, required MusicList musicList});
-
-  Future<List<MusicW>> crateApiMusicSdkSqlMusicFactoryWReadMusicData(
-      {required SqlMusicFactoryW that, required String source});
-
-  Future<List<MusicList>> crateApiMusicSdkSqlMusicFactoryWReadMusicLists(
-      {required SqlMusicFactoryW that});
-
-  Future<void> crateApiMusicSdkSqlMusicFactoryWReorderMusic(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required Int64List newIndex,
-      required List<MusicW> oldMusicsInOrder});
-
-  Future<List<MusicW>> crateApiMusicSdkGetMusicsFromMusicList(
-      {required String payload, required int page, required String source});
-
-  Future<(MusicList, List<MusicW>)> crateApiMusicSdkSearchAlbum(
-      {required MusicW music, required int page});
-
-  Future<List<MusicW>> crateApiMusicSdkSearchMusic(
-      {required String content, required int page, required String source});
-
-  Future<List<(String, MusicList)>> crateApiMusicSdkSearchMusicList(
-      {required String content, required int page, required String source});
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_MusicListWPtr;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_MusicW;
 
   RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_MusicW;
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_MusicWPtr;
-
-  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_PoolAny;
-
-  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_PoolAny;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PoolAnyPtr;
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_SqlMusicFactoryW;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_SqlMusicFactoryW;
-
-  CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_SqlMusicFactoryWPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -285,16 +379,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String?> crateApiCacheUseCacheFile(
+  String? crateApiCacheUseCacheFile(
       {required String file, required String cachePath, String? filename}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(file, serializer);
         sse_encode_String(cachePath, serializer);
         sse_encode_opt_String(filename, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -312,12 +405,62 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Release?> crateApiCheckUpdateCheckUpdate(
+      {required String currentVersion}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(currentVersion, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 5, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_release,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCheckUpdateCheckUpdateConstMeta,
+      argValues: [currentVersion],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCheckUpdateCheckUpdateConstMeta =>
+      const TaskConstMeta(
+        debugName: "check_update",
+        argNames: ["currentVersion"],
+      );
+
+  @override
+  Future<Release> crateApiCheckUpdateGetRelease() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 6, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_release,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCheckUpdateGetReleaseConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCheckUpdateGetReleaseConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_release",
+        argNames: [],
+      );
+
+  @override
   Future<Config> crateApiConfigConfigLoad() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
+            funcId: 7, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_config,
@@ -341,7 +484,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_config(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -359,6 +502,612 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ExternApi?> crateApiExternApiExternApiFetchUpdate(
+      {required ExternApi that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_extern_api(that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 9, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_extern_api,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiExternApiExternApiFetchUpdateConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExternApiExternApiFetchUpdateConstMeta =>
+      const TaskConstMeta(
+        debugName: "extern_api_fetch_update",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<ExternApi> crateApiExternApiExternApiFromPath({required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 10, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_extern_api,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiExternApiExternApiFromPathConstMeta,
+      argValues: [path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExternApiExternApiFromPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "extern_api_from_path",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<ExternApi> crateApiExternApiExternApiFromUrl({required String url}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(url, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 11, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_extern_api,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiExternApiExternApiFromUrlConstMeta,
+      argValues: [url],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiExternApiExternApiFromUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "extern_api_from_url",
+        argNames: ["url"],
+      );
+
+  @override
+  Future<List<MusicAggregatorW>>
+      crateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
+          {required List<MusicAggregatorW> aggregators,
+          required List<String> sources,
+          required String content,
+          required int page,
+          required int limit,
+          MusicFuzzFilter? filter}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            aggregators, serializer);
+        sse_encode_list_String(sources, serializer);
+        sse_encode_String(content, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        sse_encode_opt_box_autoadd_music_fuzz_filter(filter, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 12, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregatorConstMeta,
+      argValues: [aggregators, sources, content, page, limit, filter],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregatorConstMeta =>
+          const TaskConstMeta(
+            debugName: "aggregator_online_factory_w_search_music_aggregator",
+            argNames: [
+              "aggregators",
+              "sources",
+              "content",
+              "page",
+              "limit",
+              "filter"
+            ],
+          );
+
+  @override
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiFactoryBindOnlineFactoryWGetMusiclistFromShare(
+          {required String shareUrl}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(shareUrl, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 13, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiFactoryBindOnlineFactoryWGetMusiclistFromShareConstMeta,
+      argValues: [shareUrl],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiFactoryBindOnlineFactoryWGetMusiclistFromShareConstMeta =>
+          const TaskConstMeta(
+            debugName: "online_factory_w_get_musiclist_from_share",
+            argNames: ["shareUrl"],
+          );
+
+  @override
+  Future<List<MusicListW>> crateApiFactoryBindOnlineFactoryWSearchMusiclist(
+      {required List<String> sources,
+      required String content,
+      required int page,
+      required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_String(sources, serializer);
+        sse_encode_String(content, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 14, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindOnlineFactoryWSearchMusiclistConstMeta,
+      argValues: [sources, content, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiFactoryBindOnlineFactoryWSearchMusiclistConstMeta =>
+          const TaskConstMeta(
+            debugName: "online_factory_w_search_musiclist",
+            argNames: ["sources", "content", "page", "limit"],
+          );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWAddMusics(
+      {required String musicsListName,
+      required List<MusicAggregatorW> musics}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(musicsListName, serializer);
+        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            musics, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 15, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWAddMusicsConstMeta,
+      argValues: [musicsListName, musics],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWAddMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_add_musics",
+        argNames: ["musicsListName", "musics"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicDefaultSource(
+      {required String musicListName,
+      required Int64List ids,
+      required List<String> newDefaultSources}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(musicListName, serializer);
+        sse_encode_list_prim_i_64_strict(ids, serializer);
+        sse_encode_list_String(newDefaultSources, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 16, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiFactoryBindSqlFactoryWChangeMusicDefaultSourceConstMeta,
+      argValues: [musicListName, ids, newDefaultSources],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiFactoryBindSqlFactoryWChangeMusicDefaultSourceConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_change_music_default_source",
+            argNames: ["musicListName", "ids", "newDefaultSources"],
+          );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicInfo(
+      {required List<MusicW> musics, required List<MusicInfo> newInfos}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            musics, serializer);
+        sse_encode_list_music_info(newInfos, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 17, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWChangeMusicInfoConstMeta,
+      argValues: [musics, newInfos],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWChangeMusicInfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_change_music_info",
+        argNames: ["musics", "newInfos"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWChangeMusiclistInfo(
+      {required List<MusicListInfo> old, required List<MusicListInfo> new_}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_music_list_info(old, serializer);
+        sse_encode_list_music_list_info(new_, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 18, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWChangeMusiclistInfoConstMeta,
+      argValues: [old, new_],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiFactoryBindSqlFactoryWChangeMusiclistInfoConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_change_musiclist_info",
+            argNames: ["old", "new_"],
+          );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWCleanUnusedMusicData() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 19, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWCleanUnusedMusicDataConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiFactoryBindSqlFactoryWCleanUnusedMusicDataConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_clean_unused_music_data",
+            argNames: [],
+          );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWCreateMusiclist(
+      {required List<MusicListInfo> musicListInfos}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_music_list_info(musicListInfos, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 20, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWCreateMusiclistConstMeta,
+      argValues: [musicListInfos],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWCreateMusiclistConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_create_musiclist",
+        argNames: ["musicListInfos"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWDelMusiclist(
+      {required List<String> musiclistNames}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_list_String(musiclistNames, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 21, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWDelMusiclistConstMeta,
+      argValues: [musiclistNames],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWDelMusiclistConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_del_musiclist",
+        argNames: ["musiclistNames"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWDelMusics(
+      {required String musicListName, required Int64List ids}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(musicListName, serializer);
+        sse_encode_list_prim_i_64_strict(ids, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 22, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWDelMusicsConstMeta,
+      argValues: [musicListName, ids],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWDelMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_del_musics",
+        argNames: ["musicListName", "ids"],
+      );
+
+  @override
+  Future<List<MusicListW>> crateApiFactoryBindSqlFactoryWGetAllMusiclists() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 23, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWGetAllMusiclistsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWGetAllMusiclistsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_get_all_musiclists",
+        argNames: [],
+      );
+
+  @override
+  Future<List<MusicAggregatorW>> crateApiFactoryBindSqlFactoryWGetAllMusics(
+      {required MusicListInfo musiclistInfo}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_music_list_info(musiclistInfo, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 24, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWGetAllMusicsConstMeta,
+      argValues: [musiclistInfo],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWGetAllMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_get_all_musics",
+        argNames: ["musiclistInfo"],
+      );
+
+  @override
+  Future<MusicAggregatorW> crateApiFactoryBindSqlFactoryWGetMusicById(
+      {required MusicListInfo musicListInfo,
+      required PlatformInt64 id,
+      required List<String> sources}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_music_list_info(musicListInfo, serializer);
+        sse_encode_i_64(id, serializer);
+        sse_encode_list_String(sources, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 25, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWGetMusicByIdConstMeta,
+      argValues: [musicListInfo, id, sources],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWGetMusicByIdConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_get_music_by_id",
+        argNames: ["musicListInfo", "id", "sources"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWInitFromPath(
+      {required String filepath}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(filepath, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 26, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWInitFromPathConstMeta,
+      argValues: [filepath],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWInitFromPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_init_from_path",
+        argNames: ["filepath"],
+      );
+
+  @override
+  Future<List<MusicW>> crateApiFactoryBindSqlFactoryWReadMusicData(
+      {required String source}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(source, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 27, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWReadMusicDataConstMeta,
+      argValues: [source],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReadMusicDataConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_read_music_data",
+        argNames: ["source"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWReorderMusics(
+      {required String musicListName,
+      required Int64List newFullIndex,
+      required Int64List fullIdsInOrder}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(musicListName, serializer);
+        sse_encode_list_prim_i_64_strict(newFullIndex, serializer);
+        sse_encode_list_prim_i_64_strict(fullIdsInOrder, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 28, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWReorderMusicsConstMeta,
+      argValues: [musicListName, newFullIndex, fullIdsInOrder],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReorderMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_reorder_musics",
+        argNames: ["musicListName", "newFullIndex", "fullIdsInOrder"],
+      );
+
+  @override
+  Future<void> crateApiFactoryBindSqlFactoryWReplaceMusics(
+      {required String musicListName,
+      required Int64List ids,
+      required List<MusicAggregatorW> musics}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(musicListName, serializer);
+        sse_encode_list_prim_i_64_strict(ids, serializer);
+        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            musics, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 29, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiFactoryBindSqlFactoryWReplaceMusicsConstMeta,
+      argValues: [musicListName, ids, musics],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReplaceMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "sql_factory_w_replace_musics",
+        argNames: ["musicListName", "ids", "musics"],
+      );
+
+  @override
   Future<String> crateApiHttpHelperSendRequest(
       {required String method,
       required Map<String, String> headers,
@@ -372,7 +1121,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(url, serializer);
         sse_encode_String(payload, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 30, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -391,56 +1140,696 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiInitInitApp() {
+  Future<void> crateApiInitInit() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
+            funcId: 31, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiInitInitAppConstMeta,
+      constMeta: kCrateApiInitInitConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiInitInitAppConstMeta => const TaskConstMeta(
-        debugName: "init_app",
+  TaskConstMeta get kCrateApiInitInitConstMeta => const TaskConstMeta(
+        debugName: "init",
         argNames: [],
       );
 
   @override
-  Future<(SqlMusicFactoryW, Config)> crateApiInitInitStore(
-      {required String storeRoot}) {
+  Future<Config> crateApiInitInitBackend({required String storeRoot}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(storeRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 32, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_sql_music_factory_w_config,
+        decodeSuccessData: sse_decode_config,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiInitInitStoreConstMeta,
+      constMeta: kCrateApiInitInitBackendConstMeta,
       argValues: [storeRoot],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiInitInitStoreConstMeta => const TaskConstMeta(
-        debugName: "init_store",
+  TaskConstMeta get kCrateApiInitInitBackendConstMeta => const TaskConstMeta(
+        debugName: "init_backend",
         argNames: ["storeRoot"],
       );
 
   @override
-  String crateApiMusicSdkMusicWGetExtraInto(
+  Future<void> crateApiTypeBindMusicAggregatorWAddMusic(
+      {required MusicAggregatorW that, required MusicW music}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            music, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 33, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWAddMusicConstMeta,
+      argValues: [that, music],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWAddMusicConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_add_music",
+        argNames: ["that", "music"],
+      );
+
+  @override
+  bool crateApiTypeBindMusicAggregatorWBelongTo(
+      {required MusicAggregatorW that, required MusicW music}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            music, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWBelongToConstMeta,
+      argValues: [that, music],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWBelongToConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_belong_to",
+        argNames: ["that", "music"],
+      );
+
+  @override
+  MusicAggregatorW crateApiTypeBindMusicAggregatorWClone(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWCloneConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWCloneConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_clone",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiTypeBindMusicAggregatorWFetchAlbum(
+          {required MusicAggregatorW that,
+          required int page,
+          required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 36, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWFetchAlbumConstMeta,
+      argValues: [that, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWFetchAlbumConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_fetch_album",
+        argNames: ["that", "page", "limit"],
+      );
+
+  @override
+  Future<String> crateApiTypeBindMusicAggregatorWFetchLyric(
+      {required MusicAggregatorW that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 37, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWFetchLyricConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWFetchLyricConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_fetch_lyric",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<List<MusicW>> crateApiTypeBindMusicAggregatorWFetchMusics(
+      {required MusicAggregatorW that, required List<String> sources}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_list_String(sources, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 38, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWFetchMusicsConstMeta,
+      argValues: [that, sources],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWFetchMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_fetch_musics",
+        argNames: ["that", "sources"],
+      );
+
+  @override
+  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusics(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetAllMusicsConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetAllMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_get_all_musics",
+        argNames: ["that"],
+      );
+
+  @override
+  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusicsOwned(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetAllMusicsOwnedConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiTypeBindMusicAggregatorWGetAllMusicsOwnedConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_all_musics_owned",
+            argNames: ["that"],
+          );
+
+  @override
+  List<String> crateApiTypeBindMusicAggregatorWGetAvailableSources(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetAvailableSourcesConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiTypeBindMusicAggregatorWGetAvailableSourcesConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_available_sources",
+            argNames: ["that"],
+          );
+
+  @override
+  MusicW crateApiTypeBindMusicAggregatorWGetDefaultMusic(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetDefaultMusicConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetDefaultMusicConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_get_default_music",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiTypeBindMusicAggregatorWGetDefaultSource(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetDefaultSourceConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiTypeBindMusicAggregatorWGetDefaultSourceConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_default_source",
+            argNames: ["that"],
+          );
+
+  @override
+  Future<MusicW?> crateApiTypeBindMusicAggregatorWGetMusic(
+      {required MusicAggregatorW that, required String source}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_String(source, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 44, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetMusicConstMeta,
+      argValues: [that, source],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetMusicConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_get_music",
+        argNames: ["that", "source"],
+      );
+
+  @override
+  PlatformInt64 crateApiTypeBindMusicAggregatorWGetMusicId(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_i_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWGetMusicIdConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetMusicIdConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_get_music_id",
+        argNames: ["that"],
+      );
+
+  @override
+  bool crateApiTypeBindMusicAggregatorWMatchFilter(
+      {required MusicAggregatorW that, required MusicFuzzFilter filter}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_box_autoadd_music_fuzz_filter(filter, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWMatchFilterConstMeta,
+      argValues: [that, filter],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWMatchFilterConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_match_filter",
+        argNames: ["that", "filter"],
+      );
+
+  @override
+  Future<void> crateApiTypeBindMusicAggregatorWSetDefaultSource(
+      {required MusicAggregatorW that, required String source}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_String(source, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 47, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWSetDefaultSourceConstMeta,
+      argValues: [that, source],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiTypeBindMusicAggregatorWSetDefaultSourceConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_set_default_source",
+            argNames: ["that", "source"],
+          );
+
+  @override
+  String crateApiTypeBindMusicAggregatorWToString(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicAggregatorWToStringConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWToStringConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_to_string",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<List<MusicAggregatorW>>
+      crateApiTypeBindMusicListWFetchAllMusicAggregators(
+          {required MusicListW that,
+          required int pagesPerBatch,
+          required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        sse_encode_u_32(pagesPerBatch, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 49, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicListWFetchAllMusicAggregatorsConstMeta,
+      argValues: [that, pagesPerBatch, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiTypeBindMusicListWFetchAllMusicAggregatorsConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicListW_fetch_all_music_aggregators",
+            argNames: ["that", "pagesPerBatch", "limit"],
+          );
+
+  @override
+  Future<List<MusicAggregatorW>> crateApiTypeBindMusicListWGetMusicAggregators(
+      {required MusicListW that, required int page, required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 50, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicListWGetMusicAggregatorsConstMeta,
+      argValues: [that, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicListWGetMusicAggregatorsConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_get_music_aggregators",
+        argNames: ["that", "page", "limit"],
+      );
+
+  @override
+  MusicListInfo crateApiTypeBindMusicListWGetMusiclistInfo(
+      {required MusicListW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_music_list_info,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicListWGetMusiclistInfoConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicListWGetMusiclistInfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_get_musiclist_info",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiTypeBindMusicListWSource({required MusicListW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicListWSourceConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicListWSourceConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_source",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiTypeBindMusicListWToString({required MusicListW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiTypeBindMusicListWToStringConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicListWToStringConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_to_string",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<(MusicListW, List<MusicAggregatorW>)> crateApiTypeBindMusicWFetchAlbum(
+      {required MusicW that, required int page, required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 54, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicWFetchAlbumConstMeta,
+      argValues: [that, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicWFetchAlbumConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_fetch_album",
+        argNames: ["that", "page", "limit"],
+      );
+
+  @override
+  Future<String> crateApiTypeBindMusicWFetchLyric({required MusicW that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 55, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypeBindMusicWFetchLyricConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypeBindMusicWFetchLyricConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_fetch_lyric",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiTypeBindMusicWGetExtraInfo(
       {required MusicW that, required Quality quality}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -448,611 +1837,139 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
             that, serializer);
         sse_encode_box_autoadd_quality(quality, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiMusicSdkMusicWGetExtraIntoConstMeta,
+      constMeta: kCrateApiTypeBindMusicWGetExtraInfoConstMeta,
       argValues: [that, quality],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiMusicSdkMusicWGetExtraIntoConstMeta =>
+  TaskConstMeta get kCrateApiTypeBindMusicWGetExtraInfoConstMeta =>
       const TaskConstMeta(
-        debugName: "MusicW_get_extra_into",
+        debugName: "MusicW_get_extra_info",
         argNames: ["that", "quality"],
       );
 
   @override
-  PlatformInt64 crateApiMusicSdkMusicWGetMusicId({required MusicW that}) {
+  MusicInfo crateApiTypeBindMusicWGetMusicInfo({required MusicW that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
             that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiMusicSdkMusicWGetMusicIdConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkMusicWGetMusicIdConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicW_get_music_id",
-        argNames: ["that"],
-      );
-
-  @override
-  MusicInfo crateApiMusicSdkMusicWGetMusicInfo({required MusicW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_music_info,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiMusicSdkMusicWGetMusicInfoConstMeta,
+      constMeta: kCrateApiTypeBindMusicWGetMusicInfoConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiMusicSdkMusicWGetMusicInfoConstMeta =>
+  TaskConstMeta get kCrateApiTypeBindMusicWGetMusicInfoConstMeta =>
       const TaskConstMeta(
         debugName: "MusicW_get_music_info",
         argNames: ["that"],
       );
 
   @override
-  Future<SqlMusicFactoryW> crateApiMusicSdkSqlMusicFactoryWBuild(
-      {required PoolAny pool}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
-            pool, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 13, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWBuildConstMeta,
-      argValues: [pool],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWBuildConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_build",
-        argNames: ["pool"],
-      );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWChangeMusicData(
-      {required SqlMusicFactoryW that,
-      required List<MusicW> musics,
-      required List<MusicInfo> infos}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            musics, serializer);
-        sse_encode_list_music_info(infos, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 14, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWChangeMusicDataConstMeta,
-      argValues: [that, musics, infos],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWChangeMusicDataConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_change_music_data",
-        argNames: ["that", "musics", "infos"],
-      );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWChangeMusicDefaultSource(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required Int64List ids,
-      required List<String> defaultSources}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_box_autoadd_music_list(musicList, serializer);
-        sse_encode_list_prim_i_64_strict(ids, serializer);
-        sse_encode_list_String(defaultSources, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 15, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta:
-          kCrateApiMusicSdkSqlMusicFactoryWChangeMusicDefaultSourceConstMeta,
-      argValues: [that, musicList, ids, defaultSources],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicSdkSqlMusicFactoryWChangeMusicDefaultSourceConstMeta =>
-          const TaskConstMeta(
-            debugName: "SqlMusicFactoryW_change_music_default_source",
-            argNames: ["that", "musicList", "ids", "defaultSources"],
-          );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWChangeMusicListMetadata(
-      {required SqlMusicFactoryW that,
-      required List<MusicList> oldList,
-      required List<MusicList> newList}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_list_music_list(oldList, serializer);
-        sse_encode_list_music_list(newList, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 16, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta:
-          kCrateApiMusicSdkSqlMusicFactoryWChangeMusicListMetadataConstMeta,
-      argValues: [that, oldList, newList],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicSdkSqlMusicFactoryWChangeMusicListMetadataConstMeta =>
-          const TaskConstMeta(
-            debugName: "SqlMusicFactoryW_change_music_list_metadata",
-            argNames: ["that", "oldList", "newList"],
-          );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWCleanUnusedMusicData(
-      {required SqlMusicFactoryW that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 17, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWCleanUnusedMusicDataConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicSdkSqlMusicFactoryWCleanUnusedMusicDataConstMeta =>
-          const TaskConstMeta(
-            debugName: "SqlMusicFactoryW_clean_unused_music_data",
-            argNames: ["that"],
-          );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWCreateMusicListTable(
-      {required SqlMusicFactoryW that, required List<MusicList> musicLists}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_list_music_list(musicLists, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 18, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWCreateMusicListTableConstMeta,
-      argValues: [that, musicLists],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicSdkSqlMusicFactoryWCreateMusicListTableConstMeta =>
-          const TaskConstMeta(
-            debugName: "SqlMusicFactoryW_create_music_list_table",
-            argNames: ["that", "musicLists"],
-          );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWDelMusic(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required Int64List ids}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_box_autoadd_music_list(musicList, serializer);
-        sse_encode_list_prim_i_64_strict(ids, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 19, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWDelMusicConstMeta,
-      argValues: [that, musicList, ids],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWDelMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_del_music",
-        argNames: ["that", "musicList", "ids"],
-      );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWDelMusicListTable(
-      {required SqlMusicFactoryW that, required List<MusicList> musicLists}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_list_music_list(musicLists, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 20, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWDelMusicListTableConstMeta,
-      argValues: [that, musicLists],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicSdkSqlMusicFactoryWDelMusicListTableConstMeta =>
-          const TaskConstMeta(
-            debugName: "SqlMusicFactoryW_del_music_list_table",
-            argNames: ["that", "musicLists"],
-          );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWInitCreateTable(
-      {required SqlMusicFactoryW that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 21, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWInitCreateTableConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWInitCreateTableConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_init_create_table",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWInsertMusic(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required List<MusicW> musics}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_box_autoadd_music_list(musicList, serializer);
-        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            musics, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 22, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWInsertMusicConstMeta,
-      argValues: [that, musicList, musics],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWInsertMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_insert_music",
-        argNames: ["that", "musicList", "musics"],
-      );
-
-  @override
-  Future<List<MusicW>> crateApiMusicSdkSqlMusicFactoryWReadMusic(
-      {required SqlMusicFactoryW that, required MusicList musicList}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_box_autoadd_music_list(musicList, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 23, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWReadMusicConstMeta,
-      argValues: [that, musicList],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWReadMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_read_music",
-        argNames: ["that", "musicList"],
-      );
-
-  @override
-  Future<List<MusicW>> crateApiMusicSdkSqlMusicFactoryWReadMusicData(
-      {required SqlMusicFactoryW that, required String source}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_String(source, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 24, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWReadMusicDataConstMeta,
-      argValues: [that, source],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWReadMusicDataConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_read_music_data",
-        argNames: ["that", "source"],
-      );
-
-  @override
-  Future<List<MusicList>> crateApiMusicSdkSqlMusicFactoryWReadMusicLists(
-      {required SqlMusicFactoryW that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 25, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_music_list,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWReadMusicListsConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWReadMusicListsConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_read_music_lists",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<void> crateApiMusicSdkSqlMusicFactoryWReorderMusic(
-      {required SqlMusicFactoryW that,
-      required MusicList musicList,
-      required Int64List newIndex,
-      required List<MusicW> oldMusicsInOrder}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-            that, serializer);
-        sse_encode_box_autoadd_music_list(musicList, serializer);
-        sse_encode_list_prim_i_64_strict(newIndex, serializer);
-        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            oldMusicsInOrder, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 26, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkSqlMusicFactoryWReorderMusicConstMeta,
-      argValues: [that, musicList, newIndex, oldMusicsInOrder],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkSqlMusicFactoryWReorderMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "SqlMusicFactoryW_reorder_music",
-        argNames: ["that", "musicList", "newIndex", "oldMusicsInOrder"],
-      );
-
-  @override
-  Future<List<MusicW>> crateApiMusicSdkGetMusicsFromMusicList(
-      {required String payload, required int page, required String source}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(payload, serializer);
-        sse_encode_u_32(page, serializer);
-        sse_encode_String(source, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 27, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicSdkGetMusicsFromMusicListConstMeta,
-      argValues: [payload, page, source],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicSdkGetMusicsFromMusicListConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_musics_from_music_list",
-        argNames: ["payload", "page", "source"],
-      );
-
-  @override
-  Future<(MusicList, List<MusicW>)> crateApiMusicSdkSearchAlbum(
-      {required MusicW music, required int page}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  (String, String) crateApiTypeBindMusicWGetPrimaryKv({required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            music, serializer);
-        sse_encode_u_32(page, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 28, port: port_);
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_w,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData: sse_decode_record_string_string,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiMusicSdkSearchAlbumConstMeta,
-      argValues: [music, page],
+      constMeta: kCrateApiTypeBindMusicWGetPrimaryKvConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiMusicSdkSearchAlbumConstMeta =>
+  TaskConstMeta get kCrateApiTypeBindMusicWGetPrimaryKvConstMeta =>
       const TaskConstMeta(
-        debugName: "search_album",
-        argNames: ["music", "page"],
+        debugName: "MusicW_get_primary_kv",
+        argNames: ["that"],
       );
 
   @override
-  Future<List<MusicW>> crateApiMusicSdkSearchMusic(
-      {required String content, required int page, required String source}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  String crateApiTypeBindMusicWSource({required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(content, serializer);
-        sse_encode_u_32(page, serializer);
-        sse_encode_String(source, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 29, port: port_);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiMusicSdkSearchMusicConstMeta,
-      argValues: [content, page, source],
+      constMeta: kCrateApiTypeBindMusicWSourceConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiMusicSdkSearchMusicConstMeta =>
+  TaskConstMeta get kCrateApiTypeBindMusicWSourceConstMeta =>
       const TaskConstMeta(
-        debugName: "search_music",
-        argNames: ["content", "page", "source"],
+        debugName: "MusicW_source",
+        argNames: ["that"],
       );
 
   @override
-  Future<List<(String, MusicList)>> crateApiMusicSdkSearchMusicList(
-      {required String content, required int page, required String source}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  String crateApiTypeBindMusicWToString({required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(content, serializer);
-        sse_encode_u_32(page, serializer);
-        sse_encode_String(source, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 30, port: port_);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_record_string_music_list,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiMusicSdkSearchMusicListConstMeta,
-      argValues: [content, page, source],
+      constMeta: kCrateApiTypeBindMusicWToStringConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiMusicSdkSearchMusicListConstMeta =>
+  TaskConstMeta get kCrateApiTypeBindMusicWToStringConstMeta =>
       const TaskConstMeta(
-        debugName: "search_music_list",
-        argNames: ["content", "page", "source"],
+        debugName: "MusicW_to_string",
+        argNames: ["that"],
       );
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_MusicAggregatorW => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_MusicAggregatorW => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_MusicListW => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_MusicListW => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_MusicW => wire
@@ -1062,26 +1979,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       get rust_arc_decrement_strong_count_MusicW => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW;
 
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_PoolAny => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_PoolAny => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny;
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_SqlMusicFactoryW => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_SqlMusicFactoryW => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW;
-
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return AnyhowException(raw as String);
+  }
+
+  @protected
+  MusicAggregatorW
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MusicAggregatorWImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  MusicListW
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MusicListWImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1093,19 +2010,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PoolAny
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
+  MusicAggregatorW
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return PoolAnyImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return MusicAggregatorWImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
-  SqlMusicFactoryW
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
+  MusicAggregatorW
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SqlMusicFactoryWImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return MusicAggregatorWImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  MusicListW
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MusicListWImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1117,11 +2042,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  SqlMusicFactoryW
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          dynamic raw) {
+  DateTime dco_decode_Chrono_Utc(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SqlMusicFactoryWImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return dcoDecodeTimestamp(ts: dco_decode_i_64(raw).toInt(), isUtc: true);
   }
 
   @protected
@@ -1129,6 +2052,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Map.fromEntries(dco_decode_list_record_string_string(raw)
         .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  MusicAggregatorW
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MusicAggregatorWImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  MusicListW
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MusicListWImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1140,25 +2079,69 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PoolAny
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return PoolAnyImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  SqlMusicFactoryW
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SqlMusicFactoryWImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  AggregatorOnlineFactoryW dco_decode_aggregator_online_factory_w(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.isNotEmpty)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return const AggregatorOnlineFactoryW();
+  }
+
+  @protected
+  Asset dco_decode_asset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+    return Asset(
+      url: dco_decode_String(arr[0]),
+      id: dco_decode_u_64(arr[1]),
+      nodeId: dco_decode_String(arr[2]),
+      name: dco_decode_String(arr[3]),
+      label: dco_decode_opt_String(arr[4]),
+      uploader: dco_decode_author(arr[5]),
+      contentType: dco_decode_String(arr[6]),
+      state: dco_decode_String(arr[7]),
+      size: dco_decode_u_64(arr[8]),
+      downloadCount: dco_decode_u_64(arr[9]),
+      createdAt: dco_decode_String(arr[10]),
+      updatedAt: dco_decode_String(arr[11]),
+      browserDownloadUrl: dco_decode_String(arr[12]),
+    );
+  }
+
+  @protected
+  Author dco_decode_author(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 18)
+      throw Exception('unexpected arr length: expect 18 but see ${arr.length}');
+    return Author(
+      login: dco_decode_String(arr[0]),
+      id: dco_decode_u_64(arr[1]),
+      nodeId: dco_decode_String(arr[2]),
+      avatarUrl: dco_decode_String(arr[3]),
+      gravatarId: dco_decode_String(arr[4]),
+      url: dco_decode_String(arr[5]),
+      htmlUrl: dco_decode_String(arr[6]),
+      followersUrl: dco_decode_String(arr[7]),
+      followingUrl: dco_decode_String(arr[8]),
+      gistsUrl: dco_decode_String(arr[9]),
+      starredUrl: dco_decode_String(arr[10]),
+      subscriptionsUrl: dco_decode_String(arr[11]),
+      organizationsUrl: dco_decode_String(arr[12]),
+      reposUrl: dco_decode_String(arr[13]),
+      eventsUrl: dco_decode_String(arr[14]),
+      receivedEventsUrl: dco_decode_String(arr[15]),
+      type: dco_decode_String(arr[16]),
+      siteAdmin: dco_decode_bool(arr[17]),
+    );
   }
 
   @protected
@@ -1168,21 +2151,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  MusicW
+      dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+        raw);
+  }
+
+  @protected
+  DateTime dco_decode_box_autoadd_Chrono_Utc(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_Chrono_Utc(raw);
+  }
+
+  @protected
   Config dco_decode_box_autoadd_config(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_config(raw);
   }
 
   @protected
-  MusicList dco_decode_box_autoadd_music_list(dynamic raw) {
+  ExternApi dco_decode_box_autoadd_extern_api(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_music_list(raw);
+    return dco_decode_extern_api(raw);
+  }
+
+  @protected
+  ExtraInfo dco_decode_box_autoadd_extra_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_extra_info(raw);
+  }
+
+  @protected
+  MusicFuzzFilter dco_decode_box_autoadd_music_fuzz_filter(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_music_fuzz_filter(raw);
+  }
+
+  @protected
+  MusicListInfo dco_decode_box_autoadd_music_list_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_music_list_info(raw);
   }
 
   @protected
   Quality dco_decode_box_autoadd_quality(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_quality(raw);
+  }
+
+  @protected
+  Release dco_decode_box_autoadd_release(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_release(raw);
   }
 
   @protected
@@ -1195,11 +2217,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Config dco_decode_config(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return Config(
       userAgreement: dco_decode_bool(arr[0]),
-      externApiPath: dco_decode_opt_String(arr[1]),
+      externApi: dco_decode_opt_box_autoadd_extern_api(arr[1]),
+      versionAutoUpdate: dco_decode_bool(arr[2]),
+      externApiAutoUpdate: dco_decode_bool(arr[3]),
+      wifiAutoQuality: dco_decode_String(arr[4]),
+      mobileAutoQuality: dco_decode_String(arr[5]),
+      externApiPath: dco_decode_opt_String(arr[6]),
+    );
+  }
+
+  @protected
+  ExternApi dco_decode_extern_api(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ExternApi(
+      url: dco_decode_opt_String(arr[0]),
+      localPath: dco_decode_String(arr[1]),
+      lastModifiedTime: dco_decode_opt_box_autoadd_Chrono_Utc(arr[2]),
+    );
+  }
+
+  @protected
+  ExtraInfo dco_decode_extra_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ExtraInfo(
+      playCount: dco_decode_opt_box_autoadd_u_32(arr[0]),
+      musicCount: dco_decode_opt_box_autoadd_u_32(arr[1]),
     );
   }
 
@@ -1207,6 +2259,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PlatformInt64 dco_decode_i_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeI64(raw);
+  }
+
+  @protected
+  List<MusicAggregatorW>
+      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(
+            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW)
+        .toList();
+  }
+
+  @protected
+  List<MusicListW>
+      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(
+            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW)
+        .toList();
   }
 
   @protected
@@ -1227,15 +2301,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<Asset> dco_decode_list_asset(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_asset).toList();
+  }
+
+  @protected
   List<MusicInfo> dco_decode_list_music_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_music_info).toList();
   }
 
   @protected
-  List<MusicList> dco_decode_list_music_list(dynamic raw) {
+  List<MusicListInfo> dco_decode_list_music_list_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_music_list).toList();
+    return (raw as List<dynamic>).map(dco_decode_music_list_info).toList();
   }
 
   @protected
@@ -1257,18 +2337,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<(String, MusicList)> dco_decode_list_record_string_music_list(
-      dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(dco_decode_record_string_music_list)
-        .toList();
-  }
-
-  @protected
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
+  }
+
+  @protected
+  MusicFuzzFilter dco_decode_music_fuzz_filter(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return MusicFuzzFilter(
+      name: dco_decode_opt_String(arr[0]),
+      artist: dco_decode_list_String(arr[1]),
+      album: dco_decode_opt_String(arr[2]),
+    );
   }
 
   @protected
@@ -1292,16 +2376,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicList dco_decode_music_list(dynamic raw) {
+  MusicListInfo dco_decode_music_list_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
-    return MusicList(
-      name: dco_decode_String(arr[0]),
-      artPic: dco_decode_String(arr[1]),
-      desc: dco_decode_String(arr[2]),
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return MusicListInfo(
+      id: dco_decode_i_64(arr[0]),
+      name: dco_decode_String(arr[1]),
+      artPic: dco_decode_String(arr[2]),
+      desc: dco_decode_String(arr[3]),
+      extra: dco_decode_opt_box_autoadd_extra_info(arr[4]),
     );
+  }
+
+  @protected
+  OnlineFactoryW dco_decode_online_factory_w(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.isNotEmpty)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return const OnlineFactoryW();
   }
 
   @protected
@@ -1311,9 +2406,50 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  MusicW?
+      dco_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            raw);
+  }
+
+  @protected
+  DateTime? dco_decode_opt_box_autoadd_Chrono_Utc(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_Chrono_Utc(raw);
+  }
+
+  @protected
+  ExternApi? dco_decode_opt_box_autoadd_extern_api(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_extern_api(raw);
+  }
+
+  @protected
+  ExtraInfo? dco_decode_opt_box_autoadd_extra_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_extra_info(raw);
+  }
+
+  @protected
+  MusicFuzzFilter? dco_decode_opt_box_autoadd_music_fuzz_filter(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_music_fuzz_filter(raw);
+  }
+
+  @protected
   Quality? dco_decode_opt_box_autoadd_quality(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_quality(raw);
+  }
+
+  @protected
+  Release? dco_decode_opt_box_autoadd_release(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_release(raw);
   }
 
   @protected
@@ -1339,9 +2475,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   (
-    SqlMusicFactoryW,
-    Config
-  ) dco_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_sql_music_factory_w_config(
+    MusicListW,
+    List<MusicAggregatorW>
+  ) dco_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1349,40 +2485,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('Expected 2 elements, got ${arr.length}');
     }
     return (
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
           arr[0]),
-      dco_decode_config(arr[1]),
-    );
-  }
-
-  @protected
-  (
-    MusicList,
-    List<MusicW>
-  ) dco_decode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_w(
-      dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2) {
-      throw Exception('Expected 2 elements, got ${arr.length}');
-    }
-    return (
-      dco_decode_music_list(arr[0]),
-      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
           arr[1]),
-    );
-  }
-
-  @protected
-  (String, MusicList) dco_decode_record_string_music_list(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2) {
-      throw Exception('Expected 2 elements, got ${arr.length}');
-    }
-    return (
-      dco_decode_String(arr[0]),
-      dco_decode_music_list(arr[1]),
     );
   }
 
@@ -1400,9 +2506,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Release dco_decode_release(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 18)
+      throw Exception('unexpected arr length: expect 18 but see ${arr.length}');
+    return Release(
+      url: dco_decode_String(arr[0]),
+      assetsUrl: dco_decode_String(arr[1]),
+      uploadUrl: dco_decode_String(arr[2]),
+      htmlUrl: dco_decode_String(arr[3]),
+      id: dco_decode_u_64(arr[4]),
+      author: dco_decode_author(arr[5]),
+      nodeId: dco_decode_String(arr[6]),
+      tagName: dco_decode_String(arr[7]),
+      targetCommitish: dco_decode_String(arr[8]),
+      name: dco_decode_String(arr[9]),
+      draft: dco_decode_bool(arr[10]),
+      prerelease: dco_decode_bool(arr[11]),
+      createdAt: dco_decode_String(arr[12]),
+      publishedAt: dco_decode_String(arr[13]),
+      assets: dco_decode_list_asset(arr[14]),
+      tarballUrl: dco_decode_String(arr[15]),
+      zipballUrl: dco_decode_String(arr[16]),
+      body: dco_decode_String(arr[17]),
+    );
+  }
+
+  @protected
+  SqlFactoryW dco_decode_sql_factory_w(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.isNotEmpty)
+      throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
+    return const SqlFactoryW();
+  }
+
+  @protected
   int dco_decode_u_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
+  }
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
   }
 
   @protected
@@ -1431,6 +2580,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  MusicAggregatorW
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MusicAggregatorWImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  MusicListW
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MusicListWImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
   MusicW
       sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
           SseDeserializer deserializer) {
@@ -1440,20 +2607,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PoolAny
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
+  MusicAggregatorW
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return PoolAnyImpl.frbInternalSseDecode(
+    return MusicAggregatorWImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
-  SqlMusicFactoryW
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
+  MusicAggregatorW
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SqlMusicFactoryWImpl.frbInternalSseDecode(
+    return MusicAggregatorWImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  MusicListW
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MusicListWImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -1467,12 +2643,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  SqlMusicFactoryW
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          SseDeserializer deserializer) {
+  DateTime sse_decode_Chrono_Utc(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SqlMusicFactoryWImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+    var inner = sse_decode_i_64(deserializer);
+    return DateTime.fromMicrosecondsSinceEpoch(inner.toInt(), isUtc: true);
   }
 
   @protected
@@ -1481,6 +2655,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_record_string_string(deserializer);
     return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  MusicAggregatorW
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MusicAggregatorWImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  MusicListW
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return MusicListWImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
@@ -1493,28 +2685,91 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PoolAny
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return PoolAnyImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
-  SqlMusicFactoryW
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return SqlMusicFactoryWImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   String sse_decode_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  AggregatorOnlineFactoryW sse_decode_aggregator_online_factory_w(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return const AggregatorOnlineFactoryW();
+  }
+
+  @protected
+  Asset sse_decode_asset(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_url = sse_decode_String(deserializer);
+    var var_id = sse_decode_u_64(deserializer);
+    var var_nodeId = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_label = sse_decode_opt_String(deserializer);
+    var var_uploader = sse_decode_author(deserializer);
+    var var_contentType = sse_decode_String(deserializer);
+    var var_state = sse_decode_String(deserializer);
+    var var_size = sse_decode_u_64(deserializer);
+    var var_downloadCount = sse_decode_u_64(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_browserDownloadUrl = sse_decode_String(deserializer);
+    return Asset(
+        url: var_url,
+        id: var_id,
+        nodeId: var_nodeId,
+        name: var_name,
+        label: var_label,
+        uploader: var_uploader,
+        contentType: var_contentType,
+        state: var_state,
+        size: var_size,
+        downloadCount: var_downloadCount,
+        createdAt: var_createdAt,
+        updatedAt: var_updatedAt,
+        browserDownloadUrl: var_browserDownloadUrl);
+  }
+
+  @protected
+  Author sse_decode_author(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_login = sse_decode_String(deserializer);
+    var var_id = sse_decode_u_64(deserializer);
+    var var_nodeId = sse_decode_String(deserializer);
+    var var_avatarUrl = sse_decode_String(deserializer);
+    var var_gravatarId = sse_decode_String(deserializer);
+    var var_url = sse_decode_String(deserializer);
+    var var_htmlUrl = sse_decode_String(deserializer);
+    var var_followersUrl = sse_decode_String(deserializer);
+    var var_followingUrl = sse_decode_String(deserializer);
+    var var_gistsUrl = sse_decode_String(deserializer);
+    var var_starredUrl = sse_decode_String(deserializer);
+    var var_subscriptionsUrl = sse_decode_String(deserializer);
+    var var_organizationsUrl = sse_decode_String(deserializer);
+    var var_reposUrl = sse_decode_String(deserializer);
+    var var_eventsUrl = sse_decode_String(deserializer);
+    var var_receivedEventsUrl = sse_decode_String(deserializer);
+    var var_type = sse_decode_String(deserializer);
+    var var_siteAdmin = sse_decode_bool(deserializer);
+    return Author(
+        login: var_login,
+        id: var_id,
+        nodeId: var_nodeId,
+        avatarUrl: var_avatarUrl,
+        gravatarId: var_gravatarId,
+        url: var_url,
+        htmlUrl: var_htmlUrl,
+        followersUrl: var_followersUrl,
+        followingUrl: var_followingUrl,
+        gistsUrl: var_gistsUrl,
+        starredUrl: var_starredUrl,
+        subscriptionsUrl: var_subscriptionsUrl,
+        organizationsUrl: var_organizationsUrl,
+        reposUrl: var_reposUrl,
+        eventsUrl: var_eventsUrl,
+        receivedEventsUrl: var_receivedEventsUrl,
+        type: var_type,
+        siteAdmin: var_siteAdmin);
   }
 
   @protected
@@ -1524,21 +2779,62 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  MusicW
+      sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+        deserializer));
+  }
+
+  @protected
+  DateTime sse_decode_box_autoadd_Chrono_Utc(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_Chrono_Utc(deserializer));
+  }
+
+  @protected
   Config sse_decode_box_autoadd_config(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_config(deserializer));
   }
 
   @protected
-  MusicList sse_decode_box_autoadd_music_list(SseDeserializer deserializer) {
+  ExternApi sse_decode_box_autoadd_extern_api(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_music_list(deserializer));
+    return (sse_decode_extern_api(deserializer));
+  }
+
+  @protected
+  ExtraInfo sse_decode_box_autoadd_extra_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_extra_info(deserializer));
+  }
+
+  @protected
+  MusicFuzzFilter sse_decode_box_autoadd_music_fuzz_filter(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_music_fuzz_filter(deserializer));
+  }
+
+  @protected
+  MusicListInfo sse_decode_box_autoadd_music_list_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_music_list_info(deserializer));
   }
 
   @protected
   Quality sse_decode_box_autoadd_quality(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_quality(deserializer));
+  }
+
+  @protected
+  Release sse_decode_box_autoadd_release(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_release(deserializer));
   }
 
   @protected
@@ -1551,15 +2847,79 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Config sse_decode_config(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_userAgreement = sse_decode_bool(deserializer);
+    var var_externApi = sse_decode_opt_box_autoadd_extern_api(deserializer);
+    var var_versionAutoUpdate = sse_decode_bool(deserializer);
+    var var_externApiAutoUpdate = sse_decode_bool(deserializer);
+    var var_wifiAutoQuality = sse_decode_String(deserializer);
+    var var_mobileAutoQuality = sse_decode_String(deserializer);
     var var_externApiPath = sse_decode_opt_String(deserializer);
     return Config(
-        userAgreement: var_userAgreement, externApiPath: var_externApiPath);
+        userAgreement: var_userAgreement,
+        externApi: var_externApi,
+        versionAutoUpdate: var_versionAutoUpdate,
+        externApiAutoUpdate: var_externApiAutoUpdate,
+        wifiAutoQuality: var_wifiAutoQuality,
+        mobileAutoQuality: var_mobileAutoQuality,
+        externApiPath: var_externApiPath);
+  }
+
+  @protected
+  ExternApi sse_decode_extern_api(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_url = sse_decode_opt_String(deserializer);
+    var var_localPath = sse_decode_String(deserializer);
+    var var_lastModifiedTime =
+        sse_decode_opt_box_autoadd_Chrono_Utc(deserializer);
+    return ExternApi(
+        url: var_url,
+        localPath: var_localPath,
+        lastModifiedTime: var_lastModifiedTime);
+  }
+
+  @protected
+  ExtraInfo sse_decode_extra_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_playCount = sse_decode_opt_box_autoadd_u_32(deserializer);
+    var var_musicCount = sse_decode_opt_box_autoadd_u_32(deserializer);
+    return ExtraInfo(playCount: var_playCount, musicCount: var_musicCount);
   }
 
   @protected
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getPlatformInt64();
+  }
+
+  @protected
+  List<MusicAggregatorW>
+      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <MusicAggregatorW>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+              deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<MusicListW>
+      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <MusicListW>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(
+          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+              deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -1591,6 +2951,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<Asset> sse_decode_list_asset(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Asset>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_asset(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<MusicInfo> sse_decode_list_music_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1603,13 +2975,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<MusicList> sse_decode_list_music_list(SseDeserializer deserializer) {
+  List<MusicListInfo> sse_decode_list_music_list_info(
+      SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <MusicList>[];
+    var ans_ = <MusicListInfo>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_music_list(deserializer));
+      ans_.add(sse_decode_music_list_info(deserializer));
     }
     return ans_;
   }
@@ -1641,19 +3014,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<(String, MusicList)> sse_decode_list_record_string_music_list(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <(String, MusicList)>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_record_string_music_list(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<(String, String)> sse_decode_list_record_string_string(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1664,6 +3024,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ans_.add(sse_decode_record_string_string(deserializer));
     }
     return ans_;
+  }
+
+  @protected
+  MusicFuzzFilter sse_decode_music_fuzz_filter(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_opt_String(deserializer);
+    var var_artist = sse_decode_list_String(deserializer);
+    var var_album = sse_decode_opt_String(deserializer);
+    return MusicFuzzFilter(
+        name: var_name, artist: var_artist, album: var_album);
   }
 
   @protected
@@ -1693,12 +3063,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicList sse_decode_music_list(SseDeserializer deserializer) {
+  MusicListInfo sse_decode_music_list_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_64(deserializer);
     var var_name = sse_decode_String(deserializer);
     var var_artPic = sse_decode_String(deserializer);
     var var_desc = sse_decode_String(deserializer);
-    return MusicList(name: var_name, artPic: var_artPic, desc: var_desc);
+    var var_extra = sse_decode_opt_box_autoadd_extra_info(deserializer);
+    return MusicListInfo(
+        id: var_id,
+        name: var_name,
+        artPic: var_artPic,
+        desc: var_desc,
+        extra: var_extra);
+  }
+
+  @protected
+  OnlineFactoryW sse_decode_online_factory_w(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return const OnlineFactoryW();
   }
 
   @protected
@@ -1713,11 +3096,84 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  MusicW?
+      sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  DateTime? sse_decode_opt_box_autoadd_Chrono_Utc(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_Chrono_Utc(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ExternApi? sse_decode_opt_box_autoadd_extern_api(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_extern_api(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ExtraInfo? sse_decode_opt_box_autoadd_extra_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_extra_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  MusicFuzzFilter? sse_decode_opt_box_autoadd_music_fuzz_filter(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_music_fuzz_filter(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   Quality? sse_decode_opt_box_autoadd_quality(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_quality(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Release? sse_decode_opt_box_autoadd_release(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_release(deserializer));
     } else {
       return null;
     }
@@ -1752,38 +3208,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   (
-    SqlMusicFactoryW,
-    Config
-  ) sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_sql_music_factory_w_config(
+    MusicListW,
+    List<MusicAggregatorW>
+  ) sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 =
-        sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
+        sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
             deserializer);
-    var var_field1 = sse_decode_config(deserializer);
-    return (var_field0, var_field1);
-  }
-
-  @protected
-  (
-    MusicList,
-    List<MusicW>
-  ) sse_decode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_w(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_music_list(deserializer);
     var var_field1 =
-        sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+        sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
             deserializer);
-    return (var_field0, var_field1);
-  }
-
-  @protected
-  (String, MusicList) sse_decode_record_string_music_list(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_String(deserializer);
-    var var_field1 = sse_decode_music_list(deserializer);
     return (var_field0, var_field1);
   }
 
@@ -1797,9 +3232,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Release sse_decode_release(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_url = sse_decode_String(deserializer);
+    var var_assetsUrl = sse_decode_String(deserializer);
+    var var_uploadUrl = sse_decode_String(deserializer);
+    var var_htmlUrl = sse_decode_String(deserializer);
+    var var_id = sse_decode_u_64(deserializer);
+    var var_author = sse_decode_author(deserializer);
+    var var_nodeId = sse_decode_String(deserializer);
+    var var_tagName = sse_decode_String(deserializer);
+    var var_targetCommitish = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_draft = sse_decode_bool(deserializer);
+    var var_prerelease = sse_decode_bool(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_publishedAt = sse_decode_String(deserializer);
+    var var_assets = sse_decode_list_asset(deserializer);
+    var var_tarballUrl = sse_decode_String(deserializer);
+    var var_zipballUrl = sse_decode_String(deserializer);
+    var var_body = sse_decode_String(deserializer);
+    return Release(
+        url: var_url,
+        assetsUrl: var_assetsUrl,
+        uploadUrl: var_uploadUrl,
+        htmlUrl: var_htmlUrl,
+        id: var_id,
+        author: var_author,
+        nodeId: var_nodeId,
+        tagName: var_tagName,
+        targetCommitish: var_targetCommitish,
+        name: var_name,
+        draft: var_draft,
+        prerelease: var_prerelease,
+        createdAt: var_createdAt,
+        publishedAt: var_publishedAt,
+        assets: var_assets,
+        tarballUrl: var_tarballUrl,
+        zipballUrl: var_zipballUrl,
+        body: var_body);
+  }
+
+  @protected
+  SqlFactoryW sse_decode_sql_factory_w(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return const SqlFactoryW();
+  }
+
+  @protected
   int sse_decode_u_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint32();
+  }
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -1834,6 +3323,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          MusicAggregatorW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MusicAggregatorWImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          MusicListW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MusicListWImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
           MusicW self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1843,21 +3351,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
-          PoolAny self, SseSerializer serializer) {
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          MusicAggregatorW self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as PoolAnyImpl).frbInternalSseEncode(move: true), serializer);
+        (self as MusicAggregatorWImpl).frbInternalSseEncode(move: false),
+        serializer);
   }
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          SqlMusicFactoryW self, SseSerializer serializer) {
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          MusicAggregatorW self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as SqlMusicFactoryWImpl).frbInternalSseEncode(move: true),
+        (self as MusicAggregatorWImpl).frbInternalSseEncode(move: false),
         serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          MusicListW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MusicListWImpl).frbInternalSseEncode(move: false), serializer);
   }
 
   @protected
@@ -1870,13 +3388,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          SqlMusicFactoryW self, SseSerializer serializer) {
+  void sse_encode_Chrono_Utc(DateTime self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as SqlMusicFactoryWImpl).frbInternalSseEncode(move: false),
-        serializer);
+    sse_encode_i_64(
+        PlatformInt64Util.from(self.microsecondsSinceEpoch), serializer);
   }
 
   @protected
@@ -1889,30 +3404,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          MusicAggregatorW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MusicAggregatorWImpl).frbInternalSseEncode(move: null),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          MusicListW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as MusicListWImpl).frbInternalSseEncode(move: null), serializer);
+  }
+
+  @protected
+  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
           MusicW self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
         (self as MusicWImpl).frbInternalSseEncode(move: null), serializer);
-  }
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPoolAny(
-          PoolAny self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as PoolAnyImpl).frbInternalSseEncode(move: null), serializer);
-  }
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
-          SqlMusicFactoryW self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as SqlMusicFactoryWImpl).frbInternalSseEncode(move: null),
-        serializer);
   }
 
   @protected
@@ -1922,9 +3437,72 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_aggregator_online_factory_w(
+      AggregatorOnlineFactoryW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_asset(Asset self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.url, serializer);
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_String(self.nodeId, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_opt_String(self.label, serializer);
+    sse_encode_author(self.uploader, serializer);
+    sse_encode_String(self.contentType, serializer);
+    sse_encode_String(self.state, serializer);
+    sse_encode_u_64(self.size, serializer);
+    sse_encode_u_64(self.downloadCount, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.browserDownloadUrl, serializer);
+  }
+
+  @protected
+  void sse_encode_author(Author self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.login, serializer);
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_String(self.nodeId, serializer);
+    sse_encode_String(self.avatarUrl, serializer);
+    sse_encode_String(self.gravatarId, serializer);
+    sse_encode_String(self.url, serializer);
+    sse_encode_String(self.htmlUrl, serializer);
+    sse_encode_String(self.followersUrl, serializer);
+    sse_encode_String(self.followingUrl, serializer);
+    sse_encode_String(self.gistsUrl, serializer);
+    sse_encode_String(self.starredUrl, serializer);
+    sse_encode_String(self.subscriptionsUrl, serializer);
+    sse_encode_String(self.organizationsUrl, serializer);
+    sse_encode_String(self.reposUrl, serializer);
+    sse_encode_String(self.eventsUrl, serializer);
+    sse_encode_String(self.receivedEventsUrl, serializer);
+    sse_encode_String(self.type, serializer);
+    sse_encode_bool(self.siteAdmin, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          MusicW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+        self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_Chrono_Utc(
+      DateTime self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_Chrono_Utc(self, serializer);
   }
 
   @protected
@@ -1934,16 +3512,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_music_list(
-      MusicList self, SseSerializer serializer) {
+  void sse_encode_box_autoadd_extern_api(
+      ExternApi self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_music_list(self, serializer);
+    sse_encode_extern_api(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_extra_info(
+      ExtraInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_extra_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_music_fuzz_filter(
+      MusicFuzzFilter self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_music_fuzz_filter(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_music_list_info(
+      MusicListInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_music_list_info(self, serializer);
   }
 
   @protected
   void sse_encode_box_autoadd_quality(Quality self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_quality(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_release(Release self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_release(self, serializer);
   }
 
   @protected
@@ -1956,13 +3561,57 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_config(Config self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_bool(self.userAgreement, serializer);
+    sse_encode_opt_box_autoadd_extern_api(self.externApi, serializer);
+    sse_encode_bool(self.versionAutoUpdate, serializer);
+    sse_encode_bool(self.externApiAutoUpdate, serializer);
+    sse_encode_String(self.wifiAutoQuality, serializer);
+    sse_encode_String(self.mobileAutoQuality, serializer);
     sse_encode_opt_String(self.externApiPath, serializer);
+  }
+
+  @protected
+  void sse_encode_extern_api(ExternApi self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.url, serializer);
+    sse_encode_String(self.localPath, serializer);
+    sse_encode_opt_box_autoadd_Chrono_Utc(self.lastModifiedTime, serializer);
+  }
+
+  @protected
+  void sse_encode_extra_info(ExtraInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_u_32(self.playCount, serializer);
+    sse_encode_opt_box_autoadd_u_32(self.musicCount, serializer);
   }
 
   @protected
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putPlatformInt64(self);
+  }
+
+  @protected
+  void
+      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          List<MusicAggregatorW> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+          item, serializer);
+    }
+  }
+
+  @protected
+  void
+      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          List<MusicListW> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+          item, serializer);
+    }
   }
 
   @protected
@@ -1987,6 +3636,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_asset(List<Asset> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_asset(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_music_info(
       List<MusicInfo> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1997,12 +3655,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_music_list(
-      List<MusicList> self, SseSerializer serializer) {
+  void sse_encode_list_music_list_info(
+      List<MusicListInfo> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
-      sse_encode_music_list(item, serializer);
+      sse_encode_music_list_info(item, serializer);
     }
   }
 
@@ -2032,16 +3690,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_record_string_music_list(
-      List<(String, MusicList)> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_record_string_music_list(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_record_string_string(
       List<(String, String)> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2049,6 +3697,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (final item in self) {
       sse_encode_record_string_string(item, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_music_fuzz_filter(
+      MusicFuzzFilter self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.name, serializer);
+    sse_encode_list_String(self.artist, serializer);
+    sse_encode_opt_String(self.album, serializer);
   }
 
   @protected
@@ -2067,11 +3724,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_music_list(MusicList self, SseSerializer serializer) {
+  void sse_encode_music_list_info(
+      MusicListInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self.id, serializer);
     sse_encode_String(self.name, serializer);
     sse_encode_String(self.artPic, serializer);
     sse_encode_String(self.desc, serializer);
+    sse_encode_opt_box_autoadd_extra_info(self.extra, serializer);
+  }
+
+  @protected
+  void sse_encode_online_factory_w(
+      OnlineFactoryW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
   }
 
   @protected
@@ -2085,6 +3751,63 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void
+      sse_encode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          MusicW? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+          self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_Chrono_Utc(
+      DateTime? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_Chrono_Utc(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_extern_api(
+      ExternApi? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_extern_api(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_extra_info(
+      ExtraInfo? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_extra_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_music_fuzz_filter(
+      MusicFuzzFilter? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_music_fuzz_filter(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_quality(
       Quality? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2092,6 +3815,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_quality(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_release(
+      Release? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_release(self, serializer);
     }
   }
 
@@ -2117,30 +3851,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_sql_music_factory_w_config(
-          (SqlMusicFactoryW, Config) self, SseSerializer serializer) {
+      sse_encode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w(
+          (MusicListW, List<MusicAggregatorW>) self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSqlMusicFactoryW(
+    sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
         self.$1, serializer);
-    sse_encode_config(self.$2, serializer);
-  }
-
-  @protected
-  void
-      sse_encode_record_music_list_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_w(
-          (MusicList, List<MusicW>) self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_music_list(self.$1, serializer);
-    sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+    sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
         self.$2, serializer);
-  }
-
-  @protected
-  void sse_encode_record_string_music_list(
-      (String, MusicList) self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.$1, serializer);
-    sse_encode_music_list(self.$2, serializer);
   }
 
   @protected
@@ -2152,9 +3869,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_release(Release self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.url, serializer);
+    sse_encode_String(self.assetsUrl, serializer);
+    sse_encode_String(self.uploadUrl, serializer);
+    sse_encode_String(self.htmlUrl, serializer);
+    sse_encode_u_64(self.id, serializer);
+    sse_encode_author(self.author, serializer);
+    sse_encode_String(self.nodeId, serializer);
+    sse_encode_String(self.tagName, serializer);
+    sse_encode_String(self.targetCommitish, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_bool(self.draft, serializer);
+    sse_encode_bool(self.prerelease, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.publishedAt, serializer);
+    sse_encode_list_asset(self.assets, serializer);
+    sse_encode_String(self.tarballUrl, serializer);
+    sse_encode_String(self.zipballUrl, serializer);
+    sse_encode_String(self.body, serializer);
+  }
+
+  @protected
+  void sse_encode_sql_factory_w(SqlFactoryW self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
   void sse_encode_u_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint32(self);
+  }
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
   }
 
   @protected
@@ -2182,6 +3933,140 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 }
 
 @sealed
+class MusicAggregatorWImpl extends RustOpaque implements MusicAggregatorW {
+  // Not to be used by end users
+  MusicAggregatorWImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  MusicAggregatorWImpl.frbInternalSseDecode(
+      BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_MusicAggregatorW,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_MusicAggregatorW,
+    rustArcDecrementStrongCountPtr: RustLib
+        .instance.api.rust_arc_decrement_strong_count_MusicAggregatorWPtr,
+  );
+
+  Future<void> addMusic({required MusicW music}) => RustLib.instance.api
+      .crateApiTypeBindMusicAggregatorWAddMusic(that: this, music: music);
+
+  bool belongTo({required MusicW music}) => RustLib.instance.api
+      .crateApiTypeBindMusicAggregatorWBelongTo(that: this, music: music);
+
+  MusicAggregatorW clone() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWClone(
+        that: this,
+      );
+
+  Future<(MusicListW, List<MusicAggregatorW>)> fetchAlbum(
+          {required int page, required int limit}) =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWFetchAlbum(
+          that: this, page: page, limit: limit);
+
+  Future<String> fetchLyric() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWFetchLyric(
+        that: this,
+      );
+
+  Future<List<MusicW>> fetchMusics({required List<String> sources}) =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWFetchMusics(
+          that: this, sources: sources);
+
+  List<MusicW> getAllMusics() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetAllMusics(
+        that: this,
+      );
+
+  List<MusicW> getAllMusicsOwned() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetAllMusicsOwned(
+        that: this,
+      );
+
+  List<String> getAvailableSources() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetAvailableSources(
+        that: this,
+      );
+
+  MusicW getDefaultMusic() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetDefaultMusic(
+        that: this,
+      );
+
+  String getDefaultSource() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetDefaultSource(
+        that: this,
+      );
+
+  Future<MusicW?> getMusic({required String source}) => RustLib.instance.api
+      .crateApiTypeBindMusicAggregatorWGetMusic(that: this, source: source);
+
+  PlatformInt64 getMusicId() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetMusicId(
+        that: this,
+      );
+
+  bool matchFilter({required MusicFuzzFilter filter}) => RustLib.instance.api
+      .crateApiTypeBindMusicAggregatorWMatchFilter(that: this, filter: filter);
+
+  Future<void> setDefaultSource({required String source}) =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWSetDefaultSource(
+          that: this, source: source);
+
+  String toString() =>
+      RustLib.instance.api.crateApiTypeBindMusicAggregatorWToString(
+        that: this,
+      );
+}
+
+@sealed
+class MusicListWImpl extends RustOpaque implements MusicListW {
+  // Not to be used by end users
+  MusicListWImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  MusicListWImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_MusicListW,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_MusicListW,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_MusicListWPtr,
+  );
+
+  Future<List<MusicAggregatorW>> fetchAllMusicAggregators(
+          {required int pagesPerBatch, required int limit}) =>
+      RustLib.instance.api.crateApiTypeBindMusicListWFetchAllMusicAggregators(
+          that: this, pagesPerBatch: pagesPerBatch, limit: limit);
+
+  Future<List<MusicAggregatorW>> getMusicAggregators(
+          {required int page, required int limit}) =>
+      RustLib.instance.api.crateApiTypeBindMusicListWGetMusicAggregators(
+          that: this, page: page, limit: limit);
+
+  MusicListInfo getMusiclistInfo() =>
+      RustLib.instance.api.crateApiTypeBindMusicListWGetMusiclistInfo(
+        that: this,
+      );
+
+  String source() => RustLib.instance.api.crateApiTypeBindMusicListWSource(
+        that: this,
+      );
+
+  String toString() => RustLib.instance.api.crateApiTypeBindMusicListWToString(
+        that: this,
+      );
+}
+
+@sealed
 class MusicWImpl extends RustOpaque implements MusicW {
   // Not to be used by end users
   MusicWImpl.frbInternalDcoDecode(List<dynamic> wire)
@@ -2200,131 +4085,34 @@ class MusicWImpl extends RustOpaque implements MusicW {
         RustLib.instance.api.rust_arc_decrement_strong_count_MusicWPtr,
   );
 
-  String getExtraInto({required Quality quality}) => RustLib.instance.api
-      .crateApiMusicSdkMusicWGetExtraInto(that: this, quality: quality);
+  Future<(MusicListW, List<MusicAggregatorW>)> fetchAlbum(
+          {required int page, required int limit}) =>
+      RustLib.instance.api.crateApiTypeBindMusicWFetchAlbum(
+          that: this, page: page, limit: limit);
 
-  PlatformInt64 getMusicId() =>
-      RustLib.instance.api.crateApiMusicSdkMusicWGetMusicId(
+  Future<String> fetchLyric() =>
+      RustLib.instance.api.crateApiTypeBindMusicWFetchLyric(
         that: this,
       );
+
+  String getExtraInfo({required Quality quality}) => RustLib.instance.api
+      .crateApiTypeBindMusicWGetExtraInfo(that: this, quality: quality);
 
   MusicInfo getMusicInfo() =>
-      RustLib.instance.api.crateApiMusicSdkMusicWGetMusicInfo(
-        that: this,
-      );
-}
-
-@sealed
-class PoolAnyImpl extends RustOpaque implements PoolAny {
-  // Not to be used by end users
-  PoolAnyImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  PoolAnyImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_PoolAny,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_PoolAny,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_PoolAnyPtr,
-  );
-}
-
-@sealed
-class SqlMusicFactoryWImpl extends RustOpaque implements SqlMusicFactoryW {
-  // Not to be used by end users
-  SqlMusicFactoryWImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  SqlMusicFactoryWImpl.frbInternalSseDecode(
-      BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_SqlMusicFactoryW,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_SqlMusicFactoryW,
-    rustArcDecrementStrongCountPtr: RustLib
-        .instance.api.rust_arc_decrement_strong_count_SqlMusicFactoryWPtr,
-  );
-
-  Future<void> changeMusicData(
-          {required List<MusicW> musics, required List<MusicInfo> infos}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWChangeMusicData(
-          that: this, musics: musics, infos: infos);
-
-  Future<void> changeMusicDefaultSource(
-          {required MusicList musicList,
-          required Int64List ids,
-          required List<String> defaultSources}) =>
-      RustLib.instance.api
-          .crateApiMusicSdkSqlMusicFactoryWChangeMusicDefaultSource(
-              that: this,
-              musicList: musicList,
-              ids: ids,
-              defaultSources: defaultSources);
-
-  Future<void> changeMusicListMetadata(
-          {required List<MusicList> oldList,
-          required List<MusicList> newList}) =>
-      RustLib.instance.api
-          .crateApiMusicSdkSqlMusicFactoryWChangeMusicListMetadata(
-              that: this, oldList: oldList, newList: newList);
-
-  Future<void> cleanUnusedMusicData() =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWCleanUnusedMusicData(
+      RustLib.instance.api.crateApiTypeBindMusicWGetMusicInfo(
         that: this,
       );
 
-  Future<void> createMusicListTable({required List<MusicList> musicLists}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWCreateMusicListTable(
-          that: this, musicLists: musicLists);
-
-  Future<void> delMusic(
-          {required MusicList musicList, required Int64List ids}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWDelMusic(
-          that: this, musicList: musicList, ids: ids);
-
-  Future<void> delMusicListTable({required List<MusicList> musicLists}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWDelMusicListTable(
-          that: this, musicLists: musicLists);
-
-  Future<void> initCreateTable() =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWInitCreateTable(
+  (String, String) getPrimaryKv() =>
+      RustLib.instance.api.crateApiTypeBindMusicWGetPrimaryKv(
         that: this,
       );
 
-  Future<void> insertMusic(
-          {required MusicList musicList, required List<MusicW> musics}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWInsertMusic(
-          that: this, musicList: musicList, musics: musics);
-
-  Future<List<MusicW>> readMusic({required MusicList musicList}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWReadMusic(
-          that: this, musicList: musicList);
-
-  Future<List<MusicW>> readMusicData({required String source}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWReadMusicData(
-          that: this, source: source);
-
-  Future<List<MusicList>> readMusicLists() =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWReadMusicLists(
+  String source() => RustLib.instance.api.crateApiTypeBindMusicWSource(
         that: this,
       );
 
-  Future<void> reorderMusic(
-          {required MusicList musicList,
-          required Int64List newIndex,
-          required List<MusicW> oldMusicsInOrder}) =>
-      RustLib.instance.api.crateApiMusicSdkSqlMusicFactoryWReorderMusic(
-          that: this,
-          musicList: musicList,
-          newIndex: newIndex,
-          oldMusicsInOrder: oldMusicsInOrder);
+  String toString() => RustLib.instance.api.crateApiTypeBindMusicWToString(
+        that: this,
+      );
 }

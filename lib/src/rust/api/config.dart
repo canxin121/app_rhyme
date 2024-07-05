@@ -4,17 +4,29 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'extern_api.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `default_user_agreement`
+// These functions are ignored because they are not marked as `pub`: `default_false`, `default_true`, `mobile_auto_quality`, `wifi_auto_quality`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `default`
+// These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `update`
 
 class Config {
   final bool userAgreement;
+  ExternApi? externApi;
+  bool versionAutoUpdate;
+  bool externApiAutoUpdate;
+  String wifiAutoQuality;
+  String mobileAutoQuality;
   final String? externApiPath;
 
-  const Config({
+  Config({
     required this.userAgreement,
+    this.externApi,
+    required this.versionAutoUpdate,
+    required this.externApiAutoUpdate,
+    required this.wifiAutoQuality,
+    required this.mobileAutoQuality,
     this.externApiPath,
   });
 
@@ -26,7 +38,14 @@ class Config {
       );
 
   @override
-  int get hashCode => userAgreement.hashCode ^ externApiPath.hashCode;
+  int get hashCode =>
+      userAgreement.hashCode ^
+      externApi.hashCode ^
+      versionAutoUpdate.hashCode ^
+      externApiAutoUpdate.hashCode ^
+      wifiAutoQuality.hashCode ^
+      mobileAutoQuality.hashCode ^
+      externApiPath.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -34,5 +53,10 @@ class Config {
       other is Config &&
           runtimeType == other.runtimeType &&
           userAgreement == other.userAgreement &&
+          externApi == other.externApi &&
+          versionAutoUpdate == other.versionAutoUpdate &&
+          externApiAutoUpdate == other.externApiAutoUpdate &&
+          wifiAutoQuality == other.wifiAutoQuality &&
+          mobileAutoQuality == other.mobileAutoQuality &&
           externApiPath == other.externApiPath;
 }

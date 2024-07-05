@@ -5,8 +5,8 @@
 
 import '../frb_generated.dart';
 import 'config.dart';
-import 'music_sdk.dart';
+import 'extern_api.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<(SqlMusicFactoryW, Config)> initStore({required String storeRoot}) =>
-    RustLib.instance.api.crateApiInitInitStore(storeRoot: storeRoot);
+Future<Config> initBackend({required String storeRoot}) =>
+    RustLib.instance.api.crateApiInitInitBackend(storeRoot: storeRoot);

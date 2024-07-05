@@ -10,10 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.6
   rust_lib_app_rhyme:
     path: rust_builder
+
+  cupertino_icons: ^1.0.6
   flutter_rust_bridge: 2.0.0
   interactive_slider:
     git: https://github.com/canxin121/interactive_slider
@@ -28,7 +28,7 @@ dependencies:
   file_picker: ^8.0.3
   window_manager: ^0.3.8
   flutter_lyric:
-    git: https://github.com/ozyl/flutter_lyric
+    git: https://github.com/canxin121/flutter_lyric
   talker: ^4.1.5
   just_audio_background: ^0.0.1-beta.11
   audio_session: ^0.1.19
@@ -45,6 +45,12 @@ dependencies:
     git:
       url: https://github.com/bdlukaa/just_audio_windows
       path: just_audio_windows
+  package_info_plus: ^8.0.0
+
+  extended_image: ^8.2.1
+  url_launcher: ^6.3.0
+  connectivity_plus: ^6.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

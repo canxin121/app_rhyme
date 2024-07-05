@@ -17,7 +17,7 @@ Future<String> cacheFile(
     RustLib.instance.api.crateApiCacheCacheFile(
         file: file, cachePath: cachePath, filename: filename);
 
-Future<String?> useCacheFile(
+String? useCacheFile(
         {required String file, required String cachePath, String? filename}) =>
     RustLib.instance.api.crateApiCacheUseCacheFile(
         file: file, cachePath: cachePath, filename: filename);

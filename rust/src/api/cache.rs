@@ -1,13 +1,14 @@
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-
-use super::ROOT_PATH;
 use futures::StreamExt as _;
 use lazy_static::lazy_static;
-use music_api::search_factory::CLIENT;
+use music_api::util::CLIENT;
+use std::hash::{DefaultHasher, Hash as _, Hasher as _};
 use std::sync::Arc;
-use tokio::io::AsyncWriteExt as _;
+use std::thread::sleep;
+use std::time::Duration;
+use tokio::io::AsyncWriteExt;
 use tokio::sync::Semaphore;
+
+use super::ROOT_PATH;
 
 lazy_static! {
     static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(100));
@@ -59,20 +60,32 @@ pub async fn cache_file(
     Ok(filepath.to_string_lossy().into_owned())
 }
 
-#[flutter_rust_bridge::frb]
-pub async fn use_cache_file(
-    file: &str,
-    cache_path: &str,
-    filename: Option<String>,
-) -> Option<String> {
-    let _ = FILE_OP_SEMAPHORE.acquire().await;
-
+#[flutter_rust_bridge::frb(sync)]
+pub fn use_cache_file(file: &str, cache_path: &str, filename: Option<String>) -> Option<String> {
     let filename = match filename {
         None => gen_hash(file),
-        Some(filename) => filename.to_string(),
+        Some(filename) => filename,
     };
-    let root = ROOT_PATH.read().await;
-    let mut root_path = root.clone();
+
+    let mut attempts = 0;
+    let max_attempts = 5;
+    let mut root = None;
+
+    while attempts < max_attempts {
+        match ROOT_PATH.try_read() {
+            Ok(lock) => {
+                root = Some(lock.clone());
+                break;
+            }
+            Err(_) => {
+                attempts += 1;
+                sleep(Duration::from_millis(10)); // 等待 10 毫秒后重试
+            }
+        }
+    }
+
+    let root = root?;
+    let mut root_path = root;
     root_path.push(cache_path);
     let filepath = root_path.join(&filename);
 

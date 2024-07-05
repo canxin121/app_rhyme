@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
-use music_api::search_factory::CLIENT;
+use flutter_rust_bridge::frb;
+use music_api::util::CLIENT;
 use reqwest::header::HeaderMap;
 
+#[frb]
 pub async fn send_request(
     method: &str,
     headers: HashMap<String, String>,
