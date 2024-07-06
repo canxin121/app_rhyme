@@ -28,6 +28,7 @@ class SongDisplayPage extends StatefulWidget {
 
 class SongDisplayPageState extends State<SongDisplayPage> {
   PageState pageState = PageState.main;
+
   void onListBotton() {
     setState(() {
       if (pageState == PageState.list) {
@@ -50,6 +51,14 @@ class SongDisplayPageState extends State<SongDisplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final backgroundColor = brightness == Brightness.dark
+        ? CupertinoColors.black
+        : CupertinoColors.white;
+    final textColor = brightness == Brightness.dark
+        ? CupertinoColors.white
+        : CupertinoColors.black;
+
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -85,16 +94,16 @@ class SongDisplayPageState extends State<SongDisplayPage> {
               children: [
                 Text(
                   '待播清单',
-                  style: const TextStyle(
-                    color: CupertinoColors.systemGrey6,
+                  style: TextStyle(
+                    color: textColor,
                     fontSize: 16.0,
                   ).useSystemChineseFont(),
                 ),
                 GestureDetector(
                   child: Text(
                     '删除所有',
-                    style: const TextStyle(
-                      color: CupertinoColors.systemGrey6,
+                    style: TextStyle(
+                      color: textColor,
                       fontSize: 16.0,
                     ).useSystemChineseFont(),
                   ),
@@ -132,17 +141,21 @@ class SongDisplayPageState extends State<SongDisplayPage> {
     return DismissiblePage(
       isFullScreen: true,
       direction: DismissiblePageDismissDirection.down,
-      backgroundColor: CupertinoColors.white,
+      backgroundColor: backgroundColor,
       onDismissed: () => Navigator.of(context).pop(),
       child: Container(
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                CupertinoColors.systemGrey2,
-                CupertinoColors.systemGrey,
+                brightness == Brightness.dark
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.systemGrey2,
+                brightness == Brightness.dark
+                    ? CupertinoColors.black
+                    : CupertinoColors.systemGrey,
               ],
             ),
           ),
@@ -151,7 +164,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             Column(
               children: [
                 // 在移动设备上，会触发safeArea，自动有一个合适的padding
-                // 而在卓main设备上，需要我们手动设定一个padding
+                // 而在桌面设备上，需要我们手动设定一个padding
                 if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
                   const Padding(padding: EdgeInsets.only(top: 40)),
                 if (Platform.isAndroid || Platform.isIOS)

@@ -68,7 +68,12 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final textColor = brightness == Brightness.dark
+        ? CupertinoColors.white
+        : CupertinoColors.black;
     double screenWidth = MediaQuery.of(context).size.width;
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
           padding: const EdgeInsetsDirectional.only(end: 16),
@@ -170,8 +175,7 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
                   return Center(
                     child: Text(
                       '没有找到任何音乐',
-                      style: const TextStyle(color: CupertinoColors.black)
-                          .useSystemChineseFont(),
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
                     ),
                   );
                 },
@@ -191,30 +195,40 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
       ),
     );
   }
-}
 
-Widget _buildButton(BuildContext context,
-    {required IconData icon,
-    required String label,
-    required VoidCallback onPressed}) {
-  return ElevatedButton.icon(
-    icon: Icon(
-      icon,
-      size: 24,
-      color: activeIconRed,
-    ),
-    label: Text(
-      label,
-      style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-    ),
-    onPressed: onPressed,
-    style: ElevatedButton.styleFrom(
+  Widget _buildButton(BuildContext context,
+      {required IconData icon,
+      required String label,
+      required VoidCallback onPressed}) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final Color textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    final Color buttonBackgroundColor = isDarkMode
+        ? CupertinoColors.systemGrey6.darkColor
+        : CupertinoColors.systemGrey6;
+
+    return ElevatedButton.icon(
+      icon: Icon(
+        icon,
+        size: 24,
+        color: activeIconRed,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(color: textColor).useSystemChineseFont(),
+      ),
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
         padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.1,
-            vertical: MediaQuery.of(context).size.height * 0.02),
-        backgroundColor: CupertinoColors.systemGrey6),
-  );
+          horizontal: MediaQuery.of(context).size.width * 0.1,
+          vertical: MediaQuery.of(context).size.height * 0.02,
+        ),
+        backgroundColor: buttonBackgroundColor,
+      ),
+    );
+  }
 }

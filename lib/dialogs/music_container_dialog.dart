@@ -62,6 +62,9 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+
     String title;
     if (widget.readonly) {
       title = '音乐详情';
@@ -70,8 +73,14 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
     } else {
       title = '创建音乐';
     }
+
     return CupertinoAlertDialog(
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+        ).useSystemChineseFont(),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -112,6 +121,21 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
               controller: nameController,
               placeholder: '音乐名字',
               readOnly: widget.readonly,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
           Padding(
@@ -121,6 +145,21 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
               placeholder: '艺术家(多个用逗号分隔)',
               readOnly: widget.readonly,
               maxLines: widget.readonly ? null : 1,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
           Padding(
@@ -130,6 +169,21 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
               placeholder: '专辑',
               readOnly: widget.readonly,
               maxLines: widget.readonly ? null : 1,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
           Padding(
@@ -140,6 +194,21 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
               readOnly: widget.readonly,
               keyboardType: TextInputType.number,
               maxLines: widget.readonly ? null : 1,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
           Padding(
@@ -149,6 +218,21 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
               placeholder: '歌词',
               readOnly: widget.readonly,
               maxLines: null,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
         ],
@@ -158,8 +242,11 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
           CupertinoDialogAction(
             child: Text(
               '取消',
-              style: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont(),
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -188,8 +275,11 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
             },
             child: Text(
               '完成',
-              style: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont(),
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
             ),
           ),
         if (widget.readonly)
@@ -200,8 +290,11 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
             },
             child: Text(
               '关闭',
-              style: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont(),
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
             ),
           ),
       ],

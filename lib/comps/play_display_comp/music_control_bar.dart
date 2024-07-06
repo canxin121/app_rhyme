@@ -1,23 +1,51 @@
+import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:app_rhyme/pages/play_display_page.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
-import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class MusicControlBar extends StatelessWidget {
   final double maxHeight;
   const MusicControlBar({super.key, required this.maxHeight});
 
+  // 定义动态颜色
+  static const CupertinoDynamicColor barBackgroundDynamicColor =
+      CupertinoDynamicColor.withBrightness(
+    color: CupertinoColors.white, // light mode color
+    darkColor: CupertinoColors.black, // dark mode color
+  );
+
+  static const CupertinoDynamicColor iconColorDynamic =
+      CupertinoDynamicColor.withBrightness(
+    color: CupertinoColors.black, // light mode color
+    darkColor: CupertinoColors.white, // dark mode color
+  );
+
+  static const CupertinoDynamicColor textColorDynamic =
+      CupertinoDynamicColor.withBrightness(
+    color: CupertinoColors.black, // light mode color
+    darkColor: CupertinoColors.white, // dark mode color
+  );
+
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final Color barBackgroundColor =
+        CupertinoDynamicColor.resolve(barBackgroundDynamicColor, context);
+    final Color iconColor =
+        CupertinoDynamicColor.resolve(iconColorDynamic, context);
+    final Color textColor =
+        CupertinoDynamicColor.resolve(textColorDynamic, context);
+    final Color borderColor = brightness == Brightness.light
+        ? CupertinoColors.systemGrey3
+        : CupertinoColors.systemGrey;
+
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: maxHeight,
       ),
       child: GestureDetector(
         onVerticalDragUpdate: (details) {
-          // 当用户上滑时，details.delta.dy 会是一个负值
           if (details.delta.dy < 0) {
             navigateToSongDisplayPage(context);
           }
@@ -28,35 +56,31 @@ class MusicControlBar extends StatelessWidget {
         child: Container(
           clipBehavior: Clip.antiAliasWithSaveLayer,
           decoration: BoxDecoration(
-            color: barBackgoundWhite,
-            border: const Border(
+            color: barBackgroundColor,
+            border: Border(
               bottom: BorderSide(
-                color: CupertinoColors.systemGrey3,
+                color: borderColor,
               ),
             ),
           ),
           child: Row(
             children: <Widget>[
-              // 音乐图标
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                // 使用AspectRatio来保持图片的宽高比
                 child: Obx(() => imageCacheHelper(
                     globalAudioHandler.playingMusic.value?.info.artPic)),
               ),
-              // 音乐名称
               Expanded(
                 child: Obx(
                   () => Text(
                     globalAudioHandler.playingMusic.value?.info.name ?? "Music",
-                    style: const TextStyle(fontSize: 15.0),
+                    style: TextStyle(fontSize: 15.0, color: textColor),
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
                 ),
               ),
-              // 音乐控制按钮
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -65,18 +89,18 @@ class MusicControlBar extends StatelessWidget {
                     onPressed: () {
                       globalAudioHandler.seekToPrevious();
                     },
-                    child: const Icon(
+                    child: Icon(
                       CupertinoIcons.backward_fill,
-                      color: CupertinoColors.black,
+                      color: iconColor,
                     ),
                   ),
                   Obx(() {
                     if (globalAudioUiController.playerState.value.playing) {
                       return CupertinoButton(
                         padding: EdgeInsets.zero,
-                        child: const Icon(
+                        child: Icon(
                           CupertinoIcons.pause_solid,
-                          color: CupertinoColors.black,
+                          color: iconColor,
                         ),
                         onPressed: () {
                           globalAudioHandler.pause();
@@ -85,9 +109,9 @@ class MusicControlBar extends StatelessWidget {
                     } else {
                       return CupertinoButton(
                         padding: EdgeInsets.zero,
-                        child: const Icon(
+                        child: Icon(
                           CupertinoIcons.play_arrow_solid,
-                          color: CupertinoColors.black,
+                          color: iconColor,
                         ),
                         onPressed: () {
                           globalAudioHandler.play();
@@ -100,9 +124,9 @@ class MusicControlBar extends StatelessWidget {
                     onPressed: () {
                       globalAudioHandler.seekToNext();
                     },
-                    child: const Icon(
+                    child: Icon(
                       CupertinoIcons.forward_fill,
-                      color: CupertinoColors.black,
+                      color: iconColor,
                     ),
                   ),
                 ],

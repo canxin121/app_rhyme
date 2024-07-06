@@ -7,6 +7,7 @@ import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -20,13 +21,15 @@ class SearchMusicAggregatorPage extends StatefulWidget {
       _SearchMusicAggregatorPageState();
 }
 
-class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage> {
+class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
+    with WidgetsBindingObserver {
   final PagingController<int, MusicAggregatorW> _pagingController =
       PagingController(firstPageKey: 1);
   final TextEditingController _inputContentController = TextEditingController();
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
     _pagingController.addPageRequestListener((pageKey) {
       _fetchMusicAggregators(pageKey);
@@ -35,9 +38,15 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pagingController.dispose();
     _inputContentController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {});
   }
 
   Future<void> _fetchMusicAggregators(int pageKey) async {
@@ -69,69 +78,76 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage> {
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
-
-    return Navigator(onGenerateRoute: (RouteSettings settings) {
-      return CupertinoPageRoute(
-          builder: (context) => SafeArea(
-                  child: Container(
-                color: CupertinoColors.white,
-                child: Column(
-                  children: [
-                    // 搜索框
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CupertinoSearchTextField(
-                        controller: _inputContentController,
-                        onSubmitted: (String value) {
-                          if (value.isNotEmpty) {
-                            _pagingController.refresh();
-                          }
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: PagedListView.separated(
-                        pagingController: _pagingController,
-                        padding: EdgeInsets.only(bottom: screenHeight * 0.1),
-                        separatorBuilder: (context, index) => const Divider(
-                          color: CupertinoColors.systemGrey4,
-                          indent: 30,
-                          endIndent: 30,
-                        ),
-                        builderDelegate:
-                            PagedChildBuilderDelegate<MusicAggregatorW>(
-                          noItemsFoundIndicatorBuilder: (context) {
-                            return const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    '输入关键词以搜索单曲',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Text(
-                                    '点击右上角图标切换搜索歌单',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                          itemBuilder: (context, musicAggregator, index) =>
-                              MusicContainerListItem(
-                            musicContainer: MusicContainer(musicAggregator),
-                          ),
+    final bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+    return SafeArea(
+        child: Column(
+      children: [
+        // 搜索框
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CupertinoSearchTextField(
+            style: TextStyle(
+              color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+            ).useSystemChineseFont(),
+            controller: _inputContentController,
+            onSubmitted: (String value) {
+              if (value.isNotEmpty) {
+                _pagingController.refresh();
+              }
+            },
+          ),
+        ),
+        Expanded(
+          child: PagedListView.separated(
+            pagingController: _pagingController,
+            padding: EdgeInsets.only(bottom: screenHeight * 0.1),
+            separatorBuilder: (context, index) => Divider(
+              color: isDarkMode
+                  ? CupertinoColors.systemGrey
+                  : CupertinoColors.systemGrey4,
+              indent: 30,
+              endIndent: 30,
+            ),
+            builderDelegate: PagedChildBuilderDelegate<MusicAggregatorW>(
+              noItemsFoundIndicatorBuilder: (context) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '输入关键词以搜索单曲',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? CupertinoColors.systemGrey2
+                              : CupertinoColors.black,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )));
-    });
+                      Text(
+                        '点击右上角图标切换搜索歌单',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? CupertinoColors.systemGrey2
+                              : CupertinoColors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              itemBuilder: (context, musicAggregator, index) =>
+                  MusicContainerListItem(
+                musicContainer: MusicContainer(musicAggregator),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ));
   }
 }
-
-BuildContext? searchMusicListPageContext;
 
 class SearchMusicListPage extends StatefulWidget {
   const SearchMusicListPage({super.key});
@@ -140,7 +156,8 @@ class SearchMusicListPage extends StatefulWidget {
   _SearchMusicListState createState() => _SearchMusicListState();
 }
 
-class _SearchMusicListState extends State<SearchMusicListPage> {
+class _SearchMusicListState extends State<SearchMusicListPage>
+    with WidgetsBindingObserver {
   final PagingController<int, MusicListW> _pagingController =
       PagingController(firstPageKey: 1);
   final TextEditingController _inputContentController = TextEditingController();
@@ -148,6 +165,7 @@ class _SearchMusicListState extends State<SearchMusicListPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _pagingController.addPageRequestListener((pageKey) {
       _fetchMusicLists(pageKey);
     });
@@ -155,9 +173,15 @@ class _SearchMusicListState extends State<SearchMusicListPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pagingController.dispose();
     _inputContentController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {});
   }
 
   Future<void> _fetchMusicLists(int pageKey) async {
@@ -183,78 +207,84 @@ class _SearchMusicListState extends State<SearchMusicListPage> {
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
+    final bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
 
-    return Navigator(onGenerateRoute: (RouteSettings settings) {
-      return CupertinoPageRoute(builder: (context) {
-        searchMusicListPageContext = context;
-        return SafeArea(
-            child: Container(
-          color: CupertinoColors.white,
-          child: Column(
-            children: [
-              // 搜索框
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CupertinoSearchTextField(
-                  controller: _inputContentController,
-                  onSubmitted: (String value) {
-                    if (value.isNotEmpty) {
-                      _pagingController.refresh();
-                    }
-                  },
-                ),
-              ),
-              Expanded(
-                child: PagedGridView(
-                    padding: EdgeInsets.only(bottom: screenHeight * 0.2),
-                    pagingController: _pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<MusicListW>(
-                        noItemsFoundIndicatorBuilder: (context) {
-                      return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '输入关键词以搜索歌单',
-                              textAlign: TextAlign.center,
-                            ),
-                            Text(
-                              '点击右上角图标切换搜索单曲',
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      );
-                    }, itemBuilder: (context, musicListW, index) {
-                      return Container(
-                          padding: const EdgeInsets.only(
-                              left: 10,
-                              right: 10,
-                              bottom: 20), // Increased bottom padding
-                          child: MusicListImageCard(
-                            musicListW: musicListW,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                    builder: (context) => OnlineMusicListPage(
-                                          musicList: musicListW,
-                                        )),
-                              );
-                            },
-                            online: true,
-                          ));
-                    }),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio:
-                            0.7)), // Adjusted child aspect ratio for more vertical space
-              ),
-            ],
+    return SafeArea(
+      child: Column(
+        children: [
+          // 搜索框
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CupertinoSearchTextField(
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ).useSystemChineseFont(),
+              controller: _inputContentController,
+              onSubmitted: (String value) {
+                if (value.isNotEmpty) {
+                  _pagingController.refresh();
+                }
+              },
+            ),
           ),
-        ));
-      });
-    });
+          Expanded(
+            child: PagedGridView(
+                padding: EdgeInsets.only(bottom: screenHeight * 0.2),
+                pagingController: _pagingController,
+                builderDelegate: PagedChildBuilderDelegate<MusicListW>(
+                    noItemsFoundIndicatorBuilder: (context) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '输入关键词以搜索歌单',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? CupertinoColors.systemGrey2
+                                : CupertinoColors.black,
+                          ),
+                        ),
+                        Text(
+                          '点击右上角图标切换搜索单曲',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: isDarkMode
+                                  ? CupertinoColors.systemGrey2
+                                  : CupertinoColors.black),
+                        ),
+                      ],
+                    ),
+                  );
+                }, itemBuilder: (context, musicListW, index) {
+                  return Container(
+                      padding: const EdgeInsets.only(
+                          left: 10,
+                          right: 10,
+                          bottom: 20), // Increased bottom padding
+                      child: MusicListImageCard(
+                        musicListW: musicListW,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => OnlineMusicListPage(
+                                      musicList: musicListW,
+                                    )),
+                          );
+                        },
+                        online: true,
+                      ));
+                }),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 0.7)),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -265,7 +295,8 @@ class CombinedSearchPage extends StatefulWidget {
   _CombinedSearchPageState createState() => _CombinedSearchPageState();
 }
 
-class _CombinedSearchPageState extends State<CombinedSearchPage> {
+class _CombinedSearchPageState extends State<CombinedSearchPage>
+    with WidgetsBindingObserver {
   int _selectedIndex = 0;
 
   void _onToggle() {
@@ -275,9 +306,31 @@ class _CombinedSearchPageState extends State<CombinedSearchPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this); // 添加观察者
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 移除观察者
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    super.didChangePlatformBrightness();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final bool isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+
     return CupertinoPageScaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDarkMode ? CupertinoColors.black : CupertinoColors.white,
       navigationBar: CupertinoNavigationBar(
           leading: Padding(
             padding: const EdgeInsets.only(left: 0.0),
@@ -285,9 +338,12 @@ class _CombinedSearchPageState extends State<CombinedSearchPage> {
               alignment: Alignment.centerLeft,
               child: Text(
                 _selectedIndex == 0 ? '搜索单曲' : '搜索歌单',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
+                  color: isDarkMode
+                      ? CupertinoColors.white
+                      : CupertinoColors.black,
                 ),
               ),
             ),
@@ -297,7 +353,10 @@ class _CombinedSearchPageState extends State<CombinedSearchPage> {
               return GestureDetector(
                 child: Text(
                   '选项',
-                  style: TextStyle(color: activeIconRed),
+                  style: TextStyle(
+                      color: isDarkMode
+                          ? CupertinoColors.systemRed
+                          : activeIconRed),
                 ),
                 onTapDown: (details) {
                   showMenu();
@@ -313,9 +372,8 @@ class _CombinedSearchPageState extends State<CombinedSearchPage> {
                     await OnlineFactoryW.getMusiclistFromShare(shareUrl: url);
                 var musicListW = result.$1;
                 var musicAggregators = result.$2;
-                if (searchMusicListPageContext != null &&
-                    searchMusicListPageContext!.mounted) {
-                  Navigator.of(searchMusicListPageContext!).push(
+                if (context.mounted) {
+                  Navigator.of(context).push(
                     CupertinoPageRoute(
                         builder: (context) => OnlineMusicListPage(
                               musicList: musicListW,

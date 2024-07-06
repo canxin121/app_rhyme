@@ -3,6 +3,7 @@ import 'package:app_rhyme/comps/musiclist_comp/musiclist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
@@ -22,6 +23,10 @@ class MusicListImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MusicListInfo musicListInfo = musicListW.getMusiclistInfo();
+
+    // 获取当前主题的亮度
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -53,7 +58,6 @@ class MusicListImageCard extends StatelessWidget {
                       left: 3,
                       child: Badge(
                         label: sourceToShort(musicListW.source()),
-                        isDark: true,
                       ),
                     ),
                     Positioned(
@@ -62,8 +66,12 @@ class MusicListImageCard extends StatelessWidget {
                       child: MusicListMenu(
                         builder: (context, showMenu) => GestureDetector(
                           onTap: showMenu,
-                          child: Icon(CupertinoIcons.ellipsis_circle,
-                              color: activeIconRed),
+                          child: Icon(
+                            CupertinoIcons.ellipsis_circle,
+                            color: isDarkMode
+                                ? CupertinoColors.white
+                                : activeIconRed,
+                          ),
                         ),
                         musicListW: musicListW,
                         online: online,
@@ -91,18 +99,17 @@ class MusicListImageCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       musicListInfo.desc,
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .textStyle
-                          .copyWith(
-                            color: CupertinoColors.systemGrey,
-                            fontSize: 16,
-                          ),
+                      style: TextStyle(
+                        color: isDarkMode
+                            ? CupertinoColors.systemGrey4
+                            : CupertinoColors.systemGrey,
+                        fontSize: 16,
+                      ).useSystemChineseFont(),
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           );

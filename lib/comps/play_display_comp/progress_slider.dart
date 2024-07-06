@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/time_parser.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
 class ProgressSlider extends StatefulWidget {
@@ -37,11 +38,21 @@ class ProgressSliderState extends State<ProgressSlider> {
   }
 
   @override
+  void dispose() {
+    listen1.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+
     return Container(
       padding: widget.padding,
       child: GestureDetector(
         child: InteractiveSlider(
+          brightness: isDarkMode ? Brightness.light : Brightness.dark,
           padding: const EdgeInsets.all(0),
           controller: _progressController,
           onProgressUpdated: (value) {

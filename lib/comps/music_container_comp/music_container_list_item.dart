@@ -18,19 +18,24 @@ class MusicContainerListItem extends StatelessWidget {
   final MusicContainer musicContainer;
   final MusicListW? musicListW;
   final bool inPlayList;
-  final bool isDark;
+  final bool? isDark;
   final GestureTapCallback? onTap;
 
-  const MusicContainerListItem(
-      {super.key,
-      required this.musicContainer,
-      this.musicListW,
-      this.inPlayList = false,
-      this.isDark = false,
-      this.onTap});
+  const MusicContainerListItem({
+    super.key,
+    required this.musicContainer,
+    this.musicListW,
+    this.inPlayList = false,
+    this.isDark,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // 获取当前主题的亮度
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = isDark ?? (brightness == Brightness.dark);
+
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 14),
       onPressed: onTap ??
@@ -61,7 +66,7 @@ class MusicContainerListItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isDark
+                      color: isDarkMode
                           ? CupertinoColors.systemGrey5
                           : CupertinoColors.black,
                     ),
@@ -71,7 +76,7 @@ class MusicContainerListItem extends StatelessWidget {
                     musicContainer.info.artist.join(", "),
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark
+                      color: isDarkMode
                           ? CupertinoColors.systemGrey4
                           : CupertinoColors.inactiveGray,
                     ),
@@ -82,11 +87,10 @@ class MusicContainerListItem extends StatelessWidget {
           ),
           // 缓存标志
           if (musicListW != null && !inPlayList && musicContainer.hasCache())
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
+            const Padding(
+              padding: EdgeInsets.only(right: 8.0),
               child: Badge(
                 label: '缓存',
-                isDark: isDark,
               ),
             ),
           // 标志音乐信息来源的Badge
@@ -101,9 +105,12 @@ class MusicContainerListItem extends StatelessWidget {
             builder: (_, showMenu) => CupertinoButton(
               onPressed: showMenu,
               padding: EdgeInsets.zero,
-              child: Icon(CupertinoIcons.ellipsis, color: activeIconRed),
+              child: Icon(
+                CupertinoIcons.ellipsis,
+                color: isDarkMode ? CupertinoColors.white : activeIconRed,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

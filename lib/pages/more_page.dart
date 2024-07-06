@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/dialogs/input_extern_api_link_dialog.dart';
 import 'package:app_rhyme/dialogs/quality_select_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
@@ -27,210 +26,226 @@ class MorePage extends StatefulWidget {
   MorePageState createState() => MorePageState();
 }
 
-class MorePageState extends State<MorePage> {
+class MorePageState extends State<MorePage> with WidgetsBindingObserver {
   void _updateExternApiState() {
     setState(() {});
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Navigator(onGenerateRoute: (RouteSettings settings) {
-      return CupertinoPageRoute(
-          builder: (context) => CupertinoPageScaffold(
-                  child: Container(
-                color: CupertinoColors.systemGroupedBackground,
-                child: SafeArea(
-                  child: ListView(
-                    children: [
-                      const CupertinoNavigationBar(
-                        leading: Padding(
-                          padding: EdgeInsets.only(left: 0.0),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '设置',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 20)),
-                      CupertinoFormSection.insetGrouped(
-                        header: const Text('应用信息'),
-                        children: [
-                          CupertinoFormRow(
-                              prefix: SizedBox(
-                                  height: 60,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: imageCacheHelper(""),
-                                  )),
-                              child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    padding: const EdgeInsets.only(left: 10),
-                                    child: const Text(
-                                      'AppRhyme',
-                                      style: TextStyle(
-                                        color: CupertinoColors.black,
-                                        fontSize: 20.0,
-                                      ),
-                                    ),
-                                  ))),
-                          CupertinoFormRow(
-                              prefix: const Padding(
-                                  padding: EdgeInsets.only(right: 20),
-                                  child: Text(
-                                    '版本号',
-                                  )),
-                              child: Container(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  alignment: Alignment.centerRight,
-                                  height: 40,
-                                  child: Text(
-                                    globalPackageInfo.version,
-                                  ))),
-                          CupertinoFormRow(
-                            prefix: const Text(
-                              '检查更新',
-                            ),
-                            child: CupertinoButton(
-                              onPressed: () async {
-                                await checkVersionUpdate(context);
-                              },
-                              child: const Icon(CupertinoIcons.cloud),
-                            ),
-                          ),
-                          CupertinoFormRow(
-                            prefix: const Padding(
-                                padding: EdgeInsets.only(right: 20),
-                                child: Text(
-                                  '自动检查更新',
-                                )),
-                            child: CupertinoSwitch(
-                                value: globalConfig.versionAutoUpdate,
-                                onChanged: (value) {
-                                  if (value != globalConfig.versionAutoUpdate) {
-                                    globalConfig.versionAutoUpdate = value;
-                                    globalConfig.save();
-                                    setState(() {});
-                                  }
-                                }),
-                          ),
-                          const CupertinoFormRow(
-                            prefix: Text(
-                              '项目链接',
-                            ),
-                            child: CupertinoButton(
-                              onPressed: openProjectLink,
-                              child: Text(
-                                'github.com/canxin121/app_rhyme',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      CupertinoFormSection.insetGrouped(
-                        header: const Text("音频设置"),
-                        children: [
-                          CupertinoFormRow(
-                              prefix: const Text("清空待播清单"),
-                              child: CupertinoButton(
-                                  child: Icon(
-                                    CupertinoIcons.clear,
-                                    color: activeIconRed,
-                                  ),
-                                  onPressed: () {
-                                    globalAudioHandler.clear();
-                                  }))
-                        ],
-                      ),
-                      _buildExternApiSection(),
-                      _buildQualitySelectSection(context, () {
-                        setState(() {});
-                      }),
-                      CupertinoFormSection.insetGrouped(
-                        header: const Text('储存设置'),
-                        children: [
-                          CupertinoFormRow(
-                              prefix: Text("清除冗余歌曲数据",
-                                  style:
-                                      const TextStyle().useSystemChineseFont()),
-                              child: CupertinoButton(
-                                  onPressed: () async {
-                                    try {
-                                      await SqlFactoryW.cleanUnusedMusicData();
-                                      toastification.show(
-                                          autoCloseDuration:
-                                              const Duration(seconds: 2),
-                                          type: ToastificationType.success,
-                                          title: Text("储存清理",
-                                              style: const TextStyle()
-                                                  .useSystemChineseFont()),
-                                          description: Text("清理无用歌曲数据成功",
-                                              style: const TextStyle()
-                                                  .useSystemChineseFont()));
-                                    } catch (e) {
-                                      toastification.show(
-                                          autoCloseDuration:
-                                              const Duration(seconds: 2),
-                                          type: ToastificationType.error,
-                                          title: Text("储存清理",
-                                              style: const TextStyle()
-                                                  .useSystemChineseFont()),
-                                          description: Text(
-                                              "清理失败: ${e.toString()}",
-                                              style: const TextStyle()
-                                                  .useSystemChineseFont()));
-                                    }
-                                  },
-                                  child: const Icon(
-                                    CupertinoIcons.bin_xmark,
-                                    color: CupertinoColors.systemRed,
-                                  ))),
-                        ],
-                      ),
-                      CupertinoFormSection.insetGrouped(
-                        header: const Text('其他'),
-                        children: [
-                          CupertinoFormRow(
-                              prefix: Text("运行日志",
-                                  style:
-                                      const TextStyle().useSystemChineseFont()),
-                              child: CupertinoButton(
-                                  child: const Icon(
-                                    CupertinoIcons.book,
-                                    color: CupertinoColors.activeGreen,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .push(CupertinoPageRoute(
-                                      builder: (context) =>
-                                          TalkerScreen(talker: globalTalker),
-                                    ));
-                                  })),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              )));
-    });
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
-  CupertinoFormSection _buildExternApiSection() {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    final textColor = brightness == Brightness.dark
+        ? CupertinoColors.white
+        : CupertinoColors.black;
+    final iconColor = brightness == Brightness.dark
+        ? CupertinoColors.white
+        : CupertinoColors.black;
+
+    return CupertinoPageScaffold(
+        child: SafeArea(
+      child: ListView(
+        children: [
+          CupertinoNavigationBar(
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 0.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '设置',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Padding(padding: EdgeInsets.only(top: 20)),
+          CupertinoFormSection.insetGrouped(
+            header: Text('应用信息', style: TextStyle(color: textColor)),
+            children: [
+              CupertinoFormRow(
+                  prefix: SizedBox(
+                      height: 60,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: imageCacheHelper(""),
+                      )),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'AppRhyme',
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ))),
+              CupertinoFormRow(
+                  prefix: Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Text(
+                        '版本号',
+                        style: TextStyle(color: textColor),
+                      )),
+                  child: Container(
+                      padding: const EdgeInsets.only(right: 10),
+                      alignment: Alignment.centerRight,
+                      height: 40,
+                      child: Text(
+                        globalPackageInfo.version,
+                        style: TextStyle(color: textColor),
+                      ))),
+              CupertinoFormRow(
+                prefix: Text(
+                  '检查更新',
+                  style: TextStyle(color: textColor),
+                ),
+                child: CupertinoButton(
+                  onPressed: () async {
+                    await checkVersionUpdate(context);
+                  },
+                  child: Icon(CupertinoIcons.cloud, color: iconColor),
+                ),
+              ),
+              CupertinoFormRow(
+                prefix: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      '自动检查更新',
+                      style: TextStyle(color: textColor),
+                    )),
+                child: CupertinoSwitch(
+                    value: globalConfig.versionAutoUpdate,
+                    onChanged: (value) {
+                      if (value != globalConfig.versionAutoUpdate) {
+                        globalConfig.versionAutoUpdate = value;
+                        globalConfig.save();
+                        setState(() {});
+                      }
+                    }),
+              ),
+              CupertinoFormRow(
+                prefix: Text(
+                  '项目链接',
+                  style: TextStyle(color: textColor),
+                ),
+                child: CupertinoButton(
+                  onPressed: openProjectLink,
+                  child: Text(
+                    'github.com/canxin121/app_rhyme',
+                    style: TextStyle(color: textColor),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          CupertinoFormSection.insetGrouped(
+            header: Text("音频设置", style: TextStyle(color: textColor)),
+            children: [
+              CupertinoFormRow(
+                  prefix: Text("清空待播清单", style: TextStyle(color: textColor)),
+                  child: CupertinoButton(
+                      child: Icon(
+                        CupertinoIcons.clear,
+                        color: activeIconRed,
+                      ),
+                      onPressed: () {
+                        globalAudioHandler.clear();
+                      }))
+            ],
+          ),
+          _buildExternApiSection(textColor, iconColor),
+          _buildQualitySelectSection(context, () {
+            setState(() {});
+          }, textColor),
+          CupertinoFormSection.insetGrouped(
+            header: Text('储存设置', style: TextStyle(color: textColor)),
+            children: [
+              CupertinoFormRow(
+                  prefix: Text("清除冗余歌曲数据", style: TextStyle(color: textColor)),
+                  child: CupertinoButton(
+                      onPressed: () async {
+                        try {
+                          await SqlFactoryW.cleanUnusedMusicData();
+                          toastification.show(
+                              autoCloseDuration: const Duration(seconds: 2),
+                              type: ToastificationType.success,
+                              title: Text("储存清理",
+                                  style: TextStyle(color: textColor)),
+                              description: Text("清理无用歌曲数据成功",
+                                  style: TextStyle(color: textColor)));
+                        } catch (e) {
+                          toastification.show(
+                              autoCloseDuration: const Duration(seconds: 2),
+                              type: ToastificationType.error,
+                              title: Text("储存清理",
+                                  style: TextStyle(color: textColor)),
+                              description: Text("清理失败: ${e.toString()}",
+                                  style: TextStyle(color: textColor)));
+                        }
+                      },
+                      child: const Icon(
+                        CupertinoIcons.bin_xmark,
+                        color: CupertinoColors.systemRed,
+                      ))),
+            ],
+          ),
+          CupertinoFormSection.insetGrouped(
+            header: Text('其他', style: TextStyle(color: textColor)),
+            children: [
+              CupertinoFormRow(
+                  prefix: Text("运行日志", style: TextStyle(color: textColor)),
+                  child: CupertinoButton(
+                      child: const Icon(
+                        CupertinoIcons.book,
+                        color: CupertinoColors.activeGreen,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(CupertinoPageRoute(
+                          builder: (context) =>
+                              TalkerScreen(talker: globalTalker),
+                        ));
+                      })),
+            ],
+          ),
+        ],
+      ),
+    ));
+  }
+
+  CupertinoFormSection _buildExternApiSection(
+      Color textColor, Color iconColor) {
     bool hasExternApi = globalConfig.externApi != null;
     bool isOnlineLink = globalConfig.externApi?.url != null;
     List<Widget> children = [];
     if (hasExternApi) {
       children.add(CupertinoFormRow(
-          prefix: const Padding(
-              padding: EdgeInsets.only(right: 20),
+          prefix: Padding(
+              padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '音源状态',
+                style: TextStyle(color: textColor),
               )),
           child: Container(
               padding: const EdgeInsets.only(right: 10),
@@ -242,10 +257,11 @@ class MorePageState extends State<MorePage> {
               ))));
     } else {
       children.add(CupertinoFormRow(
-          prefix: const Padding(
-              padding: EdgeInsets.only(right: 20),
+          prefix: Padding(
+              padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '音源状态',
+                style: TextStyle(color: textColor),
               )),
           child: Container(
               padding: const EdgeInsets.only(right: 10),
@@ -259,14 +275,16 @@ class MorePageState extends State<MorePage> {
     if (hasExternApi) {
       if (isOnlineLink) {
         children.add(CupertinoFormRow(
-            prefix: const Padding(
-                padding: EdgeInsets.only(right: 20),
+            prefix: Padding(
+                padding: const EdgeInsets.only(right: 20),
                 child: Text(
                   '音源链接',
+                  style: TextStyle(color: textColor),
                 )),
             child: CupertinoButton(
               child: Text(
                 globalConfig.externApi!.url!,
+                style: TextStyle(color: textColor),
               ),
               onPressed: () async {
                 try {
@@ -275,40 +293,37 @@ class MorePageState extends State<MorePage> {
                   toastification.show(
                       autoCloseDuration: const Duration(seconds: 2),
                       type: ToastificationType.success,
-                      title: Text("音源链接",
-                          style: const TextStyle().useSystemChineseFont()),
-                      description: Text("已复制至剪切板",
-                          style: const TextStyle().useSystemChineseFont()));
+                      title: Text("音源链接", style: TextStyle(color: textColor)),
+                      description:
+                          Text("已复制至剪切板", style: TextStyle(color: textColor)));
                 } catch (e) {
                   toastification.show(
                       autoCloseDuration: const Duration(seconds: 2),
                       type: ToastificationType.error,
-                      title: Text("音源链接",
-                          style: const TextStyle().useSystemChineseFont()),
+                      title: Text("音源链接", style: TextStyle(color: textColor)),
                       description: Text("复制链接失败:${e.toString()}",
-                          style: const TextStyle().useSystemChineseFont()));
+                          style: TextStyle(color: textColor)));
                 }
               },
             )));
         children.add(
           CupertinoFormRow(
-            prefix: const Text(
-              '检查更新',
-            ),
+            prefix: Text('检查更新', style: TextStyle(color: textColor)),
             child: CupertinoButton(
               onPressed: () async {
                 await checkExternApiUpdate(context);
                 _updateExternApiState();
               },
-              child: const Icon(CupertinoIcons.cloud),
+              child: Icon(CupertinoIcons.cloud, color: iconColor),
             ),
           ),
         );
         children.add(CupertinoFormRow(
-          prefix: const Padding(
-              padding: EdgeInsets.only(right: 20),
+          prefix: Padding(
+              padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '自动检查更新',
+                style: TextStyle(color: textColor),
               )),
           child: CupertinoSwitch(
               value: globalConfig.externApiAutoUpdate,
@@ -324,10 +339,11 @@ class MorePageState extends State<MorePage> {
     }
     if (hasExternApi) {
       children.add(CupertinoFormRow(
-          prefix: const Padding(
-              padding: EdgeInsets.only(right: 20),
+          prefix: Padding(
+              padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '删除音源',
+                style: TextStyle(color: textColor),
               )),
           child: CupertinoButton(
               onPressed: () {
@@ -342,18 +358,20 @@ class MorePageState extends State<MorePage> {
               ))));
     } else {
       children.add(CupertinoFormRow(
-          prefix: const Padding(
-              padding: EdgeInsets.only(right: 20),
+          prefix: Padding(
+              padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '导入音源',
+                style: TextStyle(color: textColor),
               )),
           child: ImportExternApiMenu(
               builder: (context, showMenu) => CupertinoButton(
                   onPressed: showMenu,
-                  child: const Icon(CupertinoIcons.music_note_2)))));
+                  child:
+                      Icon(CupertinoIcons.music_note_2, color: iconColor)))));
     }
     return CupertinoFormSection.insetGrouped(
-        header: Text("自定义音源", style: const TextStyle().useSystemChineseFont()),
+        header: Text("自定义音源", style: TextStyle(color: textColor)),
         children: children);
   }
 }
@@ -425,13 +443,12 @@ class ImportExternApiMenu extends StatelessWidget {
 }
 
 CupertinoFormSection _buildQualitySelectSection(
-    BuildContext context, void Function() refresh) {
+    BuildContext context, void Function() refresh, Color textColor) {
   List<Widget> children = [];
 
   if (Platform.isAndroid || Platform.isIOS) {
     children.add(CupertinoFormRow(
-        prefix:
-            Text("Wifi下音质选择", style: const TextStyle().useSystemChineseFont()),
+        prefix: Text("Wifi下音质选择", style: TextStyle(color: textColor)),
         child: CupertinoButton(
             onPressed: () async {
               QualityOption? selectedOption =
@@ -443,10 +460,10 @@ CupertinoFormSection _buildQualitySelectSection(
               }
               refresh();
             },
-            child: Text(globalConfig.wifiAutoQuality))));
+            child: Text(globalConfig.wifiAutoQuality,
+                style: TextStyle(color: textColor)))));
     children.add(CupertinoFormRow(
-        prefix:
-            Text("数据网络下音质选择", style: const TextStyle().useSystemChineseFont()),
+        prefix: Text("数据网络下音质选择", style: TextStyle(color: textColor)),
         child: CupertinoButton(
             onPressed: () async {
               QualityOption? selectedOption =
@@ -458,10 +475,11 @@ CupertinoFormSection _buildQualitySelectSection(
               }
               refresh();
             },
-            child: Text(globalConfig.mobileAutoQuality))));
+            child: Text(globalConfig.mobileAutoQuality,
+                style: TextStyle(color: textColor)))));
   } else {
     children.add(CupertinoFormRow(
-        prefix: Text("音质选择", style: const TextStyle().useSystemChineseFont()),
+        prefix: Text("音质选择", style: TextStyle(color: textColor)),
         child: CupertinoButton(
             onPressed: () async {
               QualityOption? selectedOption =
@@ -473,10 +491,11 @@ CupertinoFormSection _buildQualitySelectSection(
               }
               refresh();
             },
-            child: Text(globalConfig.wifiAutoQuality))));
+            child: Text(globalConfig.wifiAutoQuality,
+                style: TextStyle(color: textColor)))));
   }
   return CupertinoFormSection.insetGrouped(
-    header: const Text('音质选择'),
+    header: Text('音质选择', style: TextStyle(color: textColor)),
     children: children,
   );
 }

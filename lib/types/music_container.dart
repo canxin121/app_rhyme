@@ -100,7 +100,7 @@ class MusicContainer {
 
   Future<PlayInfo?> getCurrentMusicPlayInfo([Quality? quality]) async {
     // 更新当前音质
-    _updateQuality();
+    _updateQuality(quality);
 
     late Quality finalQuality;
     if (quality != null) {
@@ -158,6 +158,7 @@ class MusicContainer {
       return null;
     } else {
       currentQuality.value = playinfo.quality;
+
       globalTalker.info(
           "[getCurrentMusicPlayInfo] 使用第三方Api请求获取playinfo: [${info.source}]${info.name}");
       return PlayInfo(playinfo.uri, playinfo.quality);
@@ -269,7 +270,7 @@ class MusicContainer {
         extra = currentMusic.getExtraInfo(quality: info.defaultQuality!);
         audioSource =
             AudioSource.asset("assets/blank.mp3", tag: _toMediaItem());
-        currentQuality = info.defaultQuality!.obs;
+        currentQuality.value = info.defaultQuality;
         toastification.show(
             autoCloseDuration: const Duration(seconds: 2),
             type: ToastificationType.success,
@@ -287,13 +288,18 @@ class MusicContainer {
     }
   }
 
-  void _updateQuality() {
-    if (info.qualities.isNotEmpty) {
-      currentQuality = autoPickQuality(info.qualities).obs;
-      extra = currentMusic.getExtraInfo(quality: currentQuality.value!);
+  void _updateQuality([Quality? quality]) {
+    if (quality != null) {
+      currentQuality.value = quality;
+      extra = currentMusic.getExtraInfo(quality: quality);
     } else {
-      currentQuality = null.obs;
-      extra = null;
+      if (info.qualities.isNotEmpty) {
+        currentQuality = autoPickQuality(info.qualities).obs;
+        extra = currentMusic.getExtraInfo(quality: currentQuality.value!);
+      } else {
+        currentQuality.value = null;
+        extra = null;
+      }
     }
   }
 }

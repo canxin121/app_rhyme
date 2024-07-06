@@ -4,17 +4,22 @@ import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:flutter/cupertino.dart';
 
-Future<MusicListW?> showMusicListSelectionDialog(
-  BuildContext context,
-) async {
+Future<MusicListW?> showMusicListSelectionDialog(BuildContext context) async {
   var musicLists = await SqlFactoryW.getAllMusiclists();
   if (context.mounted) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+
     return await showCupertinoModalPopup<MusicListW>(
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          title:
-              Text("选择一个歌单", style: const TextStyle().useSystemChineseFont()),
+          title: Text(
+            "选择一个歌单",
+            style: TextStyle(
+              color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+            ).useSystemChineseFont(),
+          ),
           actions: List<Widget>.generate(musicLists.length, (index) {
             return CupertinoActionSheetAction(
               onPressed: () {
@@ -34,7 +39,14 @@ Future<MusicListW?> showMusicListSelectionDialog(
               Navigator.pop(context, null);
             },
             isDefaultAction: true,
-            child: const Text('取消'),
+            child: Text(
+              '取消',
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
+            ),
           ),
         );
       },

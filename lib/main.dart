@@ -34,20 +34,22 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ToastificationWrapper(
-        child: CupertinoApp(
-      localizationsDelegates: const [
-        DefaultMaterialLocalizations.delegate,
-        DefaultCupertinoLocalizations.delegate,
-        DefaultWidgetsLocalizations.delegate,
-      ],
-      theme: CupertinoThemeData(
-        textTheme: CupertinoTextThemeData(
-          textStyle: const TextStyle(color: CupertinoColors.black)
-              .useSystemChineseFont(),
+      child: CupertinoApp(
+        localizationsDelegates: const [
+          DefaultMaterialLocalizations.delegate,
+          DefaultCupertinoLocalizations.delegate,
+          DefaultWidgetsLocalizations.delegate,
+        ],
+        theme: CupertinoThemeData(
+          applyThemeToAll: true,
+          textTheme: CupertinoTextThemeData(
+            textStyle: const TextStyle(color: CupertinoColors.black)
+                .useSystemChineseFont(),
+          ),
         ),
+        home: const Home(),
       ),
-      home: const Home(),
-    ));
+    );
   }
 }
 
@@ -60,11 +62,32 @@ class Home extends StatefulWidget {
 
 class HomeState extends State<Home> {
   int _selectedIndex = 0;
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+  ];
+
   final List<Widget> _pages = [
     const LocalMusicListGridPage(),
     const CombinedSearchPage(),
     const MorePage(),
   ];
+
+  Future<bool> _onWillPop() async {
+    final isFirstRouteInCurrentTab =
+        !await _navigatorKeys[_selectedIndex].currentState!.maybePop();
+    if (isFirstRouteInCurrentTab) {
+      if (_selectedIndex != 0) {
+        setState(() {
+          _selectedIndex = 0;
+        });
+        return false;
+      }
+    }
+    return isFirstRouteInCurrentTab;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,54 +98,68 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: IndexedStack(
-                index: _selectedIndex,
-                children: _pages,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: CupertinoPageScaffold(
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: IndexedStack(
+                  index: _selectedIndex,
+                  children: _pages.asMap().entries.map((entry) {
+                    int idx = entry.key;
+                    Widget page = entry.value;
+                    return Navigator(
+                      key: _navigatorKeys[idx],
+                      onGenerateRoute: (RouteSettings settings) {
+                        return CupertinoPageRoute(
+                          builder: (context) => page,
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const MusicControlBar(maxHeight: 60),
-                CupertinoTabBar(
-                  currentIndex: _selectedIndex,
-                  onTap: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                  items: const [
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: Icon(
-                          CupertinoIcons.music_albums_fill,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const MusicControlBar(maxHeight: 60),
+                  CupertinoTabBar(
+                    currentIndex: _selectedIndex,
+                    onTap: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Icon(
+                            CupertinoIcons.music_albums_fill,
+                          ),
                         ),
                       ),
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: Icon(CupertinoIcons.search),
+                      BottomNavigationBarItem(
+                        icon: Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Icon(CupertinoIcons.search),
+                        ),
                       ),
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 10, bottom: 10),
-                        child: Icon(CupertinoIcons.settings),
+                      BottomNavigationBarItem(
+                        icon: Padding(
+                          padding: EdgeInsets.only(top: 10, bottom: 10),
+                          child: Icon(CupertinoIcons.settings),
+                        ),
                       ),
-                    ),
-                  ],
-                  activeColor: activeIconRed, // Set the active color here
-                ),
-              ],
-            ),
-          ],
+                    ],
+                    activeColor: activeIconRed,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

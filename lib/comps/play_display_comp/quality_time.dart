@@ -56,27 +56,7 @@ class QualityTimeState extends State<QualityTime> {
                 label: globalAudioHandler
                         .playingMusic.value?.currentQuality.value?.short ??
                     "Quality",
-                isDark: false,
               );
-              //  GlassContainer(
-              //     shadowColor: Platform.isIOS
-              //         ? CupertinoColors.black.withOpacity(0.1)
-              //         : CupertinoColors.black.withOpacity(0.2),
-              //     shadowStrength: Platform.isIOS ? 3 : 8,
-              //     child: Container(
-              //       margin: const EdgeInsets.only(
-              //           left: 10, right: 10, top: 2, bottom: 2),
-              //       child: Text(
-              //         globalAudioHandler.playingMusic.value?.currentQuality
-              //                 .value?.short ??
-              //             "Quality",
-              //         style: TextStyle(
-              //           color: CupertinoColors.white,
-              //           fontSize: widget.fontHeight,
-              //           fontWeight: FontWeight.normal,
-              //         ).useSystemChineseFont(),
-              //       ),
-              //     ));
             }),
           ),
           Obx(() => Text(

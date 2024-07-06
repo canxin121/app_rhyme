@@ -10,6 +10,7 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 class MusicContainerImageCard extends StatelessWidget {
   final MusicContainer musicContainer;
   final GestureTapCallback? onTap;
+
   const MusicContainerImageCard({
     super.key,
     required this.musicContainer,
@@ -18,6 +19,10 @@ class MusicContainerImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 获取当前主题的亮度
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: LayoutBuilder(
@@ -47,7 +52,6 @@ class MusicContainerImageCard extends StatelessWidget {
                       left: 3,
                       child: Badge(
                         label: sourceToShort(musicContainer.info.source),
-                        isDark: true,
                       ),
                     ),
                     Positioned(
@@ -56,8 +60,12 @@ class MusicContainerImageCard extends StatelessWidget {
                       child: MusicContainerMenu(
                         builder: (context, showMenu) => GestureDetector(
                           onTap: showMenu,
-                          child: Icon(CupertinoIcons.ellipsis_circle,
-                              color: activeIconRed),
+                          child: Icon(
+                            CupertinoIcons.ellipsis_circle,
+                            color: isDarkMode
+                                ? CupertinoColors.white
+                                : activeIconRed,
+                          ),
                         ),
                         musicContainer: musicContainer,
                       ),
@@ -69,9 +77,6 @@ class MusicContainerImageCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       musicContainer.info.name,
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .navTitleTextStyle,
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -88,13 +93,6 @@ class MusicContainerImageCard extends StatelessWidget {
                               },
                               child: Text(
                                 musicContainer.info.artist.join(", "),
-                                style: CupertinoTheme.of(context)
-                                    .textTheme
-                                    .textStyle
-                                    .copyWith(
-                                      color: CupertinoColors.systemRed,
-                                      fontSize: 16,
-                                    ),
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
                               ),

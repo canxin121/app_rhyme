@@ -35,13 +35,14 @@ class LocalMusicContainerListPage extends StatefulWidget {
 }
 
 class LocalMusicContainerListPageState
-    extends State<LocalMusicContainerListPage> {
+    extends State<LocalMusicContainerListPage> with WidgetsBindingObserver {
   List<MusicContainer> musicContainers = [];
   late MusicListW musicListW;
   late MusicListInfo musicListInfo;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     musicListW = widget.musicList;
     musicListInfo = musicListW.getMusiclistInfo();
     // 设置全局的更新函数
@@ -64,10 +65,18 @@ class LocalMusicContainerListPageState
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // 清空全局的更新函数
     globalMusicContainerListPageRefreshFunction = () async {};
     globalMusicContainerListPagePopFunction = () {};
     super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {
+      // 重建界面以响应亮暗模式变化
+    });
   }
 
   Future<void> loadMusicContainers() async {
@@ -92,11 +101,18 @@ class LocalMusicContainerListPageState
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final Color backgroundColor =
+        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+
     double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
+      backgroundColor: backgroundColor,
       navigationBar: CupertinoNavigationBar(
           padding: const EdgeInsetsDirectional.only(end: 16),
+          backgroundColor: backgroundColor,
           leading: CupertinoButton(
             padding: const EdgeInsets.all(0),
             child: Icon(CupertinoIcons.back, color: activeIconRed),
@@ -203,6 +219,14 @@ class LocalMusicContainerListPageState
       {required IconData icon,
       required String label,
       required VoidCallback onPressed}) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final Color textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    final Color buttonBackgroundColor = isDarkMode
+        ? CupertinoColors.systemGrey6.darkColor
+        : CupertinoColors.systemGrey6;
+
     return ElevatedButton.icon(
       icon: Icon(
         icon,
@@ -211,7 +235,7 @@ class LocalMusicContainerListPageState
       ),
       label: Text(
         label,
-        style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+        style: TextStyle(color: textColor).useSystemChineseFont(),
       ),
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -222,7 +246,7 @@ class LocalMusicContainerListPageState
           horizontal: MediaQuery.of(context).size.width * 0.1,
           vertical: MediaQuery.of(context).size.height * 0.02,
         ),
-        backgroundColor: CupertinoColors.systemGrey6,
+        backgroundColor: buttonBackgroundColor,
       ),
     );
   }
@@ -271,7 +295,7 @@ class LocalMusicListChoicMenu extends StatelessWidget {
             }
           },
           title: '取消缓存所有音乐',
-        )
+        ),
       ],
       animationBuilder: null,
       position: PullDownMenuPosition.automatic,

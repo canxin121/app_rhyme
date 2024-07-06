@@ -6,26 +6,28 @@ import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
 import 'package:flutter/cupertino.dart';
 
-// 2种：1. 本地歌单 2. 在线歌单
-// 区分
-
 class MusicListListItem extends StatelessWidget {
   final MusicListW musicListW;
   final bool online;
-  final bool isDark;
+  final bool? isDark; // Make it nullable to support theme adaptation
   final GestureTapCallback? onTap;
 
   const MusicListListItem({
     super.key,
     required this.musicListW,
     required this.online,
-    this.isDark = false,
+    this.isDark,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     var musicListInfo = musicListW.getMusiclistInfo();
+
+    // 获取当前主题的亮度
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = isDark ?? (brightness == Brightness.dark);
+
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       onPressed: onTap,
@@ -33,17 +35,18 @@ class MusicListListItem extends StatelessWidget {
         children: <Widget>[
           // 歌单的封面
           CupertinoButton(
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-              onPressed: () {},
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: imageCacheHelper(
-                  musicListInfo.artPic,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                ),
-              )),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+            onPressed: () {},
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: imageCacheHelper(
+                musicListInfo.artPic,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           // 歌单的名称和介绍
           Expanded(
             child: Padding(
@@ -56,7 +59,7 @@ class MusicListListItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: isDark
+                      color: isDarkMode
                           ? CupertinoColors.systemGrey5
                           : CupertinoColors.black,
                     ),
@@ -68,7 +71,7 @@ class MusicListListItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark
+                      color: isDarkMode
                           ? CupertinoColors.systemGrey4
                           : CupertinoColors.inactiveGray,
                     ),
@@ -87,10 +90,13 @@ class MusicListListItem extends StatelessWidget {
             builder: (_, showMenu) => CupertinoButton(
               onPressed: showMenu,
               padding: EdgeInsets.zero,
-              child: Icon(CupertinoIcons.ellipsis, color: activeIconRed),
+              child: Icon(
+                CupertinoIcons.ellipsis,
+                color: isDarkMode ? CupertinoColors.white : activeIconRed,
+              ),
             ),
             online: online,
-          )
+          ),
         ],
       ),
     );

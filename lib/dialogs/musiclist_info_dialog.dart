@@ -53,6 +53,9 @@ class MusicListDialogState extends State<MusicListDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+
     String title;
     if (widget.readonly) {
       title = '歌单详情';
@@ -61,8 +64,14 @@ class MusicListDialogState extends State<MusicListDialog> {
     } else {
       title = '创建歌单';
     }
+
     return CupertinoAlertDialog(
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+        ).useSystemChineseFont(),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -103,6 +112,21 @@ class MusicListDialogState extends State<MusicListDialog> {
               controller: nameController,
               placeholder: '歌单名字',
               readOnly: widget.readonly,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
           Padding(
@@ -111,7 +135,22 @@ class MusicListDialogState extends State<MusicListDialog> {
               controller: descController,
               placeholder: '介绍',
               readOnly: widget.readonly,
-              maxLines: widget.readonly ? null : 1, // 展示更长的描述介绍
+              maxLines: widget.readonly ? null : 1,
+              style: TextStyle(
+                color:
+                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+              ),
+              placeholderStyle: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.systemGrey2,
+              ),
+              decoration: BoxDecoration(
+                color: isDarkMode
+                    ? CupertinoColors.darkBackgroundGray
+                    : CupertinoColors.white,
+                borderRadius: BorderRadius.circular(5.0),
+              ),
             ),
           ),
         ],
@@ -121,8 +160,11 @@ class MusicListDialogState extends State<MusicListDialog> {
           CupertinoDialogAction(
             child: Text(
               '取消',
-              style: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont(),
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -143,8 +185,11 @@ class MusicListDialogState extends State<MusicListDialog> {
             },
             child: Text(
               '完成',
-              style: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont(),
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
             ),
           ),
         if (widget.readonly)
@@ -155,8 +200,11 @@ class MusicListDialogState extends State<MusicListDialog> {
             },
             child: Text(
               '关闭',
-              style: const TextStyle(color: CupertinoColors.black)
-                  .useSystemChineseFont(),
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.activeBlue,
+              ).useSystemChineseFont(),
             ),
           ),
       ],

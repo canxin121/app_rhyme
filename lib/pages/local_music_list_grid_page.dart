@@ -7,7 +7,6 @@ import 'package:app_rhyme/pages/online_music_list_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:toastification/toastification.dart';
@@ -21,7 +20,8 @@ class LocalMusicListGridPage extends StatefulWidget {
   LocalMusicListGridPageState createState() => LocalMusicListGridPageState();
 }
 
-class LocalMusicListGridPageState extends State<LocalMusicListGridPage> {
+class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
+    with WidgetsBindingObserver {
   List<MusicListW> musicLists = [];
 
   @override
@@ -35,8 +35,14 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     globalMusicListGridPageRefreshFunction = () {};
     super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {});
   }
 
   // Function to load music lists
@@ -59,81 +65,85 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: (RouteSettings settings) {
-        return CupertinoPageRoute(
-          builder: (context) => CupertinoPageScaffold(
-            child: SafeArea(
-              child: Column(
-                children: [
-                  CupertinoNavigationBar(
-                    leading: const Padding(
-                      padding: EdgeInsets.only(left: 0.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '资料库',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
-                        ),
-                      ),
-                    ),
-                    trailing: MusicListGridPageMenu(
-                      builder: (context, showMenu) => GestureDetector(
-                        child: Text(
-                          '选项',
-                          style: TextStyle(color: activeIconRed),
-                        ),
-                        onTapDown: (details) {
-                          showMenu();
-                        },
-                      ),
-                    ),
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final Color textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    final Color backgroundColor =
+        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+
+    return CupertinoPageScaffold(
+      backgroundColor: backgroundColor,
+      child: SafeArea(
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+              backgroundColor: backgroundColor,
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 0.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '资料库',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: textColor),
                   ),
-                  // Display music lists grid view
-                  Expanded(
-                    child: musicLists.isEmpty
-                        ? const Center(child: Text("没有歌单"))
-                        : GridView.builder(
-                            padding: const EdgeInsets.only(
-                                top: 30, bottom: 150, right: 10, left: 10),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.75,
-                              crossAxisSpacing: 8.0,
-                              mainAxisSpacing: 8.0,
-                            ),
-                            itemCount: musicLists.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              var musicList = musicLists[index];
-                              return MusicListImageCard(
-                                key: ValueKey(musicList.getMusiclistInfo().id),
-                                musicListW: musicList,
-                                online: false,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    CupertinoPageRoute(
-                                      builder: (context) =>
-                                          LocalMusicContainerListPage(
-                                        musicList: musicList,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
+                ),
+              ),
+              trailing: MusicListGridPageMenu(
+                builder: (context, showMenu) => GestureDetector(
+                  child: Text(
+                    '选项',
+                    style: TextStyle(color: activeIconRed),
                   ),
-                ],
+                  onTapDown: (details) {
+                    showMenu();
+                  },
+                ),
               ),
             ),
-          ),
-        );
-      },
+            // Display music lists grid view
+            Expanded(
+              child: musicLists.isEmpty
+                  ? Center(
+                      child: Text("没有歌单", style: TextStyle(color: textColor)))
+                  : GridView.builder(
+                      padding: const EdgeInsets.only(
+                          top: 30, bottom: 150, right: 10, left: 10),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      itemCount: musicLists.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var musicList = musicLists[index];
+                        return MusicListImageCard(
+                          key: ValueKey(musicList.getMusiclistInfo().id),
+                          musicListW: musicList,
+                          online: false,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) =>
+                                    LocalMusicContainerListPage(
+                                  musicList: musicList,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -148,6 +158,9 @@ class MusicListGridPageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
@@ -162,15 +175,43 @@ class MusicListGridPageMenu extends StatelessWidget {
                   toastification.show(
                     autoCloseDuration: const Duration(seconds: 2),
                     type: ToastificationType.success,
-                    title: const Text('创建歌单'),
-                    description: const Text('创建歌单成功'),
+                    title: Text(
+                      '创建歌单',
+                      style: TextStyle(
+                        color: isDarkMode
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ).useSystemChineseFont(),
+                    ),
+                    description: Text(
+                      '创建歌单成功',
+                      style: TextStyle(
+                        color: isDarkMode
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ).useSystemChineseFont(),
+                    ),
                   );
                 } catch (e) {
                   toastification.show(
                     autoCloseDuration: const Duration(seconds: 2),
                     type: ToastificationType.error,
-                    title: const Text('创建歌单'),
-                    description: Text('创建歌单失败: $e'),
+                    title: Text(
+                      '创建歌单',
+                      style: TextStyle(
+                        color: isDarkMode
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ).useSystemChineseFont(),
+                    ),
+                    description: Text(
+                      '创建歌单失败: $e',
+                      style: TextStyle(
+                        color: isDarkMode
+                            ? CupertinoColors.white
+                            : CupertinoColors.black,
+                      ).useSystemChineseFont(),
+                    ),
                   );
                 }
               }
