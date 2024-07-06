@@ -101,65 +101,63 @@ class HomeState extends State<Home> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: CupertinoPageScaffold(
-        child: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: IndexedStack(
-                  index: _selectedIndex,
-                  children: _pages.asMap().entries.map((entry) {
-                    int idx = entry.key;
-                    Widget page = entry.value;
-                    return Navigator(
-                      key: _navigatorKeys[idx],
-                      onGenerateRoute: (RouteSettings settings) {
-                        return CupertinoPageRoute(
-                          builder: (context) => page,
-                        );
-                      },
-                    );
-                  }).toList(),
-                ),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const MusicControlBar(maxHeight: 60),
-                  CupertinoTabBar(
-                    currentIndex: _selectedIndex,
-                    onTap: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
+        child: Column(
+          children: [
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: _pages.asMap().entries.map((entry) {
+                  int idx = entry.key;
+                  Widget page = entry.value;
+                  return Navigator(
+                    key: _navigatorKeys[idx],
+                    onGenerateRoute: (RouteSettings settings) {
+                      return CupertinoPageRoute(
+                        builder: (context) => page,
+                      );
                     },
-                    items: const [
-                      BottomNavigationBarItem(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Icon(
-                            CupertinoIcons.music_albums_fill,
-                          ),
-                        ),
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Icon(CupertinoIcons.search),
-                        ),
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Padding(
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          child: Icon(CupertinoIcons.settings),
-                        ),
-                      ),
-                    ],
-                    activeColor: activeIconRed,
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
-            ],
-          ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const MusicControlBar(maxHeight: 60),
+                CupertinoTabBar(
+                  currentIndex: _selectedIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Icon(
+                          CupertinoIcons.music_albums_fill,
+                        ),
+                      ),
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Icon(CupertinoIcons.search),
+                      ),
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Padding(
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        child: Icon(CupertinoIcons.settings),
+                      ),
+                    ),
+                  ],
+                  activeColor: activeIconRed,
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
