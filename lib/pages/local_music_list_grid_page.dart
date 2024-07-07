@@ -78,7 +78,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
         child: Column(
           children: [
             CupertinoNavigationBar(
-              backgroundColor: backgroundColor,
+              // backgroundColor: backgroundColor,
               leading: Padding(
                 padding: const EdgeInsets.only(left: 0.0),
                 child: Align(
