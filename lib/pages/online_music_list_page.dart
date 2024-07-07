@@ -102,18 +102,19 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
           // 歌单封面
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.only(
-                  top: screenWidth * 0.1,
-                  left: screenWidth * 0.1,
-                  right: screenWidth * 0.1),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: screenWidth * 0.7,
-                ),
-                child: MusicListImageCard(
-                    musicListW: widget.musicList, online: true),
-              ),
-            ),
+                padding: EdgeInsets.only(
+                    top: screenWidth * 0.1,
+                    left: screenWidth * 0.1,
+                    right: screenWidth * 0.1),
+                child: SafeArea(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: screenWidth * 0.7,
+                    ),
+                    child: MusicListImageCard(
+                        musicListW: widget.musicList, online: true),
+                  ),
+                )),
           ),
           // Two buttons
           SliverToBoxAdapter(
