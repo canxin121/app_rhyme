@@ -80,8 +80,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
-    return SafeArea(
-        child: Column(
+    return Column(
       children: [
         // 搜索框
         Padding(
@@ -145,7 +144,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
           ),
         ),
       ],
-    ));
+    );
   }
 }
 
@@ -210,80 +209,77 @@ class _SearchMusicListState extends State<SearchMusicListPage>
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
-    return SafeArea(
-      child: Column(
-        children: [
-          // 搜索框
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CupertinoSearchTextField(
-              style: TextStyle(
-                color:
-                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ).useSystemChineseFont(),
-              controller: _inputContentController,
-              onSubmitted: (String value) {
-                if (value.isNotEmpty) {
-                  _pagingController.refresh();
-                }
-              },
-            ),
+    return Column(
+      children: [
+        // 搜索框
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CupertinoSearchTextField(
+            style: TextStyle(
+              color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+            ).useSystemChineseFont(),
+            controller: _inputContentController,
+            onSubmitted: (String value) {
+              if (value.isNotEmpty) {
+                _pagingController.refresh();
+              }
+            },
           ),
-          Expanded(
-            child: PagedGridView(
-                padding: EdgeInsets.only(bottom: screenHeight * 0.2),
-                pagingController: _pagingController,
-                builderDelegate: PagedChildBuilderDelegate<MusicListW>(
-                    noItemsFoundIndicatorBuilder: (context) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '输入关键词以搜索歌单',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
+        ),
+        Expanded(
+          child: PagedGridView(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.2),
+              pagingController: _pagingController,
+              builderDelegate: PagedChildBuilderDelegate<MusicListW>(
+                  noItemsFoundIndicatorBuilder: (context) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '输入关键词以搜索歌单',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? CupertinoColors.systemGrey2
+                              : CupertinoColors.black,
+                        ),
+                      ),
+                      Text(
+                        '点击右上角图标切换搜索单曲',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
                             color: isDarkMode
                                 ? CupertinoColors.systemGrey2
-                                : CupertinoColors.black,
-                          ),
-                        ),
-                        Text(
-                          '点击右上角图标切换搜索单曲',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: isDarkMode
-                                  ? CupertinoColors.systemGrey2
-                                  : CupertinoColors.black),
-                        ),
-                      ],
-                    ),
-                  );
-                }, itemBuilder: (context, musicListW, index) {
-                  return Container(
-                      padding: const EdgeInsets.only(
-                          left: 10,
-                          right: 10,
-                          bottom: 20), // Increased bottom padding
-                      child: MusicListImageCard(
-                        musicListW: musicListW,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => OnlineMusicListPage(
-                                      musicList: musicListW,
-                                    )),
-                          );
-                        },
-                        online: true,
-                      ));
-                }),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, childAspectRatio: 0.7)),
-          ),
-        ],
-      ),
+                                : CupertinoColors.black),
+                      ),
+                    ],
+                  ),
+                );
+              }, itemBuilder: (context, musicListW, index) {
+                return Container(
+                    padding: const EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                        bottom: 20), // Increased bottom padding
+                    child: MusicListImageCard(
+                      musicListW: musicListW,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (context) => OnlineMusicListPage(
+                                    musicList: musicListW,
+                                  )),
+                        );
+                      },
+                      online: true,
+                    ));
+              }),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, childAspectRatio: 0.7)),
+        ),
+      ],
     );
   }
 }

@@ -74,75 +74,72 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
 
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
-      child: SafeArea(
-        child: Column(
-          children: [
-            CupertinoNavigationBar(
-              // backgroundColor: backgroundColor,
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 0.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '资料库',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: textColor),
-                  ),
-                ),
-              ),
-              trailing: MusicListGridPageMenu(
-                builder: (context, showMenu) => GestureDetector(
-                  child: Text(
-                    '选项',
-                    style: TextStyle(color: activeIconRed),
-                  ),
-                  onTapDown: (details) {
-                    showMenu();
-                  },
+      child: Column(
+        children: [
+          CupertinoNavigationBar(
+            // backgroundColor: backgroundColor,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 0.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '资料库',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: textColor),
                 ),
               ),
             ),
-            // Display music lists grid view
-            Expanded(
-              child: musicLists.isEmpty
-                  ? Center(
-                      child: Text("没有歌单", style: TextStyle(color: textColor)))
-                  : GridView.builder(
-                      padding: const EdgeInsets.only(
-                          top: 30, bottom: 150, right: 10, left: 10),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.75,
-                        crossAxisSpacing: 8.0,
-                        mainAxisSpacing: 8.0,
-                      ),
-                      itemCount: musicLists.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        var musicList = musicLists[index];
-                        return MusicListImageCard(
-                          key: ValueKey(musicList.getMusiclistInfo().id),
-                          musicListW: musicList,
-                          online: false,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) =>
-                                    LocalMusicContainerListPage(
-                                  musicList: musicList,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+            trailing: MusicListGridPageMenu(
+              builder: (context, showMenu) => GestureDetector(
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed),
+                ),
+                onTapDown: (details) {
+                  showMenu();
+                },
+              ),
+            ),
+          ),
+          // Display music lists grid view
+          Expanded(
+            child: musicLists.isEmpty
+                ? Center(
+                    child: Text("没有歌单", style: TextStyle(color: textColor)))
+                : GridView.builder(
+                    padding: const EdgeInsets.only(
+                        top: 30, bottom: 150, right: 10, left: 10),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 8.0,
                     ),
-            ),
-          ],
-        ),
+                    itemCount: musicLists.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      var musicList = musicLists[index];
+                      return MusicListImageCard(
+                        key: ValueKey(musicList.getMusiclistInfo().id),
+                        musicListW: musicList,
+                        online: false,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => LocalMusicContainerListPage(
+                                musicList: musicList,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

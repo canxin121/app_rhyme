@@ -123,9 +123,7 @@ class HomeState extends State<Home> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SafeArea(
-                  child: MusicControlBar(maxHeight: 60),
-                ),
+                const MusicControlBar(maxHeight: 60),
                 CupertinoTabBar(
                   currentIndex: _selectedIndex,
                   onTap: (index) {

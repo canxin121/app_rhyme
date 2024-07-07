@@ -97,101 +97,99 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
                   ),
               musicListW: widget.musicList,
               online: true)),
-      child: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
-            // 歌单封面
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    top: screenWidth * 0.1,
-                    left: screenWidth * 0.1,
-                    right: screenWidth * 0.1),
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: screenWidth * 0.7,
+      child: CustomScrollView(
+        slivers: <Widget>[
+          // 歌单封面
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: screenWidth * 0.1,
+                  left: screenWidth * 0.1,
+                  right: screenWidth * 0.1),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: screenWidth * 0.7,
+                ),
+                child: MusicListImageCard(
+                    musicListW: widget.musicList, online: true),
+              ),
+            ),
+          ),
+          // Two buttons
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildButton(
+                    context,
+                    icon: CupertinoIcons.play_fill,
+                    label: '播放全部',
+                    onPressed: () async {
+                      await _fetchAllMusics();
+                      if (_pagingController.itemList != null &&
+                          _pagingController.itemList!.isNotEmpty) {
+                        globalAudioHandler.clearReplaceMusicAll(
+                            _pagingController.itemList!
+                                .map((a) => MusicContainer(a))
+                                .toList());
+                      }
+                    },
                   ),
-                  child: MusicListImageCard(
-                      musicListW: widget.musicList, online: true),
-                ),
+                  _buildButton(
+                    context,
+                    icon: Icons.shuffle,
+                    label: '随机播放',
+                    onPressed: () async {
+                      await _fetchAllMusics();
+                      if (_pagingController.itemList != null &&
+                          _pagingController.itemList!.isNotEmpty) {
+                        await globalAudioHandler.clearReplaceMusicAll(
+                            shuffleList(_pagingController.itemList!)
+                                .map((a) => MusicContainer(a))
+                                .toList());
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-            // Two buttons
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildButton(
-                      context,
-                      icon: CupertinoIcons.play_fill,
-                      label: '播放全部',
-                      onPressed: () async {
-                        await _fetchAllMusics();
-                        if (_pagingController.itemList != null &&
-                            _pagingController.itemList!.isNotEmpty) {
-                          globalAudioHandler.clearReplaceMusicAll(
-                              _pagingController.itemList!
-                                  .map((a) => MusicContainer(a))
-                                  .toList());
-                        }
-                      },
-                    ),
-                    _buildButton(
-                      context,
-                      icon: Icons.shuffle,
-                      label: '随机播放',
-                      onPressed: () async {
-                        await _fetchAllMusics();
-                        if (_pagingController.itemList != null &&
-                            _pagingController.itemList!.isNotEmpty) {
-                          await globalAudioHandler.clearReplaceMusicAll(
-                              shuffleList(_pagingController.itemList!)
-                                  .map((a) => MusicContainer(a))
-                                  .toList());
-                        }
-                      },
-                    ),
-                  ],
-                ),
+          ),
+          const SliverToBoxAdapter(
+            child: Divider(
+              color: CupertinoColors.systemGrey5,
+              height: 1,
+            ),
+          ),
+          PagedSliverList.separated(
+            pagingController: _pagingController,
+            separatorBuilder: (context, index) => const Divider(
+              color: CupertinoColors.systemGrey4,
+              indent: 30,
+              endIndent: 30,
+            ),
+            builderDelegate: PagedChildBuilderDelegate<MusicAggregatorW>(
+              noItemsFoundIndicatorBuilder: (context) {
+                return Center(
+                  child: Text(
+                    '没有找到任何音乐',
+                    style: TextStyle(color: textColor).useSystemChineseFont(),
+                  ),
+                );
+              },
+              itemBuilder: (context, musicAggregator, index) =>
+                  MusicContainerListItem(
+                musicContainer: MusicContainer(musicAggregator),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: Divider(
-                color: CupertinoColors.systemGrey5,
-                height: 1,
-              ),
+          ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(top: 200),
             ),
-            PagedSliverList.separated(
-              pagingController: _pagingController,
-              separatorBuilder: (context, index) => const Divider(
-                color: CupertinoColors.systemGrey4,
-                indent: 30,
-                endIndent: 30,
-              ),
-              builderDelegate: PagedChildBuilderDelegate<MusicAggregatorW>(
-                noItemsFoundIndicatorBuilder: (context) {
-                  return Center(
-                    child: Text(
-                      '没有找到任何音乐',
-                      style: TextStyle(color: textColor).useSystemChineseFont(),
-                    ),
-                  );
-                },
-                itemBuilder: (context, musicAggregator, index) =>
-                    MusicContainerListItem(
-                  musicContainer: MusicContainer(musicAggregator),
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(top: 200),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

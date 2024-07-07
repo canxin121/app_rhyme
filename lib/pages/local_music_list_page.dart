@@ -134,83 +134,80 @@ class LocalMusicContainerListPageState
             online: false,
             musicContainers: musicContainers,
           )),
-      child: SafeArea(
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    top: screenWidth * 0.1,
-                    left: screenWidth * 0.1,
-                    right: screenWidth * 0.1),
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: screenWidth * 0.7,
-                  ),
-                  child: MusicListImageCard(
-                    musicListW: musicListW,
-                    online: false,
-                  ),
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: screenWidth * 0.1,
+                  left: screenWidth * 0.1,
+                  right: screenWidth * 0.1),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: screenWidth * 0.7,
+                ),
+                child: MusicListImageCard(
+                  musicListW: musicListW,
+                  online: false,
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildButton(
-                      context,
-                      icon: CupertinoIcons.play_fill,
-                      label: '播放全部',
-                      onPressed: () {
-                        globalAudioHandler
-                            .clearReplaceMusicAll(musicContainers);
-                      },
-                    ),
-                    _buildButton(
-                      context,
-                      icon: Icons.shuffle,
-                      label: '随机播放',
-                      onPressed: () {
-                        var musics_ = musicContainers.toList();
-                        musics_.shuffle();
-                        globalAudioHandler
-                            .clearReplaceMusicAll(shuffleList(musics_));
-                      },
-                    ),
-                  ],
-                ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildButton(
+                    context,
+                    icon: CupertinoIcons.play_fill,
+                    label: '播放全部',
+                    onPressed: () {
+                      globalAudioHandler.clearReplaceMusicAll(musicContainers);
+                    },
+                  ),
+                  _buildButton(
+                    context,
+                    icon: Icons.shuffle,
+                    label: '随机播放',
+                    onPressed: () {
+                      var musics_ = musicContainers.toList();
+                      musics_.shuffle();
+                      globalAudioHandler
+                          .clearReplaceMusicAll(shuffleList(musics_));
+                    },
+                  ),
+                ],
               ),
             ),
-            const SliverToBoxAdapter(
-              child: Divider(
-                color: CupertinoColors.systemGrey5,
-                height: 1,
-              ),
+          ),
+          const SliverToBoxAdapter(
+            child: Divider(
+              color: CupertinoColors.systemGrey5,
+              height: 1,
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final musicContainer = musicContainers[index];
-                  return MusicContainerListItem(
-                    key: ValueKey(
-                        '${musicContainer.hasCache()}_${musicContainer.hashCode}'),
-                    musicContainer: musicContainer,
-                    musicListW: widget.musicList,
-                  );
-                },
-                childCount: musicContainers.length,
-              ),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final musicContainer = musicContainers[index];
+                return MusicContainerListItem(
+                  key: ValueKey(
+                      '${musicContainer.hasCache()}_${musicContainer.hashCode}'),
+                  musicContainer: musicContainer,
+                  musicListW: widget.musicList,
+                );
+              },
+              childCount: musicContainers.length,
             ),
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(top: 200),
-              ),
+          ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(top: 200),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
