@@ -203,6 +203,26 @@ jobs:
           tag_name: ${{ github.event.inputs.tag_name }}
           token: ${{ secrets.RELEASE_TOKEN }}
 
+      - name: Set up environment variables
+        run: |
+          $env:APK_SIGN_PWD="${{ secrets.APK_SIGN_PWD }}"
+          $env:APK_SIGN_ALIAS="${{ secrets.APK_SIGN_ALIAS }}"
+          $env:APK_SIGN_JKS="${{ secrets.APK_SIGN_JKS }}"
+        shell: pwsh
+
+      - name: Write signing properties
+        run: |
+          echo keyPassword=$env:APK_SIGN_PWD > android\key.properties
+          echo storePassword=$env:APK_SIGN_PWD >> android\key.properties
+          echo keyAlias=$env:APK_SIGN_ALIAS >> android\key.properties
+          echo storeFile=key.jks >> android\key.properties
+        shell: pwsh
+
+      - name: Decode and save key
+        run: |
+          echo $env:APK_SIGN_JKS | base64 -d > android\app\key.jks
+        shell: pwsh
+
       - name: Flutter build apk abi
         run: flutter build apk --release --split-per-abi --verbose
       

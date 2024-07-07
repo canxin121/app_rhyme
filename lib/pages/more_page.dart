@@ -81,7 +81,6 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               ),
             ),
           ),
-          const Padding(padding: EdgeInsets.only(top: 20)),
           CupertinoFormSection.insetGrouped(
             header: Text('应用信息', style: TextStyle(color: textColor)),
             children: [
