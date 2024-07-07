@@ -12,13 +12,14 @@ class MusicListImageCard extends StatelessWidget {
   final MusicListW musicListW;
   final bool online;
   final GestureTapCallback? onTap;
+  final bool cachePic;
 
-  const MusicListImageCard({
-    super.key,
-    required this.musicListW,
-    required this.online,
-    this.onTap,
-  });
+  const MusicListImageCard(
+      {super.key,
+      required this.musicListW,
+      required this.online,
+      this.onTap,
+      this.cachePic = false});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,8 @@ class MusicListImageCard extends StatelessWidget {
                         },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
-                          child: imageCacheHelper(musicListInfo.artPic),
+                          child: imageCacheHelper(musicListInfo.artPic,
+                              cacheNow: cachePic),
                         ),
                       ),
                       musicListW: musicListW,

@@ -43,14 +43,15 @@ abstract class MusicAggregatorW implements RustOpaqueInterface {
 
   Future<void> setDefaultSource({required String source});
 
-  @override
   String toString();
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicListW>>
 abstract class MusicListW implements RustOpaqueInterface {
   Future<List<MusicAggregatorW>> fetchAllMusicAggregators(
-      {required int pagesPerBatch, required int limit});
+      {required int pagesPerBatch,
+      required int limit,
+      required bool withLyric});
 
   Future<List<MusicAggregatorW>> getMusicAggregators(
       {required int page, required int limit});
@@ -59,7 +60,6 @@ abstract class MusicListW implements RustOpaqueInterface {
 
   String source();
 
-  @override
   String toString();
 }
 
@@ -78,6 +78,5 @@ abstract class MusicW implements RustOpaqueInterface {
 
   String source();
 
-  @override
   String toString();
 }

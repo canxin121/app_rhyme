@@ -1,3 +1,4 @@
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
@@ -134,6 +135,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                             ),
                           );
                         },
+                        cachePic: globalConfig.savePicWhenAddMusicList,
                       );
                     },
                   ),

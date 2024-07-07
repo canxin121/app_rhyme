@@ -2170,6 +2170,7 @@ fn wire__crate__api__type_bind__MusicListW_fetch_all_music_aggregators_impl(
             >>::sse_decode(&mut deserializer);
             let api_pages_per_batch = <u32>::sse_decode(&mut deserializer);
             let api_limit = <u32>::sse_decode(&mut deserializer);
+            let api_with_lyric = <bool>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
@@ -2196,6 +2197,7 @@ fn wire__crate__api__type_bind__MusicListW_fetch_all_music_aggregators_impl(
                                 &*api_that_guard,
                                 api_pages_per_batch,
                                 api_limit,
+                                api_with_lyric,
                             )
                             .await?;
                         Ok(output_ok)
@@ -3028,6 +3030,8 @@ impl SseDecode for crate::api::config::Config {
         let mut var_externApiAutoUpdate = <bool>::sse_decode(deserializer);
         let mut var_wifiAutoQuality = <String>::sse_decode(deserializer);
         let mut var_mobileAutoQuality = <String>::sse_decode(deserializer);
+        let mut var_savePicWhenAddMusicList = <bool>::sse_decode(deserializer);
+        let mut var_saveLyricWhenAddMusicList = <bool>::sse_decode(deserializer);
         let mut var_externApiPath = <Option<String>>::sse_decode(deserializer);
         return crate::api::config::Config {
             user_agreement: var_userAgreement,
@@ -3036,6 +3040,8 @@ impl SseDecode for crate::api::config::Config {
             extern_api_auto_update: var_externApiAutoUpdate,
             wifi_auto_quality: var_wifiAutoQuality,
             mobile_auto_quality: var_mobileAutoQuality,
+            save_pic_when_add_music_list: var_savePicWhenAddMusicList,
+            save_lyric_when_add_music_list: var_saveLyricWhenAddMusicList,
             extern_api_path: var_externApiPath,
         };
     }
@@ -3928,6 +3934,12 @@ impl flutter_rust_bridge::IntoDart for crate::api::config::Config {
             self.extern_api_auto_update.into_into_dart().into_dart(),
             self.wifi_auto_quality.into_into_dart().into_dart(),
             self.mobile_auto_quality.into_into_dart().into_dart(),
+            self.save_pic_when_add_music_list
+                .into_into_dart()
+                .into_dart(),
+            self.save_lyric_when_add_music_list
+                .into_into_dart()
+                .into_dart(),
             self.extern_api_path.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -4297,6 +4309,8 @@ impl SseEncode for crate::api::config::Config {
         <bool>::sse_encode(self.extern_api_auto_update, serializer);
         <String>::sse_encode(self.wifi_auto_quality, serializer);
         <String>::sse_encode(self.mobile_auto_quality, serializer);
+        <bool>::sse_encode(self.save_pic_when_add_music_list, serializer);
+        <bool>::sse_encode(self.save_lyric_when_add_music_list, serializer);
         <Option<String>>::sse_encode(self.extern_api_path, serializer);
     }
 }

@@ -1,3 +1,6 @@
+import 'package:app_rhyme/src/rust/api/cache.dart';
+import 'package:app_rhyme/utils/const_vars.dart';
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
@@ -163,10 +166,30 @@ List<dynamic> _onlineMusicListItems(
         var musicListInfo = await showMusicListInfoDialog(context,
             defaultMusicList: musicListw.getMusiclistInfo());
         if (musicListInfo != null) {
+          toastification.show(
+              title:
+                  Text("保存歌单", style: const TextStyle().useSystemChineseFont()),
+              description: Text("正在获取歌单数据，请稍等",
+                  style: const TextStyle().useSystemChineseFont()),
+              autoCloseDuration: const Duration(seconds: 3),
+              type: ToastificationType.info);
           try {
+            if (musicListInfo.artPic.isNotEmpty) {
+              cacheFile(file: musicListInfo.artPic, cachePath: picCacheRoot);
+            }
             await SqlFactoryW.createMusiclist(musicListInfos: [musicListInfo]);
             var aggs = await musicListw.fetchAllMusicAggregators(
-                pagesPerBatch: 5, limit: 50);
+                pagesPerBatch: 5,
+                limit: 50,
+                withLyric: globalConfig.saveLyricWhenAddMusicList);
+            if (globalConfig.savePicWhenAddMusicList) {
+              for (var agg in aggs) {
+                var pic = agg.getDefaultMusic().getMusicInfo().artPic;
+                if (pic != null && pic.isNotEmpty) {
+                  cacheFile(file: pic, cachePath: picCacheRoot);
+                }
+              }
+            }
             await SqlFactoryW.addMusics(
                 musicsListName: musicListInfo.name, musics: aggs);
             globalMusicListGridPageRefreshFunction();
@@ -195,9 +218,26 @@ List<dynamic> _onlineMusicListItems(
       onTap: () async {
         var targetMusicList = await showMusicListSelectionDialog(context);
         if (targetMusicList != null) {
+          toastification.show(
+              title:
+                  Text("添加歌曲", style: const TextStyle().useSystemChineseFont()),
+              description: Text("正在获取歌单数据，请稍等",
+                  style: const TextStyle().useSystemChineseFont()),
+              autoCloseDuration: const Duration(seconds: 3),
+              type: ToastificationType.info);
           try {
             var aggs = await musicListw.fetchAllMusicAggregators(
-                pagesPerBatch: 5, limit: 50);
+                pagesPerBatch: 5,
+                limit: 50,
+                withLyric: globalConfig.saveLyricWhenAddMusicList);
+            if (globalConfig.savePicWhenAddMusicList) {
+              for (var agg in aggs) {
+                var pic = agg.getDefaultMusic().getMusicInfo().artPic;
+                if (pic != null && pic.isNotEmpty) {
+                  cacheFile(file: pic, cachePath: picCacheRoot);
+                }
+              }
+            }
             await SqlFactoryW.addMusics(
                 musicsListName: targetMusicList.getMusiclistInfo().name,
                 musics: aggs);

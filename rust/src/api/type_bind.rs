@@ -260,6 +260,7 @@ impl MusicListW {
         &self,
         pages_per_batch: u32,
         limit: u32,
+        with_lyric: bool,
     ) -> Result<Vec<MusicAggregatorW>, anyhow::Error> {
         let mut all_aggregators = Vec::new();
         let mut page = 1;
@@ -294,7 +295,12 @@ impl MusicListW {
                 }
             }
         }
-
+        if with_lyric {
+            let futures = all_aggregators.iter_mut().map(|agg| async {
+                let _ = agg.fetch_lyric();
+            });
+            futures::future::join_all(futures).await;
+        }
         Ok(all_aggregators)
     }
 }

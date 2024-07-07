@@ -27,7 +27,7 @@ class MorePage extends StatefulWidget {
 }
 
 class MorePageState extends State<MorePage> with WidgetsBindingObserver {
-  void _updateExternApiState() {
+  refresh() {
     setState(() {});
   }
 
@@ -185,6 +185,40 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
             header: Text('储存设置', style: TextStyle(color: textColor)),
             children: [
               CupertinoFormRow(
+                prefix: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      '保存歌曲时缓存歌曲封面',
+                      style: TextStyle(color: textColor),
+                    )),
+                child: CupertinoSwitch(
+                    value: globalConfig.savePicWhenAddMusicList,
+                    onChanged: (value) {
+                      if (value != globalConfig.savePicWhenAddMusicList) {
+                        globalConfig.savePicWhenAddMusicList = value;
+                        globalConfig.save();
+                        setState(() {});
+                      }
+                    }),
+              ),
+              CupertinoFormRow(
+                prefix: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      '保存歌单时缓存歌曲歌词',
+                      style: TextStyle(color: textColor),
+                    )),
+                child: CupertinoSwitch(
+                    value: globalConfig.saveLyricWhenAddMusicList,
+                    onChanged: (value) {
+                      if (value != globalConfig.saveLyricWhenAddMusicList) {
+                        globalConfig.saveLyricWhenAddMusicList = value;
+                        globalConfig.save();
+                        setState(() {});
+                      }
+                    }),
+              ),
+              CupertinoFormRow(
                   prefix: Text("清除冗余歌曲数据", style: TextStyle(color: textColor)),
                   child: CupertinoButton(
                       onPressed: () async {
@@ -314,7 +348,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
             child: CupertinoButton(
               onPressed: () async {
                 await checkExternApiUpdate(context);
-                _updateExternApiState();
+                setState(() {});
               },
               child: Icon(CupertinoIcons.cloud, color: iconColor),
             ),
@@ -333,7 +367,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                 if (value != globalConfig.externApiAutoUpdate) {
                   globalConfig.externApiAutoUpdate = value;
                   globalConfig.save();
-                  _updateExternApiState();
+                  setState(() {});
                 }
               }),
         ));
@@ -352,7 +386,8 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                 globalConfig.externApi = null;
                 globalConfig.save();
                 globalExternApiEvaler = null;
-                _updateExternApiState();
+
+                setState(() {});
               },
               child: Icon(
                 CupertinoIcons.delete,
@@ -405,9 +440,7 @@ class ImportExternApiMenu extends StatelessWidget {
                 globalConfig.save();
                 globalExternApiEvaler = ExternApiEvaler(path);
                 if (context.mounted) {
-                  context
-                      .findAncestorStateOfType<MorePageState>()
-                      ?._updateExternApiState();
+                  context.findAncestorStateOfType<MorePageState>()?.refresh();
                 }
               } catch (e) {
                 globalTalker.error("[More Page] 导入第三方音乐源失败:$e");
@@ -427,9 +460,7 @@ class ImportExternApiMenu extends StatelessWidget {
               globalExternApiEvaler =
                   ExternApiEvaler(globalConfig.externApi!.localPath);
               if (context.mounted) {
-                context
-                    .findAncestorStateOfType<MorePageState>()
-                    ?._updateExternApiState();
+                context.findAncestorStateOfType<MorePageState>()?.refresh();
               }
             }
           },

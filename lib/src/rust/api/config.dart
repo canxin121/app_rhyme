@@ -18,6 +18,8 @@ class Config {
   bool externApiAutoUpdate;
   String wifiAutoQuality;
   String mobileAutoQuality;
+  bool savePicWhenAddMusicList;
+  bool saveLyricWhenAddMusicList;
   final String? externApiPath;
 
   Config({
@@ -27,6 +29,8 @@ class Config {
     required this.externApiAutoUpdate,
     required this.wifiAutoQuality,
     required this.mobileAutoQuality,
+    required this.savePicWhenAddMusicList,
+    required this.saveLyricWhenAddMusicList,
     this.externApiPath,
   });
 
@@ -45,6 +49,8 @@ class Config {
       externApiAutoUpdate.hashCode ^
       wifiAutoQuality.hashCode ^
       mobileAutoQuality.hashCode ^
+      savePicWhenAddMusicList.hashCode ^
+      saveLyricWhenAddMusicList.hashCode ^
       externApiPath.hashCode;
 
   @override
@@ -58,5 +64,7 @@ class Config {
           externApiAutoUpdate == other.externApiAutoUpdate &&
           wifiAutoQuality == other.wifiAutoQuality &&
           mobileAutoQuality == other.mobileAutoQuality &&
+          savePicWhenAddMusicList == other.savePicWhenAddMusicList &&
+          saveLyricWhenAddMusicList == other.saveLyricWhenAddMusicList &&
           externApiPath == other.externApiPath;
 }

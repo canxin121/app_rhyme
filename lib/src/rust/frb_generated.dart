@@ -239,7 +239,8 @@ abstract class RustLibApi extends BaseApi {
       crateApiTypeBindMusicListWFetchAllMusicAggregators(
           {required MusicListW that,
           required int pagesPerBatch,
-          required int limit});
+          required int limit,
+          required bool withLyric});
 
   Future<List<MusicAggregatorW>> crateApiTypeBindMusicListWGetMusicAggregators(
       {required MusicListW that, required int page, required int limit});
@@ -1637,7 +1638,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       crateApiTypeBindMusicListWFetchAllMusicAggregators(
           {required MusicListW that,
           required int pagesPerBatch,
-          required int limit}) {
+          required int limit,
+          required bool withLyric}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1645,6 +1647,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_u_32(pagesPerBatch, serializer);
         sse_encode_u_32(limit, serializer);
+        sse_encode_bool(withLyric, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 49, port: port_);
       },
@@ -1654,7 +1657,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiTypeBindMusicListWFetchAllMusicAggregatorsConstMeta,
-      argValues: [that, pagesPerBatch, limit],
+      argValues: [that, pagesPerBatch, limit, withLyric],
       apiImpl: this,
     ));
   }
@@ -1663,7 +1666,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       get kCrateApiTypeBindMusicListWFetchAllMusicAggregatorsConstMeta =>
           const TaskConstMeta(
             debugName: "MusicListW_fetch_all_music_aggregators",
-            argNames: ["that", "pagesPerBatch", "limit"],
+            argNames: ["that", "pagesPerBatch", "limit", "withLyric"],
           );
 
   @override
@@ -2088,9 +2091,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AggregatorOnlineFactoryW dco_decode_aggregator_online_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.isNotEmpty)
+    if (arr.length != 0)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return const AggregatorOnlineFactoryW();
+    return AggregatorOnlineFactoryW();
   }
 
   @protected
@@ -2217,8 +2220,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Config dco_decode_config(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return Config(
       userAgreement: dco_decode_bool(arr[0]),
       externApi: dco_decode_opt_box_autoadd_extern_api(arr[1]),
@@ -2226,7 +2229,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       externApiAutoUpdate: dco_decode_bool(arr[3]),
       wifiAutoQuality: dco_decode_String(arr[4]),
       mobileAutoQuality: dco_decode_String(arr[5]),
-      externApiPath: dco_decode_opt_String(arr[6]),
+      savePicWhenAddMusicList: dco_decode_bool(arr[6]),
+      saveLyricWhenAddMusicList: dco_decode_bool(arr[7]),
+      externApiPath: dco_decode_opt_String(arr[8]),
     );
   }
 
@@ -2394,9 +2399,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   OnlineFactoryW dco_decode_online_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.isNotEmpty)
+    if (arr.length != 0)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return const OnlineFactoryW();
+    return OnlineFactoryW();
   }
 
   @protected
@@ -2537,9 +2542,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SqlFactoryW dco_decode_sql_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.isNotEmpty)
+    if (arr.length != 0)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return const SqlFactoryW();
+    return SqlFactoryW();
   }
 
   @protected
@@ -2695,7 +2700,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AggregatorOnlineFactoryW sse_decode_aggregator_online_factory_w(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return const AggregatorOnlineFactoryW();
+    return AggregatorOnlineFactoryW();
   }
 
   @protected
@@ -2852,6 +2857,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_externApiAutoUpdate = sse_decode_bool(deserializer);
     var var_wifiAutoQuality = sse_decode_String(deserializer);
     var var_mobileAutoQuality = sse_decode_String(deserializer);
+    var var_savePicWhenAddMusicList = sse_decode_bool(deserializer);
+    var var_saveLyricWhenAddMusicList = sse_decode_bool(deserializer);
     var var_externApiPath = sse_decode_opt_String(deserializer);
     return Config(
         userAgreement: var_userAgreement,
@@ -2860,6 +2867,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         externApiAutoUpdate: var_externApiAutoUpdate,
         wifiAutoQuality: var_wifiAutoQuality,
         mobileAutoQuality: var_mobileAutoQuality,
+        savePicWhenAddMusicList: var_savePicWhenAddMusicList,
+        saveLyricWhenAddMusicList: var_saveLyricWhenAddMusicList,
         externApiPath: var_externApiPath);
   }
 
@@ -3081,7 +3090,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   OnlineFactoryW sse_decode_online_factory_w(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return const OnlineFactoryW();
+    return OnlineFactoryW();
   }
 
   @protected
@@ -3276,7 +3285,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   SqlFactoryW sse_decode_sql_factory_w(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return const SqlFactoryW();
+    return SqlFactoryW();
   }
 
   @protected
@@ -3566,6 +3575,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.externApiAutoUpdate, serializer);
     sse_encode_String(self.wifiAutoQuality, serializer);
     sse_encode_String(self.mobileAutoQuality, serializer);
+    sse_encode_bool(self.savePicWhenAddMusicList, serializer);
+    sse_encode_bool(self.saveLyricWhenAddMusicList, serializer);
     sse_encode_opt_String(self.externApiPath, serializer);
   }
 
@@ -4043,9 +4054,14 @@ class MusicListWImpl extends RustOpaque implements MusicListW {
   );
 
   Future<List<MusicAggregatorW>> fetchAllMusicAggregators(
-          {required int pagesPerBatch, required int limit}) =>
+          {required int pagesPerBatch,
+          required int limit,
+          required bool withLyric}) =>
       RustLib.instance.api.crateApiTypeBindMusicListWFetchAllMusicAggregators(
-          that: this, pagesPerBatch: pagesPerBatch, limit: limit);
+          that: this,
+          pagesPerBatch: pagesPerBatch,
+          limit: limit,
+          withLyric: withLyric);
 
   Future<List<MusicAggregatorW>> getMusicAggregators(
           {required int page, required int limit}) =>

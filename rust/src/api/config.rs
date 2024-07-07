@@ -29,6 +29,14 @@ pub struct Config {
     #[frb(non_final)]
     #[serde(default = "mobile_auto_quality")]
     pub mobile_auto_quality: String,
+    // 添加歌单时是否保存封面
+    #[frb(non_final)]
+    #[serde(default = "default_true")]
+    pub save_pic_when_add_music_list: bool,
+    // 添加歌单时是否保存歌词
+    #[frb(non_final)]
+    #[serde(default = "default_true")]
+    pub save_lyric_when_add_music_list: bool,
     // deprecated fields
     // 使用skip_serializing来避免序列化, 但是仍然可以反序列化
     // 从而实现在save时废弃这个字段，而在load时又可以兼容
@@ -59,6 +67,8 @@ impl Default for Config {
             extern_api_auto_update: true,
             wifi_auto_quality: wifi_auto_quality(),
             mobile_auto_quality: mobile_auto_quality(),
+            save_pic_when_add_music_list: true,
+            save_lyric_when_add_music_list: true,
         }
     }
 }

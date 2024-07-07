@@ -197,6 +197,7 @@ class LocalMusicContainerListPageState
                       '${musicContainer.hasCache()}_${musicContainer.hashCode}'),
                   musicContainer: musicContainer,
                   musicListW: widget.musicList,
+                  cachePic: globalConfig.savePicWhenAddMusicList,
                 );
               },
               childCount: musicContainers.length,

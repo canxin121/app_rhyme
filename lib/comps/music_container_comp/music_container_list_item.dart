@@ -20,15 +20,16 @@ class MusicContainerListItem extends StatelessWidget {
   final bool inPlayList;
   final bool? isDark;
   final GestureTapCallback? onTap;
+  final bool cachePic;
 
-  const MusicContainerListItem({
-    super.key,
-    required this.musicContainer,
-    this.musicListW,
-    this.inPlayList = false,
-    this.isDark,
-    this.onTap,
-  });
+  const MusicContainerListItem(
+      {super.key,
+      required this.musicContainer,
+      this.musicListW,
+      this.inPlayList = false,
+      this.isDark,
+      this.onTap,
+      this.cachePic = false});
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +48,8 @@ class MusicContainerListItem extends StatelessWidget {
           // 歌曲的封面
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: imageCacheHelper(
-              musicContainer.info.artPic,
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
-            ),
+            child: imageCacheHelper(musicContainer.info.artPic,
+                width: 50, height: 50, fit: BoxFit.cover, cacheNow: cachePic),
           ),
           // 歌曲的信息(歌名, 歌手)
           Expanded(

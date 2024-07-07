@@ -1,5 +1,6 @@
 // Helper functions for actions
 
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/dialogs/music_container_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
@@ -151,6 +152,14 @@ Future<void> addToMusicList(
   var targetMusicList = await showMusicListSelectionDialog(context);
   if (targetMusicList != null) {
     try {
+      if (globalConfig.saveLyricWhenAddMusicList) {
+        await musicContainer.aggregator.fetchLyric();
+      }
+      if (globalConfig.savePicWhenAddMusicList &&
+          musicContainer.info.artPic != null &&
+          musicContainer.info.artPic!.isNotEmpty) {
+        cacheFile(file: musicContainer.info.artPic!, cachePath: picCacheRoot);
+      }
       await SqlFactoryW.addMusics(
           musicsListName: targetMusicList.getMusiclistInfo().name,
           musics: [musicContainer.aggregator]);
@@ -186,8 +195,19 @@ Future<void> createNewMusicList(
   if (newMusicListInfo == null) {
     return;
   }
+  if (newMusicListInfo.artPic.isNotEmpty) {
+    cacheFile(file: newMusicListInfo.artPic, cachePath: picCacheRoot);
+  }
   try {
     await SqlFactoryW.createMusiclist(musicListInfos: [newMusicListInfo]);
+    if (globalConfig.saveLyricWhenAddMusicList) {
+      await musicContainer.aggregator.fetchLyric();
+    }
+    if (globalConfig.savePicWhenAddMusicList &&
+        musicContainer.info.artPic != null &&
+        musicContainer.info.artPic!.isNotEmpty) {
+      cacheFile(file: musicContainer.info.artPic!, cachePath: picCacheRoot);
+    }
     await SqlFactoryW.addMusics(
         musicsListName: newMusicListInfo.name,
         musics: [musicContainer.aggregator]);
