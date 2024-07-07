@@ -84,19 +84,22 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
       children: [
         // 搜索框
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CupertinoSearchTextField(
-            style: TextStyle(
-              color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-            ).useSystemChineseFont(),
-            controller: _inputContentController,
-            onSubmitted: (String value) {
-              if (value.isNotEmpty) {
-                _pagingController.refresh();
-              }
-            },
-          ),
-        ),
+            padding: const EdgeInsets.all(8.0),
+            child: SafeArea(
+              child: CupertinoSearchTextField(
+                style: TextStyle(
+                  color: isDarkMode
+                      ? CupertinoColors.white
+                      : CupertinoColors.black,
+                ).useSystemChineseFont(),
+                controller: _inputContentController,
+                onSubmitted: (String value) {
+                  if (value.isNotEmpty) {
+                    _pagingController.refresh();
+                  }
+                },
+              ),
+            )),
         Expanded(
           child: PagedListView.separated(
             pagingController: _pagingController,
@@ -214,7 +217,8 @@ class _SearchMusicListState extends State<SearchMusicListPage>
         // 搜索框
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: CupertinoSearchTextField(
+          child: SafeArea(
+              child: CupertinoSearchTextField(
             style: TextStyle(
               color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
             ).useSystemChineseFont(),
@@ -224,7 +228,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                 _pagingController.refresh();
               }
             },
-          ),
+          )),
         ),
         Expanded(
           child: PagedGridView(
