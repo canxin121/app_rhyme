@@ -13,6 +13,7 @@ import 'package:app_rhyme/utils/global_vars.dart';
 // import 'package:app_rhyme/utils/logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:toastification/toastification.dart';
 
 Future<void> main() async {
@@ -25,6 +26,11 @@ Future<void> main() async {
 
   await initGlobalAudioHandler();
   await initGlobalAudioUiController();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+  ));
   runApp(const MyApp());
 }
 
