@@ -57,12 +57,15 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
     final iconColor = brightness == Brightness.dark
         ? CupertinoColors.white
         : CupertinoColors.black;
-
+    final barColor = brightness == Brightness.dark
+        ? CupertinoColors.systemGrey6
+        : CupertinoColors.systemGroupedBackground;
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
       child: ListView(
         children: [
           CupertinoNavigationBar(
+            backgroundColor: barColor,
             leading: Padding(
               padding: const EdgeInsets.only(left: 0.0),
               child: Align(
