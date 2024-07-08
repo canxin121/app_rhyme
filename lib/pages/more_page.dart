@@ -581,6 +581,10 @@ List<CupertinoFormRow> _buildExportCacheRoot(BuildContext context,
   }
 
   List<CupertinoFormRow> children = [];
+
+  // Ios 没有外部存储访问权限，因此取消此项设定
+  if (Platform.isIOS) return children;
+
   if (globalConfig.exportCacheRoot == null) {
     children.add(
       CupertinoFormRow(
