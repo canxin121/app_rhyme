@@ -6,6 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `del_old_data`
 // These types are ignored because they are not used by any `pub` functions: `FILE_OP_SEMAPHORE`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `initialize`
 
@@ -13,16 +14,49 @@ Future<String> genHash({required String str}) =>
     RustLib.instance.api.crateApiCacheGenHash(str: str);
 
 Future<String> cacheFile(
-        {required String file, required String cachePath, String? filename}) =>
+        {required String file,
+        required String cachePath,
+        String? filename,
+        String? exportRoot}) =>
     RustLib.instance.api.crateApiCacheCacheFile(
-        file: file, cachePath: cachePath, filename: filename);
+        file: file,
+        cachePath: cachePath,
+        filename: filename,
+        exportRoot: exportRoot);
 
 String? useCacheFile(
-        {required String file, required String cachePath, String? filename}) =>
+        {required String file,
+        required String cachePath,
+        String? filename,
+        String? exportRoot}) =>
     RustLib.instance.api.crateApiCacheUseCacheFile(
-        file: file, cachePath: cachePath, filename: filename);
+        file: file,
+        cachePath: cachePath,
+        filename: filename,
+        exportRoot: exportRoot);
 
 Future<void> deleteCacheFile(
-        {required String file, required String cachePath, String? filename}) =>
+        {required String file,
+        required String cachePath,
+        String? filename,
+        String? exportRoot}) =>
     RustLib.instance.api.crateApiCacheDeleteCacheFile(
-        file: file, cachePath: cachePath, filename: filename);
+        file: file,
+        cachePath: cachePath,
+        filename: filename,
+        exportRoot: exportRoot);
+
+Future<void> rename({required String from, required String to}) =>
+    RustLib.instance.api.crateApiCacheRename(from: from, to: to);
+
+Future<void> copyFile({required String from, required String to}) =>
+    RustLib.instance.api.crateApiCacheCopyFile(from: from, to: to);
+
+Future<void> copyDirectory({required String src, required String dst}) =>
+    RustLib.instance.api.crateApiCacheCopyDirectory(src: src, dst: dst);
+
+Future<void> removeDir({required String dir}) =>
+    RustLib.instance.api.crateApiCacheRemoveDir(dir: dir);
+
+Future<void> removeFile({required String file}) =>
+    RustLib.instance.api.crateApiCacheRemoveFile(file: file);

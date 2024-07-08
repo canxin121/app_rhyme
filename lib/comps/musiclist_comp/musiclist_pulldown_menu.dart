@@ -1,7 +1,6 @@
-import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:chinese_font_library/chinese_font_library.dart';
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
 import 'package:app_rhyme/pages/local_music_list_grid_page.dart';
@@ -12,7 +11,6 @@ import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import 'package:toastification/toastification.dart';
 
 // 有三种使用场景: 1. 本地歌单 2. 在线歌单
 // 区分:
@@ -92,22 +90,11 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
                     new_: [newMusicListInfo]);
                 globalMusicListGridPageRefreshFunction();
                 await globalMusicContainerListPageRefreshFunction();
-
-                toastification.show(
-                    autoCloseDuration: const Duration(seconds: 2),
-                    type: ToastificationType.success,
-                    title: Text("编辑歌单",
-                        style: const TextStyle().useSystemChineseFont()),
-                    description: Text("编辑歌单成功",
-                        style: const TextStyle().useSystemChineseFont()));
+                LogToast.success("编辑歌单", "编辑歌单成功",
+                    "[LocalMusicListItemsPullDown] Succeed to edit music list");
               } catch (e) {
-                toastification.show(
-                    autoCloseDuration: const Duration(seconds: 2),
-                    type: ToastificationType.error,
-                    title: Text("编辑歌单",
-                        style: const TextStyle().useSystemChineseFont()),
-                    description: Text("编辑歌单失败: $e",
-                        style: const TextStyle().useSystemChineseFont()));
+                LogToast.error("编辑歌单", "编辑歌单失败: $e",
+                    "[LocalMusicListItemsPullDown] Failed to edit music list: $e");
               }
             }
           },
@@ -120,25 +107,13 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
               await SqlFactoryW.delMusiclist(
                   musiclistNames: [musicListW.getMusiclistInfo().name]);
               globalMusicListGridPageRefreshFunction();
-
-              toastification.show(
-                  autoCloseDuration: const Duration(seconds: 2),
-                  type: ToastificationType.success,
-                  title: Text("删除歌单",
-                      style: const TextStyle().useSystemChineseFont()),
-                  description: Text("删除歌单成功",
-                      style: const TextStyle().useSystemChineseFont()));
-
+              LogToast.success("删除歌单", "删除歌单成功",
+                  "[LocalMusicListItemsPullDown] Succeed to delete music list");
               globalMusicListGridPageRefreshFunction();
               globalMusicContainerListPagePopFunction();
             } catch (e) {
-              toastification.show(
-                  autoCloseDuration: const Duration(seconds: 2),
-                  type: ToastificationType.error,
-                  title: Text("删除歌单",
-                      style: const TextStyle().useSystemChineseFont()),
-                  description: Text("删除歌单失败: $e",
-                      style: const TextStyle().useSystemChineseFont()));
+              LogToast.error("删除歌单", "删除歌单失败: $e",
+                  "[LocalMusicListItemsPullDown] Failed to delete music list: $e");
             }
           },
           title: '删除歌单',
@@ -166,16 +141,12 @@ List<dynamic> _onlineMusicListItems(
         var musicListInfo = await showMusicListInfoDialog(context,
             defaultMusicList: musicListw.getMusiclistInfo());
         if (musicListInfo != null) {
-          toastification.show(
-              title:
-                  Text("保存歌单", style: const TextStyle().useSystemChineseFont()),
-              description: Text("正在获取歌单数据，请稍等",
-                  style: const TextStyle().useSystemChineseFont()),
-              autoCloseDuration: const Duration(seconds: 3),
-              type: ToastificationType.info);
+          LogToast.success("保存歌单", "正在获取歌单数据，请稍等",
+              "[OnlineMusicListItemsPullDown] Start to save music list");
+
           try {
             if (musicListInfo.artPic.isNotEmpty) {
-              cacheFile(file: musicListInfo.artPic, cachePath: picCacheRoot);
+              cacheFileHelper(musicListInfo.artPic, picCacheRoot);
             }
             await SqlFactoryW.createMusiclist(musicListInfos: [musicListInfo]);
             var aggs = await musicListw.fetchAllMusicAggregators(
@@ -186,28 +157,18 @@ List<dynamic> _onlineMusicListItems(
               for (var agg in aggs) {
                 var pic = agg.getDefaultMusic().getMusicInfo().artPic;
                 if (pic != null && pic.isNotEmpty) {
-                  cacheFile(file: pic, cachePath: picCacheRoot);
+                  cacheFileHelper(pic, picCacheRoot);
                 }
               }
             }
             await SqlFactoryW.addMusics(
                 musicsListName: musicListInfo.name, musics: aggs);
             globalMusicListGridPageRefreshFunction();
-            toastification.show(
-                title: Text("保存歌单",
-                    style: const TextStyle().useSystemChineseFont()),
-                description: Text("保存歌单成功",
-                    style: const TextStyle().useSystemChineseFont()),
-                autoCloseDuration: const Duration(seconds: 2),
-                type: ToastificationType.success);
+            LogToast.success("保存歌单", "保存歌单成功",
+                "[OnlineMusicListItemsPullDown] Succeed to save music list");
           } catch (e) {
-            toastification.show(
-                title: Text("保存歌单",
-                    style: const TextStyle().useSystemChineseFont()),
-                description: Text("保存歌单失败: $e",
-                    style: const TextStyle().useSystemChineseFont()),
-                autoCloseDuration: const Duration(seconds: 2),
-                type: ToastificationType.error);
+            LogToast.error("保存歌单", "保存歌单失败: $e",
+                "[OnlineMusicListItemsPullDown] Failed to save music list: $e");
           }
         }
       },
@@ -218,13 +179,8 @@ List<dynamic> _onlineMusicListItems(
       onTap: () async {
         var targetMusicList = await showMusicListSelectionDialog(context);
         if (targetMusicList != null) {
-          toastification.show(
-              title:
-                  Text("添加歌曲", style: const TextStyle().useSystemChineseFont()),
-              description: Text("正在获取歌单数据，请稍等",
-                  style: const TextStyle().useSystemChineseFont()),
-              autoCloseDuration: const Duration(seconds: 3),
-              type: ToastificationType.info);
+          LogToast.info("添加歌曲", "正在获取歌单数据，请稍等",
+              "[OnlineMusicListItemsPullDown] Start to add music");
           try {
             var aggs = await musicListw.fetchAllMusicAggregators(
                 pagesPerBatch: 5,
@@ -234,7 +190,7 @@ List<dynamic> _onlineMusicListItems(
               for (var agg in aggs) {
                 var pic = agg.getDefaultMusic().getMusicInfo().artPic;
                 if (pic != null && pic.isNotEmpty) {
-                  cacheFile(file: pic, cachePath: picCacheRoot);
+                  cacheFileHelper(pic, picCacheRoot);
                 }
               }
             }
@@ -242,21 +198,11 @@ List<dynamic> _onlineMusicListItems(
                 musicsListName: targetMusicList.getMusiclistInfo().name,
                 musics: aggs);
             await globalMusicContainerListPageRefreshFunction();
-            toastification.show(
-                title: Text("添加歌曲",
-                    style: const TextStyle().useSystemChineseFont()),
-                description: Text("添加歌曲成功",
-                    style: const TextStyle().useSystemChineseFont()),
-                autoCloseDuration: const Duration(seconds: 2),
-                type: ToastificationType.success);
+            LogToast.success("添加歌曲", "添加歌曲成功",
+                "[OnlineMusicListItemsPullDown] Succeed to add music");
           } catch (e) {
-            toastification.show(
-                title: Text("添加歌曲",
-                    style: const TextStyle().useSystemChineseFont()),
-                description: Text("添加歌曲失败: $e",
-                    style: const TextStyle().useSystemChineseFont()),
-                autoCloseDuration: const Duration(seconds: 2),
-                type: ToastificationType.error);
+            LogToast.error("添加歌曲", "添加歌曲失败: $e",
+                "[OnlineMusicListItemsPullDown] Failed to add music: $e");
           }
         }
       },

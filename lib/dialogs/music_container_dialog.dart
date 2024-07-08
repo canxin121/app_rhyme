@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
@@ -95,10 +94,7 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
                       setState(() {
                         artPicPath = imageFile.path;
                         image = ExtendedImage.file(File(artPicPath));
-                        cacheFile(
-                          file: imageFile.path,
-                          cachePath: picCacheRoot,
-                        );
+                        cacheFileHelper(imageFile.path, picCacheRoot);
                       });
                     }
                   },

@@ -84,7 +84,9 @@ impl SqlFactoryW {
     pub async fn init_from_path(filepath: &str) -> Result<(), anyhow::Error> {
         Ok(SqlFactory::init_from_path(filepath).await?)
     }
-
+    pub async fn shutdown() -> Result<(), anyhow::Error> {
+        Ok(SqlFactory::shutdown().await?)
+    }
     pub async fn clean_unused_music_data() -> Result<(), anyhow::Error> {
         Ok(SqlFactory::clean_unused_music_data().await?)
     }

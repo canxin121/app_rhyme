@@ -1,17 +1,15 @@
 import 'dart:io';
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:audio_session/audio_session.dart';
-import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/time_parser.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:toastification/toastification.dart';
 
 // 初始化所有和Audio相关的内容
 Future<void> initGlobalAudioHandler() async {
@@ -92,11 +90,9 @@ class AudioHandler extends GetxController {
           // 重置失败次数
           allowFailedTimes = 3;
           if (isPlaying) await pause();
-          toastification.show(
-              type: ToastificationType.error,
-              title: const Text("播放失败!"),
-              description: const Text("播放失败次数过多，暂停播放!"),
-              autoCloseDuration: const Duration(seconds: 4));
+          LogToast.error("播放失败!", "播放失败次数过多，暂停播放!",
+              "[LazyLoadMusic] Failed to lazy load music '${musicList[index].info.name}' to many times, stop playing.");
+
           return;
         } else {
           if (isPlaying) await pause();
@@ -162,15 +158,6 @@ class AudioHandler extends GetxController {
       // 由于是手动添加新的音乐，我们直接获取音乐链接并且添加到系统播放资源即可(直接添加到最后面)
       // 添加新的音乐到待播列表(直接添加到最后面)
       if (!await musicContainer.updateAll()) {
-        // toastification.show(
-        //     autoCloseDuration: const Duration(seconds: 2),
-        //     title: Text("播放音乐失败!",
-        //         style: const TextStyle().useSystemChineseFont()),
-        //     description: Text("获取播放资源失败!",
-        //         style: const TextStyle().useSystemChineseFont()),
-        //     type: ToastificationType.error);
-        globalTalker.info(
-            "[Music Handler] In addMusicPlay, Failed to updateAudioSource: ${musicContainer.info.name}");
         return;
       }
       // 先暂停播放
@@ -197,13 +184,8 @@ class AudioHandler extends GetxController {
       // 播放新的音乐
       await seek(Duration.zero, index: audioSourceList.length - 1);
     } catch (e) {
-      toastification.show(
-          autoCloseDuration: const Duration(seconds: 2),
-          title:
-              Text("播放音乐失败!", style: const TextStyle().useSystemChineseFont()),
-          description: Text(e.toString()),
-          type: ToastificationType.error);
-      globalTalker.error("[Music Handler] In addMusicPlay, Error occur: $e");
+      LogToast.error("添加音乐播放失败", "添加音乐 '${musicContainer.info.name}' 播放失败!",
+          "[Music Handler] In addMusicPlay, error occur: $e");
     }
   }
 

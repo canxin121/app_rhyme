@@ -5,7 +5,7 @@ use tokio::fs::create_dir_all;
 
 use crate::api::ROOT_PATH;
 
-use super::config::Config;
+use super::{cache::del_old_data, config::Config};
 
 #[flutter_rust_bridge::frb(init)]
 pub async fn init() {
@@ -19,18 +19,40 @@ pub async fn init_backend(store_root: String) -> Result<Config, anyhow::Error> {
     if !store_root.exists() {
         create_dir_all(store_root.clone()).await?;
     }
+
     // 初始化全局的储存根目录
     {
         let mut root_path = ROOT_PATH.write().await;
         *root_path = store_root.clone();
     }
+    let config = Config::load().await?;
 
-    // 构造数据库路径
-    let mut db_path = store_root.clone();
-    db_path.push("MusicData.db");
+    // 构造数据库路径, 优先使用export_cache_root
+    let db_path = match config.export_cache_root.as_ref() {
+        Some(export_root) => {
+            let mut export_root = PathBuf::from(export_root);
+            export_root.push("MusicData.db");
+            // 检测export_root是否存在，不存在的话就和None一样返回
+            if export_root.exists() {
+                export_root
+            } else {
+                store_root.push("MusicData.db");
+                store_root
+            }
+        }
+        None => {
+            store_root.push("MusicData.db");
+            store_root
+        }
+    };
+
+    if config.export_cache_root.is_some() {
+        del_old_data().await?;
+    }
+
     let db_path_str = db_path.to_str().unwrap().to_string();
-
+    println!("db_path_str: {}", db_path_str);
     SqlFactory::init_from_path(&db_path_str).await.unwrap();
 
-    Config::load().await
+    Ok(config)
 }

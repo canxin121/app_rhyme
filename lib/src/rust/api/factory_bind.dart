@@ -148,6 +148,9 @@ class SqlFactoryW {
       RustLib.instance.api.crateApiFactoryBindSqlFactoryWReplaceMusics(
           musicListName: musicListName, ids: ids, musics: musics);
 
+  static Future<void> shutdown() =>
+      RustLib.instance.api.crateApiFactoryBindSqlFactoryWShutdown();
+
   @override
   int get hashCode => 0;
 

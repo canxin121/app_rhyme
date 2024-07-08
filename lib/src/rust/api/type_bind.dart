@@ -43,6 +43,7 @@ abstract class MusicAggregatorW implements RustOpaqueInterface {
 
   Future<void> setDefaultSource({required String source});
 
+  @override
   String toString();
 }
 
@@ -60,6 +61,7 @@ abstract class MusicListW implements RustOpaqueInterface {
 
   String source();
 
+  @override
   String toString();
 }
 
@@ -78,5 +80,6 @@ abstract class MusicW implements RustOpaqueInterface {
 
   String source();
 
+  @override
   String toString();
 }

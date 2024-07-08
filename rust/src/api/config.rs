@@ -37,6 +37,14 @@ pub struct Config {
     #[frb(non_final)]
     #[serde(default = "default_true")]
     pub save_lyric_when_add_music_list: bool,
+    // 自定义的应用数据缓存路径
+    #[frb(non_final)]
+    #[serde(default)]
+    pub export_cache_root: Option<String>,
+    // 上一次的应用数据缓存路径
+    #[frb(non_final)]
+    #[serde(default)]
+    pub last_export_cache_root: Option<String>,
     // deprecated fields
     // 使用skip_serializing来避免序列化, 但是仍然可以反序列化
     // 从而实现在save时废弃这个字段，而在load时又可以兼容
@@ -57,9 +65,9 @@ fn default_false() -> bool {
     false
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Config {
+impl Config {
+    fn default(app_cache_root: &str) -> Self {
+        let config = Config {
             extern_api_path: None,
             user_agreement: false,
             extern_api: None,
@@ -69,11 +77,11 @@ impl Default for Config {
             mobile_auto_quality: mobile_auto_quality(),
             save_pic_when_add_music_list: true,
             save_lyric_when_add_music_list: true,
-        }
+            export_cache_root: None,
+            last_export_cache_root: Some(app_cache_root.to_string()),
+        };
+        config
     }
-}
-
-impl Config {
     // 解决deprecated
     pub async fn update(mut self) -> Result<Self, anyhow::Error> {
         // 1. handle deprecated field `extern_api_path`
@@ -96,7 +104,7 @@ impl Config {
         let root_path = ROOT_PATH.read().await;
         let path = root_path.clone().join("config.json");
         let mut self_ = if !path.exists() {
-            let config = Config::default();
+            let config = Config::default(root_path.to_str().unwrap());
             config.save().await?;
             config
         } else {
@@ -105,13 +113,6 @@ impl Config {
 
         // 加载之后更新一次，以便于处理deprecated
         self_ = self_.update().await?;
-
-        // // load时检查extern_api是否需要更新，从而实现自动更新
-        // // 更新extern_api的数据
-        // if let Some(extern_api) = self_.extern_api {
-        //     self_.extern_api = Some(extern_api.fetch_update().await?);
-        //     self_.save().await?;
-        // }
 
         Ok(self_)
     }

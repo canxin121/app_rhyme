@@ -658,6 +658,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fs_extra"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42703706b716c37f96a77aea830392ad231f44c9e9a67872fa5548707e11b11c"
+
+[[package]]
 name = "futures"
 version = "0.3.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1182,7 +1188,7 @@ dependencies = [
 [[package]]
 name = "music_api"
 version = "0.1.0"
-source = "git+https://github.com/canxin121/music_api#8a872880d700e07cc77b4a5fcb54d1c52fd509d7"
+source = "git+https://github.com/canxin121/music_api#4b3875228b9430adcb9c2d522a8a59b2c4f41c76"
 dependencies = [
  "aes",
  "anyhow",
@@ -1777,6 +1783,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "flutter_rust_bridge",
+ "fs_extra",
  "futures",
  "futures-util",
  "lazy_static",

@@ -1,3 +1,4 @@
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
@@ -14,7 +15,6 @@ import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import 'package:toastification/toastification.dart';
 
 // 用于执行更改本地歌单内的操作后直接刷新整个歌单页面，由于使用了 ValueKey，过渡自然
 Future<void> Function() globalMusicContainerListPageRefreshFunction =
@@ -86,13 +86,9 @@ class LocalMusicContainerListPageState
         musicContainers = aggs.map((a) => MusicContainer(a)).toList();
       });
     } catch (e) {
-      toastification.show(
-          type: ToastificationType.error,
-          title:
-              Text("加载歌曲列表", style: const TextStyle().useSystemChineseFont()),
-          description: Text("加载歌曲列表失败!:$e",
-              style: const TextStyle().useSystemChineseFont()),
-          autoCloseDuration: const Duration(seconds: 2));
+      LogToast.error("加载歌曲列表", "加载歌曲列表失败!:$e",
+          "[loadMusicContainers] Failed to load music list: $e");
+
       setState(() {
         musicContainers = [];
       });

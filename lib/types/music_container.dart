@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
@@ -10,10 +10,8 @@ import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
 import 'package:app_rhyme/utils/type_helper.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:toastification/toastification.dart';
 
 class PlayInfo {
   late String uri;
@@ -81,7 +79,10 @@ class MusicContainer {
   // 是否有缓存
   bool hasCache() {
     var cache = useCacheFile(
-        file: "", cachePath: musicCacheRoot, filename: toCacheFileName());
+        file: "",
+        cachePath: musicCacheRoot,
+        filename: toCacheFileName(),
+        exportRoot: globalConfig.exportCacheRoot);
     return cache != null;
   }
 
@@ -108,13 +109,8 @@ class MusicContainer {
     } else if (currentQuality.value != null) {
       finalQuality = currentQuality.value!;
     } else {
-      toastification.show(
-          title:
-              Text("获取播放信息失败", style: const TextStyle().useSystemChineseFont()),
-          description:
-              Text("未找到可用音质", style: const TextStyle().useSystemChineseFont()),
-          type: ToastificationType.error,
-          autoCloseDuration: const Duration(seconds: 2));
+      LogToast.error("获取播放信息失败", "未找到可用音质",
+          "[getCurrentMusicPlayInfo] Failed to get play info, no quality found");
       return null;
     }
 
@@ -122,7 +118,8 @@ class MusicContainer {
     var cache = useCacheFile(
         file: "",
         cachePath: musicCacheRoot,
-        filename: toCacheFileName(quality_: quality));
+        filename: toCacheFileName(quality_: quality),
+        exportRoot: globalConfig.exportCacheRoot);
 
     // 有本地缓存直接返回
     if (cache != null) {
@@ -133,17 +130,8 @@ class MusicContainer {
     // 没有本地缓存，也没有第三方api，直接返回null
     if (globalConfig.externApi == null) {
       // 未导入第三方音乐源，应当toast提示用户
-      toastification.show(
-          autoCloseDuration: const Duration(seconds: 2),
-          type: ToastificationType.error,
-          title: Text(
-            '获取播放信息失败',
-            style: const TextStyle().useSystemChineseFont(),
-          ),
-          description: Text('未导入第三方音乐源，无法在线获取播放信息',
-              style: const TextStyle().useSystemChineseFont()));
-
-      globalTalker.error("[getCurrentMusicPlayInfo] 无第三方音乐源,无法获取播放信息");
+      LogToast.error("获取播放信息失败", "未导入第三方音乐源，无法在线获取播放信息",
+          "[getCurrentMusicPlayInfo] Failed to get play info, no extern api");
       return null;
     }
 
@@ -188,13 +176,8 @@ class MusicContainer {
         globalTalker.info("[MusicContainer] 更新 '${info.name}' 歌词成功");
         info.lyric = lyric;
       } catch (e) {
-        toastification.show(
-            autoCloseDuration: const Duration(seconds: 2),
-            type: ToastificationType.info,
-            title:
-                Text("更新歌词失败", style: const TextStyle().useSystemChineseFont()),
-            description: Text("在线更新 '${info.name}' 歌词失败:${e.toString()}",
-                style: const TextStyle().useSystemChineseFont()));
+        LogToast.error("更新歌词失败", "在线更新歌词失败: $e",
+            "[MusicContainer] Failed to update lyric: $e");
         info.lyric = "[00:00.00]获取歌词失败";
       }
     }
@@ -240,13 +223,8 @@ class MusicContainer {
         globalTalker.info("[MusicContainer] 更新 '${info.name}' 音频资源成功");
         return true;
       } else {
-        toastification.show(
-            autoCloseDuration: const Duration(seconds: 2),
-            type: ToastificationType.info,
-            title: Text("获取播放资源失败",
-                style: const TextStyle().useSystemChineseFont()),
-            description: Text("${info.name}获取播放资源失败, 尝试换源播放",
-                style: const TextStyle().useSystemChineseFont()));
+        LogToast.error("获取播放资源失败", "${info.name}获取播放资源失败, 尝试换源播放",
+            "[MusicContainer] Failed to update audio source, try to change source");
         bool changed = await _changeSource();
         if (!changed) {
           return false;
@@ -270,16 +248,12 @@ class MusicContainer {
         extra = currentMusic.getExtraInfo(quality: info.defaultQuality!);
         audioSource =
             AudioSource.asset("assets/blank.mp3", tag: _toMediaItem());
-        currentQuality.value = info.defaultQuality;
-        toastification.show(
-            autoCloseDuration: const Duration(seconds: 2),
-            type: ToastificationType.success,
-            title: Text("切换音乐源成功",
-                style: const TextStyle().useSystemChineseFont()),
-            description: Text("${info.name}默认音源切换为$source",
-                style: const TextStyle().useSystemChineseFont()));
+        LogToast.info("切换音乐源成功", "${info.name}默认音源切换为$source",
+            "[MusicContainer] Successfully changed music source to $source");
       } catch (e) {
-        globalTalker.error("[PlayMusic] 切换音乐源失败: $e");
+        LogToast.error("切换音乐源失败", "${info.name}切换音乐源失败: $e",
+            "[MusicContainer] Failed to change music source: $e");
+
         return false;
       }
       return true;

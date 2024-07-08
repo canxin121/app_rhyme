@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:app_rhyme/dialogs/input_extern_api_link_dialog.dart';
 import 'package:app_rhyme/dialogs/quality_select_dialog.dart';
+import 'package:app_rhyme/dialogs/wait_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/extern_api.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
@@ -9,15 +11,17 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
+import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/extern_api.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:toastification/toastification.dart';
 
 class MorePage extends StatefulWidget {
   const MorePage({super.key});
@@ -184,6 +188,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
           CupertinoFormSection.insetGrouped(
             header: Text('储存设置', style: TextStyle(color: textColor)),
             children: [
+              ..._buildExportCacheRoot(context, refresh, textColor, iconColor),
               CupertinoFormRow(
                 prefix: Padding(
                     padding: const EdgeInsets.only(right: 20),
@@ -224,21 +229,11 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                       onPressed: () async {
                         try {
                           await SqlFactoryW.cleanUnusedMusicData();
-                          toastification.show(
-                              autoCloseDuration: const Duration(seconds: 2),
-                              type: ToastificationType.success,
-                              title: Text("储存清理",
-                                  style: TextStyle(color: textColor)),
-                              description: Text("清理无用歌曲数据成功",
-                                  style: TextStyle(color: textColor)));
+                          LogToast.success("储存清理", "清理无用歌曲数据成功",
+                              "[MorePage] Cleaned unused music data");
                         } catch (e) {
-                          toastification.show(
-                              autoCloseDuration: const Duration(seconds: 2),
-                              type: ToastificationType.error,
-                              title: Text("储存清理",
-                                  style: TextStyle(color: textColor)),
-                              description: Text("清理失败: ${e.toString()}",
-                                  style: TextStyle(color: textColor)));
+                          LogToast.error("储存清理", "清理无用歌曲数据失败: $e",
+                              "[MorePage] Failed to clean unused music data: $e");
                         }
                       },
                       child: const Icon(
@@ -326,19 +321,11 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                 try {
                   await Clipboard.setData(
                       ClipboardData(text: globalConfig.externApi!.url!));
-                  toastification.show(
-                      autoCloseDuration: const Duration(seconds: 2),
-                      type: ToastificationType.success,
-                      title: Text("音源链接", style: TextStyle(color: textColor)),
-                      description:
-                          Text("已复制至剪切板", style: TextStyle(color: textColor)));
+                  LogToast.success("音源链接", "已复制至剪切板",
+                      "[MorePage] Copied extern api link to clipboard");
                 } catch (e) {
-                  toastification.show(
-                      autoCloseDuration: const Duration(seconds: 2),
-                      type: ToastificationType.error,
-                      title: Text("音源链接", style: TextStyle(color: textColor)),
-                      description: Text("复制链接失败:${e.toString()}",
-                          style: TextStyle(color: textColor)));
+                  LogToast.error("音源链接", "复制链接失败: $e",
+                      "[MorePage] Failed to copy extern api link: $e");
                 }
               },
             )));
@@ -430,10 +417,11 @@ class ImportExternApiMenu extends StatelessWidget {
             FilePickerResult? result = await FilePicker.platform.pickFiles();
 
             if (result != null) {
-              var path = await cacheFile(
-                  file: result.files.single.path!,
-                  cachePath: "",
-                  filename: "extern_api_cache");
+              var path = await cacheFileHelper(
+                result.files.single.path!,
+                "",
+                filename: "extern_api_cache",
+              );
               try {
                 var externApi = await ExternApi.fromPath(path: path);
                 globalConfig.externApi = externApi;
@@ -531,4 +519,92 @@ CupertinoFormSection _buildQualitySelectSection(
     header: Text('音质选择', style: TextStyle(color: textColor)),
     children: children,
   );
+}
+
+List<CupertinoFormRow> _buildExportCacheRoot(BuildContext context,
+    void Function() refresh, Color textColor, Color iconColor) {
+  Future<void> exportCacheRoot() async {
+    var path = await pickDirectory();
+    if (context.mounted && path != null) {
+      try {
+        try {
+          await showWaitDialog(context, "正在迁移数据,稍后将自动退出应用以应用更改");
+          await globalAudioHandler.clear();
+          await SqlFactoryW.shutdown();
+          late String originRootPath;
+          if (globalConfig.exportCacheRoot != null &&
+              globalConfig.exportCacheRoot!.isNotEmpty) {
+            originRootPath = globalConfig.exportCacheRoot!;
+          } else {
+            originRootPath = "$globalDocumentPath/AppRhyme";
+          }
+          await copyDirectory(
+              src: "$originRootPath/$picCacheRoot", dst: "$path/$picCacheRoot");
+          await copyDirectory(
+              src: "$originRootPath/$musicCacheRoot",
+              dst: "$path/$musicCacheRoot");
+          await copyFile(
+              from: "$originRootPath/MusicData.db", to: "$path/MusicData.db");
+
+          globalConfig.lastExportCacheRoot = globalConfig.exportCacheRoot;
+          globalConfig.exportCacheRoot = path;
+          globalConfig.save();
+          if (context.mounted) {
+            context.findAncestorStateOfType<MorePageState>()?.refresh();
+          }
+          await SqlFactoryW.initFromPath(filepath: "$path/MusicData.db");
+        } finally {
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        }
+        try {
+          if (context.mounted) {
+            await showWaitDialog(context,
+                "应用将在3秒后退出\n下次打开时将删除旧数据, 并应用迁移后新数据\n如未正常退出, 请关闭应用后重新打开");
+          }
+          await Future.delayed(const Duration(seconds: 3));
+        } finally {
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+          if (Platform.isAndroid || Platform.isIOS) {
+            await FlutterExitApp.exitApp(iosForceExit: true);
+          } else {
+            exit(0);
+          }
+        }
+      } catch (e) {
+        LogToast.error("设置自定义数据目录", "数据迁移失败: $e", "[exportCacheRoot] $e");
+      }
+    }
+  }
+
+  List<CupertinoFormRow> children = [];
+  if (globalConfig.exportCacheRoot == null) {
+    children.add(
+      CupertinoFormRow(
+        prefix: Text(
+          '选择自定义数据目录',
+          style: TextStyle(color: textColor),
+        ),
+        child: CupertinoButton(
+          onPressed: () async {
+            await exportCacheRoot();
+          },
+          child: Icon(CupertinoIcons.folder, color: iconColor),
+        ),
+      ),
+    );
+  } else {
+    children.add(CupertinoFormRow(
+        prefix: Text("自定义数据目录", style: TextStyle(color: textColor)),
+        child: CupertinoButton(
+            onPressed: () async {
+              await exportCacheRoot();
+            },
+            child: Text(globalConfig.exportCacheRoot!,
+                style: TextStyle(color: textColor)))));
+  }
+  return children;
 }

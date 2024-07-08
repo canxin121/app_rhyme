@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:app_rhyme/utils/logger.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:toastification/toastification.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<T> shuffleList<T>(List<T> items) {
@@ -28,12 +28,21 @@ void openProjectLink() async {
   } else {
     await Clipboard.setData(
         const ClipboardData(text: "https://github.com/canxin121/app_rhyme"));
-    toastification.show(
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-        title:
-            Text("打开项目页面失败", style: const TextStyle().useSystemChineseFont()),
-        description: Text("已复制链接到剪切板，请在浏览器中打开",
-            style: const TextStyle().useSystemChineseFont()));
+    LogToast.error("打开项目页面失败", "已复制链接到剪切板，请在浏览器中打开",
+        "[openProjectLink] Failed to launch github url, copied to clipboard");
+  }
+}
+
+Future<String?> pickDirectory() async {
+  // 请求存储权限
+  if (await Permission.storage.request().isGranted) {
+    // 使用file_picker选择目录
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    return selectedDirectory;
+  } else {
+    // 权限被拒绝
+    LogToast.error("未授予存储权限", "请在设置中授予AppRhyme存储权限",
+        "[pickDirectory] Storage permission not granted");
+    return null;
   }
 }

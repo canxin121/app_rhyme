@@ -17,7 +17,7 @@ late ExternApiEvaler? globalExternApiEvaler;
 late AudioHandler globalAudioHandler;
 late AudioUiController globalAudioUiController;
 late PackageInfo globalPackageInfo;
-
+late String globalDocumentPath;
 late Connectivity globalConnectivity;
 ConnectivityStateSimple globalConnectivityStateSimple =
     ConnectivityStateSimple.none;
@@ -26,9 +26,9 @@ ConnectivityStateSimple globalConnectivityStateSimple =
 // 即可用于在App启动时也可用于配置更新时
 Future<void> initGlobalVars() async {
   // 初始化rust全局配置，将documentPath设置为应用程序文档目录
-  String documentPath = (await getApplicationDocumentsDirectory()).path;
+  globalDocumentPath = (await getApplicationDocumentsDirectory()).path;
   // 初始化全局变量globalConfig
-  globalConfig = await initBackend(storeRoot: documentPath);
+  globalConfig = await initBackend(storeRoot: globalDocumentPath);
   // 初始化全局变量globalExternApi
   if (globalConfig.externApi != null) {
     globalExternApiEvaler = ExternApiEvaler(globalConfig.externApi!.localPath);

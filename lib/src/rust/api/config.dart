@@ -7,8 +7,7 @@ import '../frb_generated.dart';
 import 'extern_api.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `default_false`, `default_true`, `mobile_auto_quality`, `wifi_auto_quality`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `default`
+// These functions are ignored because they are not marked as `pub`: `default_false`, `default_true`, `default`, `mobile_auto_quality`, `wifi_auto_quality`
 // These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `update`
 
 class Config {
@@ -20,6 +19,8 @@ class Config {
   String mobileAutoQuality;
   bool savePicWhenAddMusicList;
   bool saveLyricWhenAddMusicList;
+  String? exportCacheRoot;
+  String? lastExportCacheRoot;
   final String? externApiPath;
 
   Config({
@@ -31,6 +32,8 @@ class Config {
     required this.mobileAutoQuality,
     required this.savePicWhenAddMusicList,
     required this.saveLyricWhenAddMusicList,
+    this.exportCacheRoot,
+    this.lastExportCacheRoot,
     this.externApiPath,
   });
 
@@ -51,6 +54,8 @@ class Config {
       mobileAutoQuality.hashCode ^
       savePicWhenAddMusicList.hashCode ^
       saveLyricWhenAddMusicList.hashCode ^
+      exportCacheRoot.hashCode ^
+      lastExportCacheRoot.hashCode ^
       externApiPath.hashCode;
 
   @override
@@ -66,5 +71,7 @@ class Config {
           mobileAutoQuality == other.mobileAutoQuality &&
           savePicWhenAddMusicList == other.savePicWhenAddMusicList &&
           saveLyricWhenAddMusicList == other.saveLyricWhenAddMusicList &&
+          exportCacheRoot == other.exportCacheRoot &&
+          lastExportCacheRoot == other.lastExportCacheRoot &&
           externApiPath == other.externApiPath;
 }

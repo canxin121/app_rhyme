@@ -1,5 +1,5 @@
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:chinese_font_library/chinese_font_library.dart';
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
@@ -10,7 +10,6 @@ import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import 'package:toastification/toastification.dart';
 
 void Function() globalMusicListGridPageRefreshFunction = () {};
 
@@ -54,13 +53,8 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
         musicLists = loadedLists;
       });
     } catch (e) {
-      toastification.show(
-          type: ToastificationType.error,
-          title:
-              Text("加载歌单列表", style: const TextStyle().useSystemChineseFont()),
-          description: Text("加载歌单列表失败!",
-              style: const TextStyle().useSystemChineseFont()),
-          autoCloseDuration: const Duration(seconds: 2));
+      LogToast.error("加载歌单列表", "加载歌单列表失败: $e",
+          "[loadMusicLists] Failed to load music lists: $e");
     }
   }
 
@@ -156,8 +150,6 @@ class MusicListGridPageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDarkMode = brightness == Brightness.dark;
 
     return PullDownButton(
       itemBuilder: (context) => [
@@ -170,47 +162,11 @@ class MusicListGridPageMenu extends StatelessWidget {
                   await SqlFactoryW.createMusiclist(
                       musicListInfos: [musicListInfo]);
                   globalMusicListGridPageRefreshFunction();
-                  toastification.show(
-                    autoCloseDuration: const Duration(seconds: 2),
-                    type: ToastificationType.success,
-                    title: Text(
-                      '创建歌单',
-                      style: TextStyle(
-                        color: isDarkMode
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                      ).useSystemChineseFont(),
-                    ),
-                    description: Text(
-                      '创建歌单成功',
-                      style: TextStyle(
-                        color: isDarkMode
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                      ).useSystemChineseFont(),
-                    ),
-                  );
+                  LogToast.success("创建歌单", "创建歌单成功",
+                      "[MusicListGridPageMenu] Successfully created music list");
                 } catch (e) {
-                  toastification.show(
-                    autoCloseDuration: const Duration(seconds: 2),
-                    type: ToastificationType.error,
-                    title: Text(
-                      '创建歌单',
-                      style: TextStyle(
-                        color: isDarkMode
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                      ).useSystemChineseFont(),
-                    ),
-                    description: Text(
-                      '创建歌单失败: $e',
-                      style: TextStyle(
-                        color: isDarkMode
-                            ? CupertinoColors.white
-                            : CupertinoColors.black,
-                      ).useSystemChineseFont(),
-                    ),
-                  );
+                  LogToast.error("创建歌单", "创建歌单失败: $e",
+                      "[MusicListGridPageMenu] Failed to create music list: $e");
                 }
               }
             }

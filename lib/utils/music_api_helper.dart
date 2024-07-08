@@ -1,7 +1,8 @@
 // Helper functions for actions
 
+import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:chinese_font_library/chinese_font_library.dart';
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/dialogs/music_container_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
@@ -16,7 +17,6 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'package:toastification/toastification.dart';
 
 Future<void> deleteFromMusicList(BuildContext context,
     MusicContainer musicContainer, MusicListW musicListW) async {
@@ -26,12 +26,8 @@ Future<void> deleteFromMusicList(BuildContext context,
         ids: Int64List.fromList([musicContainer.info.id]));
     await globalMusicContainerListPageRefreshFunction();
   } catch (e) {
-    toastification.show(
-      type: ToastificationType.error,
-      title: Text("删除失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("删除音乐失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("删除音乐失败", "删除音乐'${musicContainer.info.name}'失败: $e",
+        "[deleteFromMusicList] Failed to delete music: $e");
   }
 }
 
@@ -43,21 +39,11 @@ Future<void> deleteMusicCache(MusicContainer musicContainer) async {
         cachePath: musicCacheRoot,
         filename: musicContainer.toCacheFileName());
     await globalMusicContainerListPageRefreshFunction();
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.success,
-      title: Text("删除成功", style: const TextStyle().useSystemChineseFont()),
-      description: Text("成功删除: ${musicContainer.info.name}",
-          style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.success("删除缓存成功", "成功删除缓存: ${musicContainer.info.name}",
+        "[deleteMusicCache] Successfully deleted cache: ${musicContainer.info.name}");
   } catch (e) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("删除失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("删除音乐失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("删除缓存失败", "删除缓存'${musicContainer.info.name}'失败: $e",
+        "[deleteMusicCache] Failed to delete cache: $e");
   }
 }
 
@@ -68,26 +54,14 @@ Future<void> cacheMusic(MusicContainer musicContainer) async {
       return;
     }
     var playinfo = musicContainer.playInfo;
-    await cacheFile(
-        file: playinfo!.uri,
-        cachePath: musicCacheRoot,
+    await cacheFileHelper(playinfo!.uri, musicCacheRoot,
         filename: musicContainer.toCacheFileName());
     await globalMusicContainerListPageRefreshFunction();
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.success,
-      title: Text("缓存成功", style: const TextStyle().useSystemChineseFont()),
-      description: Text("成功缓存: ${musicContainer.info.name}",
-          style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.success("缓存成功", "成功缓存: ${musicContainer.info.name}",
+        "[cacheMusic] Successfully cached: ${musicContainer.info.name}");
   } catch (e) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("缓存失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("缓存音乐失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("缓存失败", "缓存'${musicContainer.info.name}'失败: $e",
+        "[cacheMusic] Failed to cache: $e");
   }
 }
 
@@ -101,22 +75,12 @@ Future<void> editMusicInfo(
     }
     await SqlFactoryW.changeMusicInfo(
         musics: [musicContainer.currentMusic], newInfos: [musicInfo]);
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.success,
-      title: Text("编辑成功", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("编辑音乐信息成功", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.success(
+        "编辑成功", "编辑音乐信息成功", "[editMusicInfo] Successfully edited music info");
     await globalMusicContainerListPageRefreshFunction();
   } catch (e) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("编辑失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("编辑音乐信息失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("编辑失败", "编辑音乐信息失败: $e",
+        "[editMusicInfo] Failed to edit music info: $e");
   }
 }
 
@@ -137,13 +101,8 @@ Future<void> viewAlbum(
       );
     }
   } catch (e) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("查看专辑失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("查看专辑失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error(
+        "查看专辑失败", "查看专辑失败: $e", "[viewAlbum] Failed to view album: $e");
   }
 }
 
@@ -158,28 +117,20 @@ Future<void> addToMusicList(
       if (globalConfig.savePicWhenAddMusicList &&
           musicContainer.info.artPic != null &&
           musicContainer.info.artPic!.isNotEmpty) {
-        cacheFile(file: musicContainer.info.artPic!, cachePath: picCacheRoot);
+        cacheFileHelper(musicContainer.info.artPic!, picCacheRoot);
       }
       await SqlFactoryW.addMusics(
           musicsListName: targetMusicList.getMusiclistInfo().name,
           musics: [musicContainer.aggregator]);
       await globalMusicContainerListPageRefreshFunction();
 
-      toastification.show(
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.success,
-        title: Text("添加成功", style: const TextStyle().useSystemChineseFont()),
-        description: Text(
-            "成功添加'${musicContainer.info.name}'到: ${targetMusicList.getMusiclistInfo().name}"),
-      );
+      LogToast.success(
+          "添加成功",
+          "成功添加'${musicContainer.info.name}'到: ${targetMusicList.getMusiclistInfo().name}",
+          "[addToMusicList] Successfully added '${musicContainer.info.name}' to: ${targetMusicList.getMusiclistInfo().name}");
     } catch (e) {
-      toastification.show(
-        autoCloseDuration: const Duration(seconds: 2),
-        type: ToastificationType.error,
-        title: Text("添加失败", style: const TextStyle().useSystemChineseFont()),
-        description:
-            Text("添加音乐失败: $e", style: const TextStyle().useSystemChineseFont()),
-      );
+      LogToast.error(
+          "添加失败", "添加音乐失败: $e", "[addToMusicList] Failed to add music: $e");
     }
   }
 }
@@ -196,7 +147,7 @@ Future<void> createNewMusicList(
     return;
   }
   if (newMusicListInfo.artPic.isNotEmpty) {
-    cacheFile(file: newMusicListInfo.artPic, cachePath: picCacheRoot);
+    cacheFileHelper(newMusicListInfo.artPic, picCacheRoot);
   }
   try {
     await SqlFactoryW.createMusiclist(musicListInfos: [newMusicListInfo]);
@@ -206,7 +157,7 @@ Future<void> createNewMusicList(
     if (globalConfig.savePicWhenAddMusicList &&
         musicContainer.info.artPic != null &&
         musicContainer.info.artPic!.isNotEmpty) {
-      cacheFile(file: musicContainer.info.artPic!, cachePath: picCacheRoot);
+      cacheFileHelper(musicContainer.info.artPic!, picCacheRoot);
     }
     await SqlFactoryW.addMusics(
         musicsListName: newMusicListInfo.name,
@@ -214,21 +165,11 @@ Future<void> createNewMusicList(
     globalMusicListGridPageRefreshFunction();
     await globalMusicContainerListPageRefreshFunction();
 
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.success,
-      title: Text("添加成功", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("成功添加'${musicContainer.info.name}'到新歌单${newMusicListInfo.name}"),
-    );
+    LogToast.success("创建成功", "成功创建新歌单: ${newMusicListInfo.name}",
+        "[createNewMusicList] Successfully created new music list: ${newMusicListInfo.name}");
   } catch (e) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("添加失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("添加音乐失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("创建失败", "创建歌单失败: $e",
+        "[createNewMusicList] Failed to create music list: $e");
   }
 }
 
@@ -236,13 +177,8 @@ Future<void> setAsMusicListCover(
     MusicContainer musicContainer, MusicListW musicListW) async {
   var picLink = musicContainer.info.artPic;
   if (picLink == null || picLink.isEmpty) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("设置封面失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("歌曲没有封面", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("设置封面失败", "歌曲没有封面",
+        "[setAsMusicListCover] Failed to set cover: music has no cover");
     return;
   }
   var oldMusicListInfo = musicListW.getMusiclistInfo();
@@ -257,21 +193,11 @@ Future<void> setAsMusicListCover(
         old: [oldMusicListInfo], new_: [newMusicListInfo]);
     await globalMusicContainerListPageRefreshFunction();
     globalMusicListGridPageRefreshFunction();
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.success,
-      title: Text("设置封面成功", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("成功设置为封面", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.success(
+        "设置封面成功", "成功设置为封面", "[setAsMusicListCover] Successfully set as cover");
   } catch (e) {
-    toastification.show(
-      autoCloseDuration: const Duration(seconds: 2),
-      type: ToastificationType.error,
-      title: Text("设置封面失败", style: const TextStyle().useSystemChineseFont()),
-      description:
-          Text("设置封面失败: $e", style: const TextStyle().useSystemChineseFont()),
-    );
+    LogToast.error("设置封面失败", "设置封面失败: $e",
+        "[setAsMusicListCover] Failed to set cover: $e");
   }
 }
 
