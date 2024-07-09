@@ -129,7 +129,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                 ),
                 child: CupertinoButton(
                   onPressed: () async {
-                    await checkVersionUpdate(context);
+                    await checkVersionUpdate(context, true);
                   },
                   child: Icon(CupertinoIcons.cloud, color: iconColor),
                 ),
@@ -336,7 +336,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
             prefix: Text('检查更新', style: TextStyle(color: textColor)),
             child: CupertinoButton(
               onPressed: () async {
-                await checkExternApiUpdate(context);
+                await checkExternApiUpdate(context, true);
                 setState(() {});
               },
               child: Icon(CupertinoIcons.cloud, color: iconColor),

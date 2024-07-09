@@ -70,14 +70,27 @@ pub struct Asset {
 }
 
 pub async fn get_release() -> Result<Release, anyhow::Error> {
-    let url = "https://api.github.com/repos/canxin121/app_rhyme/releases/latest";
+    let back_url = "https://raw.githubusercontent.com/canxin121/app_rhyme/main/Release_latest.json";
+    let url = "https://cdn.jsdelivr.net/gh/canxin121/app_rhyme@main/Release_latest.json";
+
     let resp = CLIENT
         .get(url)
         .header(USER_AGENT, HeaderValue::from_static("AppRhyme"))
         .send()
-        .await?;
+        .await;
 
-    let release = resp.json::<Release>().await?;
+    let release = match resp {
+        Ok(resp) => resp.json::<Release>().await?,
+        Err(_) => {
+            let back_resp = CLIENT
+                .get(back_url)
+                .header(USER_AGENT, HeaderValue::from_static("AppRhyme"))
+                .send()
+                .await?;
+            back_resp.json::<Release>().await?
+        }
+    };
+
     Ok(release)
 }
 
