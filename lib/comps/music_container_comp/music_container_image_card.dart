@@ -82,23 +82,23 @@ class MusicContainerImageCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Flexible(
-                  child: Center(
-                    child: ArtistsMenu(
-                        artists: musicContainer.info.artist,
-                        builder: (_, showMenu) => GestureDetector(
-                              onTap: () {
-                                showMenu();
-                              },
-                              child: Text(
-                                musicContainer.info.artist.join(", "),
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            )),
-                  ),
-                ),
+                // const SizedBox(height: 4),
+                // Flexible(
+                //   child: Center(
+                //     child: ArtistsMenu(
+                //         artists: musicContainer.info.artist,
+                //         builder: (_, showMenu) => GestureDetector(
+                //               onTap: () {
+                //                 showMenu();
+                //               },
+                //               child: Text(
+                //                 musicContainer.info.artist.join(", "),
+                //                 textAlign: TextAlign.center,
+                //                 overflow: TextOverflow.ellipsis,
+                //               ),
+                //             )),
+                //   ),
+                // ),
               ],
             ),
           );

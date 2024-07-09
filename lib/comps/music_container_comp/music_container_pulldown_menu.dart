@@ -188,11 +188,11 @@ class MusicContainerMenu extends StatelessWidget {
         title: '查看专辑',
         icon: CupertinoIcons.music_albums,
       ),
-      PullDownMenuItem(
-        onTap: () {},
-        title: '搜索歌手',
-        icon: CupertinoIcons.profile_circled,
-      ),
+      // PullDownMenuItem(
+      //   onTap: () {},
+      //   title: '搜索歌手',
+      //   icon: CupertinoIcons.profile_circled,
+      // ),
     ];
   }
 }

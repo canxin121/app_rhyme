@@ -1,21 +1,25 @@
 # AppRhyme
 ## 果韵
+使用Flutter和Rust开发的跨平台`自定义音源`音乐播放器 
 
-# 已实现功能
+后端Rust库仓库[music_api](https://github.com/canxin121/music_api)，实现了MusicAggregator和MusicList的Trait Object封装。实现了便捷的跨(音乐)平台音乐`聚合`和`换源`，提供了统一的接口便于开发使用。
+
+### 支持的音乐平台:
+- 网易云音乐
+- 酷我音乐
+
+### 功能:
 - 移动设备视图
-- 音乐搜索
-- 歌单搜索
-- 查看专辑
-- 音乐歌单储存
-- 歌词,待播列表
-- 载入用户自定义第三方音源
-- 音乐播放(由用户的音源提供)
-- 音乐缓存(由用户的音源提供)
-
-![display1](assets/display1.jpeg)
-![display2](assets/display2.jpeg)
-
-本应用正在积极开发中，更多功能很快就会到来
+- 自适应黑夜模式
+- 应用本体更新检测
+- 导入音源链接并自动检测更新
+- 音乐播放和缓存(由用户自定义音源提供音乐数据)
+- 应用音量调节
+- 应用内歌词显示，待播清单
+- 音乐、歌单搜索, 专辑查看
+- 通过链接导入歌单
+- 自定义数据存储目录
+- wifi/数据下音质选择
 
 ------
 本协议中的“本项目”指AppRhyme项目；“使用者”指签署本协议的使用者；“官方音乐平台”指对本项目内置的包括酷我、酷狗、咪咕等音乐源的官方平台统称；“版权数据”指包括但不限于图像、音频、名字等在内的他人拥有所属版权的数据。
@@ -24,16 +28,6 @@
 
 本项目无力提供音乐播放链接或音频文件，只具备从各官方音乐平台的官方公开数据库中检索和提供音乐的基本信息和自定义歌单存储的功能。
 如需音乐播放和缓存功能，请自行制作和使用音源链接自己的音乐库，用户的第三方音源内容与本项目无关，本项目无法提供相关支持。
-
-## Star 历史
-
-<a href="https://star-history.com/#canxin121/app_rhyme&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date" />
- </picture>
-</a>
 
 # 数据源
 
@@ -65,6 +59,17 @@
 
 本项目不接受任何商业合作，不接受任何商业捐赠。
 本项目欢迎开源代码贡献和ui设计贡献，但请贡献内容符合法律法规和协议要求。
+
+# Star 历史
+
+<a href="https://star-history.com/#canxin121/app_rhyme&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=canxin121/app_rhyme&type=Date" />
+ </picture>
+</a>
+
 
 # 协议
 

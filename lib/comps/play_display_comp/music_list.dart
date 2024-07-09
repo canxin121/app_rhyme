@@ -36,6 +36,9 @@ class MusicListComp extends StatelessWidget {
                     musicContainer: musics[index],
                     inPlayList: true,
                     isDark: true,
+                    onTap: () {
+                      globalAudioHandler.seek(Duration.zero, index: index);
+                    },
                   ),
                 ),
                 itemCount: musics.length,
