@@ -528,6 +528,12 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
   Future<void> exportCacheRoot(bool copy) async {
     var path = await pickDirectory();
     if (path == null) return;
+    if (globalConfig.exportCacheRoot != null &&
+        globalConfig.exportCacheRoot == path) {
+      LogToast.info("数据设定", "与原文件夹相同, 无需操作",
+          "[exportCacheRoot] Same as original folder, no need to operate");
+      return;
+    }
     try {
       try {
         if (context.mounted) {
