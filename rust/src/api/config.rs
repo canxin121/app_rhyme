@@ -8,6 +8,7 @@ use super::{extern_api::ExternApi, ROOT_PATH};
 #[frb(non_opaque)]
 pub struct Config {
     // 用户是否同意使用协议
+    #[frb(non_final)]
     #[serde(default = "default_false")]
     pub user_agreement: bool,
     // 自定义音源

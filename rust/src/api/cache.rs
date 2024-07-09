@@ -1,4 +1,4 @@
-use fs_extra::dir::CopyOptions;
+use anyhow::Result;
 use futures::StreamExt as _;
 use lazy_static::lazy_static;
 use music_api::util::CLIENT;
@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
+use tokio::fs;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::Semaphore;
 
@@ -171,42 +172,54 @@ pub async fn rename(from: &str, to: &str) -> Result<(), anyhow::Error> {
 }
 
 #[flutter_rust_bridge::frb]
-pub fn copy_file(from: &str, to: &str) -> Result<(), anyhow::Error> {
+pub async fn copy_file(from: &str, to: &str) -> Result<(), anyhow::Error> {
     let from_path = Path::new(from);
     let to_path = Path::new(to);
+
     // 如果目标文件存在, 则删除
     if to_path.exists() {
-        std::fs::remove_file(to_path)?;
+        fs::remove_file(to_path).await?;
     }
 
     // 如果目标目录不存在, 则创建
-    if !to_path.parent().unwrap().exists() {
-        std::fs::create_dir_all(to_path.parent().unwrap())?;
+    if let Some(parent) = to_path.parent() {
+        if !parent.exists() {
+            fs::create_dir_all(parent).await?;
+        }
     }
 
-    fs_extra::file::copy(from_path, to_path, &fs_extra::file::CopyOptions::new())?;
+    fs::copy(from_path, to_path).await?;
     Ok(())
 }
 
 #[flutter_rust_bridge::frb]
-pub fn copy_directory(src: &str, dst: &str) -> Result<(), anyhow::Error> {
+pub async fn copy_directory(src: &str, dst: &str) -> Result<(), anyhow::Error> {
     let src_path = Path::new(src);
-    println!("src_path: {:?}", src_path);
     let dst_path = Path::new(dst);
-    println!("dst_path: {:?}", dst_path);
-    if dst_path.exists() {
-        std::fs::remove_dir_all(dst_path)?;
+
+    if !dst_path.exists() {
+        fs::create_dir_all(dst_path).await?;
     }
-    std::fs::create_dir_all(dst_path)?;
 
     // 如果源目录不存在, 则直接返回, 不需要拷贝
     if !src_path.exists() {
         return Ok(());
     }
 
-    let options = CopyOptions::new();
+    let mut entries = fs::read_dir(src_path).await?;
+    while let Some(entry) = entries.next_entry().await? {
+        let entry_path = entry.path();
+        if entry_path.is_file() {
+            let file_name = entry.file_name();
+            let dst_file_path = dst_path.join(file_name);
+            copy_file(
+                entry_path.to_str().unwrap(),
+                dst_file_path.to_str().unwrap(),
+            )
+            .await?;
+        }
+    }
 
-    fs_extra::dir::copy(src_path, dst_path, &options)?;
     Ok(())
 }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/dialogs/input_extern_api_link_dialog.dart';
 import 'package:app_rhyme/dialogs/quality_select_dialog.dart';
 import 'package:app_rhyme/dialogs/wait_dialog.dart';
@@ -19,7 +20,6 @@ import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
@@ -185,10 +185,12 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
           _buildQualitySelectSection(context, () {
             setState(() {});
           }, textColor),
+          // IOS系统无法直接访问文件系统，且已开启在文件中显示应用数据，所以不显示此选项
+          if (!Platform.isIOS)
+            _buildExportCacheRoot(context, refresh, textColor, iconColor),
           CupertinoFormSection.insetGrouped(
             header: Text('储存设置', style: TextStyle(color: textColor)),
             children: [
-              ..._buildExportCacheRoot(context, refresh, textColor, iconColor),
               CupertinoFormRow(
                 prefix: Padding(
                     padding: const EdgeInsets.only(right: 20),
@@ -521,23 +523,26 @@ CupertinoFormSection _buildQualitySelectSection(
   );
 }
 
-List<CupertinoFormRow> _buildExportCacheRoot(BuildContext context,
+CupertinoFormSection _buildExportCacheRoot(BuildContext context,
     void Function() refresh, Color textColor, Color iconColor) {
-  Future<void> exportCacheRoot() async {
+  Future<void> exportCacheRoot(bool copy) async {
     var path = await pickDirectory();
-    if (context.mounted && path != null) {
+    if (path == null) return;
+    try {
       try {
-        try {
-          await showWaitDialog(context, "正在迁移数据,稍后将自动退出应用以应用更改");
-          await globalAudioHandler.clear();
-          await SqlFactoryW.shutdown();
-          late String originRootPath;
-          if (globalConfig.exportCacheRoot != null &&
-              globalConfig.exportCacheRoot!.isNotEmpty) {
-            originRootPath = globalConfig.exportCacheRoot!;
-          } else {
-            originRootPath = "$globalDocumentPath/AppRhyme";
-          }
+        if (context.mounted) {
+          await showWaitDialog(context, "正在处理中,稍后将自动退出应用以应用更改");
+        }
+        await globalAudioHandler.clear();
+        await SqlFactoryW.shutdown();
+        late String originRootPath;
+        if (globalConfig.exportCacheRoot != null &&
+            globalConfig.exportCacheRoot!.isNotEmpty) {
+          originRootPath = globalConfig.exportCacheRoot!;
+        } else {
+          originRootPath = "$globalDocumentPath/AppRhyme";
+        }
+        if (copy) {
           await copyDirectory(
               src: "$originRootPath/$picCacheRoot", dst: "$path/$picCacheRoot");
           await copyDirectory(
@@ -545,70 +550,121 @@ List<CupertinoFormRow> _buildExportCacheRoot(BuildContext context,
               dst: "$path/$musicCacheRoot");
           await copyFile(
               from: "$originRootPath/MusicData.db", to: "$path/MusicData.db");
+        }
 
-          globalConfig.lastExportCacheRoot = globalConfig.exportCacheRoot;
-          globalConfig.exportCacheRoot = path;
-          globalConfig.save();
-          if (context.mounted) {
-            context.findAncestorStateOfType<MorePageState>()?.refresh();
-          }
-          await SqlFactoryW.initFromPath(filepath: "$path/MusicData.db");
-        } finally {
-          if (context.mounted) {
-            Navigator.pop(context);
-          }
+        globalConfig.lastExportCacheRoot = globalConfig.exportCacheRoot;
+        globalConfig.exportCacheRoot = path;
+        globalConfig.save();
+        if (context.mounted) {
+          context.findAncestorStateOfType<MorePageState>()?.refresh();
         }
-        try {
-          if (context.mounted) {
-            await showWaitDialog(context,
-                "应用将在3秒后退出\n下次打开时将删除旧数据, 并应用迁移后新数据\n如未正常退出, 请关闭应用后重新打开");
-          }
-          await Future.delayed(const Duration(seconds: 3));
-        } finally {
-          if (context.mounted) {
-            Navigator.pop(context);
-          }
-          if (Platform.isAndroid || Platform.isIOS) {
-            await FlutterExitApp.exitApp(iosForceExit: true);
-          } else {
-            exit(0);
-          }
+        await SqlFactoryW.initFromPath(filepath: "$path/MusicData.db");
+      } finally {
+        if (context.mounted) {
+          Navigator.pop(context);
         }
-      } catch (e) {
-        LogToast.error("设置自定义数据目录", "数据迁移失败: $e", "[exportCacheRoot] $e");
       }
+      try {
+        if (context.mounted) {
+          await showWaitDialog(context,
+              "应用将在3秒后退出\n下次打开时将删除旧文件夹下数据, 并应用新文件夹下数据\n如未正常退出, 请关闭应用后重新打开");
+        }
+        await Future.delayed(const Duration(seconds: 3));
+      } finally {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+        await exitApp();
+      }
+    } catch (e) {
+      LogToast.error("数据设定", "数据设定失败: $e", "[exportCacheRoot] $e");
     }
   }
 
   List<CupertinoFormRow> children = [];
-
-  // Ios 没有外部存储访问权限，因此取消此项设定
-  if (Platform.isIOS) return children;
-
   if (globalConfig.exportCacheRoot == null) {
-    children.add(
-      CupertinoFormRow(
-        prefix: Text(
-          '选择自定义数据目录',
-          style: TextStyle(color: textColor),
-        ),
-        child: CupertinoButton(
-          onPressed: () async {
-            await exportCacheRoot();
-          },
-          child: Icon(CupertinoIcons.folder, color: iconColor),
-        ),
-      ),
-    );
+    children.add(CupertinoFormRow(
+        prefix: Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Text(
+              '当前数据状态',
+              style: TextStyle(color: textColor),
+            )),
+        child: Container(
+            padding: const EdgeInsets.only(right: 10),
+            alignment: Alignment.centerRight,
+            height: 50,
+            child: Text(
+              "应用内部数据",
+              style: TextStyle(color: textColor),
+            ))));
   } else {
     children.add(CupertinoFormRow(
-        prefix: Text("自定义数据目录", style: TextStyle(color: textColor)),
-        child: CupertinoButton(
-            onPressed: () async {
-              await exportCacheRoot();
-            },
-            child: Text(globalConfig.exportCacheRoot!,
-                style: TextStyle(color: textColor)))));
+        prefix: Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Text(
+              '当前数据文件夹',
+              style: TextStyle(color: textColor),
+            )),
+        child: Container(
+            padding: const EdgeInsets.only(right: 10),
+            alignment: Alignment.centerRight,
+            height: 50,
+            child: Text(
+              globalConfig.exportCacheRoot!,
+              style: TextStyle(color: textColor),
+            ))));
   }
-  return children;
+  children.add(
+    CupertinoFormRow(
+      prefix: Text(
+        '迁移数据文件夹',
+        style: TextStyle(color: textColor),
+      ),
+      child: CupertinoButton(
+        onPressed: () async {
+          var confirm = await showConfirmationDialog(
+              context,
+              "注意!\n"
+              "迁移数据将会将当前使用文件夹下的数据迁移到新的文件夹下\n"
+              "请确保新的文件夹下没有AppRhyme的数据, 否则会导致该文件夹中数据完全丢失!!!\n"
+              "如果你想直接使用指定文件夹下的数据, 请使用'使用数据'功能\n"
+              "操作后应用将会自动退出, 请重新打开应用以应用更改\n"
+              "是否继续?");
+          if (confirm != null && confirm) {
+            await exportCacheRoot(true);
+          }
+        },
+        child: Icon(CupertinoIcons.folder, color: iconColor),
+      ),
+    ),
+  );
+  children.add(
+    CupertinoFormRow(
+      prefix: Text(
+        '使用数据文件夹',
+        style: TextStyle(color: textColor),
+      ),
+      child: CupertinoButton(
+        onPressed: () async {
+          var confirm = await showConfirmationDialog(
+              context,
+              "注意!\n"
+              "使用数据将会直接使用指定文件夹下的数据, 请确保指定下有正确的数据\n"
+              "这将会导致当前使用的文件夹下的数据完全丢失!!!\n"
+              "如果你想迁移数据, 请使用'迁移数据'功能\n"
+              "操作后应用将会自动退出, 请重新打开应用以应用更改\n"
+              "是否继续?");
+          if (confirm != null && confirm) {
+            await exportCacheRoot(false);
+          }
+        },
+        child: Icon(CupertinoIcons.folder, color: iconColor),
+      ),
+    ),
+  );
+  return CupertinoFormSection.insetGrouped(
+    header: Text('数据设定', style: TextStyle(color: textColor)),
+    children: children,
+  );
 }

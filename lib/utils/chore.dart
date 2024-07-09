@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -35,7 +37,7 @@ void openProjectLink() async {
 
 Future<String?> pickDirectory() async {
   // 请求存储权限
-  if (await Permission.storage.request().isGranted) {
+  if (await Permission.manageExternalStorage.request().isGranted) {
     // 使用file_picker选择目录
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     return selectedDirectory;
@@ -44,5 +46,13 @@ Future<String?> pickDirectory() async {
     LogToast.error("未授予存储权限", "请在设置中授予AppRhyme存储权限",
         "[pickDirectory] Storage permission not granted");
     return null;
+  }
+}
+
+Future<void> exitApp() async {
+  if (Platform.isAndroid || Platform.isIOS) {
+    await FlutterExitApp.exitApp(iosForceExit: true);
+  } else {
+    exit(0);
   }
 }

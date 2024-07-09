@@ -11,7 +11,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `update`
 
 class Config {
-  final bool userAgreement;
+  bool userAgreement;
   ExternApi? externApi;
   bool versionAutoUpdate;
   bool externApiAutoUpdate;

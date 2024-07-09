@@ -7,15 +7,15 @@ import 'package:flutter/widgets.dart';
 
 Future<void> checkVersionUpdate(BuildContext context) async {
   try {
-    LogToast.info("检查应用版本更新", "正在加载数据,请稍等",
-        "[checkVersionUpdate] Checking app version update");
+    // LogToast.info("检查应用版本更新", "正在加载数据,请稍等",
+    //     "[checkVersionUpdate] Checking app version update");
 
     var release = await checkUpdate(currentVersion: globalPackageInfo.version);
     if (context.mounted && release != null) {
       showVersionUpdateDialog(context, release);
     } else if (release == null) {
-      LogToast.info("版本更新", "当前版本无需更新",
-          "[checkVersionUpdate] Current version does not need to be updated");
+      // LogToast.info("版本更新", "当前版本无需更新",
+      //     "[checkVersionUpdate] Current version does not need to be updated");
     }
   } catch (e) {
     globalTalker.log("[VersionUpdate] $e");
@@ -27,8 +27,8 @@ Future<void> checkExternApiUpdate(BuildContext context) async {
     if (globalConfig.externApi != null &&
         globalConfig.externApi!.url != null &&
         globalConfig.externApi!.url!.isNotEmpty) {
-      LogToast.info("检查自定义源更新", "正在加载数据,请稍等",
-          "[checkExternApiUpdate] Checking custom source update");
+      // LogToast.info("检查自定义源更新", "正在加载数据,请稍等",
+      //     "[checkExternApiUpdate] Checking custom source update");
       var externApi = await globalConfig.externApi!.fetchUpdate();
       if (externApi != null) {
         if (context.mounted) {
@@ -40,8 +40,8 @@ Future<void> checkExternApiUpdate(BuildContext context) async {
           }
         }
       } else {
-        LogToast.info("自定义源更新", "当前自定义源无需更新",
-            "[checkExternApiUpdate] The current custom source does not need to be updated");
+        // LogToast.info("自定义源更新", "当前自定义源无需更新",
+        //     "[checkExternApiUpdate] The current custom source does not need to be updated");
       }
     }
   } catch (e) {
