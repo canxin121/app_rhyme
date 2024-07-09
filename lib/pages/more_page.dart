@@ -66,25 +66,25 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
         : CupertinoColors.systemGroupedBackground;
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
-      child: ListView(
-        children: [
-          CupertinoNavigationBar(
-            backgroundColor: backgroundColor,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '设置',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: textColor,
-                  ),
-                ),
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: backgroundColor,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 0.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '设置',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: textColor,
               ),
             ),
           ),
+        ),
+      ),
+      child: ListView(
+        children: [
           CupertinoFormSection.insetGrouped(
             header: Text('应用信息', style: TextStyle(color: textColor)),
             children: [
