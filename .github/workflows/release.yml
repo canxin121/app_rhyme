@@ -54,8 +54,8 @@ jobs:
         run: |-
           flutter build ios --release --no-codesign --verbose
 
-          chmod 777 unbitcode.sh
-          sh unbitcode.sh
+          chmod 777 tools/unbitcode.sh
+          sh tools/unbitcode.sh
 
           mkdir -p Payload
           mv ./build/ios/iphoneos/Runner.app Payload
