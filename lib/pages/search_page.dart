@@ -69,7 +69,9 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
               limit: 5));
 
       _pagingController.nextPageKey =
-          _pagingController.itemList!.length > originLength ? pageKey + 1 : 0;
+          _pagingController.itemList!.length > originLength
+              ? pageKey + 1
+              : null;
     } catch (error) {
       _pagingController.error = error;
     }
@@ -90,7 +92,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                 style: TextStyle(
                   color: isDarkMode
                       ? CupertinoColors.white
-                      : CupertinoColors.black,
+                      : const Color.fromRGBO(0, 0, 0, 1),
                 ).useSystemChineseFont(),
                 controller: _inputContentController,
                 onSubmitted: (String value) {
