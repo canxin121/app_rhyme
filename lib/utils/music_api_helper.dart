@@ -10,7 +10,6 @@ import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
 import 'package:app_rhyme/pages/local_music_list_grid_page.dart';
 import 'package:app_rhyme/pages/local_music_list_page.dart';
 import 'package:app_rhyme/pages/online_music_list_page.dart';
-import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
@@ -118,7 +117,7 @@ Future<void> addToMusicList(
       }
       await SqlFactoryW.addMusics(
           musicsListName: targetMusicList.getMusiclistInfo().name,
-          musics: [musicContainer.aggregator]);
+          musics: [musicContainer.aggregator.clone()]);
       await globalMusicContainerListPageRefreshFunction();
 
       LogToast.success(

@@ -8,7 +8,7 @@ import 'mirrors.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `get_inner`, `get_inner`, `get_mut_ref`, `get_mut_ref`, `get_ref`, `get_ref`, `new`, `new`, `new`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicAggregatorW>>
 abstract class MusicAggregatorW implements RustOpaqueInterface {
