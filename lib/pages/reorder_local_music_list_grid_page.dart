@@ -86,11 +86,13 @@ class ReorderLocalMusicListGridPageState
             ? Center(
                 child: Text("没有歌单", style: TextStyle(color: textColor)),
               )
-            : Align(
+            : SafeArea(
+                child: Align(
                 alignment: Alignment.topCenter,
                 child: ReorderableWrap(
                   padding: const EdgeInsets.only(
-                      top: 50, bottom: 100, left: 0, right: 0),
+                    bottom: 100,
+                  ),
                   spacing: 8.0,
                   runSpacing: 8.0,
                   needsLongPressDraggable: false,
@@ -113,6 +115,6 @@ class ReorderLocalMusicListGridPageState
                     });
                   },
                 ),
-              ));
+              )));
   }
 }
