@@ -89,16 +89,13 @@ class ReorderLocalMusicListPageState extends State<ReorderLocalMusicListPage>
             ? Center(
                 child: Text("没有歌曲", style: TextStyle(color: textColor)),
               )
-            : SafeArea(
-                child: Align(
+            : Align(
                 alignment: Alignment.topCenter,
                 child: ReorderableWrap(
-                  padding: const EdgeInsets.only(
-                    bottom: 100,
-                  ),
+                  padding: const EdgeInsets.only(bottom: 100, top: 60),
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  needsLongPressDraggable: false,
+                  needsLongPressDraggable: true,
                   children: widget.musicContainers.map((musicContainer) {
                     return SizedBox(
                         width: screenWidth - 20,
@@ -116,6 +113,6 @@ class ReorderLocalMusicListPageState extends State<ReorderLocalMusicListPage>
                     });
                   },
                 ),
-              )));
+              ));
   }
 }
