@@ -277,7 +277,7 @@ class LocalMusicListChoicMenu extends StatelessWidget {
         PullDownMenuItem(
           onTap: () async {
             for (var musicContainer in musicContainers) {
-              await cacheMusic(musicContainer);
+              await cacheMusicHelper(musicContainer);
             }
           },
           title: '缓存歌单所有音乐',

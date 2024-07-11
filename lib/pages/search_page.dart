@@ -3,6 +3,7 @@ import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/pages/online_music_list_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
+import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -26,7 +27,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
   final PagingController<int, MusicAggregatorW> _pagingController =
       PagingController(firstPageKey: 1);
   final TextEditingController _inputContentController = TextEditingController();
-
+  MusicFuzzFilter? filter;
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);

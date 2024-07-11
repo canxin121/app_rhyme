@@ -1,5 +1,6 @@
 // Helper functions for actions
 
+import 'package:app_rhyme/src/rust/api/music_cache.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/logger.dart';
@@ -33,11 +34,8 @@ Future<void> deleteFromMusicList(BuildContext context,
 
 Future<void> deleteMusicCache(MusicContainer musicContainer) async {
   try {
-    if (!musicContainer.hasCache()) return;
-    await deleteCacheFile(
-        file: "",
-        cachePath: musicCacheRoot,
-        filename: musicContainer.toCacheFileName());
+    if (!await musicContainer.hasCache()) return;
+    await deleteMusicCache(musicContainer);
     await globalMusicContainerListPageRefreshFunction();
     LogToast.success("删除缓存成功", "成功删除缓存: ${musicContainer.info.name}",
         "[deleteMusicCache] Successfully deleted cache: ${musicContainer.info.name}");
@@ -47,15 +45,14 @@ Future<void> deleteMusicCache(MusicContainer musicContainer) async {
   }
 }
 
-Future<void> cacheMusic(MusicContainer musicContainer) async {
+Future<void> cacheMusicHelper(MusicContainer musicContainer) async {
   try {
     var success = await musicContainer.updateAll();
-    if (!success) {
+    if (!success || musicContainer.playInfo == null) {
       return;
     }
-    var playinfo = musicContainer.playInfo;
-    await cacheFileHelper(playinfo!.uri, musicCacheRoot,
-        filename: musicContainer.toCacheFileName());
+    await cacheMusic(
+        musicInfo: musicContainer.info, playinfo: musicContainer.playInfo!);
     await globalMusicContainerListPageRefreshFunction();
     LogToast.success("缓存成功", "成功缓存: ${musicContainer.info.name}",
         "[cacheMusic] Successfully cached: ${musicContainer.info.name}");

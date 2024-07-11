@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use tokio::{self, io::AsyncWriteExt as _};
 
 use super::ROOT_PATH;
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Clone)]
 #[frb(non_opaque)]
 pub struct ExternApi {
     pub url: Option<String>,

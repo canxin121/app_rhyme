@@ -3,6 +3,7 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 // 有三种使用场景: 1. 本地歌单的歌曲 2. 在线的歌曲 3. 播放列表
@@ -18,7 +19,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 // 3. 播放列表的歌曲:查看详情, 从播放列表删除, , 查看专辑, 搜索歌手, 添加到歌单, 创建新歌单
 
 @immutable
-class MusicContainerMenu extends StatelessWidget {
+class MusicContainerMenu extends StatefulWidget {
   const MusicContainerMenu({
     super.key,
     required this.builder,
@@ -33,89 +34,118 @@ class MusicContainerMenu extends StatelessWidget {
   final bool inPlayList;
 
   @override
+  _MusicContainerMenuState createState() => _MusicContainerMenuState();
+}
+
+class _MusicContainerMenuState extends State<MusicContainerMenu> {
+  late Future<bool> hasCacheFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    hasCacheFuture = widget.musicContainer.hasCache();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<dynamic> menuItems;
 
-    if (musicListW != null && !inPlayList) {
-      // 本地歌单的歌曲
-      menuItems = _localMusiclistItems(context);
-    } else if (musicListW == null && !inPlayList) {
+    if (widget.musicListW == null && !widget.inPlayList) {
       // 在线的歌曲
       menuItems = _onlineSongItems(context);
-    } else if (musicListW == null && inPlayList) {
+    } else if (widget.musicListW == null && widget.inPlayList) {
       // 播放列表的歌曲
       menuItems = _playlistItems(context);
     } else {
       menuItems = [];
     }
 
-    return PullDownButton(
-      itemBuilder: (context) => [
-        PullDownMenuHeader(
-          leading: imageCacheHelper(musicContainer.info.artPic),
-          title: musicContainer.info.name,
-          subtitle: musicContainer.info.artist.join(", "),
-        ),
-        const PullDownMenuDivider.large(),
-        ...menuItems,
-      ],
-      animationBuilder: null,
-      position: PullDownMenuPosition.automatic,
-      buttonBuilder: builder,
+    return FutureBuilder<bool>(
+      future: hasCacheFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          bool hasCache = snapshot.data ?? false;
+
+          if (widget.musicListW != null && !widget.inPlayList) {
+            // 更新本地歌单的菜单项
+            menuItems = _localMusiclistItems(context, hasCache);
+          }
+
+          return PullDownButton(
+            itemBuilder: (context) => [
+              PullDownMenuHeader(
+                leading: imageCacheHelper(widget.musicContainer.info.artPic),
+                title: widget.musicContainer.info.name,
+                subtitle: widget.musicContainer.info.artist.join(", "),
+              ),
+              const PullDownMenuDivider.large(),
+              ...menuItems,
+            ],
+            animationBuilder: null,
+            position: PullDownMenuPosition.automatic,
+            buttonBuilder: widget.builder,
+          );
+        }
+      },
     );
   }
 
-  List<dynamic> _localMusiclistItems(BuildContext context) {
+  List<dynamic> _localMusiclistItems(BuildContext context, bool hasCache) {
     return [
       PullDownMenuActionsRow.medium(
         items: [
           PullDownMenuItem(
-            onTap: () =>
-                deleteFromMusicList(context, musicContainer, musicListW!),
+            onTap: () => deleteFromMusicList(
+                context, widget.musicContainer, widget.musicListW!),
             title: '从歌单删除',
             icon: CupertinoIcons.delete,
           ),
-          if (musicContainer.hasCache())
+          if (hasCache)
             PullDownMenuItem(
-              onTap: () => deleteMusicCache(musicContainer),
+              onTap: () => deleteMusicCache(widget.musicContainer),
               title: '删除缓存',
               icon: CupertinoIcons.delete_solid,
             )
           else
             PullDownMenuItem(
-              onTap: () => cacheMusic(musicContainer),
+              onTap: () => cacheMusicHelper(widget.musicContainer),
               title: '缓存音乐',
               icon: CupertinoIcons.cloud_download,
             ),
           PullDownMenuItem(
-            onTap: () => editMusicInfo(context, musicContainer),
+            onTap: () => editMusicInfo(context, widget.musicContainer),
             title: '编辑信息',
             icon: CupertinoIcons.pencil,
           ),
         ],
       ),
       PullDownMenuItem(
-        onTap: () => showDetailsDialog(context, musicContainer),
+        onTap: () => showDetailsDialog(context, widget.musicContainer),
         title: '查看详情',
         icon: CupertinoIcons.photo,
       ),
       PullDownMenuItem(
-        onTap: () => viewAlbum(context, musicContainer),
+        onTap: () => viewAlbum(context, widget.musicContainer),
         title: '查看专辑',
         icon: CupertinoIcons.music_albums,
       ),
       PullDownMenuItem(
-        onTap: () => addToMusicList(context, musicContainer),
+        onTap: () => addToMusicList(context, widget.musicContainer),
         title: '添加到歌单',
         icon: CupertinoIcons.add,
       ),
       PullDownMenuItem(
-        onTap: () => createNewMusicList(context, musicContainer),
+        onTap: () => createNewMusicList(context, widget.musicContainer),
         title: '创建新歌单',
         icon: CupertinoIcons.add_circled,
       ),
       PullDownMenuItem(
-        onTap: () => setAsMusicListCover(musicContainer, musicListW!),
+        onTap: () =>
+            setAsMusicListCover(widget.musicContainer, widget.musicListW!),
         title: '用作歌单的封面',
         icon: CupertinoIcons.photo_fill_on_rectangle_fill,
       ),
@@ -127,24 +157,24 @@ class MusicContainerMenu extends StatelessWidget {
       PullDownMenuActionsRow.medium(
         items: [
           PullDownMenuItem(
-            onTap: () => createNewMusicList(context, musicContainer),
+            onTap: () => createNewMusicList(context, widget.musicContainer),
             title: '创建新歌单',
             icon: CupertinoIcons.add_circled,
           ),
           PullDownMenuItem(
-            onTap: () => addToMusicList(context, musicContainer),
+            onTap: () => addToMusicList(context, widget.musicContainer),
             title: '添加到歌单',
             icon: CupertinoIcons.add,
           ),
           PullDownMenuItem(
-            onTap: () => viewAlbum(context, musicContainer),
+            onTap: () => viewAlbum(context, widget.musicContainer),
             title: '查看专辑',
             icon: CupertinoIcons.music_albums,
           ),
         ],
       ),
       PullDownMenuItem(
-        onTap: () => showDetailsDialog(context, musicContainer),
+        onTap: () => showDetailsDialog(context, widget.musicContainer),
         title: '查看详情',
         icon: CupertinoIcons.photo,
       ),
@@ -161,30 +191,30 @@ class MusicContainerMenu extends StatelessWidget {
       PullDownMenuActionsRow.medium(
         items: [
           PullDownMenuItem(
-            onTap: () =>
-                deleteFromMusicList(context, musicContainer, musicListW!),
+            onTap: () => deleteFromMusicList(
+                context, widget.musicContainer, widget.musicListW!),
             title: '移除',
             icon: CupertinoIcons.delete,
           ),
           PullDownMenuItem(
-            onTap: () => addToMusicList(context, musicContainer),
+            onTap: () => addToMusicList(context, widget.musicContainer),
             title: '添加到歌单',
             icon: CupertinoIcons.add,
           ),
           PullDownMenuItem(
-            onTap: () => createNewMusicList(context, musicContainer),
+            onTap: () => createNewMusicList(context, widget.musicContainer),
             title: '创建新歌单',
             icon: CupertinoIcons.add_circled,
           ),
         ],
       ),
       PullDownMenuItem(
-        onTap: () => showDetailsDialog(context, musicContainer),
+        onTap: () => showDetailsDialog(context, widget.musicContainer),
         title: '查看详情',
         icon: CupertinoIcons.photo,
       ),
       PullDownMenuItem(
-        onTap: () => viewAlbum(context, musicContainer),
+        onTap: () => viewAlbum(context, widget.musicContainer),
         title: '查看专辑',
         icon: CupertinoIcons.music_albums,
       ),
@@ -194,39 +224,5 @@ class MusicContainerMenu extends StatelessWidget {
       //   icon: CupertinoIcons.profile_circled,
       // ),
     ];
-  }
-}
-
-// 用于选择并搜索歌手的单曲
-// TODO: 未实现
-@immutable
-class ArtistsMenu extends StatelessWidget {
-  const ArtistsMenu({super.key, required this.builder, required this.artists});
-
-  final PullDownMenuButtonBuilder builder;
-  final List<String> artists;
-  @override
-  Widget build(BuildContext context) {
-    List<dynamic> menuItems = artists.map(
-      (artist) {
-        return PullDownMenuItem(
-          onTap: () {},
-          title: artist,
-        );
-      },
-    ).toList();
-    return PullDownButton(
-      itemBuilder: (context) => [
-        const PullDownMenuHeader(
-          leading: Icon(CupertinoIcons.profile_circled),
-          title: "搜索歌手单曲",
-        ),
-        const PullDownMenuDivider.large(),
-        ...menuItems,
-      ],
-      animationBuilder: null,
-      position: PullDownMenuPosition.automatic,
-      buttonBuilder: builder,
-    );
   }
 }

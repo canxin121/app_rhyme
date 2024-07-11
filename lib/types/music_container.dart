@@ -1,31 +1,15 @@
 import 'dart:io';
 
+import 'package:app_rhyme/src/rust/api/music_cache.dart';
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:app_rhyme/src/rust/api/cache.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
-import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
-import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-
-class PlayInfo {
-  late String uri;
-  late Quality quality;
-
-  PlayInfo(
-    this.uri,
-    this.quality,
-  );
-
-  factory PlayInfo.fromObject(dynamic obj) {
-    return PlayInfo(obj['url'], qualityFromObject(obj["quality"]));
-  }
-}
 
 // 这个结构代表了待播音乐的信息
 class MusicContainer {
@@ -35,7 +19,7 @@ class MusicContainer {
   late String? extra;
   // 从Api or 本地获取的真实待播放的音质信息
   late Rx<Quality?> currentQuality;
-  late PlayInfo? playInfo;
+  PlayInfo? playInfo;
   // 待播放的音频资源
   late AudioSource audioSource;
   // 已经使用过的音乐源，用于自动换源时选择下一个源
@@ -56,6 +40,10 @@ class MusicContainer {
     lastUpdate = DateTime(1999);
   }
 
+  String toCacheFileName() {
+    return "${info.name}_${info.artist.join(",")}_${currentQuality.value!.short}.${currentQuality.value!.format ?? "unknown"}";
+  }
+
   // 检查音乐是否需要更新
   bool shouldUpdate() {
     try {
@@ -69,21 +57,13 @@ class MusicContainer {
     }
   }
 
-  // 缓存文件名
-  String toCacheFileName({Quality? quality_}) {
-    var quality = quality_ ?? info.defaultQuality!;
-    return "${info.name}_${info.artist.join(',')}_${info.source}_${extra.hashCode}_${quality.short}.${quality.format ?? "unknown"}"
-        .replaceAll("\r", "");
-  }
-
   // 是否有缓存
-  bool hasCache() {
-    var cache = useCacheFile(
-        file: "",
-        cachePath: musicCacheRoot,
-        filename: toCacheFileName(),
-        exportRoot: globalConfig.exportCacheRoot);
-    return cache != null;
+  Future<bool> hasCache() async {
+    try {
+      return hasCachePlayinfo(musicInfo: info);
+    } catch (e) {
+      return false;
+    }
   }
 
   // 更新音乐内部的播放信息和音频资源
@@ -99,13 +79,13 @@ class MusicContainer {
     return success;
   }
 
-  Future<PlayInfo?> getCurrentMusicPlayInfo([Quality? quality]) async {
-    // 更新当前音质
-    _updateQuality(quality);
+  Future<PlayInfo?> getCurrentMusicPlayInfo([Quality? quality_]) async {
+    // 更新当前音质, 每次都更新以适配网络变化
+    _updateQuality(quality_);
 
     late Quality finalQuality;
-    if (quality != null) {
-      finalQuality = quality;
+    if (quality_ != null) {
+      finalQuality = quality_;
     } else if (currentQuality.value != null) {
       finalQuality = currentQuality.value!;
     } else {
@@ -113,19 +93,19 @@ class MusicContainer {
           "[getCurrentMusicPlayInfo] Failed to get play info, no quality found");
       return null;
     }
+    // 更新extra信息
+    extra = currentMusic.getExtraInfo(quality: finalQuality);
 
-    // 尝试获取本地缓存
-    var cache = useCacheFile(
-        file: "",
-        cachePath: musicCacheRoot,
-        filename: toCacheFileName(quality_: quality),
-        exportRoot: globalConfig.exportCacheRoot);
-
-    // 有本地缓存直接返回
-    if (cache != null) {
-      globalTalker.info("[getCurrentMusicPlayInfo] 使用本地歌曲缓存转化歌曲: ${info.name}");
-      return PlayInfo(cache, finalQuality);
-    }
+    // // 有本地缓存直接返回
+    try {
+      playInfo = await getCachePlayinfo(musicInfo: info);
+      if (playInfo != null) {
+        globalTalker.info("[getCurrentMusicPlayInfo] 使用缓存歌曲: ${info.name}");
+        currentQuality.value = playInfo!.quality;
+        return playInfo!;
+      }
+      // ignore: empty_catches
+    } catch (e) {}
 
     // 没有本地缓存，也没有第三方api，直接返回null
     if (globalConfig.externApi == null) {
@@ -136,20 +116,19 @@ class MusicContainer {
     }
 
     // 有第三方api，使用api进行请求
-    var playinfo =
+    playInfo =
         await globalExternApiEvaler!.getMusicPlayInfo(info.source, extra!);
 
     // 如果第三方api查找不到，直接返回null
-    if (playinfo == null) {
+    if (playInfo == null) {
       globalTalker.error(
           "[getCurrentMusicPlayInfo] 第三方音乐源无法获取到playinfo: [${info.source}]${info.name}");
       return null;
     } else {
-      currentQuality.value = playinfo.quality;
-
+      currentQuality.value = playInfo!.quality;
       globalTalker.info(
           "[getCurrentMusicPlayInfo] 使用第三方Api请求获取playinfo: [${info.source}]${info.name}");
-      return PlayInfo(playinfo.uri, playinfo.quality);
+      return playInfo;
     }
   }
 

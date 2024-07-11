@@ -11,6 +11,7 @@ import 'api/factory_bind.dart';
 import 'api/http_helper.dart';
 import 'api/init.dart';
 import 'api/mirrors.dart';
+import 'api/music_cache.dart';
 import 'api/type_bind.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -131,7 +132,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MusicFuzzFilter dco_decode_box_autoadd_music_fuzz_filter(dynamic raw);
 
   @protected
+  MusicInfo dco_decode_box_autoadd_music_info(dynamic raw);
+
+  @protected
   MusicListInfo dco_decode_box_autoadd_music_list_info(dynamic raw);
+
+  @protected
+  PlayInfo dco_decode_box_autoadd_play_info(dynamic raw);
 
   @protected
   Quality dco_decode_box_autoadd_quality(dynamic raw);
@@ -233,6 +240,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
+
+  @protected
+  PlayInfo dco_decode_play_info(dynamic raw);
 
   @protected
   Quality dco_decode_quality(dynamic raw);
@@ -366,8 +376,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  MusicInfo sse_decode_box_autoadd_music_info(SseDeserializer deserializer);
+
+  @protected
   MusicListInfo sse_decode_box_autoadd_music_list_info(
       SseDeserializer deserializer);
+
+  @protected
+  PlayInfo sse_decode_box_autoadd_play_info(SseDeserializer deserializer);
 
   @protected
   Quality sse_decode_box_autoadd_quality(SseDeserializer deserializer);
@@ -474,6 +490,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
+
+  @protected
+  PlayInfo sse_decode_play_info(SseDeserializer deserializer);
 
   @protected
   Quality sse_decode_quality(SseDeserializer deserializer);
@@ -615,8 +634,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       MusicFuzzFilter self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_music_info(
+      MusicInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_music_list_info(
       MusicListInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_play_info(
+      PlayInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_quality(Quality self, SseSerializer serializer);
@@ -731,6 +758,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_play_info(PlayInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_quality(Quality self, SseSerializer serializer);

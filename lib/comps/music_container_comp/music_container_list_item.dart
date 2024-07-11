@@ -83,12 +83,26 @@ class MusicContainerListItem extends StatelessWidget {
             ),
           ),
           // 缓存标志
-          if (musicListW != null && !inPlayList && musicContainer.hasCache())
-            const Padding(
-              padding: EdgeInsets.only(right: 8.0),
-              child: Badge(
-                label: '缓存',
-              ),
+          if (musicListW != null && !inPlayList)
+            FutureBuilder<bool>(
+              future: musicContainer.hasCache(),
+              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: CupertinoActivityIndicator(),
+                  );
+                } else if (snapshot.hasData && snapshot.data!) {
+                  return const Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: Badge(
+                      label: '缓存',
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
             ),
           // 标志音乐信息来源的Badge
           Badge(

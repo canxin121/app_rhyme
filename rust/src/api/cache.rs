@@ -1,3 +1,4 @@
+use super::{CONFIG, ROOT_PATH};
 use anyhow::Result;
 use futures::StreamExt as _;
 use lazy_static::lazy_static;
@@ -10,9 +11,6 @@ use std::time::Duration;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::Semaphore;
-
-use super::config::Config;
-use super::ROOT_PATH;
 
 lazy_static! {
     static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(100));
@@ -49,14 +47,18 @@ pub async fn cache_file(
         tokio::fs::create_dir_all(&root_path).await?;
     }
 
-    let filepath = root_path.join(&filename);
+    let filepath = root_path
+        .join(&filename)
+        .to_string_lossy()
+        .to_string()
+        .replace("\r", "");
 
     if file.starts_with("http") {
         let response = CLIENT.get(file).send().await?;
         let mut stream = response.bytes_stream();
-
+        println!("try to open file");
         let mut file = tokio::fs::File::create(&filepath).await?;
-
+        println!("file opened");
         while let Some(chunk) = stream.next().await {
             let data = chunk?;
             file.write_all(&data).await?;
@@ -65,7 +67,7 @@ pub async fn cache_file(
         tokio::fs::copy(file, &filepath).await?;
     }
 
-    Ok(filepath.to_string_lossy().into_owned())
+    Ok(filepath)
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -250,7 +252,11 @@ pub async fn remove_file(file: &str) -> Result<(), anyhow::Error> {
 }
 
 pub(crate) async fn del_old_data() -> Result<(), anyhow::Error> {
-    let config = Config::load().await?;
+    let config = CONFIG
+        .read()
+        .await
+        .clone()
+        .ok_or(anyhow::anyhow!("global config is None"))?;
     let root_path = match config.last_export_cache_root {
         Some(export_root) => export_root,
         None => {

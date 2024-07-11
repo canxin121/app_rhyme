@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use music_api::SqlFactory;
 use tokio::fs::create_dir_all;
 
-use crate::api::ROOT_PATH;
+use crate::api::{CONFIG, ROOT_PATH};
 
 use super::{cache::del_old_data, config::Config};
 
@@ -26,7 +26,11 @@ pub async fn init_backend(store_root: String) -> Result<Config, anyhow::Error> {
         *root_path = store_root.clone();
     }
     let config = Config::load().await?;
-
+    // 初始化全局的配置
+    {
+        let mut global_config = CONFIG.write().await;
+        *global_config = Some(config.clone());
+    }
     // 构造数据库路径, 优先使用export_cache_root
     let db_path = match config.export_cache_root.as_ref() {
         Some(export_root) => {

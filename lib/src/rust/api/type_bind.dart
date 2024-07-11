@@ -43,7 +43,6 @@ abstract class MusicAggregatorW implements RustOpaqueInterface {
 
   Future<void> setDefaultSource({required String source});
 
-  @override
   String toString();
 }
 
@@ -61,7 +60,6 @@ abstract class MusicListW implements RustOpaqueInterface {
 
   String source();
 
-  @override
   String toString();
 }
 
@@ -80,6 +78,26 @@ abstract class MusicW implements RustOpaqueInterface {
 
   String source();
 
-  @override
   String toString();
+}
+
+class PlayInfo {
+  final String uri;
+  final Quality quality;
+
+  const PlayInfo({
+    required this.uri,
+    required this.quality,
+  });
+
+  @override
+  int get hashCode => uri.hashCode ^ quality.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlayInfo &&
+          runtimeType == other.runtimeType &&
+          uri == other.uri &&
+          quality == other.quality;
 }

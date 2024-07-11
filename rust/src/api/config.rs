@@ -2,9 +2,9 @@ use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use super::{extern_api::ExternApi, ROOT_PATH};
+use super::{extern_api::ExternApi, CONFIG, ROOT_PATH};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[frb(non_opaque)]
 pub struct Config {
     // 用户是否同意使用协议
@@ -67,7 +67,8 @@ fn default_false() -> bool {
 }
 
 impl Config {
-    fn default(app_cache_root: &str) -> Self {
+    #[frb(ignore)]
+    pub fn default(app_cache_root: &str) -> Self {
         let config = Config {
             extern_api_path: None,
             user_agreement: false,
@@ -95,6 +96,12 @@ impl Config {
     }
 
     pub async fn save(&self) -> Result<(), anyhow::Error> {
+        // 同步到全局变量
+        {
+            let mut global_config = CONFIG.write().await;
+            *global_config = Some(self.clone());
+        }
+
         let root_path = ROOT_PATH.read().await;
         let path = root_path.clone().join("config.json");
         fs::write(path, serde_json::to_string(&self)?).await?;
@@ -115,6 +122,11 @@ impl Config {
         // 加载之后更新一次，以便于处理deprecated
         self_ = self_.update().await?;
 
+        // 同步到全局变量
+        {
+            let mut global_config = CONFIG.write().await;
+            *global_config = Some(self_.clone());
+        }
         Ok(self_)
     }
 }

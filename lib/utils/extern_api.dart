@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:app_rhyme/types/music_container.dart';
+import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
+import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
 import 'package:dart_eval/stdlib/core.dart';
@@ -116,8 +117,9 @@ class ExternApiEvaler {
       var resultFuture = runTime.executeLib("package:api/main.dart",
           "getMusicPlayInfo", [$String(source), $String(extra)]) as Future;
       dynamic result = await resultFuture;
+      globalTalker.info("[ExternEvaler] Get Result: $result");
       if (result.runtimeType != $null) {
-        return PlayInfo.fromObject(result.$reified);
+        return playInfoFromObject(result.$reified);
       } else {
         globalTalker.error("[ExternEvaler] Get Result Null.");
         return null;
