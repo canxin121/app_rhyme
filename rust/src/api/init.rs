@@ -55,7 +55,6 @@ pub async fn init_backend(store_root: String) -> Result<Config, anyhow::Error> {
     }
 
     let db_path_str = db_path.to_str().unwrap().to_string();
-    println!("db_path_str: {}", db_path_str);
     SqlFactory::init_from_path(&db_path_str).await.unwrap();
 
     Ok(config)

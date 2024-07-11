@@ -154,10 +154,9 @@ impl SqlFactoryW {
 
     pub async fn reorder_musics(
         music_list_name: &str,
-        new_full_index: &[i64],
-        full_ids_in_order: &[i64],
+        new_ids: &[i64],
     ) -> Result<(), anyhow::Error> {
-        Ok(SqlFactory::reorder_musics(music_list_name, new_full_index, full_ids_in_order).await?)
+        Ok(SqlFactory::reorder_musics(music_list_name, new_ids).await?)
     }
 
     pub async fn get_all_musics(
@@ -198,5 +197,9 @@ impl SqlFactoryW {
     ) -> Result<(), anyhow::Error> {
         let musics_refs: Vec<Music> = musics.into_par_iter().map(|m| m.get_inner()).collect();
         Ok(SqlFactory::change_music_info(&musics_refs, new_infos).await?)
+    }
+
+    pub async fn reorder_musiclist(new_ids: &[i64]) -> Result<(), anyhow::Error> {
+        Ok(SqlFactory::reorder_musiclist(new_ids).await?)
     }
 }

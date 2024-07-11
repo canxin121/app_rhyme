@@ -56,9 +56,7 @@ pub async fn cache_file(
     if file.starts_with("http") {
         let response = CLIENT.get(file).send().await?;
         let mut stream = response.bytes_stream();
-        println!("try to open file");
         let mut file = tokio::fs::File::create(&filepath).await?;
-        println!("file opened");
         while let Some(chunk) = stream.next().await {
             let data = chunk?;
             file.write_all(&data).await?;

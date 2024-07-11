@@ -13,19 +13,17 @@ class MusicListImageCard extends StatelessWidget {
   final bool online;
   final GestureTapCallback? onTap;
   final bool cachePic;
-
-  const MusicListImageCard(
-      {super.key,
-      required this.musicListW,
-      required this.online,
-      this.onTap,
-      this.cachePic = false});
+  const MusicListImageCard({
+    super.key,
+    required this.musicListW,
+    required this.online,
+    this.onTap,
+    this.cachePic = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     MusicListInfo musicListInfo = musicListW.getMusiclistInfo();
-
-    // 获取当前主题的亮度
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
 
@@ -42,15 +40,10 @@ class MusicListImageCard extends StatelessWidget {
                 Stack(
                   children: [
                     MusicListMenu(
-                      builder: (context, showMenu) => GestureDetector(
-                        onLongPress: () {
-                          showMenu();
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
-                          child: imageCacheHelper(musicListInfo.artPic,
-                              cacheNow: cachePic),
-                        ),
+                      builder: (context, showMenu) => ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: imageCacheHelper(musicListInfo.artPic,
+                            cacheNow: cachePic),
                       ),
                       musicListW: musicListW,
                       online: online,

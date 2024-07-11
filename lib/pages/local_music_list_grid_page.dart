@@ -1,3 +1,4 @@
+import 'package:app_rhyme/pages/reorder_local_music_list_grid_page.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
@@ -150,7 +151,6 @@ class MusicListGridPageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
@@ -196,6 +196,23 @@ class MusicListGridPageMenu extends StatelessWidget {
           title: '打开歌单链接',
           icon: CupertinoIcons.pencil,
         ),
+        PullDownMenuItem(
+          onTap: () async {
+            var result = await SqlFactoryW.getAllMusiclists();
+            var musicLists = result;
+            if (context.mounted) {
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => ReorderLocalMusicListGridPage(
+                    musicLists: musicLists,
+                  ),
+                ),
+              );
+            }
+          },
+          title: '排序歌单',
+          icon: CupertinoIcons.list_number,
+        )
       ],
       animationBuilder: null,
       position: PullDownMenuPosition.automatic,

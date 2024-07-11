@@ -132,14 +132,14 @@ class SqlFactoryW {
       RustLib.instance.api
           .crateApiFactoryBindSqlFactoryWReadMusicData(source: source);
 
+  static Future<void> reorderMusiclist({required Int64List newIds}) =>
+      RustLib.instance.api
+          .crateApiFactoryBindSqlFactoryWReorderMusiclist(newIds: newIds);
+
   static Future<void> reorderMusics(
-          {required String musicListName,
-          required Int64List newFullIndex,
-          required Int64List fullIdsInOrder}) =>
+          {required String musicListName, required Int64List newIds}) =>
       RustLib.instance.api.crateApiFactoryBindSqlFactoryWReorderMusics(
-          musicListName: musicListName,
-          newFullIndex: newFullIndex,
-          fullIdsInOrder: fullIdsInOrder);
+          musicListName: musicListName, newIds: newIds);
 
   static Future<void> replaceMusics(
           {required String musicListName,
