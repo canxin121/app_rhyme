@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
@@ -123,17 +125,62 @@ class MutiSelectLocalMusicListGridPageState
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
-      navigationBar: _buildNavigationBar(),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 50),
-        child: widget.musicLists.isEmpty
-            ? Center(
-                child: Text("没有歌单", style: TextStyle(color: textColor)),
-              )
-            : _buildMusicListGrid(),
-      ),
-    );
+        backgroundColor: backgroundColor,
+        navigationBar: _buildNavigationBar(),
+        child: Column(children: [
+          SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
+          widget.musicLists.isEmpty
+              ? Center(
+                  child: Text("没有歌单", style: TextStyle(color: textColor)),
+                )
+              : Expanded(
+                  child: Align(
+                    key: ValueKey(controller.hashCode),
+                    alignment: Alignment.topCenter,
+                    child: DragSelectGridView(
+                      gridController: controller,
+                      padding: const EdgeInsets.only(
+                          bottom: 100, left: 10, right: 10),
+                      itemCount: widget.musicLists.length,
+                      triggerSelectionOnTap: true,
+                      itemBuilder: (context, index, selected) {
+                        final musicList = widget.musicLists[index];
+                        return Stack(
+                          key: ValueKey("${selected}_${musicList.hashCode}"),
+                          children: [
+                            MusicListImageCard(
+                              musicListW: musicList,
+                              online: false,
+                              cachePic: globalConfig.savePicWhenAddMusicList,
+                            ),
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  selected
+                                      ? CupertinoIcons.check_mark_circled
+                                      : CupertinoIcons.circle,
+                                  color: selected
+                                      ? CupertinoColors.systemGreen
+                                      : CupertinoColors.systemGrey4,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 8.0,
+                        crossAxisSpacing: 8.0,
+                        childAspectRatio: 2 / 3,
+                      ),
+                    ),
+                  ),
+                )
+        ]));
   }
 
   CupertinoNavigationBar _buildNavigationBar() {
@@ -159,52 +206,6 @@ class MutiSelectLocalMusicListGridPageState
         selectAll: handleSelectAll,
         cancelSelectAll: handleCancelSelectAll,
         reverseSelect: handleReverseSelect,
-      ),
-    );
-  }
-
-  Widget _buildMusicListGrid() {
-    return Align(
-      key: ValueKey(controller.hashCode),
-      alignment: Alignment.topCenter,
-      child: DragSelectGridView(
-        gridController: controller,
-        padding: const EdgeInsets.only(bottom: 100, left: 10, right: 10),
-        itemCount: widget.musicLists.length,
-        triggerSelectionOnTap: true,
-        itemBuilder: (context, index, selected) {
-          final musicList = widget.musicLists[index];
-          return Stack(
-            key: ValueKey("${selected}_${musicList.hashCode}"),
-            children: [
-              MusicListImageCard(
-                musicListW: musicList,
-                online: false,
-                cachePic: globalConfig.savePicWhenAddMusicList,
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    selected
-                        ? CupertinoIcons.check_mark_circled
-                        : CupertinoIcons.circle,
-                    color: selected
-                        ? CupertinoColors.systemGreen
-                        : CupertinoColors.systemGrey4,
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8.0,
-          crossAxisSpacing: 8.0,
-          childAspectRatio: 2 / 3,
-        ),
       ),
     );
   }

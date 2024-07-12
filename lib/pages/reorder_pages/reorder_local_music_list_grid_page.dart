@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/utils/logger.dart';
@@ -82,9 +84,10 @@ class ReorderLocalMusicListGridPageState
             },
           ),
         ),
-        child: Padding(
-            padding: const EdgeInsets.only(top: 50),
-            child: widget.musicLists.isEmpty
+        child: Column(
+          children: [
+            SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
+            widget.musicLists.isEmpty
                 ? Center(
                     child: Text("没有歌单", style: TextStyle(color: textColor)),
                   )
@@ -114,6 +117,8 @@ class ReorderLocalMusicListGridPageState
                         });
                       },
                     ),
-                  )));
+                  )
+          ],
+        ));
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_grid_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_grid_page.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -97,8 +99,8 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
         ),
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(
-              child: SafeArea(child: SizedBox(height: 10.0)),
+            SliverToBoxAdapter(
+              child: SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
             ),
             musicLists.isEmpty
                 ? SliverToBoxAdapter(
@@ -106,7 +108,8 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                         child:
                             Text("没有歌单", style: TextStyle(color: textColor))))
                 : SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: Platform.isIOS ? 0.0 : 10.0),
                     sliver: SliverGrid(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(

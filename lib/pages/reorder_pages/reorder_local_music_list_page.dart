@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
@@ -84,34 +86,39 @@ class ReorderLocalMusicListPageState extends State<ReorderLocalMusicListPage>
             },
           ),
         ),
-        child: widget.musicContainers.isEmpty
-            ? Center(
-                child: Text("没有歌曲", style: TextStyle(color: textColor)),
-              )
-            : Align(
-                alignment: Alignment.topCenter,
-                child: ReorderableWrap(
-                  padding: const EdgeInsets.only(bottom: 100, top: 60),
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  needsLongPressDraggable: true,
-                  children: widget.musicContainers.map((musicContainer) {
-                    return SizedBox(
-                        width: screenWidth - 20,
-                        child: MusicContainerListItem(
-                          musicListW: widget.musicList,
-                          musicContainer: musicContainer,
-                          onTap: () {},
-                        ));
-                  }).toList(),
-                  onReorder: (int oldIndex, int newIndex) {
-                    setState(() {
-                      final MusicContainer item =
-                          widget.musicContainers.removeAt(oldIndex);
-                      widget.musicContainers.insert(newIndex, item);
-                    });
-                  },
-                ),
-              ));
+        child: Column(
+          children: [
+            SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
+            widget.musicContainers.isEmpty
+                ? Center(
+                    child: Text("没有歌曲", style: TextStyle(color: textColor)),
+                  )
+                : Align(
+                    alignment: Alignment.topCenter,
+                    child: ReorderableWrap(
+                      padding: const EdgeInsets.only(bottom: 100),
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      needsLongPressDraggable: true,
+                      children: widget.musicContainers.map((musicContainer) {
+                        return SizedBox(
+                            width: screenWidth - 20,
+                            child: MusicContainerListItem(
+                              musicListW: widget.musicList,
+                              musicContainer: musicContainer,
+                              onTap: () {},
+                            ));
+                      }).toList(),
+                      onReorder: (int oldIndex, int newIndex) {
+                        setState(() {
+                          final MusicContainer item =
+                              widget.musicContainers.removeAt(oldIndex);
+                          widget.musicContainers.insert(newIndex, item);
+                        });
+                      },
+                    ),
+                  )
+          ],
+        ));
   }
 }

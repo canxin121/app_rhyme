@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
@@ -142,59 +144,62 @@ class MutiSelectLocalMusicContainerListPageState
           reverseSelect: handleReverseSelect,
         ),
       ),
-      child: widget.musicContainers.isEmpty
-          ? Center(
-              child: Text(
-                "没有音乐",
-                style: TextStyle(
-                    color: isDarkMode
-                        ? CupertinoColors.white
-                        : CupertinoColors.black),
-              ),
-            )
-          : Align(
-              key: ValueKey(controller.hashCode),
-              alignment: Alignment.topCenter,
-              child: DragSelectGridView(
-                gridController: controller,
-                padding:
-                    const EdgeInsets.only(bottom: 100, left: 10, right: 10),
-                itemCount: widget.musicContainers.length,
-                triggerSelectionOnTap: true,
-                itemBuilder: (context, index, selected) {
-                  final musicContainer = widget.musicContainers[index];
-                  return Row(
-                    key: ValueKey(
-                        "${selected}_${musicContainer.hasCache()}_${musicContainer.hashCode}"),
-                    children: [
-                      Expanded(
-                        child: MusicContainerListItem(
-                          key: ValueKey(
-                              "${musicContainer.hasCache()}_${musicContainer.hashCode}"),
-                          showMenu: false,
-                          musicContainer: musicContainer,
-                          musicListW: widget.musicList,
-                        ),
-                      ),
-                      Icon(
-                        selected
-                            ? CupertinoIcons.check_mark_circled
-                            : CupertinoIcons.circle,
-                        color: selected
-                            ? CupertinoColors.systemGreen
-                            : CupertinoColors.systemGrey4,
-                      ),
-                    ],
-                  );
-                },
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  mainAxisSpacing: 8.0,
-                  crossAxisSpacing: 8.0,
-                  childAspectRatio: 8 / 1,
+      child: Column(children: [
+        SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
+        widget.musicContainers.isEmpty
+            ? Center(
+                child: Text(
+                  "没有音乐",
+                  style: TextStyle(
+                      color: isDarkMode
+                          ? CupertinoColors.white
+                          : CupertinoColors.black),
                 ),
-              ),
-            ),
+              )
+            : Align(
+                key: ValueKey(controller.hashCode),
+                alignment: Alignment.topCenter,
+                child: DragSelectGridView(
+                  gridController: controller,
+                  padding:
+                      const EdgeInsets.only(bottom: 100, left: 10, right: 10),
+                  itemCount: widget.musicContainers.length,
+                  triggerSelectionOnTap: true,
+                  itemBuilder: (context, index, selected) {
+                    final musicContainer = widget.musicContainers[index];
+                    return Row(
+                      key: ValueKey(
+                          "${selected}_${musicContainer.hasCache()}_${musicContainer.hashCode}"),
+                      children: [
+                        Expanded(
+                          child: MusicContainerListItem(
+                            key: ValueKey(
+                                "${musicContainer.hasCache()}_${musicContainer.hashCode}"),
+                            showMenu: false,
+                            musicContainer: musicContainer,
+                            musicListW: widget.musicList,
+                          ),
+                        ),
+                        Icon(
+                          selected
+                              ? CupertinoIcons.check_mark_circled
+                              : CupertinoIcons.circle,
+                          color: selected
+                              ? CupertinoColors.systemGreen
+                              : CupertinoColors.systemGrey4,
+                        ),
+                      ],
+                    );
+                  },
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
+                    childAspectRatio: 8 / 1,
+                  ),
+                ),
+              )
+      ]),
     );
   }
 }
