@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:app_rhyme/src/rust/api/cache.dart';
+import 'package:app_rhyme/src/rust/api/cache/file_cache.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:extended_image/extended_image.dart';

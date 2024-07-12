@@ -306,10 +306,3 @@ impl MusicListW {
         Ok(all_aggregators)
     }
 }
-
-#[frb]
-#[derive(Serialize, Deserialize, Clone)]
-pub struct PlayInfo {
-    pub uri: String,
-    pub quality: Quality,
-}

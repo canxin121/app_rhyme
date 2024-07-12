@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:extended_image/extended_image.dart';

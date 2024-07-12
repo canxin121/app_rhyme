@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:app_rhyme/types/chore.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 

@@ -2,9 +2,9 @@ import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.d
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/pages/online_music_list_page.dart';
-import 'package:app_rhyme/src/rust/api/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/const_vars.dart';

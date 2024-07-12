@@ -1,13 +1,12 @@
-
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
-import 'package:app_rhyme/src/rust/api/factory_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/colors.dart';
 
 class ReorderLocalMusicListGridPage extends StatefulWidget {

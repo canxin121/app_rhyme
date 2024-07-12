@@ -2,7 +2,9 @@ use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use super::{extern_api::ExternApi, CONFIG, ROOT_PATH};
+use crate::api::{CONFIG, ROOT_PATH};
+
+use super::extern_api::ExternApi;
 
 #[derive(Serialize, Deserialize, Clone)]
 #[frb(non_opaque)]

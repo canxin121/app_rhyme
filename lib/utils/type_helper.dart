@@ -1,5 +1,5 @@
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/types/playinfo.dart';
 
 Quality qualityFromObject(dynamic obj) {
   return Quality(

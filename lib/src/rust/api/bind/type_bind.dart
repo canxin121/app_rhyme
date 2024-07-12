@@ -3,12 +3,12 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../frb_generated.dart';
+import '../../frb_generated.dart';
 import 'mirrors.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `get_inner`, `get_inner`, `get_mut_ref`, `get_mut_ref`, `get_ref`, `get_ref`, `new`, `new`, `new`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicAggregatorW>>
 abstract class MusicAggregatorW implements RustOpaqueInterface {
@@ -43,7 +43,6 @@ abstract class MusicAggregatorW implements RustOpaqueInterface {
 
   Future<void> setDefaultSource({required String source});
 
-  @override
   String toString();
 }
 
@@ -61,7 +60,6 @@ abstract class MusicListW implements RustOpaqueInterface {
 
   String source();
 
-  @override
   String toString();
 }
 
@@ -80,27 +78,5 @@ abstract class MusicW implements RustOpaqueInterface {
 
   String source();
 
-  @override
   String toString();
-}
-
-class PlayInfo {
-  final String uri;
-  final Quality quality;
-
-  const PlayInfo({
-    required this.uri,
-    required this.quality,
-  });
-
-  @override
-  int get hashCode => uri.hashCode ^ quality.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PlayInfo &&
-          runtimeType == other.runtimeType &&
-          uri == other.uri &&
-          quality == other.quality;
 }

@@ -1,6 +1,6 @@
 import 'package:app_rhyme/audioControl/audio_controller.dart';
-import 'package:app_rhyme/src/rust/api/config.dart';
 import 'package:app_rhyme/src/rust/api/init.dart';
+import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/types/chore.dart';
 import 'package:app_rhyme/utils/extern_api.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';

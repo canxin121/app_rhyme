@@ -1,6 +1,6 @@
 import 'package:app_rhyme/comps/chores/badge.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_pulldown_menu.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -49,9 +49,11 @@ class _MusicContainerListItemState extends State<MusicContainerListItem> {
 
   void _checkCache() async {
     bool cacheStatus = await widget.musicContainer.hasCache();
-    setState(() {
-      _hasCache = cacheStatus;
-    });
+    if (mounted) {
+      setState(() {
+        _hasCache = cacheStatus;
+      });
+    }
   }
 
   @override

@@ -3,26 +3,26 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../frb_generated.dart';
-import 'mirrors.dart';
+import '../../frb_generated.dart';
+import '../bind/mirrors.dart';
+import '../types/playinfo.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-import 'type_bind.dart';
 
-// These functions are ignored because they are not marked as `pub`: `gen_file_name`, `gen_music_path`
+// These functions are ignored because they are not marked as `pub`: `gen_json_file_name`, `gen_music_path`
 
 Future<bool> hasCachePlayinfo({required MusicInfo musicInfo}) =>
     RustLib.instance.api
-        .crateApiMusicCacheHasCachePlayinfo(musicInfo: musicInfo);
+        .crateApiCacheMusicCacheHasCachePlayinfo(musicInfo: musicInfo);
 
 Future<PlayInfo> getCachePlayinfo({required MusicInfo musicInfo}) =>
     RustLib.instance.api
-        .crateApiMusicCacheGetCachePlayinfo(musicInfo: musicInfo);
+        .crateApiCacheMusicCacheGetCachePlayinfo(musicInfo: musicInfo);
 
 Future<void> cacheMusic(
         {required MusicInfo musicInfo, required PlayInfo playinfo}) =>
-    RustLib.instance.api
-        .crateApiMusicCacheCacheMusic(musicInfo: musicInfo, playinfo: playinfo);
+    RustLib.instance.api.crateApiCacheMusicCacheCacheMusic(
+        musicInfo: musicInfo, playinfo: playinfo);
 
 Future<void> deleteMusicCache({required MusicInfo musicInfo}) =>
     RustLib.instance.api
-        .crateApiMusicCacheDeleteMusicCache(musicInfo: musicInfo);
+        .crateApiCacheMusicCacheDeleteMusicCache(musicInfo: musicInfo);

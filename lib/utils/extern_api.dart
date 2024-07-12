@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/types/playinfo.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
 import 'package:dart_eval/stdlib/core.dart';
-import 'package:app_rhyme/src/rust/api/http_helper.dart' as http;
+import 'package:app_rhyme/src/rust/api/utils/http_helper.dart' as http;
 
 // 用来给外置音乐api使用
 class HttpHelper {

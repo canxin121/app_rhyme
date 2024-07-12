@@ -5,7 +5,8 @@ use reqwest::header::{HeaderMap, HeaderValue, LAST_MODIFIED, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use tokio::{self, io::AsyncWriteExt as _};
 
-use super::ROOT_PATH;
+use crate::api::ROOT_PATH;
+
 #[derive(Serialize, Deserialize, Clone)]
 #[frb(non_opaque)]
 pub struct ExternApi {

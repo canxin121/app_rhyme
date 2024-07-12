@@ -3,16 +3,19 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/cache.dart';
-import 'api/check_update.dart';
-import 'api/config.dart';
-import 'api/extern_api.dart';
-import 'api/factory_bind.dart';
-import 'api/http_helper.dart';
+import 'api/bind/factory_bind.dart';
+import 'api/bind/mirrors.dart';
+import 'api/bind/type_bind.dart';
+import 'api/cache/file_cache.dart';
+import 'api/cache/fs_util.dart';
+import 'api/cache/music_cache.dart';
 import 'api/init.dart';
-import 'api/mirrors.dart';
-import 'api/music_cache.dart';
-import 'api/type_bind.dart';
+import 'api/types/config.dart';
+import 'api/types/extern_api.dart';
+import 'api/types/playinfo.dart';
+import 'api/types/version.dart';
+import 'api/utils/http_helper.dart';
+import 'api/utils/path_util.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -67,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.0.0';
 
   @override
-  int get rustContentHash => -1771622424;
+  int get rustContentHash => -542653180;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -78,56 +81,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<String> crateApiCacheCacheFile(
-      {required String file,
-      required String cachePath,
-      String? filename,
-      String? exportRoot});
-
-  Future<void> crateApiCacheCopyDirectory(
-      {required String src, required String dst});
-
-  Future<void> crateApiCacheCopyFile(
-      {required String from, required String to});
-
-  Future<void> crateApiCacheDeleteCacheFile(
-      {required String file,
-      required String cachePath,
-      String? filename,
-      String? exportRoot});
-
-  Future<String> crateApiCacheGenHash({required String str});
-
-  Future<void> crateApiCacheRemoveDir({required String dir});
-
-  Future<void> crateApiCacheRemoveFile({required String file});
-
-  Future<void> crateApiCacheRename({required String from, required String to});
-
-  String? crateApiCacheUseCacheFile(
-      {required String file,
-      required String cachePath,
-      String? filename,
-      String? exportRoot});
-
-  Future<Release?> crateApiCheckUpdateCheckUpdate(
-      {required String currentVersion});
-
-  Future<Release> crateApiCheckUpdateGetRelease();
-
-  Future<Config> crateApiConfigConfigLoad();
-
-  Future<void> crateApiConfigConfigSave({required Config that});
-
-  Future<ExternApi?> crateApiExternApiExternApiFetchUpdate(
-      {required ExternApi that});
-
-  Future<ExternApi> crateApiExternApiExternApiFromPath({required String path});
-
-  Future<ExternApi> crateApiExternApiExternApiFromUrl({required String url});
-
   Future<List<MusicAggregatorW>>
-      crateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
+      crateApiBindFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
           {required List<MusicAggregatorW> aggregators,
           required List<String> sources,
           required String content,
@@ -136,174 +91,231 @@ abstract class RustLibApi extends BaseApi {
           MusicFuzzFilter? filter});
 
   Future<(MusicListW, List<MusicAggregatorW>)>
-      crateApiFactoryBindOnlineFactoryWGetMusiclistFromShare(
+      crateApiBindFactoryBindOnlineFactoryWGetMusiclistFromShare(
           {required String shareUrl});
 
-  Future<List<MusicListW>> crateApiFactoryBindOnlineFactoryWSearchMusiclist(
+  Future<List<MusicListW>> crateApiBindFactoryBindOnlineFactoryWSearchMusiclist(
       {required List<String> sources,
       required String content,
       required int page,
       required int limit});
 
-  Future<void> crateApiFactoryBindSqlFactoryWAddMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWAddMusics(
       {required String musicsListName, required List<MusicAggregatorW> musics});
 
-  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicDefaultSource(
+  Future<void> crateApiBindFactoryBindSqlFactoryWChangeMusicDefaultSource(
       {required String musicListName,
       required Int64List ids,
       required List<String> newDefaultSources});
 
-  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicInfo(
+  Future<void> crateApiBindFactoryBindSqlFactoryWChangeMusicInfo(
       {required List<MusicW> musics, required List<MusicInfo> newInfos});
 
-  Future<void> crateApiFactoryBindSqlFactoryWChangeMusiclistInfo(
+  Future<void> crateApiBindFactoryBindSqlFactoryWChangeMusiclistInfo(
       {required List<MusicListInfo> old, required List<MusicListInfo> new_});
 
-  Future<void> crateApiFactoryBindSqlFactoryWCleanUnusedMusicData();
+  Future<void> crateApiBindFactoryBindSqlFactoryWCleanUnusedMusicData();
 
-  Future<void> crateApiFactoryBindSqlFactoryWCreateMusiclist(
+  Future<void> crateApiBindFactoryBindSqlFactoryWCreateMusiclist(
       {required List<MusicListInfo> musicListInfos});
 
-  Future<void> crateApiFactoryBindSqlFactoryWDelMusiclist(
+  Future<void> crateApiBindFactoryBindSqlFactoryWDelMusiclist(
       {required List<String> musiclistNames});
 
-  Future<void> crateApiFactoryBindSqlFactoryWDelMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWDelMusics(
       {required String musicListName, required Int64List ids});
 
-  Future<List<MusicListW>> crateApiFactoryBindSqlFactoryWGetAllMusiclists();
+  Future<List<MusicListW>> crateApiBindFactoryBindSqlFactoryWGetAllMusiclists();
 
-  Future<List<MusicAggregatorW>> crateApiFactoryBindSqlFactoryWGetAllMusics(
+  Future<List<MusicAggregatorW>> crateApiBindFactoryBindSqlFactoryWGetAllMusics(
       {required MusicListInfo musiclistInfo});
 
-  Future<MusicAggregatorW> crateApiFactoryBindSqlFactoryWGetMusicById(
+  Future<MusicAggregatorW> crateApiBindFactoryBindSqlFactoryWGetMusicById(
       {required MusicListInfo musicListInfo,
       required PlatformInt64 id,
       required List<String> sources});
 
-  Future<void> crateApiFactoryBindSqlFactoryWInitFromPath(
+  Future<void> crateApiBindFactoryBindSqlFactoryWInitFromPath(
       {required String filepath});
 
-  Future<List<MusicW>> crateApiFactoryBindSqlFactoryWReadMusicData(
+  Future<List<MusicW>> crateApiBindFactoryBindSqlFactoryWReadMusicData(
       {required String source});
 
-  Future<void> crateApiFactoryBindSqlFactoryWReorderMusiclist(
+  Future<void> crateApiBindFactoryBindSqlFactoryWReorderMusiclist(
       {required Int64List newIds});
 
-  Future<void> crateApiFactoryBindSqlFactoryWReorderMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWReorderMusics(
       {required String musicListName, required Int64List newIds});
 
-  Future<void> crateApiFactoryBindSqlFactoryWReplaceMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWReplaceMusics(
       {required String musicListName,
       required Int64List ids,
       required List<MusicAggregatorW> musics});
 
-  Future<void> crateApiFactoryBindSqlFactoryWShutdown();
+  Future<void> crateApiBindFactoryBindSqlFactoryWShutdown();
 
-  Future<String> crateApiHttpHelperSendRequest(
-      {required String method,
-      required Map<String, String> headers,
-      required String url,
-      required String payload});
-
-  Future<void> crateApiInitInit();
-
-  Future<Config> crateApiInitInitBackend({required String storeRoot});
-
-  Future<void> crateApiMusicCacheCacheMusic(
-      {required MusicInfo musicInfo, required PlayInfo playinfo});
-
-  Future<void> crateApiMusicCacheDeleteMusicCache(
-      {required MusicInfo musicInfo});
-
-  Future<PlayInfo> crateApiMusicCacheGetCachePlayinfo(
-      {required MusicInfo musicInfo});
-
-  Future<bool> crateApiMusicCacheHasCachePlayinfo(
-      {required MusicInfo musicInfo});
-
-  Future<void> crateApiTypeBindMusicAggregatorWAddMusic(
+  Future<void> crateApiBindTypeBindMusicAggregatorWAddMusic(
       {required MusicAggregatorW that, required MusicW music});
 
-  bool crateApiTypeBindMusicAggregatorWBelongTo(
+  bool crateApiBindTypeBindMusicAggregatorWBelongTo(
       {required MusicAggregatorW that, required MusicW music});
 
-  MusicAggregatorW crateApiTypeBindMusicAggregatorWClone(
+  MusicAggregatorW crateApiBindTypeBindMusicAggregatorWClone(
       {required MusicAggregatorW that});
 
   Future<(MusicListW, List<MusicAggregatorW>)>
-      crateApiTypeBindMusicAggregatorWFetchAlbum(
+      crateApiBindTypeBindMusicAggregatorWFetchAlbum(
           {required MusicAggregatorW that,
           required int page,
           required int limit});
 
-  Future<String> crateApiTypeBindMusicAggregatorWFetchLyric(
+  Future<String> crateApiBindTypeBindMusicAggregatorWFetchLyric(
       {required MusicAggregatorW that});
 
-  Future<List<MusicW>> crateApiTypeBindMusicAggregatorWFetchMusics(
+  Future<List<MusicW>> crateApiBindTypeBindMusicAggregatorWFetchMusics(
       {required MusicAggregatorW that, required List<String> sources});
 
-  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusics(
+  List<MusicW> crateApiBindTypeBindMusicAggregatorWGetAllMusics(
       {required MusicAggregatorW that});
 
-  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusicsOwned(
+  List<MusicW> crateApiBindTypeBindMusicAggregatorWGetAllMusicsOwned(
       {required MusicAggregatorW that});
 
-  List<String> crateApiTypeBindMusicAggregatorWGetAvailableSources(
+  List<String> crateApiBindTypeBindMusicAggregatorWGetAvailableSources(
       {required MusicAggregatorW that});
 
-  MusicW crateApiTypeBindMusicAggregatorWGetDefaultMusic(
+  MusicW crateApiBindTypeBindMusicAggregatorWGetDefaultMusic(
       {required MusicAggregatorW that});
 
-  String crateApiTypeBindMusicAggregatorWGetDefaultSource(
+  String crateApiBindTypeBindMusicAggregatorWGetDefaultSource(
       {required MusicAggregatorW that});
 
-  Future<MusicW?> crateApiTypeBindMusicAggregatorWGetMusic(
+  Future<MusicW?> crateApiBindTypeBindMusicAggregatorWGetMusic(
       {required MusicAggregatorW that, required String source});
 
-  PlatformInt64 crateApiTypeBindMusicAggregatorWGetMusicId(
+  PlatformInt64 crateApiBindTypeBindMusicAggregatorWGetMusicId(
       {required MusicAggregatorW that});
 
-  bool crateApiTypeBindMusicAggregatorWMatchFilter(
+  bool crateApiBindTypeBindMusicAggregatorWMatchFilter(
       {required MusicAggregatorW that, required MusicFuzzFilter filter});
 
-  Future<void> crateApiTypeBindMusicAggregatorWSetDefaultSource(
+  Future<void> crateApiBindTypeBindMusicAggregatorWSetDefaultSource(
       {required MusicAggregatorW that, required String source});
 
-  String crateApiTypeBindMusicAggregatorWToString(
+  String crateApiBindTypeBindMusicAggregatorWToString(
       {required MusicAggregatorW that});
 
   Future<List<MusicAggregatorW>>
-      crateApiTypeBindMusicListWFetchAllMusicAggregators(
+      crateApiBindTypeBindMusicListWFetchAllMusicAggregators(
           {required MusicListW that,
           required int pagesPerBatch,
           required int limit,
           required bool withLyric});
 
-  Future<List<MusicAggregatorW>> crateApiTypeBindMusicListWGetMusicAggregators(
-      {required MusicListW that, required int page, required int limit});
+  Future<List<MusicAggregatorW>>
+      crateApiBindTypeBindMusicListWGetMusicAggregators(
+          {required MusicListW that, required int page, required int limit});
 
-  MusicListInfo crateApiTypeBindMusicListWGetMusiclistInfo(
+  MusicListInfo crateApiBindTypeBindMusicListWGetMusiclistInfo(
       {required MusicListW that});
 
-  String crateApiTypeBindMusicListWSource({required MusicListW that});
+  String crateApiBindTypeBindMusicListWSource({required MusicListW that});
 
-  String crateApiTypeBindMusicListWToString({required MusicListW that});
+  String crateApiBindTypeBindMusicListWToString({required MusicListW that});
 
-  Future<(MusicListW, List<MusicAggregatorW>)> crateApiTypeBindMusicWFetchAlbum(
-      {required MusicW that, required int page, required int limit});
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiBindTypeBindMusicWFetchAlbum(
+          {required MusicW that, required int page, required int limit});
 
-  Future<String> crateApiTypeBindMusicWFetchLyric({required MusicW that});
+  Future<String> crateApiBindTypeBindMusicWFetchLyric({required MusicW that});
 
-  String crateApiTypeBindMusicWGetExtraInfo(
+  String crateApiBindTypeBindMusicWGetExtraInfo(
       {required MusicW that, required Quality quality});
 
-  MusicInfo crateApiTypeBindMusicWGetMusicInfo({required MusicW that});
+  MusicInfo crateApiBindTypeBindMusicWGetMusicInfo({required MusicW that});
 
-  (String, String) crateApiTypeBindMusicWGetPrimaryKv({required MusicW that});
+  (String, String) crateApiBindTypeBindMusicWGetPrimaryKv(
+      {required MusicW that});
 
-  String crateApiTypeBindMusicWSource({required MusicW that});
+  String crateApiBindTypeBindMusicWSource({required MusicW that});
 
-  String crateApiTypeBindMusicWToString({required MusicW that});
+  String crateApiBindTypeBindMusicWToString({required MusicW that});
+
+  Future<String> crateApiCacheFileCacheCacheFile(
+      {required String file,
+      required String cachePath,
+      String? filename,
+      String? exportRoot});
+
+  Future<void> crateApiCacheFileCacheDeleteCacheFile(
+      {required String file,
+      required String cachePath,
+      String? filename,
+      String? exportRoot});
+
+  Future<String> crateApiCacheFileCacheGenHash({required String str});
+
+  String? crateApiCacheFileCacheUseCacheFile(
+      {required String file,
+      required String cachePath,
+      String? filename,
+      String? exportRoot});
+
+  Future<void> crateApiCacheFsUtilCopyDirectory(
+      {required String src, required String dst});
+
+  Future<void> crateApiCacheFsUtilCopyFile(
+      {required String from, required String to});
+
+  Future<void> crateApiCacheFsUtilRemoveDir({required String dir});
+
+  Future<void> crateApiCacheFsUtilRemoveFile({required String file});
+
+  Future<void> crateApiCacheFsUtilRename(
+      {required String from, required String to});
+
+  Future<void> crateApiCacheMusicCacheCacheMusic(
+      {required MusicInfo musicInfo, required PlayInfo playinfo});
+
+  Future<void> crateApiCacheMusicCacheDeleteMusicCache(
+      {required MusicInfo musicInfo});
+
+  Future<PlayInfo> crateApiCacheMusicCacheGetCachePlayinfo(
+      {required MusicInfo musicInfo});
+
+  Future<bool> crateApiCacheMusicCacheHasCachePlayinfo(
+      {required MusicInfo musicInfo});
+
+  Future<void> crateApiInitInit();
+
+  Future<Config> crateApiInitInitBackend({required String storeRoot});
+
+  Future<Config> crateApiTypesConfigConfigLoad();
+
+  Future<void> crateApiTypesConfigConfigSave({required Config that});
+
+  Future<ExternApi?> crateApiTypesExternApiExternApiFetchUpdate(
+      {required ExternApi that});
+
+  Future<ExternApi> crateApiTypesExternApiExternApiFromPath(
+      {required String path});
+
+  Future<ExternApi> crateApiTypesExternApiExternApiFromUrl(
+      {required String url});
+
+  Future<Release?> crateApiTypesVersionCheckUpdate(
+      {required String currentVersion});
+
+  Future<Release> crateApiTypesVersionGetRelease();
+
+  Future<String> crateApiUtilsHttpHelperSendRequest(
+      {required String method,
+      required Map<String, String> headers,
+      required String url,
+      required String payload});
+
+  Future<String> crateApiUtilsPathUtilUrlEncodeSpecialChars(
+      {required String input});
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_MusicAggregatorW;
@@ -338,423 +350,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<String> crateApiCacheCacheFile(
-      {required String file,
-      required String cachePath,
-      String? filename,
-      String? exportRoot}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(file, serializer);
-        sse_encode_String(cachePath, serializer);
-        sse_encode_opt_String(filename, serializer);
-        sse_encode_opt_String(exportRoot, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 1, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheCacheFileConstMeta,
-      argValues: [file, cachePath, filename, exportRoot],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheCacheFileConstMeta => const TaskConstMeta(
-        debugName: "cache_file",
-        argNames: ["file", "cachePath", "filename", "exportRoot"],
-      );
-
-  @override
-  Future<void> crateApiCacheCopyDirectory(
-      {required String src, required String dst}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(src, serializer);
-        sse_encode_String(dst, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 2, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheCopyDirectoryConstMeta,
-      argValues: [src, dst],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheCopyDirectoryConstMeta => const TaskConstMeta(
-        debugName: "copy_directory",
-        argNames: ["src", "dst"],
-      );
-
-  @override
-  Future<void> crateApiCacheCopyFile(
-      {required String from, required String to}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(from, serializer);
-        sse_encode_String(to, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 3, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheCopyFileConstMeta,
-      argValues: [from, to],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheCopyFileConstMeta => const TaskConstMeta(
-        debugName: "copy_file",
-        argNames: ["from", "to"],
-      );
-
-  @override
-  Future<void> crateApiCacheDeleteCacheFile(
-      {required String file,
-      required String cachePath,
-      String? filename,
-      String? exportRoot}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(file, serializer);
-        sse_encode_String(cachePath, serializer);
-        sse_encode_opt_String(filename, serializer);
-        sse_encode_opt_String(exportRoot, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheDeleteCacheFileConstMeta,
-      argValues: [file, cachePath, filename, exportRoot],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheDeleteCacheFileConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_cache_file",
-        argNames: ["file", "cachePath", "filename", "exportRoot"],
-      );
-
-  @override
-  Future<String> crateApiCacheGenHash({required String str}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(str, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiCacheGenHashConstMeta,
-      argValues: [str],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheGenHashConstMeta => const TaskConstMeta(
-        debugName: "gen_hash",
-        argNames: ["str"],
-      );
-
-  @override
-  Future<void> crateApiCacheRemoveDir({required String dir}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(dir, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheRemoveDirConstMeta,
-      argValues: [dir],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheRemoveDirConstMeta => const TaskConstMeta(
-        debugName: "remove_dir",
-        argNames: ["dir"],
-      );
-
-  @override
-  Future<void> crateApiCacheRemoveFile({required String file}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(file, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheRemoveFileConstMeta,
-      argValues: [file],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheRemoveFileConstMeta => const TaskConstMeta(
-        debugName: "remove_file",
-        argNames: ["file"],
-      );
-
-  @override
-  Future<void> crateApiCacheRename({required String from, required String to}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(from, serializer);
-        sse_encode_String(to, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheRenameConstMeta,
-      argValues: [from, to],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheRenameConstMeta => const TaskConstMeta(
-        debugName: "rename",
-        argNames: ["from", "to"],
-      );
-
-  @override
-  String? crateApiCacheUseCacheFile(
-      {required String file,
-      required String cachePath,
-      String? filename,
-      String? exportRoot}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(file, serializer);
-        sse_encode_String(cachePath, serializer);
-        sse_encode_opt_String(filename, serializer);
-        sse_encode_opt_String(exportRoot, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiCacheUseCacheFileConstMeta,
-      argValues: [file, cachePath, filename, exportRoot],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheUseCacheFileConstMeta => const TaskConstMeta(
-        debugName: "use_cache_file",
-        argNames: ["file", "cachePath", "filename", "exportRoot"],
-      );
-
-  @override
-  Future<Release?> crateApiCheckUpdateCheckUpdate(
-      {required String currentVersion}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(currentVersion, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_release,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCheckUpdateCheckUpdateConstMeta,
-      argValues: [currentVersion],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCheckUpdateCheckUpdateConstMeta =>
-      const TaskConstMeta(
-        debugName: "check_update",
-        argNames: ["currentVersion"],
-      );
-
-  @override
-  Future<Release> crateApiCheckUpdateGetRelease() {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_release,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCheckUpdateGetReleaseConstMeta,
-      argValues: [],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCheckUpdateGetReleaseConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_release",
-        argNames: [],
-      );
-
-  @override
-  Future<Config> crateApiConfigConfigLoad() {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 12, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_config,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiConfigConfigLoadConstMeta,
-      argValues: [],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiConfigConfigLoadConstMeta => const TaskConstMeta(
-        debugName: "config_load",
-        argNames: [],
-      );
-
-  @override
-  Future<void> crateApiConfigConfigSave({required Config that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_config(that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 13, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiConfigConfigSaveConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiConfigConfigSaveConstMeta => const TaskConstMeta(
-        debugName: "config_save",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<ExternApi?> crateApiExternApiExternApiFetchUpdate(
-      {required ExternApi that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_extern_api(that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 14, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_box_autoadd_extern_api,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiExternApiExternApiFetchUpdateConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiExternApiExternApiFetchUpdateConstMeta =>
-      const TaskConstMeta(
-        debugName: "extern_api_fetch_update",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<ExternApi> crateApiExternApiExternApiFromPath({required String path}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(path, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 15, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_extern_api,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiExternApiExternApiFromPathConstMeta,
-      argValues: [path],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiExternApiExternApiFromPathConstMeta =>
-      const TaskConstMeta(
-        debugName: "extern_api_from_path",
-        argNames: ["path"],
-      );
-
-  @override
-  Future<ExternApi> crateApiExternApiExternApiFromUrl({required String url}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(url, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 16, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_extern_api,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiExternApiExternApiFromUrlConstMeta,
-      argValues: [url],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiExternApiExternApiFromUrlConstMeta =>
-      const TaskConstMeta(
-        debugName: "extern_api_from_url",
-        argNames: ["url"],
-      );
-
-  @override
   Future<List<MusicAggregatorW>>
-      crateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
+      crateApiBindFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
           {required List<MusicAggregatorW> aggregators,
           required List<String> sources,
           required String content,
@@ -772,7 +369,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_32(limit, serializer);
         sse_encode_opt_box_autoadd_music_fuzz_filter(filter, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 17, port: port_);
+            funcId: 1, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -780,14 +377,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta:
-          kCrateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregatorConstMeta,
+          kCrateApiBindFactoryBindAggregatorOnlineFactoryWSearchMusicAggregatorConstMeta,
       argValues: [aggregators, sources, content, page, limit, filter],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregatorConstMeta =>
+      get kCrateApiBindFactoryBindAggregatorOnlineFactoryWSearchMusicAggregatorConstMeta =>
           const TaskConstMeta(
             debugName: "aggregator_online_factory_w_search_music_aggregator",
             argNames: [
@@ -802,14 +399,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<(MusicListW, List<MusicAggregatorW>)>
-      crateApiFactoryBindOnlineFactoryWGetMusiclistFromShare(
+      crateApiBindFactoryBindOnlineFactoryWGetMusiclistFromShare(
           {required String shareUrl}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(shareUrl, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 18, port: port_);
+            funcId: 2, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -817,21 +414,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta:
-          kCrateApiFactoryBindOnlineFactoryWGetMusiclistFromShareConstMeta,
+          kCrateApiBindFactoryBindOnlineFactoryWGetMusiclistFromShareConstMeta,
       argValues: [shareUrl],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiFactoryBindOnlineFactoryWGetMusiclistFromShareConstMeta =>
+      get kCrateApiBindFactoryBindOnlineFactoryWGetMusiclistFromShareConstMeta =>
           const TaskConstMeta(
             debugName: "online_factory_w_get_musiclist_from_share",
             argNames: ["shareUrl"],
           );
 
   @override
-  Future<List<MusicListW>> crateApiFactoryBindOnlineFactoryWSearchMusiclist(
+  Future<List<MusicListW>> crateApiBindFactoryBindOnlineFactoryWSearchMusiclist(
       {required List<String> sources,
       required String content,
       required int page,
@@ -844,28 +441,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_32(page, serializer);
         sse_encode_u_32(limit, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 19, port: port_);
+            funcId: 3, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
             sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindOnlineFactoryWSearchMusiclistConstMeta,
+      constMeta: kCrateApiBindFactoryBindOnlineFactoryWSearchMusiclistConstMeta,
       argValues: [sources, content, page, limit],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiFactoryBindOnlineFactoryWSearchMusiclistConstMeta =>
+      get kCrateApiBindFactoryBindOnlineFactoryWSearchMusiclistConstMeta =>
           const TaskConstMeta(
             debugName: "online_factory_w_search_musiclist",
             argNames: ["sources", "content", "page", "limit"],
           );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWAddMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWAddMusics(
       {required String musicsListName,
       required List<MusicAggregatorW> musics}) {
     return handler.executeNormal(NormalTask(
@@ -875,26 +472,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
             musics, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 20, port: port_);
+            funcId: 4, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWAddMusicsConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWAddMusicsConstMeta,
       argValues: [musicsListName, musics],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWAddMusicsConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWAddMusicsConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_add_musics",
         argNames: ["musicsListName", "musics"],
       );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicDefaultSource(
+  Future<void> crateApiBindFactoryBindSqlFactoryWChangeMusicDefaultSource(
       {required String musicListName,
       required Int64List ids,
       required List<String> newDefaultSources}) {
@@ -905,28 +502,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_prim_i_64_strict(ids, serializer);
         sse_encode_list_String(newDefaultSources, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 21, port: port_);
+            funcId: 5, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta:
-          kCrateApiFactoryBindSqlFactoryWChangeMusicDefaultSourceConstMeta,
+          kCrateApiBindFactoryBindSqlFactoryWChangeMusicDefaultSourceConstMeta,
       argValues: [musicListName, ids, newDefaultSources],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiFactoryBindSqlFactoryWChangeMusicDefaultSourceConstMeta =>
+      get kCrateApiBindFactoryBindSqlFactoryWChangeMusicDefaultSourceConstMeta =>
           const TaskConstMeta(
             debugName: "sql_factory_w_change_music_default_source",
             argNames: ["musicListName", "ids", "newDefaultSources"],
           );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWChangeMusicInfo(
+  Future<void> crateApiBindFactoryBindSqlFactoryWChangeMusicInfo(
       {required List<MusicW> musics, required List<MusicInfo> newInfos}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -935,26 +532,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             musics, serializer);
         sse_encode_list_music_info(newInfos, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 22, port: port_);
+            funcId: 6, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWChangeMusicInfoConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWChangeMusicInfoConstMeta,
       argValues: [musics, newInfos],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWChangeMusicInfoConstMeta =>
-      const TaskConstMeta(
-        debugName: "sql_factory_w_change_music_info",
-        argNames: ["musics", "newInfos"],
-      );
+  TaskConstMeta
+      get kCrateApiBindFactoryBindSqlFactoryWChangeMusicInfoConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_change_music_info",
+            argNames: ["musics", "newInfos"],
+          );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWChangeMusiclistInfo(
+  Future<void> crateApiBindFactoryBindSqlFactoryWChangeMusiclistInfo(
       {required List<MusicListInfo> old, required List<MusicListInfo> new_}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -962,104 +560,107 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_music_list_info(old, serializer);
         sse_encode_list_music_list_info(new_, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 23, port: port_);
+            funcId: 7, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWChangeMusiclistInfoConstMeta,
+      constMeta:
+          kCrateApiBindFactoryBindSqlFactoryWChangeMusiclistInfoConstMeta,
       argValues: [old, new_],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiFactoryBindSqlFactoryWChangeMusiclistInfoConstMeta =>
+      get kCrateApiBindFactoryBindSqlFactoryWChangeMusiclistInfoConstMeta =>
           const TaskConstMeta(
             debugName: "sql_factory_w_change_musiclist_info",
             argNames: ["old", "new_"],
           );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWCleanUnusedMusicData() {
+  Future<void> crateApiBindFactoryBindSqlFactoryWCleanUnusedMusicData() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 24, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWCleanUnusedMusicDataConstMeta,
+      constMeta:
+          kCrateApiBindFactoryBindSqlFactoryWCleanUnusedMusicDataConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiFactoryBindSqlFactoryWCleanUnusedMusicDataConstMeta =>
+      get kCrateApiBindFactoryBindSqlFactoryWCleanUnusedMusicDataConstMeta =>
           const TaskConstMeta(
             debugName: "sql_factory_w_clean_unused_music_data",
             argNames: [],
           );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWCreateMusiclist(
+  Future<void> crateApiBindFactoryBindSqlFactoryWCreateMusiclist(
       {required List<MusicListInfo> musicListInfos}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_music_list_info(musicListInfos, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 25, port: port_);
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWCreateMusiclistConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWCreateMusiclistConstMeta,
       argValues: [musicListInfos],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWCreateMusiclistConstMeta =>
-      const TaskConstMeta(
-        debugName: "sql_factory_w_create_musiclist",
-        argNames: ["musicListInfos"],
-      );
+  TaskConstMeta
+      get kCrateApiBindFactoryBindSqlFactoryWCreateMusiclistConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_create_musiclist",
+            argNames: ["musicListInfos"],
+          );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWDelMusiclist(
+  Future<void> crateApiBindFactoryBindSqlFactoryWDelMusiclist(
       {required List<String> musiclistNames}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_String(musiclistNames, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 26, port: port_);
+            funcId: 10, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWDelMusiclistConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWDelMusiclistConstMeta,
       argValues: [musiclistNames],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWDelMusiclistConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWDelMusiclistConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_del_musiclist",
         argNames: ["musiclistNames"],
       );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWDelMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWDelMusics(
       {required String musicListName, required Int64List ids}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -1067,78 +668,80 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(musicListName, serializer);
         sse_encode_list_prim_i_64_strict(ids, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 27, port: port_);
+            funcId: 11, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWDelMusicsConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWDelMusicsConstMeta,
       argValues: [musicListName, ids],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWDelMusicsConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWDelMusicsConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_del_musics",
         argNames: ["musicListName", "ids"],
       );
 
   @override
-  Future<List<MusicListW>> crateApiFactoryBindSqlFactoryWGetAllMusiclists() {
+  Future<List<MusicListW>>
+      crateApiBindFactoryBindSqlFactoryWGetAllMusiclists() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 28, port: port_);
+            funcId: 12, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
             sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWGetAllMusiclistsConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWGetAllMusiclistsConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWGetAllMusiclistsConstMeta =>
-      const TaskConstMeta(
-        debugName: "sql_factory_w_get_all_musiclists",
-        argNames: [],
-      );
+  TaskConstMeta
+      get kCrateApiBindFactoryBindSqlFactoryWGetAllMusiclistsConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_get_all_musiclists",
+            argNames: [],
+          );
 
   @override
-  Future<List<MusicAggregatorW>> crateApiFactoryBindSqlFactoryWGetAllMusics(
+  Future<List<MusicAggregatorW>> crateApiBindFactoryBindSqlFactoryWGetAllMusics(
       {required MusicListInfo musiclistInfo}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music_list_info(musiclistInfo, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 29, port: port_);
+            funcId: 13, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
             sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWGetAllMusicsConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWGetAllMusicsConstMeta,
       argValues: [musiclistInfo],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWGetAllMusicsConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWGetAllMusicsConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_get_all_musics",
         argNames: ["musiclistInfo"],
       );
 
   @override
-  Future<MusicAggregatorW> crateApiFactoryBindSqlFactoryWGetMusicById(
+  Future<MusicAggregatorW> crateApiBindFactoryBindSqlFactoryWGetMusicById(
       {required MusicListInfo musicListInfo,
       required PlatformInt64 id,
       required List<String> sources}) {
@@ -1149,106 +752,107 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_64(id, serializer);
         sse_encode_list_String(sources, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 30, port: port_);
+            funcId: 14, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
             sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWGetMusicByIdConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWGetMusicByIdConstMeta,
       argValues: [musicListInfo, id, sources],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWGetMusicByIdConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWGetMusicByIdConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_get_music_by_id",
         argNames: ["musicListInfo", "id", "sources"],
       );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWInitFromPath(
+  Future<void> crateApiBindFactoryBindSqlFactoryWInitFromPath(
       {required String filepath}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(filepath, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 31, port: port_);
+            funcId: 15, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWInitFromPathConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWInitFromPathConstMeta,
       argValues: [filepath],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWInitFromPathConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWInitFromPathConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_init_from_path",
         argNames: ["filepath"],
       );
 
   @override
-  Future<List<MusicW>> crateApiFactoryBindSqlFactoryWReadMusicData(
+  Future<List<MusicW>> crateApiBindFactoryBindSqlFactoryWReadMusicData(
       {required String source}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(source, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 32, port: port_);
+            funcId: 16, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
             sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWReadMusicDataConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWReadMusicDataConstMeta,
       argValues: [source],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReadMusicDataConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWReadMusicDataConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_read_music_data",
         argNames: ["source"],
       );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWReorderMusiclist(
+  Future<void> crateApiBindFactoryBindSqlFactoryWReorderMusiclist(
       {required Int64List newIds}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_list_prim_i_64_strict(newIds, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 33, port: port_);
+            funcId: 17, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWReorderMusiclistConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWReorderMusiclistConstMeta,
       argValues: [newIds],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReorderMusiclistConstMeta =>
-      const TaskConstMeta(
-        debugName: "sql_factory_w_reorder_musiclist",
-        argNames: ["newIds"],
-      );
+  TaskConstMeta
+      get kCrateApiBindFactoryBindSqlFactoryWReorderMusiclistConstMeta =>
+          const TaskConstMeta(
+            debugName: "sql_factory_w_reorder_musiclist",
+            argNames: ["newIds"],
+          );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWReorderMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWReorderMusics(
       {required String musicListName, required Int64List newIds}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -1256,26 +860,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(musicListName, serializer);
         sse_encode_list_prim_i_64_strict(newIds, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 34, port: port_);
+            funcId: 18, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWReorderMusicsConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWReorderMusicsConstMeta,
       argValues: [musicListName, newIds],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReorderMusicsConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWReorderMusicsConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_reorder_musics",
         argNames: ["musicListName", "newIds"],
       );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWReplaceMusics(
+  Future<void> crateApiBindFactoryBindSqlFactoryWReplaceMusics(
       {required String musicListName,
       required Int64List ids,
       required List<MusicAggregatorW> musics}) {
@@ -1287,78 +891,1181 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
             musics, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 35, port: port_);
+            funcId: 19, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWReplaceMusicsConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWReplaceMusicsConstMeta,
       argValues: [musicListName, ids, musics],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWReplaceMusicsConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWReplaceMusicsConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_replace_musics",
         argNames: ["musicListName", "ids", "musics"],
       );
 
   @override
-  Future<void> crateApiFactoryBindSqlFactoryWShutdown() {
+  Future<void> crateApiBindFactoryBindSqlFactoryWShutdown() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 36, port: port_);
+            funcId: 20, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiFactoryBindSqlFactoryWShutdownConstMeta,
+      constMeta: kCrateApiBindFactoryBindSqlFactoryWShutdownConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiFactoryBindSqlFactoryWShutdownConstMeta =>
+  TaskConstMeta get kCrateApiBindFactoryBindSqlFactoryWShutdownConstMeta =>
       const TaskConstMeta(
         debugName: "sql_factory_w_shutdown",
         argNames: [],
       );
 
   @override
-  Future<String> crateApiHttpHelperSendRequest(
-      {required String method,
-      required Map<String, String> headers,
-      required String url,
-      required String payload}) {
+  Future<void> crateApiBindTypeBindMusicAggregatorWAddMusic(
+      {required MusicAggregatorW that, required MusicW music}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(method, serializer);
-        sse_encode_Map_String_String(headers, serializer);
-        sse_encode_String(url, serializer);
-        sse_encode_String(payload, serializer);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            music, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 37, port: port_);
+            funcId: 21, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWAddMusicConstMeta,
+      argValues: [that, music],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWAddMusicConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_add_music",
+        argNames: ["that", "music"],
+      );
+
+  @override
+  bool crateApiBindTypeBindMusicAggregatorWBelongTo(
+      {required MusicAggregatorW that, required MusicW music}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            music, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWBelongToConstMeta,
+      argValues: [that, music],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWBelongToConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_belong_to",
+        argNames: ["that", "music"],
+      );
+
+  @override
+  MusicAggregatorW crateApiBindTypeBindMusicAggregatorWClone(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWCloneConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWCloneConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_clone",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiBindTypeBindMusicAggregatorWFetchAlbum(
+          {required MusicAggregatorW that,
+          required int page,
+          required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 24, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWFetchAlbumConstMeta,
+      argValues: [that, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWFetchAlbumConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_fetch_album",
+        argNames: ["that", "page", "limit"],
+      );
+
+  @override
+  Future<String> crateApiBindTypeBindMusicAggregatorWFetchLyric(
+      {required MusicAggregatorW that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 25, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWFetchLyricConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWFetchLyricConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_fetch_lyric",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<List<MusicW>> crateApiBindTypeBindMusicAggregatorWFetchMusics(
+      {required MusicAggregatorW that, required List<String> sources}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_list_String(sources, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 26, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWFetchMusicsConstMeta,
+      argValues: [that, sources],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWFetchMusicsConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_fetch_musics",
+        argNames: ["that", "sources"],
+      );
+
+  @override
+  List<MusicW> crateApiBindTypeBindMusicAggregatorWGetAllMusics(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWGetAllMusicsConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicAggregatorWGetAllMusicsConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_all_musics",
+            argNames: ["that"],
+          );
+
+  @override
+  List<MusicW> crateApiBindTypeBindMusicAggregatorWGetAllMusicsOwned(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kCrateApiBindTypeBindMusicAggregatorWGetAllMusicsOwnedConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicAggregatorWGetAllMusicsOwnedConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_all_musics_owned",
+            argNames: ["that"],
+          );
+
+  @override
+  List<String> crateApiBindTypeBindMusicAggregatorWGetAvailableSources(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_String,
+        decodeErrorData: null,
+      ),
+      constMeta:
+          kCrateApiBindTypeBindMusicAggregatorWGetAvailableSourcesConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicAggregatorWGetAvailableSourcesConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_available_sources",
+            argNames: ["that"],
+          );
+
+  @override
+  MusicW crateApiBindTypeBindMusicAggregatorWGetDefaultMusic(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWGetDefaultMusicConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicAggregatorWGetDefaultMusicConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_default_music",
+            argNames: ["that"],
+          );
+
+  @override
+  String crateApiBindTypeBindMusicAggregatorWGetDefaultSource(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiHttpHelperSendRequestConstMeta,
-      argValues: [method, headers, url, payload],
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWGetDefaultSourceConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiHttpHelperSendRequestConstMeta =>
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicAggregatorWGetDefaultSourceConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_get_default_source",
+            argNames: ["that"],
+          );
+
+  @override
+  Future<MusicW?> crateApiBindTypeBindMusicAggregatorWGetMusic(
+      {required MusicAggregatorW that, required String source}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_String(source, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 32, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWGetMusicConstMeta,
+      argValues: [that, source],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWGetMusicConstMeta =>
       const TaskConstMeta(
-        debugName: "send_request",
-        argNames: ["method", "headers", "url", "payload"],
+        debugName: "MusicAggregatorW_get_music",
+        argNames: ["that", "source"],
+      );
+
+  @override
+  PlatformInt64 crateApiBindTypeBindMusicAggregatorWGetMusicId(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_i_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWGetMusicIdConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWGetMusicIdConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_get_music_id",
+        argNames: ["that"],
+      );
+
+  @override
+  bool crateApiBindTypeBindMusicAggregatorWMatchFilter(
+      {required MusicAggregatorW that, required MusicFuzzFilter filter}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_box_autoadd_music_fuzz_filter(filter, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWMatchFilterConstMeta,
+      argValues: [that, filter],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWMatchFilterConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_match_filter",
+        argNames: ["that", "filter"],
+      );
+
+  @override
+  Future<void> crateApiBindTypeBindMusicAggregatorWSetDefaultSource(
+      {required MusicAggregatorW that, required String source}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        sse_encode_String(source, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 35, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWSetDefaultSourceConstMeta,
+      argValues: [that, source],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicAggregatorWSetDefaultSourceConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicAggregatorW_set_default_source",
+            argNames: ["that", "source"],
+          );
+
+  @override
+  String crateApiBindTypeBindMusicAggregatorWToString(
+      {required MusicAggregatorW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicAggregatorWToStringConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicAggregatorWToStringConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicAggregatorW_to_string",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<List<MusicAggregatorW>>
+      crateApiBindTypeBindMusicListWFetchAllMusicAggregators(
+          {required MusicListW that,
+          required int pagesPerBatch,
+          required int limit,
+          required bool withLyric}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        sse_encode_u_32(pagesPerBatch, serializer);
+        sse_encode_u_32(limit, serializer);
+        sse_encode_bool(withLyric, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 37, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta:
+          kCrateApiBindTypeBindMusicListWFetchAllMusicAggregatorsConstMeta,
+      argValues: [that, pagesPerBatch, limit, withLyric],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicListWFetchAllMusicAggregatorsConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicListW_fetch_all_music_aggregators",
+            argNames: ["that", "pagesPerBatch", "limit", "withLyric"],
+          );
+
+  @override
+  Future<List<MusicAggregatorW>>
+      crateApiBindTypeBindMusicListWGetMusicAggregators(
+          {required MusicListW that, required int page, required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 38, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicListWGetMusicAggregatorsConstMeta,
+      argValues: [that, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiBindTypeBindMusicListWGetMusicAggregatorsConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicListW_get_music_aggregators",
+            argNames: ["that", "page", "limit"],
+          );
+
+  @override
+  MusicListInfo crateApiBindTypeBindMusicListWGetMusiclistInfo(
+      {required MusicListW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_music_list_info,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicListWGetMusiclistInfoConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicListWGetMusiclistInfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_get_musiclist_info",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiBindTypeBindMusicListWSource({required MusicListW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicListWSourceConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicListWSourceConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_source",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiBindTypeBindMusicListWToString({required MusicListW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicListWToStringConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicListWToStringConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicListW_to_string",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<(MusicListW, List<MusicAggregatorW>)>
+      crateApiBindTypeBindMusicWFetchAlbum(
+          {required MusicW that, required int page, required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        sse_encode_u_32(page, serializer);
+        sse_encode_u_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 42, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWFetchAlbumConstMeta,
+      argValues: [that, page, limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWFetchAlbumConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_fetch_album",
+        argNames: ["that", "page", "limit"],
+      );
+
+  @override
+  Future<String> crateApiBindTypeBindMusicWFetchLyric({required MusicW that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 43, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWFetchLyricConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWFetchLyricConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_fetch_lyric",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiBindTypeBindMusicWGetExtraInfo(
+      {required MusicW that, required Quality quality}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        sse_encode_box_autoadd_quality(quality, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWGetExtraInfoConstMeta,
+      argValues: [that, quality],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWGetExtraInfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_get_extra_info",
+        argNames: ["that", "quality"],
+      );
+
+  @override
+  MusicInfo crateApiBindTypeBindMusicWGetMusicInfo({required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_music_info,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWGetMusicInfoConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWGetMusicInfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_get_music_info",
+        argNames: ["that"],
+      );
+
+  @override
+  (String, String) crateApiBindTypeBindMusicWGetPrimaryKv(
+      {required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_record_string_string,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWGetPrimaryKvConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWGetPrimaryKvConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_get_primary_kv",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiBindTypeBindMusicWSource({required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWSourceConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWSourceConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_source",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiBindTypeBindMusicWToString({required MusicW that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiBindTypeBindMusicWToStringConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBindTypeBindMusicWToStringConstMeta =>
+      const TaskConstMeta(
+        debugName: "MusicW_to_string",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<String> crateApiCacheFileCacheCacheFile(
+      {required String file,
+      required String cachePath,
+      String? filename,
+      String? exportRoot}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(file, serializer);
+        sse_encode_String(cachePath, serializer);
+        sse_encode_opt_String(filename, serializer);
+        sse_encode_opt_String(exportRoot, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 49, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFileCacheCacheFileConstMeta,
+      argValues: [file, cachePath, filename, exportRoot],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFileCacheCacheFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "cache_file",
+        argNames: ["file", "cachePath", "filename", "exportRoot"],
+      );
+
+  @override
+  Future<void> crateApiCacheFileCacheDeleteCacheFile(
+      {required String file,
+      required String cachePath,
+      String? filename,
+      String? exportRoot}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(file, serializer);
+        sse_encode_String(cachePath, serializer);
+        sse_encode_opt_String(filename, serializer);
+        sse_encode_opt_String(exportRoot, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 50, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFileCacheDeleteCacheFileConstMeta,
+      argValues: [file, cachePath, filename, exportRoot],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFileCacheDeleteCacheFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_cache_file",
+        argNames: ["file", "cachePath", "filename", "exportRoot"],
+      );
+
+  @override
+  Future<String> crateApiCacheFileCacheGenHash({required String str}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(str, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 51, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiCacheFileCacheGenHashConstMeta,
+      argValues: [str],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFileCacheGenHashConstMeta =>
+      const TaskConstMeta(
+        debugName: "gen_hash",
+        argNames: ["str"],
+      );
+
+  @override
+  String? crateApiCacheFileCacheUseCacheFile(
+      {required String file,
+      required String cachePath,
+      String? filename,
+      String? exportRoot}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(file, serializer);
+        sse_encode_String(cachePath, serializer);
+        sse_encode_opt_String(filename, serializer);
+        sse_encode_opt_String(exportRoot, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_String,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiCacheFileCacheUseCacheFileConstMeta,
+      argValues: [file, cachePath, filename, exportRoot],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFileCacheUseCacheFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "use_cache_file",
+        argNames: ["file", "cachePath", "filename", "exportRoot"],
+      );
+
+  @override
+  Future<void> crateApiCacheFsUtilCopyDirectory(
+      {required String src, required String dst}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(src, serializer);
+        sse_encode_String(dst, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 53, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFsUtilCopyDirectoryConstMeta,
+      argValues: [src, dst],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFsUtilCopyDirectoryConstMeta =>
+      const TaskConstMeta(
+        debugName: "copy_directory",
+        argNames: ["src", "dst"],
+      );
+
+  @override
+  Future<void> crateApiCacheFsUtilCopyFile(
+      {required String from, required String to}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(from, serializer);
+        sse_encode_String(to, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 54, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFsUtilCopyFileConstMeta,
+      argValues: [from, to],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFsUtilCopyFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "copy_file",
+        argNames: ["from", "to"],
+      );
+
+  @override
+  Future<void> crateApiCacheFsUtilRemoveDir({required String dir}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(dir, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 55, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFsUtilRemoveDirConstMeta,
+      argValues: [dir],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFsUtilRemoveDirConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_dir",
+        argNames: ["dir"],
+      );
+
+  @override
+  Future<void> crateApiCacheFsUtilRemoveFile({required String file}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(file, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 56, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFsUtilRemoveFileConstMeta,
+      argValues: [file],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFsUtilRemoveFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_file",
+        argNames: ["file"],
+      );
+
+  @override
+  Future<void> crateApiCacheFsUtilRename(
+      {required String from, required String to}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(from, serializer);
+        sse_encode_String(to, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 57, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheFsUtilRenameConstMeta,
+      argValues: [from, to],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheFsUtilRenameConstMeta => const TaskConstMeta(
+        debugName: "rename",
+        argNames: ["from", "to"],
+      );
+
+  @override
+  Future<void> crateApiCacheMusicCacheCacheMusic(
+      {required MusicInfo musicInfo, required PlayInfo playinfo}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_music_info(musicInfo, serializer);
+        sse_encode_box_autoadd_play_info(playinfo, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 58, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheMusicCacheCacheMusicConstMeta,
+      argValues: [musicInfo, playinfo],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheMusicCacheCacheMusicConstMeta =>
+      const TaskConstMeta(
+        debugName: "cache_music",
+        argNames: ["musicInfo", "playinfo"],
+      );
+
+  @override
+  Future<void> crateApiCacheMusicCacheDeleteMusicCache(
+      {required MusicInfo musicInfo}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_music_info(musicInfo, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 59, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheMusicCacheDeleteMusicCacheConstMeta,
+      argValues: [musicInfo],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheMusicCacheDeleteMusicCacheConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_music_cache",
+        argNames: ["musicInfo"],
+      );
+
+  @override
+  Future<PlayInfo> crateApiCacheMusicCacheGetCachePlayinfo(
+      {required MusicInfo musicInfo}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_music_info(musicInfo, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 60, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_play_info,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheMusicCacheGetCachePlayinfoConstMeta,
+      argValues: [musicInfo],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheMusicCacheGetCachePlayinfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_cache_playinfo",
+        argNames: ["musicInfo"],
+      );
+
+  @override
+  Future<bool> crateApiCacheMusicCacheHasCachePlayinfo(
+      {required MusicInfo musicInfo}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_music_info(musicInfo, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 61, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiCacheMusicCacheHasCachePlayinfoConstMeta,
+      argValues: [musicInfo],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCacheMusicCacheHasCachePlayinfoConstMeta =>
+      const TaskConstMeta(
+        debugName: "has_cache_playinfo",
+        argNames: ["musicInfo"],
       );
 
   @override
@@ -1367,7 +2074,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 38, port: port_);
+            funcId: 62, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1391,7 +2098,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(storeRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 39, port: port_);
+            funcId: 63, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_config,
@@ -1409,879 +2116,238 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiMusicCacheCacheMusic(
-      {required MusicInfo musicInfo, required PlayInfo playinfo}) {
+  Future<Config> crateApiTypesConfigConfigLoad() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_music_info(musicInfo, serializer);
-        sse_encode_box_autoadd_play_info(playinfo, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 40, port: port_);
+            funcId: 64, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
+        decodeSuccessData: sse_decode_config,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiMusicCacheCacheMusicConstMeta,
-      argValues: [musicInfo, playinfo],
+      constMeta: kCrateApiTypesConfigConfigLoadConstMeta,
+      argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiMusicCacheCacheMusicConstMeta =>
+  TaskConstMeta get kCrateApiTypesConfigConfigLoadConstMeta =>
       const TaskConstMeta(
-        debugName: "cache_music",
-        argNames: ["musicInfo", "playinfo"],
+        debugName: "config_load",
+        argNames: [],
       );
 
   @override
-  Future<void> crateApiMusicCacheDeleteMusicCache(
-      {required MusicInfo musicInfo}) {
+  Future<void> crateApiTypesConfigConfigSave({required Config that}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_music_info(musicInfo, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 41, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicCacheDeleteMusicCacheConstMeta,
-      argValues: [musicInfo],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicCacheDeleteMusicCacheConstMeta =>
-      const TaskConstMeta(
-        debugName: "delete_music_cache",
-        argNames: ["musicInfo"],
-      );
-
-  @override
-  Future<PlayInfo> crateApiMusicCacheGetCachePlayinfo(
-      {required MusicInfo musicInfo}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_music_info(musicInfo, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 42, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_play_info,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicCacheGetCachePlayinfoConstMeta,
-      argValues: [musicInfo],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicCacheGetCachePlayinfoConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_cache_playinfo",
-        argNames: ["musicInfo"],
-      );
-
-  @override
-  Future<bool> crateApiMusicCacheHasCachePlayinfo(
-      {required MusicInfo musicInfo}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_music_info(musicInfo, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 43, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicCacheHasCachePlayinfoConstMeta,
-      argValues: [musicInfo],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicCacheHasCachePlayinfoConstMeta =>
-      const TaskConstMeta(
-        debugName: "has_cache_playinfo",
-        argNames: ["musicInfo"],
-      );
-
-  @override
-  Future<void> crateApiTypeBindMusicAggregatorWAddMusic(
-      {required MusicAggregatorW that, required MusicW music}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            music, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 44, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWAddMusicConstMeta,
-      argValues: [that, music],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWAddMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_add_music",
-        argNames: ["that", "music"],
-      );
-
-  @override
-  bool crateApiTypeBindMusicAggregatorWBelongTo(
-      {required MusicAggregatorW that, required MusicW music}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            music, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWBelongToConstMeta,
-      argValues: [that, music],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWBelongToConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_belong_to",
-        argNames: ["that", "music"],
-      );
-
-  @override
-  MusicAggregatorW crateApiTypeBindMusicAggregatorWClone(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWCloneConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWCloneConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_clone",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<(MusicListW, List<MusicAggregatorW>)>
-      crateApiTypeBindMusicAggregatorWFetchAlbum(
-          {required MusicAggregatorW that,
-          required int page,
-          required int limit}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_u_32(page, serializer);
-        sse_encode_u_32(limit, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 47, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWFetchAlbumConstMeta,
-      argValues: [that, page, limit],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWFetchAlbumConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_fetch_album",
-        argNames: ["that", "page", "limit"],
-      );
-
-  @override
-  Future<String> crateApiTypeBindMusicAggregatorWFetchLyric(
-      {required MusicAggregatorW that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 48, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWFetchLyricConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWFetchLyricConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_fetch_lyric",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<List<MusicW>> crateApiTypeBindMusicAggregatorWFetchMusics(
-      {required MusicAggregatorW that, required List<String> sources}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_list_String(sources, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 49, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWFetchMusicsConstMeta,
-      argValues: [that, sources],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWFetchMusicsConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_fetch_musics",
-        argNames: ["that", "sources"],
-      );
-
-  @override
-  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusics(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetAllMusicsConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetAllMusicsConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_get_all_musics",
-        argNames: ["that"],
-      );
-
-  @override
-  List<MusicW> crateApiTypeBindMusicAggregatorWGetAllMusicsOwned(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetAllMusicsOwnedConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiTypeBindMusicAggregatorWGetAllMusicsOwnedConstMeta =>
-          const TaskConstMeta(
-            debugName: "MusicAggregatorW_get_all_musics_owned",
-            argNames: ["that"],
-          );
-
-  @override
-  List<String> crateApiTypeBindMusicAggregatorWGetAvailableSources(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetAvailableSourcesConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiTypeBindMusicAggregatorWGetAvailableSourcesConstMeta =>
-          const TaskConstMeta(
-            debugName: "MusicAggregatorW_get_available_sources",
-            argNames: ["that"],
-          );
-
-  @override
-  MusicW crateApiTypeBindMusicAggregatorWGetDefaultMusic(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetDefaultMusicConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetDefaultMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_get_default_music",
-        argNames: ["that"],
-      );
-
-  @override
-  String crateApiTypeBindMusicAggregatorWGetDefaultSource(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetDefaultSourceConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiTypeBindMusicAggregatorWGetDefaultSourceConstMeta =>
-          const TaskConstMeta(
-            debugName: "MusicAggregatorW_get_default_source",
-            argNames: ["that"],
-          );
-
-  @override
-  Future<MusicW?> crateApiTypeBindMusicAggregatorWGetMusic(
-      {required MusicAggregatorW that, required String source}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_String(source, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 55, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_opt_box_autoadd_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetMusicConstMeta,
-      argValues: [that, source],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetMusicConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_get_music",
-        argNames: ["that", "source"],
-      );
-
-  @override
-  PlatformInt64 crateApiTypeBindMusicAggregatorWGetMusicId(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_i_64,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWGetMusicIdConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWGetMusicIdConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_get_music_id",
-        argNames: ["that"],
-      );
-
-  @override
-  bool crateApiTypeBindMusicAggregatorWMatchFilter(
-      {required MusicAggregatorW that, required MusicFuzzFilter filter}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_box_autoadd_music_fuzz_filter(filter, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWMatchFilterConstMeta,
-      argValues: [that, filter],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWMatchFilterConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_match_filter",
-        argNames: ["that", "filter"],
-      );
-
-  @override
-  Future<void> crateApiTypeBindMusicAggregatorWSetDefaultSource(
-      {required MusicAggregatorW that, required String source}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        sse_encode_String(source, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 58, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWSetDefaultSourceConstMeta,
-      argValues: [that, source],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiTypeBindMusicAggregatorWSetDefaultSourceConstMeta =>
-          const TaskConstMeta(
-            debugName: "MusicAggregatorW_set_default_source",
-            argNames: ["that", "source"],
-          );
-
-  @override
-  String crateApiTypeBindMusicAggregatorWToString(
-      {required MusicAggregatorW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicAggregatorWToStringConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicAggregatorWToStringConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicAggregatorW_to_string",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<List<MusicAggregatorW>>
-      crateApiTypeBindMusicListWFetchAllMusicAggregators(
-          {required MusicListW that,
-          required int pagesPerBatch,
-          required int limit,
-          required bool withLyric}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
-            that, serializer);
-        sse_encode_u_32(pagesPerBatch, serializer);
-        sse_encode_u_32(limit, serializer);
-        sse_encode_bool(withLyric, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 60, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicListWFetchAllMusicAggregatorsConstMeta,
-      argValues: [that, pagesPerBatch, limit, withLyric],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiTypeBindMusicListWFetchAllMusicAggregatorsConstMeta =>
-          const TaskConstMeta(
-            debugName: "MusicListW_fetch_all_music_aggregators",
-            argNames: ["that", "pagesPerBatch", "limit", "withLyric"],
-          );
-
-  @override
-  Future<List<MusicAggregatorW>> crateApiTypeBindMusicListWGetMusicAggregators(
-      {required MusicListW that, required int page, required int limit}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
-            that, serializer);
-        sse_encode_u_32(page, serializer);
-        sse_encode_u_32(limit, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 61, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicAggregatorW,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiTypeBindMusicListWGetMusicAggregatorsConstMeta,
-      argValues: [that, page, limit],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicListWGetMusicAggregatorsConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicListW_get_music_aggregators",
-        argNames: ["that", "page", "limit"],
-      );
-
-  @override
-  MusicListInfo crateApiTypeBindMusicListWGetMusiclistInfo(
-      {required MusicListW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_music_list_info,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicListWGetMusiclistInfoConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicListWGetMusiclistInfoConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicListW_get_musiclist_info",
-        argNames: ["that"],
-      );
-
-  @override
-  String crateApiTypeBindMusicListWSource({required MusicListW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 63)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicListWSourceConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicListWSourceConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicListW_source",
-        argNames: ["that"],
-      );
-
-  @override
-  String crateApiTypeBindMusicListWToString({required MusicListW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicListW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 64)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicListWToStringConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicListWToStringConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicListW_to_string",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<(MusicListW, List<MusicAggregatorW>)> crateApiTypeBindMusicWFetchAlbum(
-      {required MusicW that, required int page, required int limit}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        sse_encode_u_32(page, serializer);
-        sse_encode_u_32(limit, serializer);
+        sse_encode_box_autoadd_config(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 65, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_record_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_list_w_list_auto_owned_rust_opaque_flutter_rust_bridgefor_generated_rust_auto_opaque_inner_music_aggregator_w,
+        decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiTypeBindMusicWFetchAlbumConstMeta,
-      argValues: [that, page, limit],
+      constMeta: kCrateApiTypesConfigConfigSaveConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiTypeBindMusicWFetchAlbumConstMeta =>
+  TaskConstMeta get kCrateApiTypesConfigConfigSaveConstMeta =>
       const TaskConstMeta(
-        debugName: "MusicW_fetch_album",
-        argNames: ["that", "page", "limit"],
+        debugName: "config_save",
+        argNames: ["that"],
       );
 
   @override
-  Future<String> crateApiTypeBindMusicWFetchLyric({required MusicW that}) {
+  Future<ExternApi?> crateApiTypesExternApiExternApiFetchUpdate(
+      {required ExternApi that}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
+        sse_encode_box_autoadd_extern_api(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 66, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
+        decodeSuccessData: sse_decode_opt_box_autoadd_extern_api,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiTypeBindMusicWFetchLyricConstMeta,
+      constMeta: kCrateApiTypesExternApiExternApiFetchUpdateConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiTypeBindMusicWFetchLyricConstMeta =>
+  TaskConstMeta get kCrateApiTypesExternApiExternApiFetchUpdateConstMeta =>
       const TaskConstMeta(
-        debugName: "MusicW_fetch_lyric",
+        debugName: "extern_api_fetch_update",
         argNames: ["that"],
       );
 
   @override
-  String crateApiTypeBindMusicWGetExtraInfo(
-      {required MusicW that, required Quality quality}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
+  Future<ExternApi> crateApiTypesExternApiExternApiFromPath(
+      {required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        sse_encode_box_autoadd_quality(quality, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 67)!;
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 67, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_extern_api,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypesExternApiExternApiFromPathConstMeta,
+      argValues: [path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypesExternApiExternApiFromPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "extern_api_from_path",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<ExternApi> crateApiTypesExternApiExternApiFromUrl(
+      {required String url}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(url, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 68, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_extern_api,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypesExternApiExternApiFromUrlConstMeta,
+      argValues: [url],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypesExternApiExternApiFromUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "extern_api_from_url",
+        argNames: ["url"],
+      );
+
+  @override
+  Future<Release?> crateApiTypesVersionCheckUpdate(
+      {required String currentVersion}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(currentVersion, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 69, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_release,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypesVersionCheckUpdateConstMeta,
+      argValues: [currentVersion],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypesVersionCheckUpdateConstMeta =>
+      const TaskConstMeta(
+        debugName: "check_update",
+        argNames: ["currentVersion"],
+      );
+
+  @override
+  Future<Release> crateApiTypesVersionGetRelease() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 70, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_release,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiTypesVersionGetReleaseConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiTypesVersionGetReleaseConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_release",
+        argNames: [],
+      );
+
+  @override
+  Future<String> crateApiUtilsHttpHelperSendRequest(
+      {required String method,
+      required Map<String, String> headers,
+      required String url,
+      required String payload}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(method, serializer);
+        sse_encode_Map_String_String(headers, serializer);
+        sse_encode_String(url, serializer);
+        sse_encode_String(payload, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 71, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiTypeBindMusicWGetExtraInfoConstMeta,
-      argValues: [that, quality],
+      constMeta: kCrateApiUtilsHttpHelperSendRequestConstMeta,
+      argValues: [method, headers, url, payload],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiTypeBindMusicWGetExtraInfoConstMeta =>
+  TaskConstMeta get kCrateApiUtilsHttpHelperSendRequestConstMeta =>
       const TaskConstMeta(
-        debugName: "MusicW_get_extra_info",
-        argNames: ["that", "quality"],
+        debugName: "send_request",
+        argNames: ["method", "headers", "url", "payload"],
       );
 
   @override
-  MusicInfo crateApiTypeBindMusicWGetMusicInfo({required MusicW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
+  Future<String> crateApiUtilsPathUtilUrlEncodeSpecialChars(
+      {required String input}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_music_info,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicWGetMusicInfoConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicWGetMusicInfoConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicW_get_music_info",
-        argNames: ["that"],
-      );
-
-  @override
-  (String, String) crateApiTypeBindMusicWGetPrimaryKv({required MusicW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_record_string_string,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicWGetPrimaryKvConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicWGetPrimaryKvConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicW_get_primary_kv",
-        argNames: ["that"],
-      );
-
-  @override
-  String crateApiTypeBindMusicWSource({required MusicW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 70)!;
+        sse_encode_String(input, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 72, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiTypeBindMusicWSourceConstMeta,
-      argValues: [that],
+      constMeta: kCrateApiUtilsPathUtilUrlEncodeSpecialCharsConstMeta,
+      argValues: [input],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiTypeBindMusicWSourceConstMeta =>
+  TaskConstMeta get kCrateApiUtilsPathUtilUrlEncodeSpecialCharsConstMeta =>
       const TaskConstMeta(
-        debugName: "MusicW_source",
-        argNames: ["that"],
-      );
-
-  @override
-  String crateApiTypeBindMusicWToString({required MusicW that}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicW(
-            that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 71)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiTypeBindMusicWToStringConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiTypeBindMusicWToStringConstMeta =>
-      const TaskConstMeta(
-        debugName: "MusicW_to_string",
-        argNames: ["that"],
+        debugName: "url_encode_special_chars",
+        argNames: ["input"],
       );
 
   RustArcIncrementStrongCountFnType
@@ -2417,9 +2483,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AggregatorOnlineFactoryW dco_decode_aggregator_online_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.isNotEmpty)
+    if (arr.length != 0)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return const AggregatorOnlineFactoryW();
+    return AggregatorOnlineFactoryW();
   }
 
   @protected
@@ -2739,9 +2805,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   OnlineFactoryW dco_decode_online_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.isNotEmpty)
+    if (arr.length != 0)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return const OnlineFactoryW();
+    return OnlineFactoryW();
   }
 
   @protected
@@ -2894,9 +2960,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SqlFactoryW dco_decode_sql_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.isNotEmpty)
+    if (arr.length != 0)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return const SqlFactoryW();
+    return SqlFactoryW();
   }
 
   @protected
@@ -3052,7 +3118,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AggregatorOnlineFactoryW sse_decode_aggregator_online_factory_w(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return const AggregatorOnlineFactoryW();
+    return AggregatorOnlineFactoryW();
   }
 
   @protected
@@ -3458,7 +3524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   OnlineFactoryW sse_decode_online_factory_w(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return const OnlineFactoryW();
+    return OnlineFactoryW();
   }
 
   @protected
@@ -3661,7 +3727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   SqlFactoryW sse_decode_sql_factory_w(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return const SqlFactoryW();
+    return SqlFactoryW();
   }
 
   @protected
@@ -4363,72 +4429,73 @@ class MusicAggregatorWImpl extends RustOpaque implements MusicAggregatorW {
   );
 
   Future<void> addMusic({required MusicW music}) => RustLib.instance.api
-      .crateApiTypeBindMusicAggregatorWAddMusic(that: this, music: music);
+      .crateApiBindTypeBindMusicAggregatorWAddMusic(that: this, music: music);
 
   bool belongTo({required MusicW music}) => RustLib.instance.api
-      .crateApiTypeBindMusicAggregatorWBelongTo(that: this, music: music);
+      .crateApiBindTypeBindMusicAggregatorWBelongTo(that: this, music: music);
 
   MusicAggregatorW clone() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWClone(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWClone(
         that: this,
       );
 
   Future<(MusicListW, List<MusicAggregatorW>)> fetchAlbum(
           {required int page, required int limit}) =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWFetchAlbum(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWFetchAlbum(
           that: this, page: page, limit: limit);
 
   Future<String> fetchLyric() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWFetchLyric(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWFetchLyric(
         that: this,
       );
 
   Future<List<MusicW>> fetchMusics({required List<String> sources}) =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWFetchMusics(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWFetchMusics(
           that: this, sources: sources);
 
   List<MusicW> getAllMusics() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetAllMusics(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWGetAllMusics(
         that: this,
       );
 
-  List<MusicW> getAllMusicsOwned() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetAllMusicsOwned(
+  List<MusicW> getAllMusicsOwned() => RustLib.instance.api
+          .crateApiBindTypeBindMusicAggregatorWGetAllMusicsOwned(
         that: this,
       );
 
-  List<String> getAvailableSources() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetAvailableSources(
+  List<String> getAvailableSources() => RustLib.instance.api
+          .crateApiBindTypeBindMusicAggregatorWGetAvailableSources(
         that: this,
       );
 
   MusicW getDefaultMusic() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetDefaultMusic(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWGetDefaultMusic(
         that: this,
       );
 
   String getDefaultSource() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetDefaultSource(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWGetDefaultSource(
         that: this,
       );
 
   Future<MusicW?> getMusic({required String source}) => RustLib.instance.api
-      .crateApiTypeBindMusicAggregatorWGetMusic(that: this, source: source);
+      .crateApiBindTypeBindMusicAggregatorWGetMusic(that: this, source: source);
 
   PlatformInt64 getMusicId() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWGetMusicId(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWGetMusicId(
         that: this,
       );
 
-  bool matchFilter({required MusicFuzzFilter filter}) => RustLib.instance.api
-      .crateApiTypeBindMusicAggregatorWMatchFilter(that: this, filter: filter);
+  bool matchFilter({required MusicFuzzFilter filter}) =>
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWMatchFilter(
+          that: this, filter: filter);
 
   Future<void> setDefaultSource({required String source}) =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWSetDefaultSource(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWSetDefaultSource(
           that: this, source: source);
 
   String toString() =>
-      RustLib.instance.api.crateApiTypeBindMusicAggregatorWToString(
+      RustLib.instance.api.crateApiBindTypeBindMusicAggregatorWToString(
         that: this,
       );
 }
@@ -4456,27 +4523,29 @@ class MusicListWImpl extends RustOpaque implements MusicListW {
           {required int pagesPerBatch,
           required int limit,
           required bool withLyric}) =>
-      RustLib.instance.api.crateApiTypeBindMusicListWFetchAllMusicAggregators(
-          that: this,
-          pagesPerBatch: pagesPerBatch,
-          limit: limit,
-          withLyric: withLyric);
+      RustLib.instance.api
+          .crateApiBindTypeBindMusicListWFetchAllMusicAggregators(
+              that: this,
+              pagesPerBatch: pagesPerBatch,
+              limit: limit,
+              withLyric: withLyric);
 
   Future<List<MusicAggregatorW>> getMusicAggregators(
           {required int page, required int limit}) =>
-      RustLib.instance.api.crateApiTypeBindMusicListWGetMusicAggregators(
+      RustLib.instance.api.crateApiBindTypeBindMusicListWGetMusicAggregators(
           that: this, page: page, limit: limit);
 
   MusicListInfo getMusiclistInfo() =>
-      RustLib.instance.api.crateApiTypeBindMusicListWGetMusiclistInfo(
+      RustLib.instance.api.crateApiBindTypeBindMusicListWGetMusiclistInfo(
         that: this,
       );
 
-  String source() => RustLib.instance.api.crateApiTypeBindMusicListWSource(
+  String source() => RustLib.instance.api.crateApiBindTypeBindMusicListWSource(
         that: this,
       );
 
-  String toString() => RustLib.instance.api.crateApiTypeBindMusicListWToString(
+  String toString() =>
+      RustLib.instance.api.crateApiBindTypeBindMusicListWToString(
         that: this,
       );
 }
@@ -4502,32 +4571,32 @@ class MusicWImpl extends RustOpaque implements MusicW {
 
   Future<(MusicListW, List<MusicAggregatorW>)> fetchAlbum(
           {required int page, required int limit}) =>
-      RustLib.instance.api.crateApiTypeBindMusicWFetchAlbum(
+      RustLib.instance.api.crateApiBindTypeBindMusicWFetchAlbum(
           that: this, page: page, limit: limit);
 
   Future<String> fetchLyric() =>
-      RustLib.instance.api.crateApiTypeBindMusicWFetchLyric(
+      RustLib.instance.api.crateApiBindTypeBindMusicWFetchLyric(
         that: this,
       );
 
   String getExtraInfo({required Quality quality}) => RustLib.instance.api
-      .crateApiTypeBindMusicWGetExtraInfo(that: this, quality: quality);
+      .crateApiBindTypeBindMusicWGetExtraInfo(that: this, quality: quality);
 
   MusicInfo getMusicInfo() =>
-      RustLib.instance.api.crateApiTypeBindMusicWGetMusicInfo(
+      RustLib.instance.api.crateApiBindTypeBindMusicWGetMusicInfo(
         that: this,
       );
 
   (String, String) getPrimaryKv() =>
-      RustLib.instance.api.crateApiTypeBindMusicWGetPrimaryKv(
+      RustLib.instance.api.crateApiBindTypeBindMusicWGetPrimaryKv(
         that: this,
       );
 
-  String source() => RustLib.instance.api.crateApiTypeBindMusicWSource(
+  String source() => RustLib.instance.api.crateApiBindTypeBindMusicWSource(
         that: this,
       );
 
-  String toString() => RustLib.instance.api.crateApiTypeBindMusicWToString(
+  String toString() => RustLib.instance.api.crateApiBindTypeBindMusicWToString(
         that: this,
       );
 }

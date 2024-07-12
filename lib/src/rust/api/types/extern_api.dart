@@ -3,7 +3,7 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../frb_generated.dart';
+import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`
@@ -20,15 +20,15 @@ class ExternApi {
   });
 
   Future<ExternApi?> fetchUpdate() =>
-      RustLib.instance.api.crateApiExternApiExternApiFetchUpdate(
+      RustLib.instance.api.crateApiTypesExternApiExternApiFetchUpdate(
         that: this,
       );
 
   static Future<ExternApi> fromPath({required String path}) =>
-      RustLib.instance.api.crateApiExternApiExternApiFromPath(path: path);
+      RustLib.instance.api.crateApiTypesExternApiExternApiFromPath(path: path);
 
   static Future<ExternApi> fromUrl({required String url}) =>
-      RustLib.instance.api.crateApiExternApiExternApiFromUrl(url: url);
+      RustLib.instance.api.crateApiTypesExternApiExternApiFromUrl(url: url);
 
   @override
   int get hashCode =>

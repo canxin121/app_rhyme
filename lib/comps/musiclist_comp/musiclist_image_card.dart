@@ -1,12 +1,12 @@
 import 'package:app_rhyme/comps/chores/badge.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_pulldown_menu.dart';
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
 
 class MusicListImageCard extends StatelessWidget {
   final MusicListW musicListW;

@@ -1,7 +1,7 @@
+import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_list_item.dart';
-import 'package:app_rhyme/src/rust/api/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<MusicListW?> showMusicListSelectionDialog(BuildContext context) async {

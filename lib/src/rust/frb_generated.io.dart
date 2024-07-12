@@ -3,16 +3,19 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/cache.dart';
-import 'api/check_update.dart';
-import 'api/config.dart';
-import 'api/extern_api.dart';
-import 'api/factory_bind.dart';
-import 'api/http_helper.dart';
+import 'api/bind/factory_bind.dart';
+import 'api/bind/mirrors.dart';
+import 'api/bind/type_bind.dart';
+import 'api/cache/file_cache.dart';
+import 'api/cache/fs_util.dart';
+import 'api/cache/music_cache.dart';
 import 'api/init.dart';
-import 'api/mirrors.dart';
-import 'api/music_cache.dart';
-import 'api/type_bind.dart';
+import 'api/types/config.dart';
+import 'api/types/extern_api.dart';
+import 'api/types/playinfo.dart';
+import 'api/types/version.dart';
+import 'api/utils/http_helper.dart';
+import 'api/utils/path_util.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;

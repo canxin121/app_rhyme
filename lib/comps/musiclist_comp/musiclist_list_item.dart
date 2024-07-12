@@ -1,6 +1,6 @@
 import 'package:app_rhyme/comps/chores/badge.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_pulldown_menu.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/source_helper.dart';

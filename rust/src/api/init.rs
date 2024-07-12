@@ -5,7 +5,7 @@ use tokio::fs::create_dir_all;
 
 use crate::api::{CONFIG, ROOT_PATH};
 
-use super::{cache::del_old_data, config::Config};
+use super::{cache::fs_util::del_old_data, types::config::Config};
 
 #[flutter_rust_bridge::frb(init)]
 pub async fn init() {

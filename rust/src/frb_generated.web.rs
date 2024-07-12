@@ -4,7 +4,7 @@
 // Section: imports
 
 use super::*;
-use crate::api::type_bind::*;
+use crate::api::bind::type_bind::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::wasm_bindgen;
 use flutter_rust_bridge::for_generated::wasm_bindgen::prelude::*;

@@ -3,7 +3,7 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../frb_generated.dart';
+import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `needs_update`, `parse`
@@ -11,11 +11,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `cmp`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `partial_cmp`
 
 Future<Release> getRelease() =>
-    RustLib.instance.api.crateApiCheckUpdateGetRelease();
+    RustLib.instance.api.crateApiTypesVersionGetRelease();
 
 Future<Release?> checkUpdate({required String currentVersion}) =>
     RustLib.instance.api
-        .crateApiCheckUpdateCheckUpdate(currentVersion: currentVersion);
+        .crateApiTypesVersionCheckUpdate(currentVersion: currentVersion);
 
 class Asset {
   final String url;

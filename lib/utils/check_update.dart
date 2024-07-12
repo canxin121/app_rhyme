@@ -1,7 +1,7 @@
+import 'package:app_rhyme/src/rust/api/types/version.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/extern_api_update_dialog.dart';
 import 'package:app_rhyme/dialogs/version_update_dialog.dart';
-import 'package:app_rhyme/src/rust/api/check_update.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/widgets.dart';
 

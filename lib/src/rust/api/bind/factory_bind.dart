@@ -3,7 +3,7 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../frb_generated.dart';
+import '../../frb_generated.dart';
 import 'mirrors.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'type_bind.dart';
@@ -19,7 +19,7 @@ class AggregatorOnlineFactoryW {
           required int limit,
           MusicFuzzFilter? filter}) =>
       RustLib.instance.api
-          .crateApiFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
+          .crateApiBindFactoryBindAggregatorOnlineFactoryWSearchMusicAggregator(
               aggregators: aggregators,
               sources: sources,
               content: content,
@@ -42,7 +42,7 @@ class OnlineFactoryW {
   static Future<(MusicListW, List<MusicAggregatorW>)> getMusiclistFromShare(
           {required String shareUrl}) =>
       RustLib.instance.api
-          .crateApiFactoryBindOnlineFactoryWGetMusiclistFromShare(
+          .crateApiBindFactoryBindOnlineFactoryWGetMusiclistFromShare(
               shareUrl: shareUrl);
 
   static Future<List<MusicListW>> searchMusiclist(
@@ -50,7 +50,7 @@ class OnlineFactoryW {
           required String content,
           required int page,
           required int limit}) =>
-      RustLib.instance.api.crateApiFactoryBindOnlineFactoryWSearchMusiclist(
+      RustLib.instance.api.crateApiBindFactoryBindOnlineFactoryWSearchMusiclist(
           sources: sources, content: content, page: page, limit: limit);
 
   @override
@@ -68,7 +68,7 @@ class SqlFactoryW {
   static Future<void> addMusics(
           {required String musicsListName,
           required List<MusicAggregatorW> musics}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWAddMusics(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWAddMusics(
           musicsListName: musicsListName, musics: musics);
 
   static Future<void> changeMusicDefaultSource(
@@ -76,80 +76,81 @@ class SqlFactoryW {
           required Int64List ids,
           required List<String> newDefaultSources}) =>
       RustLib.instance.api
-          .crateApiFactoryBindSqlFactoryWChangeMusicDefaultSource(
+          .crateApiBindFactoryBindSqlFactoryWChangeMusicDefaultSource(
               musicListName: musicListName,
               ids: ids,
               newDefaultSources: newDefaultSources);
 
   static Future<void> changeMusicInfo(
           {required List<MusicW> musics, required List<MusicInfo> newInfos}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWChangeMusicInfo(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWChangeMusicInfo(
           musics: musics, newInfos: newInfos);
 
   static Future<void> changeMusiclistInfo(
           {required List<MusicListInfo> old,
           required List<MusicListInfo> new_}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWChangeMusiclistInfo(
-          old: old, new_: new_);
+      RustLib.instance.api
+          .crateApiBindFactoryBindSqlFactoryWChangeMusiclistInfo(
+              old: old, new_: new_);
 
-  static Future<void> cleanUnusedMusicData() =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWCleanUnusedMusicData();
+  static Future<void> cleanUnusedMusicData() => RustLib.instance.api
+      .crateApiBindFactoryBindSqlFactoryWCleanUnusedMusicData();
 
   static Future<void> createMusiclist(
           {required List<MusicListInfo> musicListInfos}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWCreateMusiclist(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWCreateMusiclist(
           musicListInfos: musicListInfos);
 
   static Future<void> delMusiclist({required List<String> musiclistNames}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWDelMusiclist(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWDelMusiclist(
           musiclistNames: musiclistNames);
 
   static Future<void> delMusics(
           {required String musicListName, required Int64List ids}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWDelMusics(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWDelMusics(
           musicListName: musicListName, ids: ids);
 
   static Future<List<MusicListW>> getAllMusiclists() =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWGetAllMusiclists();
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWGetAllMusiclists();
 
   static Future<List<MusicAggregatorW>> getAllMusics(
           {required MusicListInfo musiclistInfo}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWGetAllMusics(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWGetAllMusics(
           musiclistInfo: musiclistInfo);
 
   static Future<MusicAggregatorW> getMusicById(
           {required MusicListInfo musicListInfo,
           required PlatformInt64 id,
           required List<String> sources}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWGetMusicById(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWGetMusicById(
           musicListInfo: musicListInfo, id: id, sources: sources);
 
   static Future<void> initFromPath({required String filepath}) =>
       RustLib.instance.api
-          .crateApiFactoryBindSqlFactoryWInitFromPath(filepath: filepath);
+          .crateApiBindFactoryBindSqlFactoryWInitFromPath(filepath: filepath);
 
   static Future<List<MusicW>> readMusicData({required String source}) =>
       RustLib.instance.api
-          .crateApiFactoryBindSqlFactoryWReadMusicData(source: source);
+          .crateApiBindFactoryBindSqlFactoryWReadMusicData(source: source);
 
   static Future<void> reorderMusiclist({required Int64List newIds}) =>
       RustLib.instance.api
-          .crateApiFactoryBindSqlFactoryWReorderMusiclist(newIds: newIds);
+          .crateApiBindFactoryBindSqlFactoryWReorderMusiclist(newIds: newIds);
 
   static Future<void> reorderMusics(
           {required String musicListName, required Int64List newIds}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWReorderMusics(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWReorderMusics(
           musicListName: musicListName, newIds: newIds);
 
   static Future<void> replaceMusics(
           {required String musicListName,
           required Int64List ids,
           required List<MusicAggregatorW> musics}) =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWReplaceMusics(
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWReplaceMusics(
           musicListName: musicListName, ids: ids, musics: musics);
 
   static Future<void> shutdown() =>
-      RustLib.instance.api.crateApiFactoryBindSqlFactoryWShutdown();
+      RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWShutdown();
 
   @override
   int get hashCode => 0;

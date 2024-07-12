@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:app_rhyme/src/rust/api/music_cache.dart';
+import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
+import 'package:app_rhyme/src/rust/api/types/playinfo.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:app_rhyme/utils/source_helper.dart';

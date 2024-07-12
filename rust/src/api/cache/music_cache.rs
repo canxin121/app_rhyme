@@ -3,17 +3,23 @@ use std::path::PathBuf;
 use flutter_rust_bridge::frb;
 use music_api::MusicInfo;
 
-use crate::api::utils::get_root_path;
+use crate::api::{
+    types::playinfo::PlayInfo,
+    utils::path_util::{get_root_path, url_encode_special_chars},
+    CONFIG,
+};
 
-use super::{cache::cache_file, type_bind::PlayInfo, CONFIG};
+use super::file_cache::cache_file;
+
 #[frb(ignore)]
-async fn gen_file_name(music_info: &MusicInfo) -> Result<PathBuf, anyhow::Error> {
+async fn gen_json_file_name(music_info: &MusicInfo) -> Result<PathBuf, anyhow::Error> {
     let file_name = format!(
         "{}_{}_{}.json",
         music_info.name,
         music_info.artist.join(","),
         music_info.duration.unwrap_or(0)
     );
+    let file_name = url_encode_special_chars(&file_name);
     let mut path = get_root_path().await?;
     path.push("Music");
     path.push("MetaData");
@@ -30,12 +36,12 @@ async fn gen_music_path(filename: &str) -> Result<PathBuf, anyhow::Error> {
 }
 
 pub async fn has_cache_playinfo(music_info: &MusicInfo) -> Result<bool, anyhow::Error> {
-    let path = gen_file_name(music_info).await?;
+    let path = gen_json_file_name(music_info).await?;
     Ok(path.exists())
 }
 
 pub async fn get_cache_playinfo(music_info: &MusicInfo) -> Result<PlayInfo, anyhow::Error> {
-    let path = gen_file_name(music_info).await?;
+    let path = gen_json_file_name(music_info).await?;
     if path.exists() {
         let file = std::fs::File::open(path)?;
         let reader = std::io::BufReader::new(file);
@@ -61,6 +67,7 @@ pub async fn cache_music(music_info: &MusicInfo, playinfo: &PlayInfo) -> Result<
             .clone()
             .unwrap_or("unknown".to_string().replace("\r", ""))
     );
+    let music_filename = url_encode_special_chars(&music_filename);
     let music_path = cache_file(
         &playinfo.uri,
         "Music",
@@ -70,7 +77,7 @@ pub async fn cache_music(music_info: &MusicInfo, playinfo: &PlayInfo) -> Result<
     .await?;
     playinfo.uri = music_path;
 
-    let path = gen_file_name(&music_info).await?;
+    let path = gen_json_file_name(&music_info).await?;
     // 如果file的父目录不存在，就创建
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
@@ -82,7 +89,7 @@ pub async fn cache_music(music_info: &MusicInfo, playinfo: &PlayInfo) -> Result<
 }
 
 pub async fn delete_music_cache(music_info: &MusicInfo) -> Result<(), anyhow::Error> {
-    let path = gen_file_name(music_info).await?;
+    let path = gen_json_file_name(music_info).await?;
     if path.exists() {
         let file = std::fs::File::open(&path)?;
         let reader = std::io::BufReader::new(file);

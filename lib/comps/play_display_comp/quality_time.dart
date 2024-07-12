@@ -1,6 +1,6 @@
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/chores/badge.dart';
-import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/time_parser.dart';
 import 'package:flutter/cupertino.dart';
