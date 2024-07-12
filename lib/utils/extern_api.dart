@@ -117,11 +117,9 @@ class ExternApiEvaler {
       var resultFuture = runTime.executeLib("package:api/main.dart",
           "getMusicPlayInfo", [$String(source), $String(extra)]) as Future;
       dynamic result = await resultFuture;
-      globalTalker.info("[ExternEvaler] Get Result: $result");
       if (result.runtimeType != $null) {
         return playInfoFromObject(result.$reified);
       } else {
-        globalTalker.error("[ExternEvaler] Get Result Null.");
         return null;
       }
     } catch (e) {

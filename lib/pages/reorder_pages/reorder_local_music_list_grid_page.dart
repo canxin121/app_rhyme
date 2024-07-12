@@ -1,4 +1,4 @@
-import 'package:app_rhyme/pages/local_music_list_grid_page.dart';
+import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:flutter/cupertino.dart';

@@ -1,4 +1,5 @@
-import 'package:app_rhyme/pages/reorder_local_music_list_page.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_page.dart';
+import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
@@ -276,7 +277,7 @@ class LocalMusicListChoicMenu extends StatelessWidget {
         PullDownMenuItem(
           onTap: () async {
             for (var musicContainer in musicContainers) {
-              await cacheMusicHelper(musicContainer);
+              await cacheMusic(musicContainer);
             }
           },
           title: '缓存歌单所有音乐',
@@ -284,7 +285,7 @@ class LocalMusicListChoicMenu extends StatelessWidget {
         PullDownMenuItem(
           onTap: () async {
             for (var musicContainer in musicContainers) {
-              await deleteMusicCache(musicContainer);
+              await delMusicCache(musicContainer);
             }
           },
           title: '取消缓存所有音乐',
@@ -301,7 +302,18 @@ class LocalMusicListChoicMenu extends StatelessWidget {
                 ),
               );
             },
-            title: "排序歌曲")
+            title: "手动排序"),
+        PullDownMenuItem(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => MutiSelectLocalMusicContainerListPage(
+                      musicList: musicListW, musicContainers: musicContainers),
+                ),
+              );
+            },
+            title: "多选操作")
       ],
       animationBuilder: null,
       position: PullDownMenuPosition.automatic,

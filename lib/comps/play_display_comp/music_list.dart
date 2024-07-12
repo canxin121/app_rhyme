@@ -34,11 +34,11 @@ class MusicListComp extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: MusicContainerListItem(
                     musicContainer: musics[index],
-                    inPlayList: true,
                     isDark: true,
                     onTap: () {
                       globalAudioHandler.seek(Duration.zero, index: index);
                     },
+                    index: index,
                   ),
                 ),
                 itemCount: musics.length,

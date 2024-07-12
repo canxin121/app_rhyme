@@ -2,7 +2,7 @@ import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/audioControl/audio_controller.dart';
 import 'package:app_rhyme/comps/play_display_comp/music_control_bar.dart';
-import 'package:app_rhyme/pages/local_music_list_grid_page.dart';
+import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/more_page.dart';
 import 'package:app_rhyme/pages/search_page.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
@@ -27,7 +27,7 @@ Future<void> main() async {
 
   await initGlobalAudioHandler();
   await initGlobalAudioUiController();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);

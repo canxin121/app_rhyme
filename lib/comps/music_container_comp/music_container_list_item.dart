@@ -6,30 +6,32 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 // 有三种使用场景: 1. 本地歌单的歌曲 2. 在线的歌曲 3. 播放列表
 // 区分:
-// 1. 本地歌单的歌曲: musicListW != null && inPlayList == false
-// 2. 在线的歌曲: musicListW == null && inPlayList == false
-// 3. 播放列表的歌曲: musicListW == null && inPlayList == true
+// 1. 本地歌单的歌曲: musicListW != null && index == -1
+// 2. 在线的歌曲: musicListW == null && index == -1
+// 3. 播放列表的歌曲: musicListW == null && index != -1
 
 class MusicContainerListItem extends StatelessWidget {
   final MusicContainer musicContainer;
   final MusicListW? musicListW;
-  final bool inPlayList;
   final bool? isDark;
   final GestureTapCallback? onTap;
   final bool cachePic;
-
+  final bool showMenu;
+  final int index;
   const MusicContainerListItem(
       {super.key,
       required this.musicContainer,
       this.musicListW,
-      this.inPlayList = false,
       this.isDark,
       this.onTap,
-      this.cachePic = false});
+      this.cachePic = false,
+      this.showMenu = true,
+      this.index = -1});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +68,8 @@ class MusicContainerListItem extends StatelessWidget {
                       color: isDarkMode
                           ? CupertinoColors.systemGrey5
                           : CupertinoColors.black,
-                    ),
+                      overflow: TextOverflow.ellipsis,
+                    ).useSystemChineseFont(),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -76,14 +79,15 @@ class MusicContainerListItem extends StatelessWidget {
                       color: isDarkMode
                           ? CupertinoColors.systemGrey4
                           : CupertinoColors.inactiveGray,
-                    ),
+                      overflow: TextOverflow.ellipsis,
+                    ).useSystemChineseFont(),
                   ),
                 ],
               ),
             ),
           ),
           // 缓存标志
-          if (musicListW != null && !inPlayList)
+          if (musicListW != null && index == -1)
             FutureBuilder<bool>(
               future: musicContainer.hasCache(),
               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -109,19 +113,20 @@ class MusicContainerListItem extends StatelessWidget {
             label: sourceToShort(musicContainer.info.source),
           ),
           // 歌曲的操作按钮
-          MusicContainerMenu(
-            musicContainer: musicContainer,
-            musicListW: musicListW,
-            inPlayList: inPlayList,
-            builder: (_, showMenu) => CupertinoButton(
-              onPressed: showMenu,
-              padding: EdgeInsets.zero,
-              child: Icon(
-                CupertinoIcons.ellipsis,
-                color: isDarkMode ? CupertinoColors.white : activeIconRed,
+          if (showMenu)
+            MusicContainerMenu(
+              musicContainer: musicContainer,
+              musicListW: musicListW,
+              index: index,
+              builder: (_, showMenu) => CupertinoButton(
+                onPressed: showMenu,
+                padding: EdgeInsets.zero,
+                child: Icon(
+                  CupertinoIcons.ellipsis,
+                  color: isDarkMode ? CupertinoColors.white : activeIconRed,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

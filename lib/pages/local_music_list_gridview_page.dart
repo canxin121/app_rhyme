@@ -1,11 +1,11 @@
-import 'package:app_rhyme/pages/muti_select_local_music_list_grid_page.dart';
-import 'package:app_rhyme/pages/reorder_local_music_list_grid_page.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_grid_page.dart';
+import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_grid_page.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
-import 'package:app_rhyme/pages/local_music_list_page.dart';
+import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/online_music_list_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
@@ -216,7 +216,7 @@ class MusicListGridPageMenu extends StatelessWidget {
               );
             }
           },
-          title: '歌单排序',
+          title: '手动排序',
           icon: CupertinoIcons.list_number,
         ),
         PullDownMenuItem(
@@ -231,7 +231,7 @@ class MusicListGridPageMenu extends StatelessWidget {
               );
             }
           },
-          title: '歌单多选',
+          title: '多选操作',
           icon: CupertinoIcons.list_number,
         )
       ],
