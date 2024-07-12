@@ -106,7 +106,8 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
           ),
           if (hasCache)
             PullDownMenuItem(
-              onTap: () => delMusicCache(widget.musicContainer),
+              onTap: () => delMusicCache(widget.musicContainer,
+                  showToastWhenNoMsuicCache: true),
               title: '删除缓存',
               icon: CupertinoIcons.delete_solid,
             )

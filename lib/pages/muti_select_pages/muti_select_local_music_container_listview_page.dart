@@ -4,6 +4,7 @@ import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
+import 'package:app_rhyme/utils/logger.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,9 +41,7 @@ class MutiSelectLocalMusicContainerListPageState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     controller.addListener(() {
-      setState(() {
-        print(111);
-      });
+      setState(() {});
     });
   }
 
@@ -114,91 +113,90 @@ class MutiSelectLocalMusicContainerListPageState
 
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
-      navigationBar: CupertinoNavigationBar(
-        padding: const EdgeInsetsDirectional.only(end: 16),
-        backgroundColor: backgroundColor,
-        leading: CupertinoButton(
-          padding: const EdgeInsets.all(0),
-          child: Icon(CupertinoIcons.back, color: activeIconRed),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        trailing: MutiSelectLocalMusicContainerListChoiceMenu(
-          delSelected: handleDeleteSelected,
-          refresh: handleRefresh,
-          builder: (context, showMenu) => CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            onPressed: showMenu,
-            child: Text(
-              '选项',
-              style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-            ),
-          ),
-          musicListW: widget.musicList,
-          musicContainers: controller.value.selectedIndexes
-              .map((index) => widget.musicContainers[index])
-              .toList(),
-          cancelSelectAll: handleCancelSelectAll,
-          selectAll: handleSelectAll,
-          reverseSelect: handleReverseSelect,
-        ),
-      ),
       child: Column(children: [
-        SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
-        widget.musicContainers.isEmpty
-            ? Center(
-                child: Text(
-                  "没有音乐",
-                  style: TextStyle(
-                      color: isDarkMode
-                          ? CupertinoColors.white
-                          : CupertinoColors.black),
-                ),
-              )
-            : Align(
-                key: ValueKey(controller.hashCode),
-                alignment: Alignment.topCenter,
-                child: DragSelectGridView(
-                  gridController: controller,
-                  padding:
-                      const EdgeInsets.only(bottom: 100, left: 10, right: 10),
-                  itemCount: widget.musicContainers.length,
-                  triggerSelectionOnTap: true,
-                  itemBuilder: (context, index, selected) {
-                    final musicContainer = widget.musicContainers[index];
-                    return Row(
-                      key: ValueKey(
-                          "${selected}_${musicContainer.hasCache()}_${musicContainer.hashCode}"),
-                      children: [
-                        Expanded(
-                          child: MusicContainerListItem(
-                            key: ValueKey(
-                                "${musicContainer.hasCache()}_${musicContainer.hashCode}"),
-                            showMenu: false,
-                            musicContainer: musicContainer,
-                            musicListW: widget.musicList,
-                          ),
-                        ),
-                        Icon(
-                          selected
-                              ? CupertinoIcons.check_mark_circled
-                              : CupertinoIcons.circle,
-                          color: selected
-                              ? CupertinoColors.systemGreen
-                              : CupertinoColors.systemGrey4,
-                        ),
-                      ],
-                    );
-                  },
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    mainAxisSpacing: 8.0,
-                    crossAxisSpacing: 8.0,
-                    childAspectRatio: 8 / 1,
-                  ),
-                ),
-              )
+        CupertinoNavigationBar(
+          padding: const EdgeInsetsDirectional.only(end: 16),
+          backgroundColor: backgroundColor,
+          leading: CupertinoButton(
+            padding: const EdgeInsets.all(0),
+            child: Icon(CupertinoIcons.back, color: activeIconRed),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          trailing: MutiSelectLocalMusicContainerListChoiceMenu(
+            delSelected: handleDeleteSelected,
+            refresh: handleRefresh,
+            builder: (context, showMenu) => CupertinoButton(
+              padding: const EdgeInsets.all(0),
+              onPressed: showMenu,
+              child: Text(
+                '选项',
+                style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+              ),
+            ),
+            musicListW: widget.musicList,
+            musicContainers: controller.value.selectedIndexes
+                .map((index) => widget.musicContainers[index])
+                .toList(),
+            cancelSelectAll: handleCancelSelectAll,
+            selectAll: handleSelectAll,
+            reverseSelect: handleReverseSelect,
+          ),
+        ),
+        Expanded(
+            child: widget.musicContainers.isEmpty
+                ? Center(
+                    child: Text(
+                      "没有音乐",
+                      style: TextStyle(
+                          color: isDarkMode
+                              ? CupertinoColors.white
+                              : CupertinoColors.black),
+                    ),
+                  )
+                : Align(
+                    key: ValueKey(controller.hashCode),
+                    alignment: Alignment.topCenter,
+                    child: DragSelectGridView(
+                      gridController: controller,
+                      padding: const EdgeInsets.only(
+                          bottom: 100, top: 10, left: 10, right: 10),
+                      itemCount: widget.musicContainers.length,
+                      triggerSelectionOnTap: true,
+                      itemBuilder: (context, index, selected) {
+                        final musicContainer = widget.musicContainers[index];
+                        return Row(
+                          key:
+                              ValueKey("${selected}_${musicContainer.info.id}"),
+                          children: [
+                            Expanded(
+                              child: MusicContainerListItem(
+                                showMenu: false,
+                                musicContainer: musicContainer,
+                                musicListW: widget.musicList,
+                              ),
+                            ),
+                            Icon(
+                              selected
+                                  ? CupertinoIcons.check_mark_circled
+                                  : CupertinoIcons.circle,
+                              color: selected
+                                  ? CupertinoColors.systemGreen
+                                  : CupertinoColors.systemGrey4,
+                            ),
+                          ],
+                        );
+                      },
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        mainAxisSpacing: 8.0,
+                        crossAxisSpacing: 8.0,
+                        childAspectRatio: 8 / 1,
+                      ),
+                    ),
+                  ))
       ]),
     );
   }
@@ -239,6 +237,8 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
       await delMusicCache(musicContainer);
       refresh();
     }
+    LogToast.success("删除选中音乐缓存", "删除选中音乐缓存成功",
+        "[MutiSelectLocalMusicContainerListChoiceMenu] Successfully deleted selected music caches");
   }
 
   Future<void> handleDeleteFromList() async {

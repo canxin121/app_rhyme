@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_grid_page.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_grid_page.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/logger.dart';

@@ -126,9 +126,31 @@ class MutiSelectLocalMusicListGridPageState
 
     return CupertinoPageScaffold(
         backgroundColor: backgroundColor,
-        navigationBar: _buildNavigationBar(),
         child: Column(children: [
-          SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
+          CupertinoNavigationBar(
+            padding: const EdgeInsetsDirectional.all(0),
+            leading: CupertinoButton(
+              padding: const EdgeInsets.all(0),
+              child: Icon(CupertinoIcons.back, color: activeIconRed),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            trailing: MutiSelectMusicListGridPageMenu(
+              builder: (context, showMenu) => CupertinoButton(
+                padding: const EdgeInsets.only(right: 16),
+                onPressed: showMenu,
+                child: Text(
+                  "选项",
+                  style: TextStyle(color: activeIconRed),
+                ),
+              ),
+              deleteMusicList: deleteMusicList,
+              selectAll: handleSelectAll,
+              cancelSelectAll: handleCancelSelectAll,
+              reverseSelect: handleReverseSelect,
+            ),
+          ),
           widget.musicLists.isEmpty
               ? Center(
                   child: Text("没有歌单", style: TextStyle(color: textColor)),
@@ -140,7 +162,7 @@ class MutiSelectLocalMusicListGridPageState
                     child: DragSelectGridView(
                       gridController: controller,
                       padding: const EdgeInsets.only(
-                          bottom: 100, left: 10, right: 10),
+                          bottom: 100, top: 10, left: 10, right: 10),
                       itemCount: widget.musicLists.length,
                       triggerSelectionOnTap: true,
                       itemBuilder: (context, index, selected) {
@@ -181,33 +203,6 @@ class MutiSelectLocalMusicListGridPageState
                   ),
                 )
         ]));
-  }
-
-  CupertinoNavigationBar _buildNavigationBar() {
-    return CupertinoNavigationBar(
-      padding: const EdgeInsetsDirectional.all(0),
-      leading: CupertinoButton(
-        padding: const EdgeInsets.all(0),
-        child: Icon(CupertinoIcons.back, color: activeIconRed),
-        onPressed: () {
-          Navigator.pop(context);
-        },
-      ),
-      trailing: MutiSelectMusicListGridPageMenu(
-        builder: (context, showMenu) => CupertinoButton(
-          padding: const EdgeInsets.only(right: 16),
-          onPressed: showMenu,
-          child: Text(
-            "选项",
-            style: TextStyle(color: activeIconRed),
-          ),
-        ),
-        deleteMusicList: deleteMusicList,
-        selectAll: handleSelectAll,
-        cancelSelectAll: handleCancelSelectAll,
-        reverseSelect: handleReverseSelect,
-      ),
-    );
   }
 }
 

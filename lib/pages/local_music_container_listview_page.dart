@@ -1,4 +1,4 @@
-import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_page.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
 import 'package:app_rhyme/utils/logger.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -285,10 +285,12 @@ class LocalMusicListChoicMenu extends StatelessWidget {
         PullDownMenuItem(
           onTap: () async {
             for (var musicContainer in musicContainers) {
-              await delMusicCache(musicContainer);
+              await delMusicCache(musicContainer, showToast: false);
             }
+            LogToast.success("删除所有音乐缓存", "删除所有音乐缓存成功",
+                "[LocalMusicListChoicMenu] Successfully deleted all music caches");
           },
-          title: '取消缓存所有音乐',
+          title: '删除所有音乐缓存',
         ),
         PullDownMenuItem(
             onTap: () {

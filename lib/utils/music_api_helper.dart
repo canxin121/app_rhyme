@@ -31,19 +31,26 @@ Future<void> deleteMusicsFromLocalMusicList(BuildContext context,
   }
 }
 
-Future<void> delMusicCache(MusicContainer musicContainer) async {
+Future<void> delMusicCache(MusicContainer musicContainer,
+    {bool showToast = true, bool showToastWhenNoMsuicCache = false}) async {
+  // 这个函数运行耗时短，连续使用时应showToast = false
   try {
     bool hasCache = await musicContainer.hasCache();
     if (!hasCache) {
-      LogToast.error("删除缓存失败", "音乐没有缓存",
-          "[deleteMusicCache] Failed to delete cache: music has no cache");
+      if (showToastWhenNoMsuicCache && showToast) {
+        LogToast.error("删除缓存失败", "音乐没有缓存",
+            "[deleteMusicCache] Failed to delete cache: music has no cache");
+      }
       return;
     }
     await rust_api_music_cache.deleteMusicCache(musicInfo: musicContainer.info);
     await globalMusicContainerListPageRefreshFunction();
-    LogToast.success("删除缓存成功", "成功删除缓存: ${musicContainer.info.name}",
-        "[deleteMusicCache] Successfully deleted cache: ${musicContainer.info.name}");
+    if (showToast) {
+      LogToast.success("删除缓存成功", "成功删除缓存: ${musicContainer.info.name}",
+          "[deleteMusicCache] Successfully deleted cache: ${musicContainer.info.name}");
+    }
   } catch (e) {
+    // 失败时总是要显示toast
     LogToast.error("删除缓存失败", "删除缓存'${musicContainer.info.name}'失败: $e",
         "[deleteMusicCache] Failed to delete cache: $e");
   }

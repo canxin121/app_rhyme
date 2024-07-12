@@ -54,70 +54,72 @@ class ReorderLocalMusicListPageState extends State<ReorderLocalMusicListPage>
 
     return CupertinoPageScaffold(
         backgroundColor: backgroundColor,
-        navigationBar: CupertinoNavigationBar(
-          padding: const EdgeInsetsDirectional.all(0),
-          leading: CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            child: Icon(CupertinoIcons.back, color: activeIconRed),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          trailing: CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            child: Icon(CupertinoIcons.checkmark, color: activeIconRed),
-            onPressed: () async {
-              try {
-                List<int> musicIds =
-                    widget.musicContainers.map((ml) => ml.info.id).toList();
-                await SqlFactoryW.reorderMusics(
-                    musicListName: widget.musicList.getMusiclistInfo().name,
-                    newIds: Int64List.fromList(musicIds));
-                await globalMusicContainerListPageRefreshFunction();
-                LogToast.success("歌曲排序成功", "歌曲排序成功",
-                    "[ReorderLocalMusicListPageState] Music list reordered successfully");
-              } catch (e) {
-                LogToast.error("歌曲排序失败", "歌曲排序错误:$e",
-                    "[ReorderLocalMusicListPageState] Failed to reorder music list: $e");
-              }
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-          ),
-        ),
         child: Column(
           children: [
-            SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
-            widget.musicContainers.isEmpty
-                ? Center(
-                    child: Text("没有歌曲", style: TextStyle(color: textColor)),
-                  )
-                : Align(
-                    alignment: Alignment.topCenter,
-                    child: ReorderableWrap(
-                      padding: const EdgeInsets.only(bottom: 100),
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      needsLongPressDraggable: true,
-                      children: widget.musicContainers.map((musicContainer) {
-                        return SizedBox(
-                            width: screenWidth - 20,
-                            child: MusicContainerListItem(
-                              musicListW: widget.musicList,
-                              musicContainer: musicContainer,
-                              onTap: () {},
-                            ));
-                      }).toList(),
-                      onReorder: (int oldIndex, int newIndex) {
-                        setState(() {
-                          final MusicContainer item =
-                              widget.musicContainers.removeAt(oldIndex);
-                          widget.musicContainers.insert(newIndex, item);
-                        });
-                      },
-                    ),
-                  )
+            CupertinoNavigationBar(
+              padding: const EdgeInsetsDirectional.all(0),
+              leading: CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                child: Icon(CupertinoIcons.back, color: activeIconRed),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              trailing: CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                child: Icon(CupertinoIcons.checkmark, color: activeIconRed),
+                onPressed: () async {
+                  try {
+                    List<int> musicIds =
+                        widget.musicContainers.map((ml) => ml.info.id).toList();
+                    await SqlFactoryW.reorderMusics(
+                        musicListName: widget.musicList.getMusiclistInfo().name,
+                        newIds: Int64List.fromList(musicIds));
+                    await globalMusicContainerListPageRefreshFunction();
+                    LogToast.success("歌曲排序成功", "歌曲排序成功",
+                        "[ReorderLocalMusicListPageState] Music list reordered successfully");
+                  } catch (e) {
+                    LogToast.error("歌曲排序失败", "歌曲排序错误:$e",
+                        "[ReorderLocalMusicListPageState] Failed to reorder music list: $e");
+                  }
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+            Expanded(
+                child: widget.musicContainers.isEmpty
+                    ? Center(
+                        child: Text("没有歌曲", style: TextStyle(color: textColor)),
+                      )
+                    : Align(
+                        alignment: Alignment.topCenter,
+                        child: ReorderableWrap(
+                          padding: const EdgeInsets.only(
+                              bottom: 100, left: 10, right: 10, top: 10),
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          needsLongPressDraggable: true,
+                          children:
+                              widget.musicContainers.map((musicContainer) {
+                            return SizedBox(
+                                width: screenWidth - 20,
+                                child: MusicContainerListItem(
+                                  musicListW: widget.musicList,
+                                  musicContainer: musicContainer,
+                                  onTap: () {},
+                                ));
+                          }).toList(),
+                          onReorder: (int oldIndex, int newIndex) {
+                            setState(() {
+                              final MusicContainer item =
+                                  widget.musicContainers.removeAt(oldIndex);
+                              widget.musicContainers.insert(newIndex, item);
+                            });
+                          },
+                        ),
+                      ))
           ],
         ));
   }

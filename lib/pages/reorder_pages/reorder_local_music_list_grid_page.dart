@@ -52,72 +52,75 @@ class ReorderLocalMusicListGridPageState
 
     return CupertinoPageScaffold(
         backgroundColor: backgroundColor,
-        navigationBar: CupertinoNavigationBar(
-          padding: const EdgeInsetsDirectional.all(0),
-          leading: CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            child: Icon(CupertinoIcons.back, color: activeIconRed),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          trailing: CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            child: Icon(CupertinoIcons.checkmark, color: activeIconRed),
-            onPressed: () async {
-              try {
-                List<int> musicIds = widget.musicLists
-                    .map((ml) => ml.getMusiclistInfo().id)
-                    .toList();
-                await SqlFactoryW.reorderMusiclist(
-                    newIds: Int64List.fromList(musicIds));
-                LogToast.success("歌单排序成功", "歌单排序成功",
-                    "[ReorderLocalMusicListGridPageState] Music list reordered successfully");
-                globalMusicListGridPageRefreshFunction();
-              } catch (e) {
-                LogToast.error("歌单排序失败", "歌单排序错误:$e",
-                    "[ReorderLocalMusicListGridPageState] Failed to reorder music list: $e");
-              }
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            },
-          ),
-        ),
         child: Column(
           children: [
-            SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
-            widget.musicLists.isEmpty
-                ? Center(
-                    child: Text("没有歌单", style: TextStyle(color: textColor)),
-                  )
-                : Align(
-                    alignment: Alignment.topCenter,
-                    child: ReorderableWrap(
-                      padding: const EdgeInsets.only(bottom: 100),
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      needsLongPressDraggable: true,
-                      children: widget.musicLists.map((musicList) {
-                        return SizedBox(
-                            width: screenWidth / 2 - 20,
-                            child: MusicListImageCard(
-                              key: ValueKey(musicList.getMusiclistInfo().id),
-                              musicListW: musicList,
-                              online: false,
-                              onTap: () {},
-                              cachePic: globalConfig.savePicWhenAddMusicList,
-                            ));
-                      }).toList(),
-                      onReorder: (int oldIndex, int newIndex) {
-                        setState(() {
-                          final MusicListW item =
-                              widget.musicLists.removeAt(oldIndex);
-                          widget.musicLists.insert(newIndex, item);
-                        });
-                      },
-                    ),
-                  )
+            CupertinoNavigationBar(
+              padding: const EdgeInsetsDirectional.all(0),
+              leading: CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                child: Icon(CupertinoIcons.back, color: activeIconRed),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              trailing: CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                child: Icon(CupertinoIcons.checkmark, color: activeIconRed),
+                onPressed: () async {
+                  try {
+                    List<int> musicIds = widget.musicLists
+                        .map((ml) => ml.getMusiclistInfo().id)
+                        .toList();
+                    await SqlFactoryW.reorderMusiclist(
+                        newIds: Int64List.fromList(musicIds));
+                    LogToast.success("歌单排序成功", "歌单排序成功",
+                        "[ReorderLocalMusicListGridPageState] Music list reordered successfully");
+                    globalMusicListGridPageRefreshFunction();
+                  } catch (e) {
+                    LogToast.error("歌单排序失败", "歌单排序错误:$e",
+                        "[ReorderLocalMusicListGridPageState] Failed to reorder music list: $e");
+                  }
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
+            Expanded(
+                child: widget.musicLists.isEmpty
+                    ? Center(
+                        child: Text("没有歌单", style: TextStyle(color: textColor)),
+                      )
+                    : Align(
+                        alignment: Alignment.topCenter,
+                        child: ReorderableWrap(
+                          padding: const EdgeInsets.only(
+                              bottom: 100, left: 10, right: 10, top: 10),
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          needsLongPressDraggable: true,
+                          children: widget.musicLists.map((musicList) {
+                            return SizedBox(
+                                width: screenWidth / 2 - 20,
+                                child: MusicListImageCard(
+                                  key:
+                                      ValueKey(musicList.getMusiclistInfo().id),
+                                  musicListW: musicList,
+                                  online: false,
+                                  onTap: () {},
+                                  cachePic:
+                                      globalConfig.savePicWhenAddMusicList,
+                                ));
+                          }).toList(),
+                          onReorder: (int oldIndex, int newIndex) {
+                            setState(() {
+                              final MusicListW item =
+                                  widget.musicLists.removeAt(oldIndex);
+                              widget.musicLists.insert(newIndex, item);
+                            });
+                          },
+                        ),
+                      ))
           ],
         ));
   }
