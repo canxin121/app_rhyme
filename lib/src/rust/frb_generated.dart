@@ -2483,9 +2483,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AggregatorOnlineFactoryW dco_decode_aggregator_online_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 0)
+    if (arr.isNotEmpty)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return AggregatorOnlineFactoryW();
+    return const AggregatorOnlineFactoryW();
   }
 
   @protected
@@ -2805,9 +2805,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   OnlineFactoryW dco_decode_online_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 0)
+    if (arr.isNotEmpty)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return OnlineFactoryW();
+    return const OnlineFactoryW();
   }
 
   @protected
@@ -2960,9 +2960,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SqlFactoryW dco_decode_sql_factory_w(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 0)
+    if (arr.isNotEmpty)
       throw Exception('unexpected arr length: expect 0 but see ${arr.length}');
-    return SqlFactoryW();
+    return const SqlFactoryW();
   }
 
   @protected
@@ -3118,7 +3118,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AggregatorOnlineFactoryW sse_decode_aggregator_online_factory_w(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return AggregatorOnlineFactoryW();
+    return const AggregatorOnlineFactoryW();
   }
 
   @protected
@@ -3524,7 +3524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   OnlineFactoryW sse_decode_online_factory_w(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return OnlineFactoryW();
+    return const OnlineFactoryW();
   }
 
   @protected
@@ -3727,7 +3727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   SqlFactoryW sse_decode_sql_factory_w(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SqlFactoryW();
+    return const SqlFactoryW();
   }
 
   @protected
