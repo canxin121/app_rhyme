@@ -176,8 +176,7 @@ class MusicContainer {
         currentQuality.value = playInfo!.quality;
 
         if (playInfo!.uri.contains("http")) {
-          if ((Platform.isIOS || Platform.isMacOS) &&
-              playInfo!.quality.short.contains("flac")) {
+          if (Platform.isIOS || Platform.isMacOS) {
             audioSource = ProgressiveAudioSource(Uri.parse(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
@@ -188,8 +187,7 @@ class MusicContainer {
                 AudioSource.uri(Uri.parse(playInfo!.uri), tag: _toMediaItem());
           }
         } else {
-          if ((Platform.isIOS || Platform.isMacOS) &&
-              playInfo!.quality.short.contains("flac")) {
+          if (Platform.isIOS || Platform.isMacOS) {
             audioSource = ProgressiveAudioSource(Uri.file(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
@@ -202,7 +200,7 @@ class MusicContainer {
         globalTalker.info("[MusicContainer] 更新 '${info.name}' 音频资源成功");
         return true;
       } else {
-        LogToast.error("获取播放资源失败", "${info.name}获取播放资源失败, 尝试换源播放",
+        LogToast.error("更新播放资源失败", "${info.name}更新播放资源失败, 尝试换源播放",
             "[MusicContainer] Failed to update audio source, try to change source");
         bool changed = await _changeSource();
         if (!changed) {
