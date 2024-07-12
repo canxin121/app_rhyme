@@ -15,7 +15,7 @@ import 'package:flutter/cupertino.dart';
 // 2. 在线的歌曲: musicListW == null && index == -1
 // 3. 播放列表的歌曲: musicListW == null && index != -1
 
-class MusicContainerListItem extends StatelessWidget {
+class MusicContainerListItem extends StatefulWidget {
   final MusicContainer musicContainer;
   final MusicListW? musicListW;
   final bool? isDark;
@@ -23,35 +23,61 @@ class MusicContainerListItem extends StatelessWidget {
   final bool cachePic;
   final bool showMenu;
   final int index;
-  const MusicContainerListItem(
-      {super.key,
-      required this.musicContainer,
-      this.musicListW,
-      this.isDark,
-      this.onTap,
-      this.cachePic = false,
-      this.showMenu = true,
-      this.index = -1});
+
+  const MusicContainerListItem({
+    super.key,
+    required this.musicContainer,
+    this.musicListW,
+    this.isDark,
+    this.onTap,
+    this.cachePic = false,
+    this.showMenu = true,
+    this.index = -1,
+  });
+
+  @override
+  _MusicContainerListItemState createState() => _MusicContainerListItemState();
+}
+
+class _MusicContainerListItemState extends State<MusicContainerListItem> {
+  bool? _hasCache;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _checkCache() async {
+    bool cacheStatus = await widget.musicContainer.hasCache();
+    setState(() {
+      _hasCache = cacheStatus;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // 每次重绘时检查缓存状态
+    _checkCache();
     // 获取当前主题的亮度
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDarkMode = isDark ?? (brightness == Brightness.dark);
-
+    final bool isDarkMode = widget.isDark ?? (brightness == Brightness.dark);
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 14),
-      onPressed: onTap ??
+      onPressed: widget.onTap ??
           () {
-            globalAudioHandler.addMusicPlay(musicContainer);
+            globalAudioHandler.addMusicPlay(widget.musicContainer);
           },
       child: Row(
+        key: ValueKey("${_hasCache}_${widget.musicContainer.hashCode}"),
         children: <Widget>[
           // 歌曲的封面
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: imageCacheHelper(musicContainer.info.artPic,
-                width: 50, height: 50, fit: BoxFit.cover, cacheNow: cachePic),
+            child: imageCacheHelper(widget.musicContainer.info.artPic,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                cacheNow: widget.cachePic),
           ),
           // 歌曲的信息(歌名, 歌手)
           Expanded(
@@ -61,7 +87,7 @@ class MusicContainerListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    musicContainer.info.name,
+                    widget.musicContainer.info.name,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -73,7 +99,7 @@ class MusicContainerListItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    musicContainer.info.artist.join(", "),
+                    widget.musicContainer.info.artist.join(", "),
                     style: TextStyle(
                       fontSize: 14,
                       color: isDarkMode
@@ -87,37 +113,29 @@ class MusicContainerListItem extends StatelessWidget {
             ),
           ),
           // 缓存标志
-          if (musicListW != null && index == -1)
-            FutureBuilder<bool>(
-              future: musicContainer.hasCache(),
-              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: CupertinoActivityIndicator(),
-                  );
-                } else if (snapshot.hasData && snapshot.data!) {
-                  return const Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: Badge(
-                      label: '缓存',
-                    ),
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
-              },
-            ),
+          if (widget.musicListW != null && widget.index == -1)
+            _hasCache == null
+                ? const Padding(
+                    padding: EdgeInsets.all(0),
+                  )
+                : _hasCache!
+                    ? const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: Badge(
+                          label: '缓存',
+                        ),
+                      )
+                    : const SizedBox.shrink(),
           // 标志音乐信息来源的Badge
           Badge(
-            label: sourceToShort(musicContainer.info.source),
+            label: sourceToShort(widget.musicContainer.info.source),
           ),
           // 歌曲的操作按钮
-          if (showMenu)
+          if (widget.showMenu)
             MusicContainerMenu(
-              musicContainer: musicContainer,
-              musicListW: musicListW,
-              index: index,
+              musicContainer: widget.musicContainer,
+              musicListW: widget.musicListW,
+              index: widget.index,
               builder: (_, showMenu) => CupertinoButton(
                 onPressed: showMenu,
                 padding: EdgeInsets.zero,

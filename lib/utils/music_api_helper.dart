@@ -2,7 +2,7 @@ import 'package:app_rhyme/src/rust/api/music_cache.dart'
     as rust_api_music_cache;
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/music_container_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';

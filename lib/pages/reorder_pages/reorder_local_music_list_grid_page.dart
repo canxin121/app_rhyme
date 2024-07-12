@@ -1,8 +1,7 @@
-import 'dart:io';
 
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:reorderables/reorderables.dart';

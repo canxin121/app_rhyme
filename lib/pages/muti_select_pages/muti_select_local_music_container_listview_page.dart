@@ -1,10 +1,9 @@
-import 'dart:io';
 
 import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/src/rust/api/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -230,11 +229,13 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
       await cacheMusic(musicContainer);
       refresh();
     }
+    LogToast.success("缓存选中音乐", "缓存选中音乐成功",
+        "[MutiSelectLocalMusicContainerListChoiceMenu] Successfully cached selected music");
   }
 
   Future<void> handleDeleteCacheSelected() async {
     for (var musicContainer in musicContainers) {
-      await delMusicCache(musicContainer);
+      await delMusicCache(musicContainer, showToast: false);
       refresh();
     }
     LogToast.success("删除选中音乐缓存", "删除选中音乐缓存成功",

@@ -20,7 +20,7 @@ class LogToast {
   static void info(String toastTitle, String toastDesc, String log,
       {bool isLong = false}) {
     toastification.show(
-      autoCloseDuration: Duration(seconds: isLong ? 5 : 3),
+      autoCloseDuration: Duration(seconds: isLong ? 4 : 2),
       type: ToastificationType.info,
       title: Text(
         toastTitle,
@@ -37,7 +37,7 @@ class LogToast {
   static void success(String toastTitle, String toastDesc, String log,
       {bool isLong = false}) {
     toastification.show(
-      autoCloseDuration: Duration(seconds: isLong ? 5 : 3),
+      autoCloseDuration: Duration(seconds: isLong ? 4 : 2),
       type: ToastificationType.success,
       title: Text(
         toastTitle,

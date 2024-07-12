@@ -1,6 +1,6 @@
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
@@ -135,9 +135,7 @@ class LocalMusicContainerListPageState
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: screenWidth * 0.1,
-                  left: screenWidth * 0.1,
-                  right: screenWidth * 0.1),
+                  top: 10, left: screenWidth * 0.1, right: screenWidth * 0.1),
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: screenWidth * 0.7,

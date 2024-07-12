@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/types/music_container.dart';

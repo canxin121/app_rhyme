@@ -1,6 +1,6 @@
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';

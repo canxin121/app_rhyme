@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_grid_page.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';

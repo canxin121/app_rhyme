@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/music_cache.dart';
-import 'package:app_rhyme/utils/logger.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:app_rhyme/src/rust/api/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/type_bind.dart';
