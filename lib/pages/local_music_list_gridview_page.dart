@@ -98,9 +98,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(top: 50),
-              ),
+              child: SafeArea(child: SizedBox(height: 10.0)),
             ),
             musicLists.isEmpty
                 ? SliverToBoxAdapter(
