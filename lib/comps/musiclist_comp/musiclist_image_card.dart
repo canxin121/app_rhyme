@@ -27,87 +27,87 @@ class MusicListImageCard extends StatelessWidget {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
 
+    Widget cardContent = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Stack(
+          children: [
+            MusicListMenu(
+              builder: (context, showMenu) => ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child:
+                    imageCacheHelper(musicListInfo.artPic, cacheNow: cachePic),
+              ),
+              musicListW: musicListW,
+              online: online,
+            ),
+            Positioned(
+              top: 3,
+              left: 3,
+              child: Badge(
+                label: sourceToShort(musicListW.source()),
+              ),
+            ),
+            Positioned(
+              bottom: 8,
+              right: 8,
+              child: MusicListMenu(
+                builder: (context, showMenu) => GestureDetector(
+                  onTap: showMenu,
+                  child: Icon(
+                    CupertinoIcons.ellipsis_circle,
+                    color: isDarkMode ? CupertinoColors.white : activeIconRed,
+                  ),
+                ),
+                musicListW: musicListW,
+                online: online,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Flexible(
+          fit: FlexFit.loose,
+          child: Center(
+            child: Text(
+              musicListInfo.name,
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Flexible(
+          fit: FlexFit.loose,
+          child: Center(
+            child: Text(
+              musicListInfo.desc,
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey4
+                    : CupertinoColors.systemGrey,
+                fontSize: 16,
+              ).useSystemChineseFont(),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
+    );
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return GestureDetector(
-            onTap: onTap,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    MusicListMenu(
-                      builder: (context, showMenu) => ClipRRect(
-                        borderRadius: BorderRadius.circular(12.0),
-                        child: imageCacheHelper(musicListInfo.artPic,
-                            cacheNow: cachePic),
-                      ),
-                      musicListW: musicListW,
-                      online: online,
-                    ),
-                    Positioned(
-                      top: 3,
-                      left: 3,
-                      child: Badge(
-                        label: sourceToShort(musicListW.source()),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 8,
-                      right: 8,
-                      child: MusicListMenu(
-                        builder: (context, showMenu) => GestureDetector(
-                          onTap: showMenu,
-                          child: Icon(
-                            CupertinoIcons.ellipsis_circle,
-                            color: isDarkMode
-                                ? CupertinoColors.white
-                                : activeIconRed,
-                          ),
-                        ),
-                        musicListW: musicListW,
-                        online: online,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: Center(
-                    child: Text(
-                      musicListInfo.name,
-                      style: CupertinoTheme.of(context)
-                          .textTheme
-                          .navTitleTextStyle,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: Center(
-                    child: Text(
-                      musicListInfo.desc,
-                      style: TextStyle(
-                        color: isDarkMode
-                            ? CupertinoColors.systemGrey4
-                            : CupertinoColors.systemGrey,
-                        fontSize: 16,
-                      ).useSystemChineseFont(),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return onTap != null
+              ? GestureDetector(
+                  onTap: onTap,
+                  child: cardContent,
+                )
+              : cardContent;
         },
       ),
     );

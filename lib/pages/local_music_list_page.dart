@@ -118,15 +118,13 @@ class LocalMusicContainerListPageState
             },
           ),
           trailing: LocalMusicListChoicMenu(
-            builder: (context, showMenu) => GestureDetector(
-              child: Text(
-                '选项',
-                style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-              ),
-              onTapDown: (details) {
-                showMenu();
-              },
-            ),
+            builder: (context, showMenu) => CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+                )),
             musicListW: musicListW,
             online: false,
             musicContainers: musicContainers,

@@ -82,36 +82,38 @@ class ReorderLocalMusicListGridPageState
             },
           ),
         ),
-        child: widget.musicLists.isEmpty
-            ? Center(
-                child: Text("没有歌单", style: TextStyle(color: textColor)),
-              )
-            : Align(
-                alignment: Alignment.topCenter,
-                child: ReorderableWrap(
-                  padding: const EdgeInsets.only(bottom: 100, top: 60),
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  needsLongPressDraggable: true,
-                  children: widget.musicLists.map((musicList) {
-                    return SizedBox(
-                        width: screenWidth / 2 - 20,
-                        child: MusicListImageCard(
-                          key: ValueKey(musicList.getMusiclistInfo().id),
-                          musicListW: musicList,
-                          online: false,
-                          onTap: () {},
-                          cachePic: globalConfig.savePicWhenAddMusicList,
-                        ));
-                  }).toList(),
-                  onReorder: (int oldIndex, int newIndex) {
-                    setState(() {
-                      final MusicListW item =
-                          widget.musicLists.removeAt(oldIndex);
-                      widget.musicLists.insert(newIndex, item);
-                    });
-                  },
-                ),
-              ));
+        child: Padding(
+            padding: const EdgeInsets.only(top: 50),
+            child: widget.musicLists.isEmpty
+                ? Center(
+                    child: Text("没有歌单", style: TextStyle(color: textColor)),
+                  )
+                : Align(
+                    alignment: Alignment.topCenter,
+                    child: ReorderableWrap(
+                      padding: const EdgeInsets.only(bottom: 100),
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      needsLongPressDraggable: true,
+                      children: widget.musicLists.map((musicList) {
+                        return SizedBox(
+                            width: screenWidth / 2 - 20,
+                            child: MusicListImageCard(
+                              key: ValueKey(musicList.getMusiclistInfo().id),
+                              musicListW: musicList,
+                              online: false,
+                              onTap: () {},
+                              cachePic: globalConfig.savePicWhenAddMusicList,
+                            ));
+                      }).toList(),
+                      onReorder: (int oldIndex, int newIndex) {
+                        setState(() {
+                          final MusicListW item =
+                              widget.musicLists.removeAt(oldIndex);
+                          widget.musicLists.insert(newIndex, item);
+                        });
+                      },
+                    ),
+                  )));
   }
 }

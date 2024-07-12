@@ -1,3 +1,4 @@
+import 'package:app_rhyme/pages/muti_select_local_music_list_grid_page.dart';
 import 'package:app_rhyme/pages/reorder_local_music_list_grid_page.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/logger.dart';
@@ -69,66 +70,80 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
-      navigationBar: CupertinoNavigationBar(
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '资料库',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 24, color: textColor),
+        backgroundColor: backgroundColor,
+        navigationBar: CupertinoNavigationBar(
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 0.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '资料库',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    color: textColor),
+              ),
             ),
           ),
-        ),
-        trailing: MusicListGridPageMenu(
-          builder: (context, showMenu) => GestureDetector(
-            child: Text(
-              '选项',
-              style: TextStyle(color: activeIconRed),
-            ),
-            onTapDown: (details) {
-              showMenu();
-            },
+          trailing: MusicListGridPageMenu(
+            builder: (context, showMenu) => CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed),
+                )),
           ),
         ),
-      ),
-      child:
-          // Display music lists grid view
-          musicLists.isEmpty
-              ? Center(child: Text("没有歌单", style: TextStyle(color: textColor)))
-              : GridView.builder(
-                  padding: const EdgeInsets.only(
-                      top: 50, bottom: 150, right: 10, left: 10),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.75,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
+        child: CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(top: 50),
+              ),
+            ),
+            musicLists.isEmpty
+                ? SliverToBoxAdapter(
+                    child: Center(
+                        child:
+                            Text("没有歌单", style: TextStyle(color: textColor))))
+                : SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.75,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          var musicList = musicLists[index];
+                          return MusicListImageCard(
+                            key: ValueKey(musicList.getMusiclistInfo().id),
+                            musicListW: musicList,
+                            online: false,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) =>
+                                      LocalMusicContainerListPage(
+                                    musicList: musicList,
+                                  ),
+                                ),
+                              );
+                            },
+                            cachePic: globalConfig.savePicWhenAddMusicList,
+                          );
+                        },
+                        childCount: musicLists.length,
+                      ),
+                    ),
                   ),
-                  itemCount: musicLists.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    var musicList = musicLists[index];
-                    return MusicListImageCard(
-                      key: ValueKey(musicList.getMusiclistInfo().id),
-                      musicListW: musicList,
-                      online: false,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => LocalMusicContainerListPage(
-                              musicList: musicList,
-                            ),
-                          ),
-                        );
-                      },
-                      cachePic: globalConfig.savePicWhenAddMusicList,
-                    );
-                  },
-                ),
-    );
+          ],
+        ));
   }
 }
 
@@ -201,7 +216,22 @@ class MusicListGridPageMenu extends StatelessWidget {
               );
             }
           },
-          title: '排序歌单',
+          title: '歌单排序',
+          icon: CupertinoIcons.list_number,
+        ),
+        PullDownMenuItem(
+          onTap: () async {
+            var result = await SqlFactoryW.getAllMusiclists();
+            var musicLists = result;
+            if (context.mounted) {
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                    builder: (context) => MutiSelectLocalMusicListGridPage(
+                        musicLists: musicLists)),
+              );
+            }
+          },
+          title: '歌单多选',
           icon: CupertinoIcons.list_number,
         )
       ],
