@@ -177,7 +177,10 @@ class MusicContainer {
         currentQuality.value = playInfo!.quality;
 
         if (playInfo!.uri.contains("http")) {
-          if (Platform.isIOS || Platform.isMacOS) {
+          if ((Platform.isIOS || Platform.isMacOS) &&
+              ((playInfo!.quality.format != null &&
+                      playInfo!.quality.format!.contains("flac")) ||
+                  (playInfo!.quality.short.contains("flac")))) {
             audioSource = ProgressiveAudioSource(Uri.parse(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
@@ -188,7 +191,10 @@ class MusicContainer {
                 AudioSource.uri(Uri.parse(playInfo!.uri), tag: _toMediaItem());
           }
         } else {
-          if (Platform.isIOS || Platform.isMacOS) {
+          if ((Platform.isIOS || Platform.isMacOS) &&
+              ((playInfo!.quality.format != null &&
+                      playInfo!.quality.format!.contains("flac")) ||
+                  (playInfo!.quality.short.contains("flac")))) {
             audioSource = ProgressiveAudioSource(Uri.file(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(

@@ -85,23 +85,25 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Column(
       children: [
+        const SafeArea(
+            child: SizedBox(
+          height: 0,
+        )),
         // 搜索框
         Padding(
             padding: const EdgeInsets.all(8.0),
-            child: SafeArea(
-              child: CupertinoSearchTextField(
-                style: TextStyle(
-                  color: isDarkMode
-                      ? CupertinoColors.white
-                      : const Color.fromRGBO(0, 0, 0, 1),
-                ).useSystemChineseFont(),
-                controller: _inputContentController,
-                onSubmitted: (String value) {
-                  if (value.isNotEmpty) {
-                    _pagingController.refresh();
-                  }
-                },
-              ),
+            child: CupertinoSearchTextField(
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.white
+                    : const Color.fromRGBO(0, 0, 0, 1),
+              ).useSystemChineseFont(),
+              controller: _inputContentController,
+              onSubmitted: (String value) {
+                if (value.isNotEmpty) {
+                  _pagingController.refresh();
+                }
+              },
             )),
         Expanded(
           child: PagedListView.separated(
@@ -217,11 +219,14 @@ class _SearchMusicListState extends State<SearchMusicListPage>
 
     return Column(
       children: [
+        const SafeArea(
+            child: SizedBox(
+          height: 0,
+        )),
         // 搜索框
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SafeArea(
-              child: CupertinoSearchTextField(
+          child: CupertinoSearchTextField(
             style: TextStyle(
               color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
             ).useSystemChineseFont(),
@@ -231,7 +236,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                 _pagingController.refresh();
               }
             },
-          )),
+          ),
         ),
         Expanded(
           child: PagedGridView(
