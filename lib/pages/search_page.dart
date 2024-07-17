@@ -176,104 +176,93 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
           ),
           // 编辑 MusicFuzzFilter 的 Section
           if (_isFilterSectionVisible)
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  CupertinoFormSection.insetGrouped(
-                    header: Text('筛选条件', style: TextStyle(color: textColor)),
+            CupertinoFormSection.insetGrouped(
+              header: Text('筛选条件', style: TextStyle(color: textColor)),
+              children: [
+                CupertinoFormRow(
+                  prefix: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Text('歌曲名', style: TextStyle(color: textColor)),
+                  ),
+                  child: CupertinoTextField(
+                    controller: _nameController,
+                    placeholder: '输入曲名',
+                  ),
+                ),
+                CupertinoFormRow(
+                  prefix: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Text('演唱者', style: TextStyle(color: textColor)),
+                  ),
+                  child: CupertinoTextField(
+                    controller: _artistController,
+                    placeholder: '输入演唱者 (多个用逗号分隔)',
+                  ),
+                ),
+                CupertinoFormRow(
+                  prefix: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Text('专辑名', style: TextStyle(color: textColor)),
+                  ),
+                  child: CupertinoTextField(
+                    controller: _albumController,
+                    placeholder: '输入专辑名',
+                  ),
+                ),
+                CupertinoFormRow(
+                  padding: EdgeInsets.zero,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      CupertinoFormRow(
-                        prefix: Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child:
-                              Text('歌曲名', style: TextStyle(color: textColor)),
-                        ),
-                        child: CupertinoTextField(
-                          controller: _nameController,
-                          placeholder: '输入曲名',
-                        ),
-                      ),
-                      CupertinoFormRow(
-                        prefix: Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child:
-                              Text('演唱者', style: TextStyle(color: textColor)),
-                        ),
-                        child: CupertinoTextField(
-                          controller: _artistController,
-                          placeholder: '输入演唱者 (多个用逗号分隔)',
-                        ),
-                      ),
-                      CupertinoFormRow(
-                        prefix: Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child:
-                              Text('专辑名', style: TextStyle(color: textColor)),
-                        ),
-                        child: CupertinoTextField(
-                          controller: _albumController,
-                          placeholder: '输入专辑名',
-                        ),
-                      ),
-                      CupertinoFormRow(
-                        padding: EdgeInsets.zero,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            CupertinoButton(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 20),
-                              onPressed: _applyFilter,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: CupertinoColors.activeBlue,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: const Text(
-                                  '应用筛选条件',
-                                  style: TextStyle(
-                                    color: CupertinoColors.activeBlue,
-                                  ),
-                                ),
-                              ),
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 20),
+                        onPressed: _applyFilter,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 20),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: CupertinoColors.activeBlue,
+                              width: 1.0,
                             ),
-                            CupertinoButton(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 20),
-                              onPressed: _clearFilter,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: CupertinoColors.systemRed,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: const Text(
-                                  '清空筛选条件',
-                                  style: TextStyle(
-                                    color: CupertinoColors.systemRed,
-                                  ),
-                                ),
-                              ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: const Text(
+                            '应用筛选条件',
+                            style: TextStyle(
+                              color: CupertinoColors.activeBlue,
                             ),
-                          ],
+                          ),
+                        ),
+                      ),
+                      CupertinoButton(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 20),
+                        onPressed: _clearFilter,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 20),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: CupertinoColors.systemRed,
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: const Text(
+                            '清空筛选条件',
+                            style: TextStyle(
+                              color: CupertinoColors.systemRed,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-
           Expanded(
             child: PagedListView.separated(
               pagingController: _pagingController,
@@ -399,7 +388,8 @@ class _SearchMusicListState extends State<SearchMusicListPage>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(
+              left: 8.0, right: 8.0, bottom: 8.0, top: 10.0),
           child: CupertinoSearchTextField(
             style: TextStyle(
               color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
@@ -447,7 +437,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                     padding: const EdgeInsets.only(
                         left: 10,
                         right: 10,
-                        bottom: 20), // Increased bottom padding
+                        bottom: 20),
                     child: MusicListImageCard(
                       musicListW: musicListW,
                       onTap: () {
