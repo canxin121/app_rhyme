@@ -143,7 +143,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
           const SafeArea(child: SizedBox(height: 0)),
           // 搜索框和过滤按钮
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(4.0),
             child: Row(
               children: [
                 Expanded(
@@ -405,7 +405,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
         )),
         // 搜索框
         Padding(
-          padding: const EdgeInsets.only(top: 12.0, left: 8, right: 8),
+          padding: const EdgeInsets.all(8.0),
           child: CupertinoSearchTextField(
             style: TextStyle(
               color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
