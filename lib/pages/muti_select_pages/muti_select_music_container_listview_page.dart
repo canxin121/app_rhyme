@@ -15,23 +15,23 @@ import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
-class MutiSelectLocalMusicContainerListPage extends StatefulWidget {
+class MutiSelectMusicContainerListPage extends StatefulWidget {
   final List<MusicContainer> musicContainers;
-  final MusicListW musicList;
+  final MusicListW? musicList;
 
-  const MutiSelectLocalMusicContainerListPage({
+  const MutiSelectMusicContainerListPage({
     super.key,
-    required this.musicList,
+    this.musicList,
     required this.musicContainers,
   });
 
   @override
-  MutiSelectLocalMusicContainerListPageState createState() =>
-      MutiSelectLocalMusicContainerListPageState();
+  MutiSelectMusicContainerListPageState createState() =>
+      MutiSelectMusicContainerListPageState();
 }
 
-class MutiSelectLocalMusicContainerListPageState
-    extends State<MutiSelectLocalMusicContainerListPage>
+class MutiSelectMusicContainerListPageState
+    extends State<MutiSelectMusicContainerListPage>
     with WidgetsBindingObserver {
   DragSelectGridViewController controller = DragSelectGridViewController();
 
@@ -216,7 +216,7 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   });
 
   final PullDownMenuButtonBuilder builder;
-  final MusicListW musicListW;
+  final MusicListW? musicListW;
   final List<MusicContainer> musicContainers;
   final void Function() refresh;
   final void Function() cancelSelectAll;
@@ -243,25 +243,25 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   }
 
   Future<void> handleDeleteFromList() async {
-    MusicListInfo musicListInfo = musicListW.getMusiclistInfo();
-    SqlFactoryW.delMusics(
-      musicListName: musicListInfo.name,
-      ids: Int64List.fromList(musicContainers.map((e) => e.info.id).toList()),
-    );
-    globalMusicContainerListPageRefreshFunction();
-    delSelected();
+    if (musicListW != null) {
+      MusicListInfo musicListInfo = musicListW!.getMusiclistInfo();
+      SqlFactoryW.delMusics(
+        musicListName: musicListInfo.name,
+        ids: Int64List.fromList(musicContainers.map((e) => e.info.id).toList()),
+      );
+      globalMusicContainerListPageRefreshFunction();
+      delSelected();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    MusicListInfo musicListInfo = musicListW.getMusiclistInfo();
-
-    return PullDownButton(
-      itemBuilder: (context) => [
+    final List<PullDownMenuEntry> menuItems = [
+      if (musicListW != null) ...[
         PullDownMenuHeader(
-          leading: imageCacheHelper(musicListInfo.artPic),
-          title: musicListInfo.name,
-          subtitle: musicListInfo.desc,
+          leading: imageCacheHelper(musicListW!.getMusiclistInfo().artPic),
+          title: musicListW!.getMusiclistInfo().name,
+          subtitle: musicListW!.getMusiclistInfo().desc,
         ),
         const PullDownMenuDivider.large(),
         PullDownMenuItem(
@@ -276,31 +276,38 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
           onTap: handleDeleteFromList,
           title: '从歌单删除',
         ),
-        PullDownMenuItem(
-          onTap: () async {
-            await addMusicsToMusicList(context, musicContainers);
-          },
-          title: '添加到歌单',
-        ),
-        PullDownMenuItem(
-          onTap: () async {
-            await createNewMusicListFromMusics(context, musicContainers);
-          },
-          title: '创建新歌单',
-        ),
-        PullDownMenuItem(
-          onTap: cancelSelectAll,
-          title: '取消选中',
-        ),
-        PullDownMenuItem(
-          onTap: selectAll,
-          title: '全部选中',
-        ),
-        PullDownMenuItem(
-          onTap: reverseSelect,
-          title: '反选',
-        ),
       ],
+      PullDownMenuItem(
+        onTap: () async {
+          await addMusicsToMusicList(context, musicContainers);
+        },
+        title: '添加到歌单',
+      ),
+      PullDownMenuItem(
+        onTap: () async {
+          await createNewMusicListFromMusics(context, musicContainers);
+        },
+        title: '创建新歌单',
+      ),
+      PullDownMenuItem(
+        onTap: selectAll,
+        title: '全部选中',
+        icon: CupertinoIcons.checkmark_seal_fill,
+      ),
+      PullDownMenuItem(
+        onTap: cancelSelectAll,
+        title: '取消选中',
+        icon: CupertinoIcons.xmark,
+      ),
+      PullDownMenuItem(
+        onTap: reverseSelect,
+        title: '反选',
+        icon: CupertinoIcons.arrow_swap,
+      ),
+    ];
+
+    return PullDownButton(
+      itemBuilder: (context) => menuItems,
       animationBuilder: null,
       position: PullDownMenuPosition.automatic,
       buttonBuilder: builder,

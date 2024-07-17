@@ -116,33 +116,43 @@ Future<void> viewMusicAlbum(
 
 Future<void> addMusicsToMusicList(
     BuildContext context, List<MusicContainer> musicContainers,
-    {MusicListW? musicList}) async {
-  var targetMusicList =
-      musicList ?? await showMusicListSelectionDialog(context);
+    {MusicListInfo? musicListinfo}) async {
+  MusicListInfo? targetMusicList;
+  if (musicListinfo != null) {
+    targetMusicList = musicListinfo;
+  } else {
+    targetMusicList =
+        (await showMusicListSelectionDialog(context))?.getMusiclistInfo();
+  }
   if (targetMusicList != null) {
     try {
       if (globalConfig.savePicWhenAddMusicList) {
         for (var musicContainer in musicContainers) {
           var pic = musicContainer.info.artPic;
           if (pic != null && pic.isNotEmpty) {
-            cacheFileHelper(pic, picCacheRoot);
+            try {
+              cacheFileHelper(pic, picCacheRoot);
+            } catch (_) {}
           }
         }
       }
-      await Future.wait(musicContainers.map((musicContainer) async {
-        if (globalConfig.saveLyricWhenAddMusicList) {
-          await musicContainer.aggregator.fetchLyric();
-        }
-      }));
+      try {
+        await Future.wait(musicContainers.map((musicContainer) async {
+          if (globalConfig.saveLyricWhenAddMusicList) {
+            await musicContainer.aggregator.fetchLyric();
+          }
+        }));
+      } catch (_) {
+        // LogToast.error(
+        //     "添加音乐", "获取歌词失败: $e", "[addToMusicList] Failed to get lyric: $e");
+      }
       await SqlFactoryW.addMusics(
-          musicsListName: targetMusicList.getMusiclistInfo().name,
+          musicsListName: targetMusicList.name,
           musics: musicContainers.map((e) => e.aggregator.clone()).toList());
       await globalMusicContainerListPageRefreshFunction();
 
-      LogToast.success(
-          "添加成功",
-          "成功添加音乐到: ${targetMusicList.getMusiclistInfo().name}",
-          "[addToMusicList] Successfully added musics to: ${targetMusicList.getMusiclistInfo().name}");
+      LogToast.success("添加成功", "成功添加音乐到: ${targetMusicList.name}",
+          "[addToMusicList] Successfully added musics to: ${targetMusicList.name}");
     } catch (e) {
       LogToast.error(
           "添加失败", "添加音乐失败: $e", "[addToMusicList] Failed to add music: $e");
@@ -169,10 +179,12 @@ Future<void> createNewMusicListFromMusics(
   }
   try {
     await SqlFactoryW.createMusiclist(musicListInfos: [newMusicListInfo]);
+    globalMusicListGridPageRefreshFunction();
     if (context.mounted) {
       LogToast.success("创建成功", "成功创建新歌单: ${newMusicListInfo.name}, 正在添加音乐",
           "[createNewMusicList] Successfully created new music list: ${newMusicListInfo.name}, adding musics");
-      await addMusicsToMusicList(context, musicContainers);
+      await addMusicsToMusicList(context, musicContainers,
+          musicListinfo: newMusicListInfo);
     } else {
       await SqlFactoryW.delMusiclist(musiclistNames: [newMusicListInfo.name]);
       LogToast.error("创建失败", "创建歌单失败: context is not mounted",
@@ -209,6 +221,75 @@ Future<void> setMusicPicAsMusicListCover(
   } catch (e) {
     LogToast.error("设置封面失败", "设置封面失败: $e",
         "[setAsMusicListCover] Failed to set cover: $e");
+  }
+}
+
+Future<void> saveMusicList(
+    MusicListW musicList, MusicListInfo targetMusicListInfo) async {
+  LogToast.success("保存歌单", "正在获取歌单'${musicList.getMusiclistInfo().name}'数据，请稍等",
+      "[OnlineMusicListItemsPullDown] Start to save music list");
+  try {
+    if (targetMusicListInfo.artPic.isNotEmpty) {
+      cacheFileHelper(targetMusicListInfo.artPic, picCacheRoot);
+    }
+    await SqlFactoryW.createMusiclist(musicListInfos: [targetMusicListInfo]);
+    globalMusicListGridPageRefreshFunction();
+    var aggs = await musicList.fetchAllMusicAggregators(
+        pagesPerBatch: 5,
+        limit: 50,
+        withLyric: globalConfig.saveLyricWhenAddMusicList);
+    if (globalConfig.savePicWhenAddMusicList) {
+      for (var agg in aggs) {
+        var pic = agg.getDefaultMusic().getMusicInfo().artPic;
+        if (pic != null && pic.isNotEmpty) {
+          cacheFileHelper(pic, picCacheRoot);
+        }
+      }
+    }
+    await SqlFactoryW.addMusics(
+        musicsListName: targetMusicListInfo.name, musics: aggs);
+    globalMusicListGridPageRefreshFunction();
+    LogToast.success("保存歌单", "保存歌单'${targetMusicListInfo.name}'成功",
+        "[OnlineMusicListItemsPullDown] Succeed to save music list '${targetMusicListInfo.name}'");
+  } catch (e) {
+    LogToast.error("保存歌单", "保存歌单'${targetMusicListInfo.name}'失败: $e",
+        "[OnlineMusicListItemsPullDown] Failed to save music list '${targetMusicListInfo.name}': $e");
+  }
+}
+
+Future<void> addAggsOfMusicListToTargetMusicList(
+  MusicListW musicList,
+  MusicListW targetMusicList,
+) async {
+  var musicListInfo = musicList.getMusiclistInfo();
+  var targetMusicListInfo = targetMusicList.getMusiclistInfo();
+  LogToast.info("添加歌曲", "正在获取歌单'${musicListInfo.name}'数据，请稍等",
+      "[OnlineMusicListItemsPullDown] Start to add music");
+  try {
+    var aggs = await musicList.fetchAllMusicAggregators(
+        pagesPerBatch: 5,
+        limit: 50,
+        withLyric: globalConfig.saveLyricWhenAddMusicList);
+    if (globalConfig.savePicWhenAddMusicList) {
+      for (var agg in aggs) {
+        var pic = agg.getDefaultMusic().getMusicInfo().artPic;
+        if (pic != null && pic.isNotEmpty) {
+          cacheFileHelper(pic, picCacheRoot);
+        }
+      }
+    }
+    await SqlFactoryW.addMusics(
+        musicsListName: targetMusicList.getMusiclistInfo().name, musics: aggs);
+    await globalMusicContainerListPageRefreshFunction();
+    LogToast.success(
+        "添加歌曲",
+        "添加歌单'${musicListInfo.name}'中的歌曲到'${targetMusicListInfo.name}'成功",
+        "[OnlineMusicListItemsPullDown] Succeed to add music from '${musicListInfo.name}' to '${targetMusicListInfo.name}'");
+  } catch (e) {
+    LogToast.error(
+        "添加歌曲",
+        "添加歌单'${musicListInfo.name}'中的歌曲到'${targetMusicListInfo.name}'失败: $e",
+        "[OnlineMusicListItemsPullDown] Failed to add music from '${musicListInfo.name}' to '${targetMusicListInfo.name}': $e");
   }
 }
 

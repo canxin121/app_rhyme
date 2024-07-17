@@ -231,7 +231,7 @@ class MusicListGridPageMenu extends StatelessWidget {
             }
           },
           title: '多选操作',
-          icon: CupertinoIcons.list_number,
+          icon: CupertinoIcons.selection_pin_in_out,
         )
       ],
       animationBuilder: null,

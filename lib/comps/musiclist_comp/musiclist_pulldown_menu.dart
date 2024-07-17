@@ -1,14 +1,13 @@
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
-import 'package:app_rhyme/utils/const_vars.dart';
-import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
+import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
@@ -141,35 +140,7 @@ List<dynamic> onlineMusicListItems(
         var musicListInfo = await showMusicListInfoDialog(context,
             defaultMusicList: musicListw.getMusiclistInfo());
         if (musicListInfo != null) {
-          LogToast.success("保存歌单", "正在获取歌单数据，请稍等",
-              "[OnlineMusicListItemsPullDown] Start to save music list");
-
-          try {
-            if (musicListInfo.artPic.isNotEmpty) {
-              cacheFileHelper(musicListInfo.artPic, picCacheRoot);
-            }
-            await SqlFactoryW.createMusiclist(musicListInfos: [musicListInfo]);
-            var aggs = await musicListw.fetchAllMusicAggregators(
-                pagesPerBatch: 5,
-                limit: 50,
-                withLyric: globalConfig.saveLyricWhenAddMusicList);
-            if (globalConfig.savePicWhenAddMusicList) {
-              for (var agg in aggs) {
-                var pic = agg.getDefaultMusic().getMusicInfo().artPic;
-                if (pic != null && pic.isNotEmpty) {
-                  cacheFileHelper(pic, picCacheRoot);
-                }
-              }
-            }
-            await SqlFactoryW.addMusics(
-                musicsListName: musicListInfo.name, musics: aggs);
-            globalMusicListGridPageRefreshFunction();
-            LogToast.success("保存歌单", "保存歌单成功",
-                "[OnlineMusicListItemsPullDown] Succeed to save music list");
-          } catch (e) {
-            LogToast.error("保存歌单", "保存歌单失败: $e",
-                "[OnlineMusicListItemsPullDown] Failed to save music list: $e");
-          }
+          await saveMusicList(musicListw, musicListInfo);
         }
       },
       title: '保存为新增歌单',
@@ -179,31 +150,8 @@ List<dynamic> onlineMusicListItems(
       onTap: () async {
         var targetMusicList = await showMusicListSelectionDialog(context);
         if (targetMusicList != null) {
-          LogToast.info("添加歌曲", "正在获取歌单数据，请稍等",
-              "[OnlineMusicListItemsPullDown] Start to add music");
-          try {
-            var aggs = await musicListw.fetchAllMusicAggregators(
-                pagesPerBatch: 5,
-                limit: 50,
-                withLyric: globalConfig.saveLyricWhenAddMusicList);
-            if (globalConfig.savePicWhenAddMusicList) {
-              for (var agg in aggs) {
-                var pic = agg.getDefaultMusic().getMusicInfo().artPic;
-                if (pic != null && pic.isNotEmpty) {
-                  cacheFileHelper(pic, picCacheRoot);
-                }
-              }
-            }
-            await SqlFactoryW.addMusics(
-                musicsListName: targetMusicList.getMusiclistInfo().name,
-                musics: aggs);
-            await globalMusicContainerListPageRefreshFunction();
-            LogToast.success("添加歌曲", "添加歌曲成功",
-                "[OnlineMusicListItemsPullDown] Succeed to add music");
-          } catch (e) {
-            LogToast.error("添加歌曲", "添加歌曲失败: $e",
-                "[OnlineMusicListItemsPullDown] Failed to add music: $e");
-          }
+          await addAggsOfMusicListToTargetMusicList(
+              musicListw, targetMusicList);
         }
       },
       title: '添加到已有歌单',

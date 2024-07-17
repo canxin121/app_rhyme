@@ -1,4 +1,5 @@
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
@@ -161,6 +162,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
             ),
           ),
           trailing: SearchMusicAggregatroChoiceMenu(
+            musicAggregatorController: _pagingController,
             builder: (BuildContext context, Future<void> Function() showMenu) {
               return GestureDetector(
                 child: Text(
@@ -363,13 +365,14 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
 
 @immutable
 class SearchMusicAggregatroChoiceMenu extends StatelessWidget {
-  final Future<void> Function() fetchAllMusicAggregators;
   const SearchMusicAggregatroChoiceMenu({
     super.key,
     required this.builder,
     required this.fetchAllMusicAggregators,
+    required this.musicAggregatorController,
   });
-
+  final PagingController<int, MusicAggregatorW> musicAggregatorController;
+  final Future<void> Function() fetchAllMusicAggregators;
   final PullDownMenuButtonBuilder builder;
 
   @override
@@ -382,15 +385,42 @@ class SearchMusicAggregatroChoiceMenu extends StatelessWidget {
           icon: CupertinoIcons.photo,
         ),
         PullDownMenuItem(
-            onTap: () async {
-              await fetchAllMusicAggregators();
-              LogToast.success(
-                "加载所有歌曲",
-                "已加载所有歌曲",
-                "[SearchMusicAggregatorPage] Succeed to fetch all music aggregators",
+          onTap: () async {
+            await fetchAllMusicAggregators();
+            LogToast.success(
+              "加载所有歌曲",
+              "已加载所有歌曲",
+              "[SearchMusicAggregatorPage] Succeed to fetch all music aggregators",
+            );
+          },
+          title: "加载所有歌曲",
+          icon: CupertinoIcons.music_note_2,
+        ),
+        PullDownMenuItem(
+          onTap: () async {
+            LogToast.info(
+              "多选操作",
+              "正在加载所有歌曲,请稍等",
+              "[SearchMusicAggregatorPage] Multi select operation, wait to fetch all music aggregators",
+            );
+            await fetchAllMusicAggregators();
+            if (musicAggregatorController.itemList == null) return;
+            if (musicAggregatorController.itemList!.isEmpty) return;
+            if (context.mounted) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => MutiSelectMusicContainerListPage(
+                      musicContainers: musicAggregatorController.itemList!
+                          .map((e) => MusicContainer(e))
+                          .toList()),
+                ),
               );
-            },
-            title: "加载所有歌曲")
+            }
+          },
+          title: "多选操作",
+          icon: CupertinoIcons.selection_pin_in_out,
+        )
       ],
       position: PullDownMenuPosition.automatic,
       buttonBuilder: builder,

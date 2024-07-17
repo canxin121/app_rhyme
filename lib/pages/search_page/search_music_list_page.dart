@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_online_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/online_music_list_page.dart';
 import 'package:app_rhyme/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
@@ -75,6 +78,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = Platform.isIOS || Platform.isAndroid;
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
@@ -86,7 +90,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '搜索歌曲',
+                  '搜索歌单',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
@@ -129,13 +133,17 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                   }
                 }
               },
+              musicListController: _pagingController,
             )),
         child: SafeArea(
             child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(
-                  left: 8.0, right: 8.0, bottom: 8.0, top: 10.0),
+              padding: EdgeInsets.only(
+                  left: 8.0,
+                  right: 8.0,
+                  bottom: 8.0,
+                  top: isMobile ? 10.0 : 8.0),
               child: CupertinoSearchTextField(
                 style: TextStyle(
                   color: isDarkMode
@@ -208,15 +216,17 @@ class _SearchMusicListState extends State<SearchMusicListPage>
 
 @immutable
 class SearchMusicListChoiceMenu extends StatelessWidget {
-  final void Function() openShareMusicList;
-  final Future<void> Function() fetchAllMusicAggregators;
   const SearchMusicListChoiceMenu({
     super.key,
     required this.builder,
     required this.openShareMusicList,
     required this.fetchAllMusicAggregators,
+    required this.musicListController,
   });
 
+  final void Function() openShareMusicList;
+  final Future<void> Function() fetchAllMusicAggregators;
+  final PagingController<int, MusicListW> musicListController;
   final PullDownMenuButtonBuilder builder;
 
   @override
@@ -229,19 +239,45 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
           icon: CupertinoIcons.photo,
         ),
         PullDownMenuItem(
-            onTap: () async {
-              await fetchAllMusicAggregators();
-              LogToast.success(
-                "加载所有歌单",
-                "已加载所有歌单",
-                "[SearchMusicListPage] Succeed to fetch all music lists",
-              );
-            },
-            title: "加载所有歌单"),
-        PullDownMenuItem(
           onTap: openShareMusicList,
           title: '打开歌单链接',
-          icon: CupertinoIcons.pencil,
+          icon: CupertinoIcons.link,
+        ),
+        PullDownMenuItem(
+          onTap: () async {
+            await fetchAllMusicAggregators();
+            LogToast.success(
+              "加载所有歌单",
+              "已加载所有歌单",
+              "[SearchMusicListPage] Succeed to fetch all music lists",
+            );
+          },
+          title: "加载所有歌单",
+          icon: CupertinoIcons.music_note_2,
+        ),
+        PullDownMenuItem(
+          onTap: () async {
+            LogToast.info(
+              "多选操作",
+              "多选操作,正在加载所有歌单",
+              "[SearchMusicListPage] Multi select operation, wait to fetch all music lists",
+            );
+            await fetchAllMusicAggregators();
+
+            if (musicListController.itemList == null) return;
+            if (musicListController.itemList!.isEmpty) return;
+            if (context.mounted) {
+              Navigator.of(context).push(
+                CupertinoPageRoute(
+                  builder: (context) => MutiSelectOnlineMusicListGridPage(
+                    musicLists: musicListController.itemList!,
+                  ),
+                ),
+              );
+            }
+          },
+          title: '多选操作',
+          icon: CupertinoIcons.selection_pin_in_out,
         ),
       ],
       position: PullDownMenuPosition.automatic,

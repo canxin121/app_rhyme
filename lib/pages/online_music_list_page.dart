@@ -1,6 +1,7 @@
 import 'package:app_rhyme/comps/chores/button.dart';
-import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
@@ -51,6 +52,8 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
     while (_pagingController.nextPageKey != null) {
       await _fetchMusicAggregators(_pagingController.nextPageKey!);
     }
+    LogToast.success("加载所有音乐", '已加载所有音乐',
+        "[OnlineMusicListPage] Succeed to fetch all music aggregators");
   }
 
   Future<void> _fetchMusicAggregators(int pageKey) async {
@@ -103,9 +106,7 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
               },
             ),
             musicListW: widget.musicList,
-            musicAggregators: _pagingController.itemList != null
-                ? _pagingController.itemList!
-                : [],
+            musicAggregatorsController: _pagingController,
             fetchAllMusicAggregators: _fetchAllMusics,
           )),
       child: CustomScrollView(
@@ -223,13 +224,12 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
     super.key,
     required this.builder,
     required this.musicListW,
-    required this.musicAggregators,
     required this.fetchAllMusicAggregators,
+    required this.musicAggregatorsController,
   });
-
+  final PagingController<int, MusicAggregatorW> musicAggregatorsController;
   final PullDownMenuButtonBuilder builder;
   final MusicListW musicListW;
-  final List<MusicAggregatorW> musicAggregators;
   final Future<void> Function() fetchAllMusicAggregators;
 
   @override
@@ -245,21 +245,35 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
         ),
         const PullDownMenuDivider.large(),
         ...onlineMusicListItems(context, musicListW),
-        PullDownMenuItem(onTap: fetchAllMusicAggregators, title: "加载所有音乐"),
         PullDownMenuItem(
-            onTap: () {
+          onTap: fetchAllMusicAggregators,
+          title: "加载所有音乐",
+          icon: CupertinoIcons.music_note_2,
+        ),
+        PullDownMenuItem(
+          onTap: () async {
+            LogToast.info("多选操作", "正在加载所有音乐,请稍等",
+                "[OnlineMusicListPage] MultiSelect wait to fetch all music aggregators");
+            await fetchAllMusicAggregators();
+            if (musicAggregatorsController.itemList == null) return;
+
+            List<MusicContainer> musicContainers = musicAggregatorsController
+                .itemList!
+                .map((a) => MusicContainer(a))
+                .toList();
+            if (context.mounted) {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => MutiSelectLocalMusicContainerListPage(
-                      musicList: musicListW,
-                      musicContainers: musicAggregators
-                          .map((a) => MusicContainer(a))
-                          .toList()),
+                  builder: (context) => MutiSelectMusicContainerListPage(
+                      musicContainers: musicContainers),
                 ),
               );
-            },
-            title: "多选操作")
+            }
+          },
+          title: "多选操作",
+          icon: CupertinoIcons.selection_pin_in_out,
+        )
       ],
       animationBuilder: null,
       position: PullDownMenuPosition.automatic,

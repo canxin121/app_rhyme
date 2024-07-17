@@ -1,5 +1,5 @@
 import 'package:app_rhyme/comps/chores/button.dart';
-import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -295,16 +295,18 @@ class LocalMusicListChoicMenu extends StatelessWidget {
             },
             title: "手动排序"),
         PullDownMenuItem(
-            onTap: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => MutiSelectLocalMusicContainerListPage(
-                      musicList: musicListW, musicContainers: musicContainers),
-                ),
-              );
-            },
-            title: "多选操作")
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => MutiSelectMusicContainerListPage(
+                    musicList: musicListW, musicContainers: musicContainers),
+              ),
+            );
+          },
+          title: "多选操作",
+          icon: CupertinoIcons.selection_pin_in_out,
+        )
       ],
       animationBuilder: null,
       position: PullDownMenuPosition.automatic,
