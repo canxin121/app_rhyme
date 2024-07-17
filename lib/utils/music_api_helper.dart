@@ -136,7 +136,7 @@ Future<void> addMusicsToMusicList(
       }));
       await SqlFactoryW.addMusics(
           musicsListName: targetMusicList.getMusiclistInfo().name,
-          musics: musicContainers.map((e) => e.aggregator).toList());
+          musics: musicContainers.map((e) => e.aggregator.clone()).toList());
       await globalMusicContainerListPageRefreshFunction();
 
       LogToast.success(
