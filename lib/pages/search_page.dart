@@ -140,7 +140,6 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
       backgroundColor: backgroundColor,
       child: Column(
         children: [
-          const SafeArea(child: SizedBox(height: 0)),
           // 搜索框和过滤按钮
           Padding(
             padding: const EdgeInsets.all(4.0),
@@ -399,11 +398,6 @@ class _SearchMusicListState extends State<SearchMusicListPage>
 
     return Column(
       children: [
-        const SafeArea(
-            child: SizedBox(
-          height: 0,
-        )),
-        // 搜索框
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: CupertinoSearchTextField(
@@ -575,8 +569,12 @@ class _CombinedSearchPageState extends State<CombinedSearchPage>
       child: IndexedStack(
         index: _selectedIndex,
         children: const [
-          SearchMusicAggregatorPage(),
-          SearchMusicListPage(),
+          SafeArea(
+            child: SearchMusicAggregatorPage(),
+          ),
+          SafeArea(
+            child: SearchMusicListPage(),
+          )
         ],
       ),
     );

@@ -1,18 +1,14 @@
 use anyhow::Result;
 use futures::StreamExt as _;
-use lazy_static::lazy_static;
 use music_api::util::CLIENT;
 use std::hash::{DefaultHasher, Hash as _, Hasher as _};
-use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::path::PathBuf;
 use std::thread::sleep;
 use std::time::Duration;
-use tokio::fs;
 use tokio::io::AsyncWriteExt;
-use tokio::sync::Semaphore;
 
 use crate::api::utils::path_util::url_encode_special_chars;
-use crate::api::{CONFIG, ROOT_PATH};
+use crate::api::ROOT_PATH;
 
 use super::FILE_OP_SEMAPHORE;
 

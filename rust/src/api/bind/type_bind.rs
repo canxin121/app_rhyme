@@ -4,9 +4,7 @@ use std::fmt::Display;
 
 use flutter_rust_bridge::frb;
 use futures::future::join_all;
-use music_api::Quality;
 use rayon::iter::{IntoParallelIterator, ParallelIterator as _};
-use serde::{Deserialize, Serialize};
 
 #[frb]
 pub struct MusicAggregatorW(music_api::MusicAggregator);
