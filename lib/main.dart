@@ -1,10 +1,10 @@
 import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
+import 'package:app_rhyme/pages/search_page/combined_search_page.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/audioControl/audio_controller.dart';
 import 'package:app_rhyme/comps/play_display_comp/music_control_bar.dart';
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/more_page.dart';
-import 'package:app_rhyme/pages/search_page.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
 import 'package:app_rhyme/utils/bypass_netimg_error.dart';
 import 'package:app_rhyme/utils/check_update.dart';
@@ -122,6 +122,11 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final Color dividerColor = isDarkMode
+        ? const Color.fromARGB(255, 56, 56, 57)
+        : const Color.fromARGB(255, 209, 209, 209);
     return CupertinoPageScaffold(
       child: Column(
         children: [
@@ -153,6 +158,12 @@ class HomeState extends State<Home> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const MusicControlBar(maxHeight: 60),
+                      Center(
+                        child: Divider(
+                          color: dividerColor,
+                          height: 0.5,
+                        ),
+                      ),
                       CupertinoTabBar(
                         currentIndex: _selectedIndex,
                         onTap: (index) {

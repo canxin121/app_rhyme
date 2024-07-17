@@ -76,8 +76,8 @@ class _MusicContainerListItemState extends State<MusicContainerListItem> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: imageCacheHelper(widget.musicContainer.info.artPic,
-                width: 50,
-                height: 50,
+                width: 40,
+                height: 40,
                 fit: BoxFit.cover,
                 cacheNow: widget.cachePic),
           ),

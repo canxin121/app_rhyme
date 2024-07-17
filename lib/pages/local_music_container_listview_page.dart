@@ -103,7 +103,9 @@ class LocalMusicContainerListPageState
     final bool isDarkMode = brightness == Brightness.dark;
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-
+    final Color dividerColor = isDarkMode
+        ? const Color.fromARGB(255, 41, 41, 43)
+        : const Color.fromARGB(255, 245, 245, 246);
     double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
@@ -135,7 +137,7 @@ class LocalMusicContainerListPageState
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.only(
-                  top: 10, left: screenWidth * 0.1, right: screenWidth * 0.1),
+                  top: 10, left: screenWidth * 0.15, right: screenWidth * 0.15),
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: screenWidth * 0.7,
@@ -156,7 +158,7 @@ class LocalMusicContainerListPageState
                   _buildButton(
                     context,
                     icon: CupertinoIcons.play_fill,
-                    label: '播放全部',
+                    label: '播放',
                     onPressed: () {
                       globalAudioHandler.clearReplaceMusicAll(musicContainers);
                     },
@@ -176,22 +178,46 @@ class LocalMusicContainerListPageState
               ),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: Divider(
-              color: CupertinoColors.systemGrey5,
-              height: 1,
+          SliverToBoxAdapter(
+            child: Center(
+              child: SizedBox(
+                width: screenWidth * 0.85,
+                child: Divider(
+                  color: dividerColor,
+                  height: 0.5,
+                ),
+              ),
             ),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
+                bool isLastItem = index == musicContainers.length - 1;
+
                 final musicContainer = musicContainers[index];
-                return MusicContainerListItem(
-                  key: ValueKey(
-                      '${musicContainer.hasCache()}_${musicContainer.hashCode}'),
-                  musicContainer: musicContainer,
-                  musicListW: widget.musicList,
-                  cachePic: globalConfig.savePicWhenAddMusicList,
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
+                      child: MusicContainerListItem(
+                        key: ValueKey(
+                            '${musicContainer.hasCache()}_${musicContainer.hashCode}'),
+                        musicContainer: musicContainer,
+                        musicListW: widget.musicList,
+                        cachePic: globalConfig.savePicWhenAddMusicList,
+                      ),
+                    ),
+                    if (!isLastItem)
+                      Center(
+                        child: SizedBox(
+                          width: screenWidth * 0.85,
+                          child: Divider(
+                            color: dividerColor,
+                            height: 0.5,
+                          ),
+                        ),
+                      )
+                  ],
                 );
               },
               childCount: musicContainers.length,
@@ -213,12 +239,11 @@ class LocalMusicContainerListPageState
       required VoidCallback onPressed}) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color buttonBackgroundColor = isDarkMode
-        ? CupertinoColors.systemGrey6.darkColor
-        : CupertinoColors.systemGrey6;
 
+    final Color buttonBackgroundColor = isDarkMode
+        ? const Color.fromARGB(255, 28, 28, 30)
+        : const Color.fromARGB(255, 238, 238, 239);
+    double screenWidth = MediaQuery.of(context).size.width;
     return ElevatedButton.icon(
       icon: Icon(
         icon,
@@ -227,17 +252,16 @@ class LocalMusicContainerListPageState
       ),
       label: Text(
         label,
-        style: TextStyle(color: textColor).useSystemChineseFont(),
+        style: TextStyle(color: activeIconRed, fontWeight: FontWeight.bold)
+            .useSystemChineseFont(),
       ),
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
+        fixedSize: Size(screenWidth * 0.4, 50),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.1,
-          vertical: MediaQuery.of(context).size.height * 0.02,
-        ),
+        padding: const EdgeInsets.all(0),
         backgroundColor: buttonBackgroundColor,
       ),
     );

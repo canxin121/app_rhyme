@@ -97,17 +97,15 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                 )),
           ),
         ),
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: SafeArea(child: SizedBox(height: Platform.isIOS ? 0 : 10)),
-            ),
-            musicLists.isEmpty
-                ? SliverToBoxAdapter(
-                    child: Center(
-                        child:
-                            Text("没有歌单", style: TextStyle(color: textColor))))
-                : SliverPadding(
+        child: musicLists.isEmpty
+            ? Center(child: Text("没有歌单", style: TextStyle(color: textColor)))
+            : CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: SafeArea(
+                        child: SizedBox(height: Platform.isIOS ? 0 : 10)),
+                  ),
+                  SliverPadding(
                     padding: EdgeInsets.symmetric(
                         horizontal: Platform.isIOS ? 0.0 : 10.0),
                     sliver: SliverGrid(
@@ -143,8 +141,8 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                       ),
                     ),
                   ),
-          ],
-        ));
+                ],
+              ));
   }
 }
 

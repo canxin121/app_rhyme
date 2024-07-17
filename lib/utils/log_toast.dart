@@ -19,6 +19,7 @@ void initFlutterLogger() {
 class LogToast {
   static void info(String toastTitle, String toastDesc, String log,
       {bool isLong = false}) {
+    toastDesc = _filterStackTrace(toastDesc);
     toastification.show(
       autoCloseDuration: Duration(seconds: isLong ? 4 : 2),
       type: ToastificationType.info,
@@ -36,6 +37,7 @@ class LogToast {
 
   static void success(String toastTitle, String toastDesc, String log,
       {bool isLong = false}) {
+    toastDesc = _filterStackTrace(toastDesc);
     toastification.show(
       autoCloseDuration: Duration(seconds: isLong ? 4 : 2),
       type: ToastificationType.success,
@@ -53,6 +55,7 @@ class LogToast {
 
   static void warning(String toastTitle, String toastDesc, String log,
       {bool isLong = false}) {
+    toastDesc = _filterStackTrace(toastDesc);
     toastification.show(
       autoCloseDuration: Duration(seconds: isLong ? 5 : 3),
       type: ToastificationType.warning,
@@ -70,6 +73,7 @@ class LogToast {
 
   static void error(String toastTitle, String toastDesc, String log,
       {bool isLong = false}) {
+    toastDesc = _filterStackTrace(toastDesc);
     toastification.show(
       autoCloseDuration: Duration(seconds: isLong ? 5 : 3),
       type: ToastificationType.error,
@@ -83,5 +87,14 @@ class LogToast {
       ),
     );
     globalTalker.error(log);
+  }
+
+  static String _filterStackTrace(String desc) {
+    const stackTraceKeyword = 'Stack backtrace';
+    final index = desc.indexOf(stackTraceKeyword);
+    if (index != -1) {
+      return desc.substring(0, index);
+    }
+    return desc;
   }
 }
