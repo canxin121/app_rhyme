@@ -179,7 +179,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
         children: [
           // 搜索框和过滤按钮
           Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.only(top: 4.0, left: 8, right: 0),
             child: Row(
               children: [
                 Expanded(
