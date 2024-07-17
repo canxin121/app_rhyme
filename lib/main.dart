@@ -14,6 +14,7 @@ import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:toastification/toastification.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 
@@ -141,43 +142,51 @@ class HomeState extends State<Home> {
               }).toList(),
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const MusicControlBar(maxHeight: 60),
-              CupertinoTabBar(
-                currentIndex: _selectedIndex,
-                onTap: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                      child: Icon(
-                        CupertinoIcons.music_albums_fill,
+          // 页面底部的音乐控制栏和底部导航栏
+          KeyboardVisibilityBuilder(
+            builder: (p0, isKeyboardVisible) => isKeyboardVisible
+                ? const SizedBox(
+                    width: 0,
+                    height: 0,
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const MusicControlBar(maxHeight: 60),
+                      CupertinoTabBar(
+                        currentIndex: _selectedIndex,
+                        onTap: (index) {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                        items: const [
+                          BottomNavigationBarItem(
+                            icon: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                              child: Icon(
+                                CupertinoIcons.music_albums_fill,
+                              ),
+                            ),
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                              child: Icon(CupertinoIcons.search),
+                            ),
+                          ),
+                          BottomNavigationBarItem(
+                            icon: Padding(
+                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                              child: Icon(CupertinoIcons.settings),
+                            ),
+                          ),
+                        ],
+                        activeColor: activeIconRed,
                       ),
-                    ),
+                    ],
                   ),
-                  BottomNavigationBarItem(
-                    icon: Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                      child: Icon(CupertinoIcons.search),
-                    ),
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 10),
-                      child: Icon(CupertinoIcons.settings),
-                    ),
-                  ),
-                ],
-                activeColor: activeIconRed,
-              ),
-            ],
-          ),
+          )
         ],
       ),
     );
