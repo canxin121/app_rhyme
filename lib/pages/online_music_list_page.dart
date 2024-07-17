@@ -1,6 +1,5 @@
 import 'package:app_rhyme/comps/chores/button.dart';
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
-import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
@@ -246,6 +245,7 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
         ),
         const PullDownMenuDivider.large(),
         ...onlineMusicListItems(context, musicListW),
+        PullDownMenuItem(onTap: fetchAllMusicAggregators, title: "加载所有音乐"),
         PullDownMenuItem(
             onTap: () {
               Navigator.push(
