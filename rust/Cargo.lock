@@ -1182,7 +1182,7 @@ dependencies = [
 [[package]]
 name = "music_api"
 version = "0.1.0"
-source = "git+https://github.com/canxin121/music_api#fb4602f724506fb83b380b86a9e8ca9c40d8dcb0"
+source = "git+https://github.com/canxin121/music_api#91a97db452eafcccc5ad464d7c2b540a1879b446"
 dependencies = [
  "aes",
  "anyhow",
@@ -1209,7 +1209,6 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
- "strsim",
  "tokio",
  "urlencoding",
 ]
@@ -2245,12 +2244,6 @@ dependencies = [
  "unicode-bidi",
  "unicode-normalization",
 ]
-
-[[package]]
-name = "strsim"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "subtle"
