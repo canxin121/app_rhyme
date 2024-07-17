@@ -44,7 +44,7 @@ class MusicListMenu extends StatelessWidget {
       menuItems = localMusiclistItems(context, musicListW);
     } else {
       // 在线的歌曲
-      menuItems = _onlineMusicListItems(context, musicListW);
+      menuItems = onlineMusicListItems(context, musicListW);
     }
 
     return PullDownButton(
@@ -125,7 +125,7 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
 }
 
 // 查看详情,保存为新增歌单, 添加到已有歌单
-List<dynamic> _onlineMusicListItems(
+List<dynamic> onlineMusicListItems(
     BuildContext context, MusicListW musicListw) {
   return [
     PullDownMenuItem(

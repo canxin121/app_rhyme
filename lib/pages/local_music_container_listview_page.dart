@@ -1,3 +1,4 @@
+import 'package:app_rhyme/comps/chores/button.dart';
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -129,7 +130,6 @@ class LocalMusicContainerListPageState
                   style: TextStyle(color: activeIconRed).useSystemChineseFont(),
                 )),
             musicListW: musicListW,
-            online: false,
             musicContainers: musicContainers,
           )),
       child: CustomScrollView(
@@ -155,7 +155,7 @@ class LocalMusicContainerListPageState
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildButton(
+                  buildButton(
                     context,
                     icon: CupertinoIcons.play_fill,
                     label: '播放',
@@ -163,7 +163,7 @@ class LocalMusicContainerListPageState
                       globalAudioHandler.clearReplaceMusicAll(musicContainers);
                     },
                   ),
-                  _buildButton(
+                  buildButton(
                     context,
                     icon: Icons.shuffle,
                     label: '随机播放',
@@ -235,40 +235,6 @@ class LocalMusicContainerListPageState
       ),
     );
   }
-
-  Widget _buildButton(BuildContext context,
-      {required IconData icon,
-      required String label,
-      required VoidCallback onPressed}) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDarkMode = brightness == Brightness.dark;
-
-    final Color buttonBackgroundColor = isDarkMode
-        ? const Color.fromARGB(255, 28, 28, 30)
-        : const Color.fromARGB(255, 238, 238, 239);
-    double screenWidth = MediaQuery.of(context).size.width;
-    return ElevatedButton.icon(
-      icon: Icon(
-        icon,
-        size: 24,
-        color: activeIconRed,
-      ),
-      label: Text(
-        label,
-        style: TextStyle(color: activeIconRed, fontWeight: FontWeight.bold)
-            .useSystemChineseFont(),
-      ),
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        fixedSize: Size(screenWidth * 0.4, 50),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        padding: const EdgeInsets.all(0),
-        backgroundColor: buttonBackgroundColor,
-      ),
-    );
-  }
 }
 
 @immutable
@@ -277,14 +243,12 @@ class LocalMusicListChoicMenu extends StatelessWidget {
     super.key,
     required this.builder,
     required this.musicListW,
-    required this.online,
     required this.musicContainers,
   });
 
   final PullDownMenuButtonBuilder builder;
   final MusicListW musicListW;
   final List<MusicContainer> musicContainers;
-  final bool online;
 
   @override
   Widget build(BuildContext context) {

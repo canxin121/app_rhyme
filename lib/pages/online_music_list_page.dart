@@ -1,3 +1,7 @@
+import 'package:app_rhyme/comps/chores/button.dart';
+import 'package:app_rhyme/pages/muti_select_pages/muti_select_local_music_container_listview_page.dart';
+import 'package:app_rhyme/pages/reorder_pages/reorder_local_music_list_page.dart';
+import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
@@ -11,6 +15,7 @@ import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 class OnlineMusicListPage extends StatefulWidget {
   final MusicListW musicList;
@@ -88,19 +93,22 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
               Navigator.pop(context);
             },
           ),
-          trailing: MusicListMenu(
-              builder: (context, showMenu) => GestureDetector(
-                    child: Text(
-                      '选项',
-                      style: TextStyle(color: activeIconRed)
-                          .useSystemChineseFont(),
-                    ),
-                    onTapDown: (details) {
-                      showMenu();
-                    },
-                  ),
-              musicListW: widget.musicList,
-              online: true)),
+          trailing: OnlineMusicListChoicMenu(
+            builder: (context, showMenu) => GestureDetector(
+              child: Text(
+                '选项',
+                style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+              ),
+              onTapDown: (details) {
+                showMenu();
+              },
+            ),
+            musicListW: widget.musicList,
+            musicAggregators: _pagingController.itemList != null
+                ? _pagingController.itemList!
+                : [],
+            fetchAllMusicAggregators: _fetchAllMusics,
+          )),
       child: CustomScrollView(
         slivers: <Widget>[
           // 歌单封面
@@ -127,7 +135,7 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildButton(
+                  buildButton(
                     context,
                     icon: CupertinoIcons.play_fill,
                     label: '播放全部',
@@ -142,7 +150,7 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
                       }
                     },
                   ),
-                  _buildButton(
+                  buildButton(
                     context,
                     icon: Icons.shuffle,
                     label: '随机播放',
@@ -208,40 +216,54 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
       ),
     );
   }
+}
 
-  Widget _buildButton(BuildContext context,
-      {required IconData icon,
-      required String label,
-      required VoidCallback onPressed}) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDarkMode = brightness == Brightness.dark;
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color buttonBackgroundColor = isDarkMode
-        ? CupertinoColors.systemGrey6.darkColor
-        : CupertinoColors.systemGrey6;
+@immutable
+class OnlineMusicListChoicMenu extends StatelessWidget {
+  const OnlineMusicListChoicMenu({
+    super.key,
+    required this.builder,
+    required this.musicListW,
+    required this.musicAggregators,
+    required this.fetchAllMusicAggregators,
+  });
 
-    return ElevatedButton.icon(
-      icon: Icon(
-        icon,
-        size: 24,
-        color: activeIconRed,
-      ),
-      label: Text(
-        label,
-        style: TextStyle(color: textColor).useSystemChineseFont(),
-      ),
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
+  final PullDownMenuButtonBuilder builder;
+  final MusicListW musicListW;
+  final List<MusicAggregatorW> musicAggregators;
+  final Future<void> Function() fetchAllMusicAggregators;
+
+  @override
+  Widget build(BuildContext context) {
+    MusicListInfo musicListInfo = musicListW.getMusiclistInfo();
+
+    return PullDownButton(
+      itemBuilder: (context) => [
+        PullDownMenuHeader(
+          leading: imageCacheHelper(musicListInfo.artPic),
+          title: musicListInfo.name,
+          subtitle: musicListInfo.desc,
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.1,
-          vertical: MediaQuery.of(context).size.height * 0.02,
-        ),
-        backgroundColor: buttonBackgroundColor,
-      ),
+        const PullDownMenuDivider.large(),
+        ...onlineMusicListItems(context, musicListW),
+        PullDownMenuItem(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => MutiSelectLocalMusicContainerListPage(
+                      musicList: musicListW,
+                      musicContainers: musicAggregators
+                          .map((a) => MusicContainer(a))
+                          .toList()),
+                ),
+              );
+            },
+            title: "多选操作")
+      ],
+      animationBuilder: null,
+      position: PullDownMenuPosition.automatic,
+      buttonBuilder: builder,
     );
   }
 }
