@@ -202,4 +202,14 @@ impl SqlFactoryW {
     pub async fn reorder_musiclist(new_ids: &[i64]) -> Result<(), anyhow::Error> {
         Ok(SqlFactory::reorder_musiclist(new_ids).await?)
     }
+
+    pub async fn del_duplicate_musics_of_musiclist(
+        musiclist_info: &MusicListInfo,
+    ) -> Result<(), anyhow::Error> {
+        Ok(SqlFactory::del_duplicate_musics_of_musiclist(musiclist_info).await?)
+    }
+
+    pub async fn clean_unused_musiclist() -> Result<(), anyhow::Error> {
+        Ok(SqlFactory::clean_unused_musiclist().await?)
+    }
 }

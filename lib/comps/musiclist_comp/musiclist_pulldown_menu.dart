@@ -120,6 +120,22 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
         ),
       ],
     ),
+    PullDownMenuItem(
+        onTap: () async {
+          try {
+            await SqlFactoryW.delDuplicateMusicsOfMusiclist(
+                musiclistInfo: musicListW.getMusiclistInfo());
+            LogToast.success("歌曲合并去重", "歌曲合并去重成功",
+                "[LocalMusicListItemsPullDown] Succeed to merge and deduplicate music");
+            globalMusicListGridPageRefreshFunction();
+            globalMusicContainerListPageRefreshFunction();
+          } catch (e) {
+            LogToast.error("歌曲合并去重", "歌曲合并去重失败: $e",
+                "[LocalMusicListItemsPullDown] Failed to merge and deduplicate music: $e");
+          }
+        },
+        title: "歌曲合并去重",
+        icon: CupertinoIcons.music_note_list)
   ];
 }
 
@@ -151,7 +167,7 @@ List<dynamic> onlineMusicListItems(
         var targetMusicList = await showMusicListSelectionDialog(context);
         if (targetMusicList != null) {
           await addAggsOfMusicListToTargetMusicList(
-              musicListw, targetMusicList);
+              musicListw, targetMusicList.getMusiclistInfo());
         }
       },
       title: '添加到已有歌单',

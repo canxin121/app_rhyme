@@ -259,10 +259,9 @@ Future<void> saveMusicList(
 
 Future<void> addAggsOfMusicListToTargetMusicList(
   MusicListW musicList,
-  MusicListW targetMusicList,
+  MusicListInfo targetMusicListInfo,
 ) async {
   var musicListInfo = musicList.getMusiclistInfo();
-  var targetMusicListInfo = targetMusicList.getMusiclistInfo();
   LogToast.info("添加歌曲", "正在获取歌单'${musicListInfo.name}'数据，请稍等",
       "[OnlineMusicListItemsPullDown] Start to add music");
   try {
@@ -279,7 +278,7 @@ Future<void> addAggsOfMusicListToTargetMusicList(
       }
     }
     await SqlFactoryW.addMusics(
-        musicsListName: targetMusicList.getMusiclistInfo().name, musics: aggs);
+        musicsListName: targetMusicListInfo.name, musics: aggs);
     await globalMusicContainerListPageRefreshFunction();
     LogToast.success(
         "添加歌曲",

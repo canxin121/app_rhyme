@@ -5,6 +5,7 @@ import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/dialogs/input_extern_api_link_dialog.dart';
 import 'package:app_rhyme/dialogs/quality_select_dialog.dart';
 import 'package:app_rhyme/dialogs/wait_dialog.dart';
+import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/cache/fs_util.dart';
 import 'package:app_rhyme/src/rust/api/types/extern_api.dart';
@@ -231,6 +232,8 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                       onPressed: () async {
                         try {
                           await SqlFactoryW.cleanUnusedMusicData();
+                          await SqlFactoryW.cleanUnusedMusiclist();
+                          globalMusicListGridPageRefreshFunction();
                           LogToast.success("储存清理", "清理无用歌曲数据成功",
                               "[MorePage] Cleaned unused music data");
                         } catch (e) {

@@ -96,10 +96,19 @@ class SqlFactoryW {
   static Future<void> cleanUnusedMusicData() => RustLib.instance.api
       .crateApiBindFactoryBindSqlFactoryWCleanUnusedMusicData();
 
+  static Future<void> cleanUnusedMusiclist() => RustLib.instance.api
+      .crateApiBindFactoryBindSqlFactoryWCleanUnusedMusiclist();
+
   static Future<void> createMusiclist(
           {required List<MusicListInfo> musicListInfos}) =>
       RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWCreateMusiclist(
           musicListInfos: musicListInfos);
+
+  static Future<void> delDuplicateMusicsOfMusiclist(
+          {required MusicListInfo musiclistInfo}) =>
+      RustLib.instance.api
+          .crateApiBindFactoryBindSqlFactoryWDelDuplicateMusicsOfMusiclist(
+              musiclistInfo: musiclistInfo);
 
   static Future<void> delMusiclist({required List<String> musiclistNames}) =>
       RustLib.instance.api.crateApiBindFactoryBindSqlFactoryWDelMusiclist(

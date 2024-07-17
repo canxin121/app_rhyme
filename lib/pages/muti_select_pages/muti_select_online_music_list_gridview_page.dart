@@ -1,4 +1,8 @@
+import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
+import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
+import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
+import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
@@ -86,13 +90,13 @@ class _MutiSelectOnlineMusicListGridPageState
       );
       return;
     }
-    List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
-        .map((index) => widget.musicLists[index])
-        .toList();
-    for (var musicList in selectedMusicLists) {
-      await saveMusicList(musicList, musicList.getMusiclistInfo());
-    }
     try {
+      List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
+          .map((index) => widget.musicLists[index])
+          .toList();
+      for (var musicList in selectedMusicLists) {
+        await saveMusicList(musicList, musicList.getMusiclistInfo());
+      }
       LogToast.success(
         "保存歌单成功",
         "保存歌单成功",
@@ -116,18 +120,19 @@ class _MutiSelectOnlineMusicListGridPageState
       );
       return;
     }
-    MusicListW? targetMusicList = await showMusicListSelectionDialog(context);
-    if (targetMusicList == null) return;
-
-    List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
-        .map((index) => widget.musicLists[index])
-        .toList();
-
-    for (var musicList in selectedMusicLists) {
-      await addAggsOfMusicListToTargetMusicList(musicList, targetMusicList);
-    }
 
     try {
+      MusicListW? targetMusicList = await showMusicListSelectionDialog(context);
+      if (targetMusicList == null) return;
+
+      List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
+          .map((index) => widget.musicLists[index])
+          .toList();
+
+      for (var musicList in selectedMusicLists) {
+        await addAggsOfMusicListToTargetMusicList(
+            musicList, targetMusicList.getMusiclistInfo());
+      }
       LogToast.success(
         "添加到目标歌单成功",
         "添加到目标歌单成功",
@@ -138,6 +143,45 @@ class _MutiSelectOnlineMusicListGridPageState
         "添加到目标歌单失败",
         "添加到目标歌单失败: $e",
         "[MutiSelectOnlineMusicListGridPage] Failed to add to target music list: $e",
+      );
+    }
+  }
+
+  Future<void> handleSaveAsNewMusicList() async {
+    if (controller.value.selectedIndexes.isEmpty) {
+      LogToast.warning(
+        "没有选中的歌单",
+        "没有选中的歌单",
+        "[MutiSelectOnlineMusicListGridPage] No music list selected",
+      );
+      return;
+    }
+
+    try {
+      List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
+          .map((index) => widget.musicLists[index])
+          .toList();
+      MusicListInfo? targetMusicListInfo = await showMusicListInfoDialog(
+          context,
+          defaultMusicList: selectedMusicLists.first.getMusiclistInfo());
+      if (targetMusicListInfo == null) return;
+
+      await SqlFactoryW.createMusiclist(musicListInfos: [targetMusicListInfo]);
+      globalMusicListGridPageRefreshFunction();
+      for (var musicList in selectedMusicLists) {
+        await addAggsOfMusicListToTargetMusicList(
+            musicList, targetMusicListInfo);
+      }
+      LogToast.success(
+        "保存为新建歌单",
+        "保存为新建歌单成功",
+        "[MutiSelectOnlineMusicListGridPage] Successfully saved as new music list",
+      );
+    } catch (e) {
+      LogToast.error(
+        "保存为新建歌单失败",
+        "保存为新建歌单失败: $e",
+        "[MutiSelectOnlineMusicListGridPage] Failed to save as new music list: $e",
       );
     }
   }
@@ -177,6 +221,7 @@ class _MutiSelectOnlineMusicListGridPageState
               selectAll: handleSelectAll,
               cancelSelectAll: handleCancelSelectAll,
               reverseSelect: handleReverseSelect,
+              saveAsNewMusicList: handleSaveAsNewMusicList,
             ),
           ),
           widget.musicLists.isEmpty
@@ -236,15 +281,15 @@ class _MutiSelectOnlineMusicListGridPageState
 
 @immutable
 class MutiSelectMusicListGridPageMenu extends StatelessWidget {
-  const MutiSelectMusicListGridPageMenu({
-    super.key,
-    required this.builder,
-    required this.selectAll,
-    required this.cancelSelectAll,
-    required this.reverseSelect,
-    required this.saveMusicLists,
-    required this.addAggsToTargetMusicList,
-  });
+  const MutiSelectMusicListGridPageMenu(
+      {super.key,
+      required this.builder,
+      required this.selectAll,
+      required this.cancelSelectAll,
+      required this.reverseSelect,
+      required this.saveMusicLists,
+      required this.addAggsToTargetMusicList,
+      required this.saveAsNewMusicList});
 
   final PullDownMenuButtonBuilder builder;
   final void Function() selectAll;
@@ -252,6 +297,7 @@ class MutiSelectMusicListGridPageMenu extends StatelessWidget {
   final void Function() reverseSelect;
   final void Function() saveMusicLists;
   final void Function() addAggsToTargetMusicList;
+  final void Function() saveAsNewMusicList;
   @override
   Widget build(BuildContext context) {
     return PullDownButton(
@@ -259,7 +305,12 @@ class MutiSelectMusicListGridPageMenu extends StatelessWidget {
         PullDownMenuItem(
           onTap: saveMusicLists,
           title: '保存为新增歌单',
-          icon: CupertinoIcons.delete,
+          icon: CupertinoIcons.music_house_fill,
+        ),
+        PullDownMenuItem(
+          onTap: saveAsNewMusicList,
+          title: '添加到新建歌单',
+          icon: CupertinoIcons.music_albums_fill,
         ),
         PullDownMenuItem(
           onTap: addAggsToTargetMusicList,

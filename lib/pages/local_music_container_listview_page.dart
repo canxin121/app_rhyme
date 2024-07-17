@@ -270,6 +270,7 @@ class LocalMusicListChoicMenu extends StatelessWidget {
             }
           },
           title: '缓存歌单所有音乐',
+          icon: CupertinoIcons.cloud_download,
         ),
         PullDownMenuItem(
           onTap: () async {
@@ -280,27 +281,32 @@ class LocalMusicListChoicMenu extends StatelessWidget {
                 "[LocalMusicListChoicMenu] Successfully deleted all music caches");
           },
           title: '删除所有音乐缓存',
+          icon: CupertinoIcons.delete,
         ),
         PullDownMenuItem(
-            onTap: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => ReorderLocalMusicListPage(
-                    musicContainers: musicContainers,
-                    musicList: musicListW,
-                  ),
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => ReorderLocalMusicListPage(
+                  musicContainers: musicContainers,
+                  musicList: musicListW,
                 ),
-              );
-            },
-            title: "手动排序"),
+              ),
+            );
+          },
+          title: "手动排序",
+          icon: CupertinoIcons.sort_up_circle,
+        ),
         PullDownMenuItem(
           onTap: () {
             Navigator.push(
               context,
               CupertinoPageRoute(
                 builder: (context) => MutiSelectMusicContainerListPage(
-                    musicList: musicListW, musicContainers: musicContainers),
+                  musicList: musicListW,
+                  musicContainers: musicContainers,
+                ),
               ),
             );
           },
