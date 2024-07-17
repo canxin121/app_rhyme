@@ -69,9 +69,13 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
     final textColor = brightness == Brightness.dark
         ? CupertinoColors.white
         : CupertinoColors.black;
+    final Color dividerColor = isDarkMode
+        ? const Color.fromARGB(255, 41, 41, 43)
+        : const Color.fromARGB(255, 245, 245, 246);
     double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
@@ -157,33 +161,43 @@ class OnlineMusicListPageState extends State<OnlineMusicListPage> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: Divider(
-              color: CupertinoColors.systemGrey5,
-              height: 1,
+          SliverToBoxAdapter(
+            child: Center(
+              child: SizedBox(
+                width: screenWidth * 0.85,
+                child: Divider(
+                  color: dividerColor,
+                  height: 0.5,
+                ),
+              ),
             ),
           ),
           PagedSliverList.separated(
             pagingController: _pagingController,
-            separatorBuilder: (context, index) => const Divider(
-              color: CupertinoColors.systemGrey4,
-              indent: 30,
-              endIndent: 30,
-            ),
-            builderDelegate: PagedChildBuilderDelegate<MusicAggregatorW>(
-              noItemsFoundIndicatorBuilder: (context) {
-                return Center(
-                  child: Text(
-                    '没有找到任何音乐',
-                    style: TextStyle(color: textColor).useSystemChineseFont(),
-                  ),
-                );
-              },
-              itemBuilder: (context, musicAggregator, index) =>
-                  MusicContainerListItem(
-                musicContainer: MusicContainer(musicAggregator),
+            separatorBuilder: (context, index) => Center(
+              child: SizedBox(
+                width: screenWidth * 0.85,
+                child: Divider(
+                  color: dividerColor,
+                  height: 0.5,
+                ),
               ),
             ),
+            builderDelegate: PagedChildBuilderDelegate<MusicAggregatorW>(
+                noItemsFoundIndicatorBuilder: (context) {
+                  return Center(
+                    child: Text(
+                      '没有找到任何音乐',
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
+                    ),
+                  );
+                },
+                itemBuilder: (context, musicAggregator, index) => Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
+                      child: MusicContainerListItem(
+                        musicContainer: MusicContainer(musicAggregator),
+                      ),
+                    )),
           ),
           const SliverToBoxAdapter(
             child: Padding(

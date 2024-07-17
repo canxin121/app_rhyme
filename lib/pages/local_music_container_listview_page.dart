@@ -192,11 +192,14 @@ class LocalMusicContainerListPageState
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
+                bool isFirst = index == 0;
                 bool isLastItem = index == musicContainers.length - 1;
 
                 final musicContainer = musicContainers[index];
                 return Column(
                   children: [
+                    if (isFirst)
+                      const Padding(padding: EdgeInsets.only(top: 5)),
                     Padding(
                       padding: const EdgeInsets.only(top: 5, bottom: 5),
                       child: MusicContainerListItem(
