@@ -6,5 +6,5 @@ use std::sync::Arc;
 use tokio::sync::Semaphore;
 
 lazy_static! {
-    static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(100));
+    static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(30));
 }
