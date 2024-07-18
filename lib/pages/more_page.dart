@@ -14,7 +14,7 @@ import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
-import 'package:app_rhyme/utils/extern_api.dart';
+import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';

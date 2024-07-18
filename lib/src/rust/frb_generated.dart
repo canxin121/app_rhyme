@@ -14,6 +14,7 @@ import 'api/types/config.dart';
 import 'api/types/extern_api.dart';
 import 'api/types/playinfo.dart';
 import 'api/types/version.dart';
+import 'api/utils/crypto.dart';
 import 'api/utils/http_helper.dart';
 import 'api/utils/path_util.dart';
 import 'dart:async';
@@ -70,7 +71,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.0.0';
 
   @override
-  int get rustContentHash => 598721628;
+  int get rustContentHash => 402443197;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -312,6 +313,12 @@ abstract class RustLibApi extends BaseApi {
       {required String currentVersion});
 
   Future<Release> crateApiTypesVersionGetRelease();
+
+  Future<String> crateApiUtilsCryptoRc4DecryptFromBase64(
+      {required String key, required String input});
+
+  Future<String> crateApiUtilsCryptoRc4EncryptToBase64(
+      {required String key, required String input});
 
   Future<String> crateApiUtilsHttpHelperSendRequest(
       {required String method,
@@ -2352,6 +2359,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<String> crateApiUtilsCryptoRc4DecryptFromBase64(
+      {required String key, required String input}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(key, serializer);
+        sse_encode_String(input, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 73, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiUtilsCryptoRc4DecryptFromBase64ConstMeta,
+      argValues: [key, input],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsCryptoRc4DecryptFromBase64ConstMeta =>
+      const TaskConstMeta(
+        debugName: "rc4_decrypt_from_base64",
+        argNames: ["key", "input"],
+      );
+
+  @override
+  Future<String> crateApiUtilsCryptoRc4EncryptToBase64(
+      {required String key, required String input}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(key, serializer);
+        sse_encode_String(input, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 74, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiUtilsCryptoRc4EncryptToBase64ConstMeta,
+      argValues: [key, input],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsCryptoRc4EncryptToBase64ConstMeta =>
+      const TaskConstMeta(
+        debugName: "rc4_encrypt_to_base64",
+        argNames: ["key", "input"],
+      );
+
+  @override
   Future<String> crateApiUtilsHttpHelperSendRequest(
       {required String method,
       required Map<String, String> headers,
@@ -2365,7 +2426,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(url, serializer);
         sse_encode_String(payload, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 73, port: port_);
+            funcId: 75, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2391,7 +2452,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(input, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 74, port: port_);
+            funcId: 76, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,

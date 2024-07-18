@@ -1,5 +1,5 @@
 import 'package:app_rhyme/src/rust/api/types/version.dart';
-import 'package:app_rhyme/utils/extern_api.dart';
+import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/extern_api_update_dialog.dart';
 import 'package:app_rhyme/dialogs/version_update_dialog.dart';

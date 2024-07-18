@@ -19,7 +19,6 @@ jobs:
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
           echo "::set-output name=app_version::$app_version"
-
           
   build_on_macos:
     needs: get_version
@@ -29,7 +28,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-  
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Replace
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          python tools/replace.py
+
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -91,6 +103,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Replace
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          python tools\replace.py
 
       - uses: subosito/flutter-action@v2
         with:
@@ -160,7 +185,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-          
+
+      - name: Replace
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          python tools\replace.py
+
       - name: Set up signing files
         run: |
           $env:APK_SIGN_PWD="${{ secrets.APK_SIGN_PWD }}"

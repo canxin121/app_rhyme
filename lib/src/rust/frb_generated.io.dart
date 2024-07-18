@@ -14,6 +14,7 @@ import 'api/types/config.dart';
 import 'api/types/extern_api.dart';
 import 'api/types/playinfo.dart';
 import 'api/types/version.dart';
+import 'api/utils/crypto.dart';
 import 'api/utils/http_helper.dart';
 import 'api/utils/path_util.dart';
 import 'dart:async';
