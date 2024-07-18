@@ -88,6 +88,8 @@ List<PullDownMenuEntry> qualitySelectPullDown(
       )),
       ...qualitys.map(
         (quality) => PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             title: quality.short,
             onTap: () async {
               await onSelect(quality);

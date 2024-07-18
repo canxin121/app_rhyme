@@ -385,11 +385,15 @@ class SearchMusicAggregatroChoiceMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: globalToggleSearchPage,
           title: '搜索歌单',
           icon: CupertinoIcons.photo,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             await fetchAllMusicAggregators();
             LogToast.success(
@@ -402,6 +406,8 @@ class SearchMusicAggregatroChoiceMenu extends StatelessWidget {
           icon: CupertinoIcons.music_note_2,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             LogToast.info(
               "多选操作",

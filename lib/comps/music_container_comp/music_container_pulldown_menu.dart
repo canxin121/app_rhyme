@@ -3,6 +3,7 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -78,6 +79,8 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
           return PullDownButton(
             itemBuilder: (context) => [
               PullDownMenuHeader(
+                itemTheme: PullDownMenuItemTheme(
+                    textStyle: const TextStyle().useSystemChineseFont()),
                 leading: imageCacheHelper(widget.musicContainer.info.artPic),
                 title: widget.musicContainer.info.name,
                 subtitle: widget.musicContainer.info.artist.join(", "),
@@ -99,6 +102,8 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
       PullDownMenuActionsRow.medium(
         items: [
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () => deleteMusicsFromLocalMusicList(
                 context, [widget.musicContainer], widget.musicListW!),
             title: '从歌单删除',
@@ -106,6 +111,8 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
           ),
           if (hasCache)
             PullDownMenuItem(
+              itemTheme: PullDownMenuItemTheme(
+                  textStyle: const TextStyle().useSystemChineseFont()),
               onTap: () => delMusicCache(widget.musicContainer,
                   showToastWhenNoMsuicCache: true),
               title: '删除缓存',
@@ -113,11 +120,15 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
             )
           else
             PullDownMenuItem(
+              itemTheme: PullDownMenuItemTheme(
+                  textStyle: const TextStyle().useSystemChineseFont()),
               onTap: () => cacheMusic(widget.musicContainer),
               title: '缓存音乐',
               icon: CupertinoIcons.cloud_download,
             ),
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () => editMusicInfo(context, widget.musicContainer),
             title: '编辑信息',
             icon: CupertinoIcons.pencil,
@@ -125,27 +136,37 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
         ],
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => showDetailsDialog(context, widget.musicContainer),
         title: '查看详情',
         icon: CupertinoIcons.photo,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => viewMusicAlbum(context, widget.musicContainer),
         title: '查看专辑',
         icon: CupertinoIcons.music_albums,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => addMusicsToMusicList(context, [widget.musicContainer]),
         title: '添加到歌单',
         icon: CupertinoIcons.add,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () =>
             createNewMusicListFromMusics(context, [widget.musicContainer]),
         title: '创建新歌单',
         icon: CupertinoIcons.add_circled,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => setMusicPicAsMusicListCover(
             widget.musicContainer, widget.musicListW!),
         title: '用作歌单的封面',
@@ -159,17 +180,23 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
       PullDownMenuActionsRow.medium(
         items: [
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () =>
                 createNewMusicListFromMusics(context, [widget.musicContainer]),
             title: '创建新歌单',
             icon: CupertinoIcons.add_circled,
           ),
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () => addMusicsToMusicList(context, [widget.musicContainer]),
             title: '添加到歌单',
             icon: CupertinoIcons.add,
           ),
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () => viewMusicAlbum(context, widget.musicContainer),
             title: '查看专辑',
             icon: CupertinoIcons.music_albums,
@@ -177,11 +204,15 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
         ],
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => showDetailsDialog(context, widget.musicContainer),
         title: '查看详情',
         icon: CupertinoIcons.photo,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () {},
         title: '搜索歌手',
         icon: CupertinoIcons.profile_circled,
@@ -194,6 +225,8 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
       PullDownMenuActionsRow.medium(
         items: [
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () async {
               globalAudioHandler.removeAt(index);
             },
@@ -201,11 +234,15 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
             icon: CupertinoIcons.delete,
           ),
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () => addMusicsToMusicList(context, [widget.musicContainer]),
             title: '添加到歌单',
             icon: CupertinoIcons.add,
           ),
           PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () =>
                 createNewMusicListFromMusics(context, [widget.musicContainer]),
             title: '创建新歌单',
@@ -214,20 +251,19 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
         ],
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => showDetailsDialog(context, widget.musicContainer),
         title: '查看详情',
         icon: CupertinoIcons.photo,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () => viewMusicAlbum(context, widget.musicContainer),
         title: '查看专辑',
         icon: CupertinoIcons.music_albums,
       ),
-      // PullDownMenuItem(
-      //   onTap: () {},
-      //   title: '搜索歌手',
-      //   icon: CupertinoIcons.profile_circled,
-      // ),
     ];
   }
 }

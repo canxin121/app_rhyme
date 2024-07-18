@@ -1,3 +1,4 @@
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
@@ -226,21 +227,29 @@ class MutiSelectMusicListGridPageMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: deleteMusicList,
           title: '删除歌单',
           icon: CupertinoIcons.delete,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: selectAll,
           title: '全部选中',
           icon: CupertinoIcons.checkmark_seal_fill,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: cancelSelectAll,
           title: '取消选中',
           icon: CupertinoIcons.xmark,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: reverseSelect,
           title: '反选',
           icon: CupertinoIcons.arrow_swap,

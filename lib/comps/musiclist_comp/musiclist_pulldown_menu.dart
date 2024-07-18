@@ -8,6 +8,7 @@ import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
@@ -49,6 +50,8 @@ class MusicListMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuHeader(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           leading: imageCacheHelper(musicListInfo.artPic),
           title: musicListInfo.name,
           subtitle: musicListInfo.desc,
@@ -69,6 +72,8 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
     PullDownMenuActionsRow.medium(
       items: [
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
             showMusicListInfoDialog(context,
                 defaultMusicList: musicListW.getMusiclistInfo(),
@@ -78,6 +83,8 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
           icon: CupertinoIcons.photo,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             var newMusicListInfo = await showMusicListInfoDialog(context,
                 defaultMusicList: musicListW.getMusiclistInfo(),
@@ -101,6 +108,8 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
           icon: CupertinoIcons.pencil,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             try {
               await SqlFactoryW.delMusiclist(
@@ -121,6 +130,8 @@ List<dynamic> localMusiclistItems(BuildContext context, MusicListW musicListW) {
       ],
     ),
     PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
           try {
             await SqlFactoryW.delDuplicateMusicsOfMusiclist(
@@ -144,6 +155,8 @@ List<dynamic> onlineMusicListItems(
     BuildContext context, MusicListW musicListw) {
   return [
     PullDownMenuItem(
+      itemTheme: PullDownMenuItemTheme(
+          textStyle: const TextStyle().useSystemChineseFont()),
       onTap: () {
         showMusicListInfoDialog(context,
             defaultMusicList: musicListw.getMusiclistInfo(), readonly: true);
@@ -152,6 +165,8 @@ List<dynamic> onlineMusicListItems(
       icon: CupertinoIcons.photo,
     ),
     PullDownMenuItem(
+      itemTheme: PullDownMenuItemTheme(
+          textStyle: const TextStyle().useSystemChineseFont()),
       onTap: () async {
         var musicListInfo = await showMusicListInfoDialog(context,
             defaultMusicList: musicListw.getMusiclistInfo());
@@ -163,6 +178,8 @@ List<dynamic> onlineMusicListItems(
       icon: CupertinoIcons.add_circled,
     ),
     PullDownMenuItem(
+      itemTheme: PullDownMenuItemTheme(
+          textStyle: const TextStyle().useSystemChineseFont()),
       onTap: () async {
         var targetMusicList = await showMusicListSelectionDialog(context);
         if (targetMusicList != null) {

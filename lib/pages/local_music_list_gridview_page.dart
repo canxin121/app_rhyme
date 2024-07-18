@@ -12,6 +12,7 @@ import 'package:app_rhyme/pages/online_music_list_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/colors.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
@@ -159,6 +160,8 @@ class MusicListGridPageMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             if (context.mounted) {
               var musicListInfo = await showMusicListInfoDialog(context);
@@ -180,6 +183,8 @@ class MusicListGridPageMenu extends StatelessWidget {
           icon: CupertinoIcons.add,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             var url = await showInputPlaylistShareLinkDialog(context);
             if (url != null) {
@@ -202,6 +207,8 @@ class MusicListGridPageMenu extends StatelessWidget {
           icon: CupertinoIcons.pencil,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             var result = await SqlFactoryW.getAllMusiclists();
             var musicLists = result;
@@ -219,6 +226,8 @@ class MusicListGridPageMenu extends StatelessWidget {
           icon: CupertinoIcons.list_number,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             var result = await SqlFactoryW.getAllMusiclists();
             var musicLists = result;

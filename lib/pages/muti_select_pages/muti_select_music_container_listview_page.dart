@@ -259,47 +259,65 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
     final List<PullDownMenuEntry> menuItems = [
       if (musicListW != null) ...[
         PullDownMenuHeader(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           leading: imageCacheHelper(musicListW!.getMusiclistInfo().artPic),
           title: musicListW!.getMusiclistInfo().name,
           subtitle: musicListW!.getMusiclistInfo().desc,
         ),
         const PullDownMenuDivider.large(),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: handleCacheSelected,
           title: '缓存选中音乐',
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: handleDeleteCacheSelected,
           title: '删除音乐缓存',
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: handleDeleteFromList,
           title: '从歌单删除',
         ),
       ],
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
           await addMusicsToMusicList(context, musicContainers);
         },
         title: '添加到歌单',
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
           await createNewMusicListFromMusics(context, musicContainers);
         },
         title: '创建新歌单',
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: selectAll,
         title: '全部选中',
         icon: CupertinoIcons.checkmark_seal_fill,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: cancelSelectAll,
         title: '取消选中',
         icon: CupertinoIcons.xmark,
       ),
       PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
         onTap: reverseSelect,
         title: '反选',
         icon: CupertinoIcons.arrow_swap,

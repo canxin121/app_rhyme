@@ -18,6 +18,7 @@ import 'package:app_rhyme/utils/extern_api.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -418,6 +419,8 @@ class ImportExternApiMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             FilePickerResult? result = await FilePicker.platform.pickFiles();
 
@@ -444,6 +447,8 @@ class ImportExternApiMenu extends StatelessWidget {
           icon: CupertinoIcons.folder,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             var link = await showInputExternApiLinkDialog(context);
             if (link != null) {

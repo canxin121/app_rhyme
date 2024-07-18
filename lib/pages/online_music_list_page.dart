@@ -239,6 +239,8 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuHeader(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           leading: imageCacheHelper(musicListInfo.artPic),
           title: musicListInfo.name,
           subtitle: musicListInfo.desc,
@@ -246,11 +248,15 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
         const PullDownMenuDivider.large(),
         ...onlineMusicListItems(context, musicListW),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: fetchAllMusicAggregators,
           title: "加载所有音乐",
           icon: CupertinoIcons.music_note_2,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             LogToast.info("多选操作", "正在加载所有音乐,请稍等",
                 "[OnlineMusicListPage] MultiSelect wait to fetch all music aggregators");

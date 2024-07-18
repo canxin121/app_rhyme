@@ -1,4 +1,3 @@
-
 import 'package:app_rhyme/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_online_music_list_gridview_page.dart';
@@ -226,16 +225,22 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: globalToggleSearchPage,
           title: '搜索歌曲',
           icon: CupertinoIcons.photo,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: openShareMusicList,
           title: '打开歌单链接',
           icon: CupertinoIcons.link,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             await fetchAllMusicAggregators();
             LogToast.success(
@@ -248,6 +253,8 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
           icon: CupertinoIcons.music_note_2,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             LogToast.info(
               "多选操作",

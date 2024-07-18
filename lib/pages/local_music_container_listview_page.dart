@@ -257,6 +257,8 @@ class LocalMusicListChoicMenu extends StatelessWidget {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuHeader(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           leading: imageCacheHelper(musicListInfo.artPic),
           title: musicListInfo.name,
           subtitle: musicListInfo.desc,
@@ -264,6 +266,8 @@ class LocalMusicListChoicMenu extends StatelessWidget {
         const PullDownMenuDivider.large(),
         ...localMusiclistItems(context, musicListW),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             for (var musicContainer in musicContainers) {
               await cacheMusic(musicContainer);
@@ -273,6 +277,8 @@ class LocalMusicListChoicMenu extends StatelessWidget {
           icon: CupertinoIcons.cloud_download,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             for (var musicContainer in musicContainers) {
               await delMusicCache(musicContainer, showToast: false);
@@ -284,6 +290,8 @@ class LocalMusicListChoicMenu extends StatelessWidget {
           icon: CupertinoIcons.delete,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
             Navigator.push(
               context,
@@ -299,6 +307,8 @@ class LocalMusicListChoicMenu extends StatelessWidget {
           icon: CupertinoIcons.sort_up_circle,
         ),
         PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
             Navigator.push(
               context,
