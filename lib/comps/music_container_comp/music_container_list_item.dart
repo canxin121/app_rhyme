@@ -5,7 +5,7 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/source_helper.dart';
+// import 'package:app_rhyme/utils/source_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -128,10 +128,11 @@ class _MusicContainerListItemState extends State<MusicContainerListItem> {
                         ),
                       )
                     : const SizedBox.shrink(),
-          // 标志音乐信息来源的Badge
-          Badge(
-            label: sourceToShort(widget.musicContainer.info.source),
-          ),
+          // 具有误导性，暂时不显示
+          // // 标志音乐信息来源的Badge
+          // Badge(
+          //   label: sourceToShort(widget.musicContainer.info.source),
+          // ),
           // 歌曲的操作按钮
           if (widget.showMenu)
             MusicContainerMenu(
