@@ -230,6 +230,11 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             TextStyle(color: textColor).useSystemChineseFont()),
                   ),
                   child: CupertinoTextField(
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ).useSystemChineseFont(),
                     controller: _nameController,
                     placeholder: '输入曲名',
                   ),
@@ -242,6 +247,11 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             TextStyle(color: textColor).useSystemChineseFont()),
                   ),
                   child: CupertinoTextField(
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ).useSystemChineseFont(),
                     controller: _artistController,
                     placeholder: '输入演唱者 (多个用逗号分隔)',
                   ),
@@ -254,6 +264,11 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             TextStyle(color: textColor).useSystemChineseFont()),
                   ),
                   child: CupertinoTextField(
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ).useSystemChineseFont(),
                     controller: _albumController,
                     placeholder: '输入专辑名',
                   ),
