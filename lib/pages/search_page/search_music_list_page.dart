@@ -84,7 +84,10 @@ class _SearchMusicListState extends State<SearchMusicListPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
+        // 下面地方如果直接使用safeArea会ios上底部有一块空白
+        child: Column(
+      children: [
+        CupertinoNavigationBar(
             leading: Padding(
               padding: const EdgeInsets.only(left: 0.0),
               child: Align(
@@ -135,83 +138,74 @@ class _SearchMusicListState extends State<SearchMusicListPage>
               },
               musicListController: _pagingController,
             )),
-        // 下面地方如果直接使用safeArea会ios上底部有一块空白
-        child: Column(
-          children: [
-            Padding(padding: EdgeInsets.only(top: isMobile ? 70 : 40)),
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 8.0,
-                  right: 8.0,
-                  bottom: 8.0,
-                  top: isMobile ? 10.0 : 8.0),
-              child: CupertinoSearchTextField(
-                style: TextStyle(
-                  color: isDarkMode
-                      ? CupertinoColors.white
-                      : CupertinoColors.black,
-                ).useSystemChineseFont(),
-                controller: _inputContentController,
-                onSubmitted: (String value) {
-                  if (value.isNotEmpty) {
-                    _pagingController.refresh();
-                  }
-                },
-              ),
-            ),
-            Expanded(
-              child: PagedGridView(
-                  padding: EdgeInsets.only(bottom: screenHeight * 0.2),
-                  pagingController: _pagingController,
-                  builderDelegate: PagedChildBuilderDelegate<MusicListW>(
-                      noItemsFoundIndicatorBuilder: (context) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '输入关键词以搜索歌单',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: isDarkMode
-                                  ? CupertinoColors.systemGrey2
-                                  : CupertinoColors.black,
-                            ),
-                          ),
-                          Text(
-                            '点击右上角图标切换搜索单曲',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: isDarkMode
-                                    ? CupertinoColors.systemGrey2
-                                    : CupertinoColors.black),
-                          ),
-                        ],
+        Padding(
+          padding: EdgeInsets.only(
+              left: 8.0, right: 8.0, bottom: 8.0, top: isMobile ? 10.0 : 8.0),
+          child: CupertinoSearchTextField(
+            style: TextStyle(
+              color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+            ).useSystemChineseFont(),
+            controller: _inputContentController,
+            onSubmitted: (String value) {
+              if (value.isNotEmpty) {
+                _pagingController.refresh();
+              }
+            },
+          ),
+        ),
+        Expanded(
+          child: PagedGridView(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.2),
+              pagingController: _pagingController,
+              builderDelegate: PagedChildBuilderDelegate<MusicListW>(
+                  noItemsFoundIndicatorBuilder: (context) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '输入关键词以搜索歌单',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? CupertinoColors.systemGrey2
+                              : CupertinoColors.black,
+                        ),
                       ),
-                    );
-                  }, itemBuilder: (context, musicListW, index) {
-                    return Container(
-                        padding: const EdgeInsets.only(
-                            left: 10, right: 10, bottom: 20),
-                        child: MusicListImageCard(
-                          musicListW: musicListW,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                  builder: (context) => OnlineMusicListPage(
-                                        musicList: musicListW,
-                                      )),
-                            );
-                          },
-                          online: true,
-                        ));
-                  }),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, childAspectRatio: 0.7)),
-            ),
-          ],
-        ));
+                      Text(
+                        '点击右上角图标切换搜索单曲',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: isDarkMode
+                                ? CupertinoColors.systemGrey2
+                                : CupertinoColors.black),
+                      ),
+                    ],
+                  ),
+                );
+              }, itemBuilder: (context, musicListW, index) {
+                return Container(
+                    padding:
+                        const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+                    child: MusicListImageCard(
+                      musicListW: musicListW,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (context) => OnlineMusicListPage(
+                                    musicList: musicListW,
+                                  )),
+                        );
+                      },
+                      online: true,
+                    ));
+              }),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, childAspectRatio: 0.7)),
+        ),
+      ],
+    ));
   }
 }
 

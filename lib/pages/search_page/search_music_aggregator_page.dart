@@ -136,7 +136,6 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = Platform.isIOS || Platform.isAndroid;
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
@@ -147,42 +146,42 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
 
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
-      navigationBar: CupertinoNavigationBar(
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 0.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '搜索歌曲',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: isDarkMode
-                      ? CupertinoColors.white
-                      : CupertinoColors.black,
-                ),
-              ),
-            ),
-          ),
-          trailing: SearchMusicAggregatroChoiceMenu(
-            musicAggregatorController: _pagingController,
-            builder: (BuildContext context, Future<void> Function() showMenu) {
-              return GestureDetector(
-                child: Text(
-                  '选项',
-                  style: TextStyle(color: activeIconRed),
-                ),
-                onTapDown: (details) {
-                  showMenu();
-                },
-              );
-            },
-            fetchAllMusicAggregators: _fetchAllMusicAggregators,
-          )),
       // 下面地方如果直接使用safeArea会ios上底部有一块空白
       child: Column(
         children: [
-          Padding(padding: EdgeInsets.only(top: isMobile ? 70 : 40)),
+          CupertinoNavigationBar(
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 0.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '搜索歌曲',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: isDarkMode
+                          ? CupertinoColors.white
+                          : CupertinoColors.black,
+                    ),
+                  ),
+                ),
+              ),
+              trailing: SearchMusicAggregatroChoiceMenu(
+                musicAggregatorController: _pagingController,
+                builder:
+                    (BuildContext context, Future<void> Function() showMenu) {
+                  return GestureDetector(
+                    child: Text(
+                      '选项',
+                      style: TextStyle(color: activeIconRed),
+                    ),
+                    onTapDown: (details) {
+                      showMenu();
+                    },
+                  );
+                },
+                fetchAllMusicAggregators: _fetchAllMusicAggregators,
+              )),
           // 搜索框和过滤按钮
           Padding(
             padding: const EdgeInsets.only(top: 4.0, left: 8, right: 0),
