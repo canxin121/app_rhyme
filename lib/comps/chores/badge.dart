@@ -1,3 +1,4 @@
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/material.dart';
 
 class Badge extends StatelessWidget {
@@ -33,7 +34,7 @@ class Badge extends StatelessWidget {
             fontSize: 11,
             fontWeight: FontWeight.bold,
             color: textColor,
-          ),
+          ).useSystemChineseFont(),
         ),
       ),
     );

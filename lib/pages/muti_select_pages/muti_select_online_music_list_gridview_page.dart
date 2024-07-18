@@ -216,7 +216,7 @@ class _MutiSelectOnlineMusicListGridPageState
                 onPressed: showMenu,
                 child: Text(
                   "选项",
-                  style: TextStyle(color: activeIconRed),
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
                 ),
               ),
               selectAll: handleSelectAll,
@@ -227,7 +227,9 @@ class _MutiSelectOnlineMusicListGridPageState
           ),
           widget.musicLists.isEmpty
               ? Center(
-                  child: Text("没有歌单", style: TextStyle(color: textColor)),
+                  child: Text("没有歌单",
+                      style:
+                          TextStyle(color: textColor).useSystemChineseFont()),
                 )
               : Expanded(
                   child: Align(

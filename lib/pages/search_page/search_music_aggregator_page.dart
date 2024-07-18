@@ -164,7 +164,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                       color: isDarkMode
                           ? CupertinoColors.white
                           : CupertinoColors.black,
-                    ),
+                    ).useSystemChineseFont(),
                   ),
                 ),
               ),
@@ -175,7 +175,8 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                   return GestureDetector(
                     child: Text(
                       '选项',
-                      style: TextStyle(color: activeIconRed),
+                      style: TextStyle(color: activeIconRed)
+                          .useSystemChineseFont(),
                     ),
                     onTapDown: (details) {
                       showMenu();
@@ -221,12 +222,15 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
           // 编辑 MusicFuzzFilter 的 Section
           if (_isFilterSectionVisible)
             CupertinoFormSection.insetGrouped(
-              header: Text('筛选条件', style: TextStyle(color: textColor)),
+              header: Text('筛选条件',
+                  style: TextStyle(color: textColor).useSystemChineseFont()),
               children: [
                 CupertinoFormRow(
                   prefix: Padding(
                     padding: const EdgeInsets.only(right: 10.0),
-                    child: Text('歌曲名', style: TextStyle(color: textColor)),
+                    child: Text('歌曲名',
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont()),
                   ),
                   child: CupertinoTextField(
                     controller: _nameController,
@@ -236,7 +240,9 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                 CupertinoFormRow(
                   prefix: Padding(
                     padding: const EdgeInsets.only(right: 10.0),
-                    child: Text('演唱者', style: TextStyle(color: textColor)),
+                    child: Text('演唱者',
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont()),
                   ),
                   child: CupertinoTextField(
                     controller: _artistController,
@@ -246,7 +252,9 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                 CupertinoFormRow(
                   prefix: Padding(
                     padding: const EdgeInsets.only(right: 10.0),
-                    child: Text('专辑名', style: TextStyle(color: textColor)),
+                    child: Text('专辑名',
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont()),
                   ),
                   child: CupertinoTextField(
                     controller: _albumController,
@@ -272,11 +280,11 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: const Text(
+                          child: Text(
                             '应用筛选条件',
                             style: TextStyle(
                               color: CupertinoColors.activeBlue,
-                            ),
+                            ).useSystemChineseFont(),
                           ),
                         ),
                       ),
@@ -294,11 +302,11 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             ),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          child: const Text(
+                          child: Text(
                             '清空筛选条件',
                             style: TextStyle(
                               color: CupertinoColors.systemRed,
-                            ),
+                            ).useSystemChineseFont(),
                           ),
                         ),
                       ),
@@ -331,7 +339,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             color: isDarkMode
                                 ? CupertinoColors.systemGrey2
                                 : CupertinoColors.black,
-                          ),
+                          ).useSystemChineseFont(),
                         ),
                         Text(
                           '点击右上角图标切换搜索歌单',
@@ -340,7 +348,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             color: isDarkMode
                                 ? CupertinoColors.systemGrey2
                                 : CupertinoColors.black,
-                          ),
+                          ).useSystemChineseFont(),
                         ),
                         Text(
                           '点击输入框右侧按钮进行设置筛选条件',
@@ -349,7 +357,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                             color: isDarkMode
                                 ? CupertinoColors.systemGrey2
                                 : CupertinoColors.black,
-                          ),
+                          ).useSystemChineseFont(),
                         ),
                       ],
                     ),

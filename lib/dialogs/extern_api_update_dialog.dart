@@ -29,13 +29,19 @@ Future<bool> showExternApiUpdateDialog(BuildContext context) async {
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('更新'),
+            child: Text(
+              '更新',
+              style: const TextStyle().useSystemChineseFont(),
+            ),
             onPressed: () async {
               Navigator.of(context).pop(true);
             },
           ),
           CupertinoDialogAction(
-            child: const Text('关闭'),
+            child: Text(
+              '关闭',
+              style: const TextStyle().useSystemChineseFont(),
+            ),
             onPressed: () {
               Navigator.of(context).pop(false);
             },

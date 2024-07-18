@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<MusicFuzzFilter?> showMusicFuzzFilterDialog(BuildContext context,
@@ -58,7 +59,7 @@ class MusicFuzzFilterDialogState extends State<MusicFuzzFilterDialog> {
         title,
         style: TextStyle(
           color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-        ),
+        ).useSystemChineseFont(),
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -145,7 +146,7 @@ class MusicFuzzFilterDialogState extends State<MusicFuzzFilterDialog> {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -172,7 +173,7 @@ class MusicFuzzFilterDialogState extends State<MusicFuzzFilterDialog> {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
         if (widget.readonly)
@@ -187,7 +188,7 @@ class MusicFuzzFilterDialogState extends State<MusicFuzzFilterDialog> {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
       ],

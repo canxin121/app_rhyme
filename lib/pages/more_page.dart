@@ -80,7 +80,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
                 color: textColor,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
         ),
@@ -88,7 +88,8 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
       child: ListView(
         children: [
           CupertinoFormSection.insetGrouped(
-            header: Text('应用信息', style: TextStyle(color: textColor)),
+            header: Text('应用信息',
+                style: TextStyle(color: textColor).useSystemChineseFont()),
             children: [
               CupertinoFormRow(
                   prefix: SizedBox(
@@ -106,7 +107,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                           style: TextStyle(
                             color: textColor,
                             fontSize: 20.0,
-                          ),
+                          ).useSystemChineseFont(),
                         ),
                       ))),
               CupertinoFormRow(
@@ -114,7 +115,8 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                       padding: const EdgeInsets.only(right: 20),
                       child: Text(
                         '版本号',
-                        style: TextStyle(color: textColor),
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont(),
                       )),
                   child: Container(
                       padding: const EdgeInsets.only(right: 10),
@@ -122,12 +124,13 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                       height: 40,
                       child: Text(
                         globalPackageInfo.version,
-                        style: TextStyle(color: textColor),
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont(),
                       ))),
               CupertinoFormRow(
                 prefix: Text(
                   '检查更新',
-                  style: TextStyle(color: textColor),
+                  style: TextStyle(color: textColor).useSystemChineseFont(),
                 ),
                 child: CupertinoButton(
                   onPressed: () async {
@@ -141,7 +144,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                     padding: const EdgeInsets.only(right: 20),
                     child: Text(
                       '自动检查更新',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
                     )),
                 child: CupertinoSwitch(
                     value: globalConfig.versionAutoUpdate,
@@ -156,23 +159,26 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               CupertinoFormRow(
                 prefix: Text(
                   '项目链接',
-                  style: TextStyle(color: textColor),
+                  style: TextStyle(color: textColor).useSystemChineseFont(),
                 ),
                 child: CupertinoButton(
                   onPressed: openProjectLink,
                   child: Text(
                     'github.com/canxin121/app_rhyme',
-                    style: TextStyle(color: textColor),
+                    style: TextStyle(color: textColor).useSystemChineseFont(),
                   ),
                 ),
               ),
             ],
           ),
           CupertinoFormSection.insetGrouped(
-            header: Text("音频设置", style: TextStyle(color: textColor)),
+            header: Text("音频设置",
+                style: TextStyle(color: textColor).useSystemChineseFont()),
             children: [
               CupertinoFormRow(
-                  prefix: Text("清空待播清单", style: TextStyle(color: textColor)),
+                  prefix: Text("清空待播清单",
+                      style:
+                          TextStyle(color: textColor).useSystemChineseFont()),
                   child: CupertinoButton(
                       child: Icon(
                         CupertinoIcons.clear,
@@ -191,14 +197,15 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
           if (!Platform.isIOS)
             _buildExportCacheRoot(context, refresh, textColor, iconColor),
           CupertinoFormSection.insetGrouped(
-            header: Text('储存设置', style: TextStyle(color: textColor)),
+            header: Text('储存设置',
+                style: TextStyle(color: textColor).useSystemChineseFont()),
             children: [
               CupertinoFormRow(
                 prefix: Padding(
                     padding: const EdgeInsets.only(right: 20),
                     child: Text(
                       '保存歌曲时缓存歌曲封面',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
                     )),
                 child: CupertinoSwitch(
                     value: globalConfig.savePicWhenAddMusicList,
@@ -215,7 +222,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                     padding: const EdgeInsets.only(right: 20),
                     child: Text(
                       '保存歌单时缓存歌曲歌词',
-                      style: TextStyle(color: textColor),
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
                     )),
                 child: CupertinoSwitch(
                     value: globalConfig.saveLyricWhenAddMusicList,
@@ -228,7 +235,9 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                     }),
               ),
               CupertinoFormRow(
-                  prefix: Text("清除冗余歌曲数据", style: TextStyle(color: textColor)),
+                  prefix: Text("清除冗余歌曲数据",
+                      style:
+                          TextStyle(color: textColor).useSystemChineseFont()),
                   child: CupertinoButton(
                       onPressed: () async {
                         try {
@@ -249,10 +258,13 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
             ],
           ),
           CupertinoFormSection.insetGrouped(
-            header: Text('其他', style: TextStyle(color: textColor)),
+            header: Text('其他',
+                style: TextStyle(color: textColor).useSystemChineseFont()),
             children: [
               CupertinoFormRow(
-                  prefix: Text("运行日志", style: TextStyle(color: textColor)),
+                  prefix: Text("运行日志",
+                      style:
+                          TextStyle(color: textColor).useSystemChineseFont()),
                   child: CupertinoButton(
                       child: const Icon(
                         CupertinoIcons.book,
@@ -282,15 +294,16 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '音源状态',
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor).useSystemChineseFont(),
               )),
           child: Container(
               padding: const EdgeInsets.only(right: 10),
               alignment: Alignment.centerRight,
               height: 50,
-              child: const Text(
+              child: Text(
                 "正常",
-                style: TextStyle(color: CupertinoColors.activeGreen),
+                style: TextStyle(color: CupertinoColors.activeGreen)
+                    .useSystemChineseFont(),
               ))));
     } else {
       children.add(CupertinoFormRow(
@@ -298,7 +311,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '音源状态',
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor).useSystemChineseFont(),
               )),
           child: Container(
               padding: const EdgeInsets.only(right: 10),
@@ -306,7 +319,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               height: 50,
               child: Text(
                 "未导入",
-                style: TextStyle(color: activeIconRed),
+                style: TextStyle(color: activeIconRed).useSystemChineseFont(),
               ))));
     }
     if (hasExternApi) {
@@ -316,12 +329,12 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                 padding: const EdgeInsets.only(right: 20),
                 child: Text(
                   '音源链接',
-                  style: TextStyle(color: textColor),
+                  style: TextStyle(color: textColor).useSystemChineseFont(),
                 )),
             child: CupertinoButton(
               child: Text(
                 globalConfig.externApi!.url!,
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor).useSystemChineseFont(),
               ),
               onPressed: () async {
                 try {
@@ -337,7 +350,8 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
             )));
         children.add(
           CupertinoFormRow(
-            prefix: Text('检查更新', style: TextStyle(color: textColor)),
+            prefix: Text('检查更新',
+                style: TextStyle(color: textColor).useSystemChineseFont()),
             child: CupertinoButton(
               onPressed: () async {
                 await checkExternApiUpdate(context, true);
@@ -352,7 +366,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '自动检查更新',
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor).useSystemChineseFont(),
               )),
           child: CupertinoSwitch(
               value: globalConfig.externApiAutoUpdate,
@@ -372,7 +386,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '删除音源',
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor).useSystemChineseFont(),
               )),
           child: CupertinoButton(
               onPressed: () {
@@ -392,7 +406,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               padding: const EdgeInsets.only(right: 20),
               child: Text(
                 '导入音源',
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor).useSystemChineseFont(),
               )),
           child: ImportExternApiMenu(
               builder: (context, showMenu) => CupertinoButton(
@@ -401,7 +415,8 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                       Icon(CupertinoIcons.music_note_2, color: iconColor)))));
     }
     return CupertinoFormSection.insetGrouped(
-        header: Text("自定义音源", style: TextStyle(color: textColor)),
+        header: Text("自定义音源",
+            style: TextStyle(color: textColor).useSystemChineseFont()),
         children: children);
   }
 }
@@ -479,7 +494,8 @@ CupertinoFormSection _buildQualitySelectSection(
 
   if (Platform.isAndroid || Platform.isIOS) {
     children.add(CupertinoFormRow(
-        prefix: Text("Wifi下音质选择", style: TextStyle(color: textColor)),
+        prefix: Text("Wifi下音质选择",
+            style: TextStyle(color: textColor).useSystemChineseFont()),
         child: CupertinoButton(
             onPressed: () async {
               QualityOption? selectedOption =
@@ -494,7 +510,8 @@ CupertinoFormSection _buildQualitySelectSection(
             child: Text(globalConfig.wifiAutoQuality,
                 style: TextStyle(color: textColor)))));
     children.add(CupertinoFormRow(
-        prefix: Text("数据网络下音质选择", style: TextStyle(color: textColor)),
+        prefix: Text("数据网络下音质选择",
+            style: TextStyle(color: textColor).useSystemChineseFont()),
         child: CupertinoButton(
             onPressed: () async {
               QualityOption? selectedOption =
@@ -507,10 +524,11 @@ CupertinoFormSection _buildQualitySelectSection(
               refresh();
             },
             child: Text(globalConfig.mobileAutoQuality,
-                style: TextStyle(color: textColor)))));
+                style: TextStyle(color: textColor).useSystemChineseFont()))));
   } else {
     children.add(CupertinoFormRow(
-        prefix: Text("音质选择", style: TextStyle(color: textColor)),
+        prefix: Text("音质选择",
+            style: TextStyle(color: textColor).useSystemChineseFont()),
         child: CupertinoButton(
             onPressed: () async {
               QualityOption? selectedOption =
@@ -523,10 +541,11 @@ CupertinoFormSection _buildQualitySelectSection(
               refresh();
             },
             child: Text(globalConfig.wifiAutoQuality,
-                style: TextStyle(color: textColor)))));
+                style: TextStyle(color: textColor).useSystemChineseFont()))));
   }
   return CupertinoFormSection.insetGrouped(
-    header: Text('音质选择', style: TextStyle(color: textColor)),
+    header:
+        Text('音质选择', style: TextStyle(color: textColor).useSystemChineseFont()),
     children: children,
   );
 }
@@ -602,7 +621,7 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
             padding: const EdgeInsets.only(right: 20),
             child: Text(
               '当前数据状态',
-              style: TextStyle(color: textColor),
+              style: TextStyle(color: textColor).useSystemChineseFont(),
             )),
         child: Container(
             padding: const EdgeInsets.only(right: 10),
@@ -610,7 +629,7 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
             height: 50,
             child: Text(
               "应用内部数据",
-              style: TextStyle(color: textColor),
+              style: TextStyle(color: textColor).useSystemChineseFont(),
             ))));
   } else {
     children.add(CupertinoFormRow(
@@ -618,7 +637,7 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
             padding: const EdgeInsets.only(right: 20),
             child: Text(
               '当前数据文件夹',
-              style: TextStyle(color: textColor),
+              style: TextStyle(color: textColor).useSystemChineseFont(),
             )),
         child: Container(
             padding: const EdgeInsets.only(right: 10),
@@ -626,14 +645,14 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
             height: 50,
             child: Text(
               globalConfig.exportCacheRoot!,
-              style: TextStyle(color: textColor),
+              style: TextStyle(color: textColor).useSystemChineseFont(),
             ))));
   }
   children.add(
     CupertinoFormRow(
       prefix: Text(
         '迁移数据文件夹',
-        style: TextStyle(color: textColor),
+        style: TextStyle(color: textColor).useSystemChineseFont(),
       ),
       child: CupertinoButton(
         onPressed: () async {
@@ -657,7 +676,7 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
     CupertinoFormRow(
       prefix: Text(
         '使用数据文件夹',
-        style: TextStyle(color: textColor),
+        style: TextStyle(color: textColor).useSystemChineseFont(),
       ),
       child: CupertinoButton(
         onPressed: () async {
@@ -678,7 +697,8 @@ CupertinoFormSection _buildExportCacheRoot(BuildContext context,
     ),
   );
   return CupertinoFormSection.insetGrouped(
-    header: Text('数据设定', style: TextStyle(color: textColor)),
+    header:
+        Text('数据设定', style: TextStyle(color: textColor).useSystemChineseFont()),
     children: children,
   );
 }

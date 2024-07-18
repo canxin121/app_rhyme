@@ -67,7 +67,10 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return Text(
+            'Error: ${snapshot.error}',
+            style: TextStyle().useSystemChineseFont(),
+          );
         } else {
           bool hasCache = snapshot.data ?? false;
 

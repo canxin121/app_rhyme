@@ -21,11 +21,18 @@ void showVersionUpdateDialog(BuildContext context, Release release) {
         ),
         content: Column(
           children: [
-            Text('作者: ${release.author.login}'),
-            Text('名称: ${release.name}'),
-            Text('版本: ${release.tagName}'),
-            Text('时间: ${release.createdAt}'),
-            Text('内容: ${release.body}'),
+            Text(
+              '作者: ${release.author.login}',
+              style: const TextStyle().useSystemChineseFont(),
+            ),
+            Text('名称: ${release.name}',
+                style: const TextStyle().useSystemChineseFont()),
+            Text('版本: ${release.tagName}',
+                style: const TextStyle().useSystemChineseFont()),
+            Text('时间: ${release.createdAt}',
+                style: const TextStyle().useSystemChineseFont()),
+            Text('内容: ${release.body}',
+                style: const TextStyle().useSystemChineseFont()),
           ],
         ),
         actions: [

@@ -1,6 +1,7 @@
 import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:reorderables/reorderables.dart';
@@ -87,7 +88,9 @@ class ReorderLocalMusicListGridPageState
             Expanded(
                 child: widget.musicLists.isEmpty
                     ? Center(
-                        child: Text("没有歌单", style: TextStyle(color: textColor)),
+                        child: Text("没有歌单",
+                            style: TextStyle(color: textColor)
+                                .useSystemChineseFont()),
                       )
                     : Align(
                         alignment: Alignment.topCenter,

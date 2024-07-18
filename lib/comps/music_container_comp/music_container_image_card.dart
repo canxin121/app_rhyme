@@ -3,6 +3,7 @@ import 'package:app_rhyme/comps/music_container_comp/music_container_pulldown_me
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
@@ -79,6 +80,7 @@ class MusicContainerImageCard extends StatelessWidget {
                       musicContainer.info.name,
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
+                      style: const TextStyle().useSystemChineseFont(),
                     ),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:app_rhyme/utils/quality_picker.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
@@ -13,7 +14,7 @@ Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
           '选择音质选项',
           style: TextStyle(
             color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-          ),
+          ).useSystemChineseFont(),
         ),
         actions: <Widget>[
           CupertinoActionSheetAction(
@@ -25,7 +26,7 @@ Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
               style: TextStyle(
                 color:
                     isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
           CupertinoActionSheetAction(
@@ -37,7 +38,7 @@ Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
               style: TextStyle(
                 color:
                     isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
           CupertinoActionSheetAction(
@@ -49,7 +50,7 @@ Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
               style: TextStyle(
                 color:
                     isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
           CupertinoActionSheetAction(
@@ -61,7 +62,7 @@ Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
               style: TextStyle(
                 color:
                     isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
         ],
@@ -75,7 +76,7 @@ Future<QualityOption?> showQualityOptionDialog(BuildContext context) async {
               color: isDarkMode
                   ? CupertinoColors.systemGrey2
                   : CupertinoColors.activeBlue,
-            ),
+            ).useSystemChineseFont(),
           ),
         ),
       );

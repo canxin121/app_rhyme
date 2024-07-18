@@ -82,9 +82,10 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
               child: Text(
                 '资料库',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: textColor),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                        color: textColor)
+                    .useSystemChineseFont(),
               ),
             ),
           ),
@@ -94,12 +95,14 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                 onPressed: showMenu,
                 child: Text(
                   '选项',
-                  style: TextStyle(color: activeIconRed),
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
                 )),
           ),
         ),
         child: musicLists.isEmpty
-            ? Center(child: Text("没有歌单", style: TextStyle(color: textColor)))
+            ? Center(
+                child: Text("没有歌单",
+                    style: TextStyle(color: textColor).useSystemChineseFont()))
             : CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(

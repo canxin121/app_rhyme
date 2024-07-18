@@ -3,6 +3,7 @@ import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:reorderables/reorderables.dart';
@@ -89,7 +90,9 @@ class ReorderLocalMusicListPageState extends State<ReorderLocalMusicListPage>
             Expanded(
                 child: widget.musicContainers.isEmpty
                     ? Center(
-                        child: Text("没有歌曲", style: TextStyle(color: textColor)),
+                        child: Text("没有歌曲",
+                            style: TextStyle(color: textColor)
+                                .useSystemChineseFont()),
                       )
                     : Align(
                         alignment: Alignment.topCenter,

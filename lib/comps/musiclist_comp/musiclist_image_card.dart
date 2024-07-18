@@ -26,7 +26,8 @@ class MusicListImageCard extends StatelessWidget {
     MusicListInfo musicListInfo = musicListW.getMusiclistInfo();
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
-
+    final Color textCOlor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     Widget cardContent = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -72,9 +73,9 @@ class MusicListImageCard extends StatelessWidget {
           child: Center(
             child: Text(
               musicListInfo.name,
-              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: textCOlor).useSystemChineseFont(),
             ),
           ),
         ),

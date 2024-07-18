@@ -141,7 +141,7 @@ class MutiSelectLocalMusicListGridPageState
                 onPressed: showMenu,
                 child: Text(
                   "选项",
-                  style: TextStyle(color: activeIconRed),
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
                 ),
               ),
               deleteMusicList: deleteMusicList,
@@ -152,7 +152,7 @@ class MutiSelectLocalMusicListGridPageState
           ),
           widget.musicLists.isEmpty
               ? Center(
-                  child: Text("没有歌单", style: TextStyle(color: textColor)),
+                child: Text("没有歌单", style: TextStyle(color: textColor).useSystemChineseFont()),
                 )
               : Expanded(
                   child: Align(

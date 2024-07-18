@@ -4,6 +4,7 @@ import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 class MusicListListItem extends StatelessWidget {
@@ -62,7 +63,7 @@ class MusicListListItem extends StatelessWidget {
                       color: isDarkMode
                           ? CupertinoColors.systemGrey5
                           : CupertinoColors.black,
-                    ),
+                    ).useSystemChineseFont(),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -74,7 +75,7 @@ class MusicListListItem extends StatelessWidget {
                       color: isDarkMode
                           ? CupertinoColors.systemGrey4
                           : CupertinoColors.inactiveGray,
-                    ),
+                    ).useSystemChineseFont(),
                   ),
                 ],
               ),

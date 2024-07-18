@@ -51,7 +51,7 @@ class LyricDisplayState extends State<LyricDisplay> {
           emptyBuilder: () => Center(
             child: Text(
               "No lyrics",
-              style: lyricUI.getOtherMainTextStyle(),
+              style: lyricUI.getOtherMainTextStyle().useSystemChineseFont(),
             ),
           ),
           model: lyricModel,

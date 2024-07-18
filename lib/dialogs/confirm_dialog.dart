@@ -1,3 +1,4 @@
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<bool?> showConfirmationDialog(BuildContext context, String body) async {
@@ -12,7 +13,7 @@ Future<bool?> showConfirmationDialog(BuildContext context, String body) async {
           body,
           style: TextStyle(
             color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-          ),
+          ).useSystemChineseFont(),
         ),
         actions: <Widget>[
           CupertinoActionSheetAction(
@@ -24,7 +25,7 @@ Future<bool?> showConfirmationDialog(BuildContext context, String body) async {
               style: TextStyle(
                 color:
                     isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
           ),
           CupertinoActionSheetAction(
@@ -37,7 +38,7 @@ Future<bool?> showConfirmationDialog(BuildContext context, String body) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
           )
         ],

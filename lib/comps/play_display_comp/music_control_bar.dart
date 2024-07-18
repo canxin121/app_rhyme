@@ -1,3 +1,4 @@
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:app_rhyme/pages/play_display_page.dart';
@@ -71,7 +72,8 @@ class _MusicControlBarState extends State<MusicControlBar>
                 child: Obx(
                   () => Text(
                     globalAudioHandler.playingMusic.value?.info.name ?? "Music",
-                    style: TextStyle(fontSize: 15.0, color: textColor),
+                    style: TextStyle(fontSize: 15.0, color: textColor)
+                        .useSystemChineseFont(),
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,

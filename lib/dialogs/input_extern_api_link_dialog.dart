@@ -1,3 +1,4 @@
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
@@ -26,7 +27,7 @@ Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey4
                     : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
             const SizedBox(height: 10),
             Text(
@@ -35,7 +36,7 @@ Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey4
                     : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
             Text(
               '1. https://github.com/user/project/releases/download/release/extern_api.evc\n'
@@ -45,7 +46,7 @@ Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.systemGrey,
-              ),
+              ).useSystemChineseFont(),
             ),
             const SizedBox(height: 10),
             CupertinoTextField(
@@ -77,7 +78,7 @@ Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -90,7 +91,7 @@ Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop(textEditingController.text);

@@ -149,9 +149,10 @@ class MutiSelectMusicContainerListPageState
                     child: Text(
                       "没有音乐",
                       style: TextStyle(
-                          color: isDarkMode
-                              ? CupertinoColors.white
-                              : CupertinoColors.black),
+                              color: isDarkMode
+                                  ? CupertinoColors.white
+                                  : CupertinoColors.black)
+                          .useSystemChineseFont(),
                     ),
                   )
                 : Align(

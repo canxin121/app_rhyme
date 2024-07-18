@@ -1,3 +1,4 @@
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
@@ -15,7 +16,7 @@ Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
           '打开歌单',
           style: TextStyle(
             color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-          ),
+          ).useSystemChineseFont(),
         ),
         content: Column(
           children: [
@@ -26,7 +27,7 @@ Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey4
                     : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
             const SizedBox(height: 10),
             Text(
@@ -35,7 +36,7 @@ Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey4
                     : CupertinoColors.black,
-              ),
+              ).useSystemChineseFont(),
             ),
             Text(
               '1. https://y.music.163.com/m/playlist?app_version=8.9.20&id=123456789\n'
@@ -45,7 +46,7 @@ Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.systemGrey,
-              ),
+              ).useSystemChineseFont(),
             ),
             const SizedBox(height: 10),
             CupertinoTextField(
@@ -77,7 +78,7 @@ Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop();
@@ -90,7 +91,7 @@ Future<String?> showInputPlaylistShareLinkDialog(BuildContext context) async {
                 color: isDarkMode
                     ? CupertinoColors.systemGrey2
                     : CupertinoColors.activeBlue,
-              ),
+              ).useSystemChineseFont(),
             ),
             onPressed: () {
               Navigator.of(context).pop(textEditingController.text);

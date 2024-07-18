@@ -97,7 +97,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                     color: isDarkMode
                         ? CupertinoColors.white
                         : CupertinoColors.black,
-                  ),
+                  ).useSystemChineseFont(),
                 ),
               ),
             ),
@@ -107,7 +107,8 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                 return GestureDetector(
                   child: Text(
                     '选项',
-                    style: TextStyle(color: activeIconRed),
+                    style:
+                        TextStyle(color: activeIconRed).useSystemChineseFont(),
                   ),
                   onTapDown: (details) {
                     showMenu();
@@ -166,15 +167,16 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                           color: isDarkMode
                               ? CupertinoColors.systemGrey2
                               : CupertinoColors.black,
-                        ),
+                        ).useSystemChineseFont(),
                       ),
                       Text(
                         '点击右上角图标切换搜索单曲',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: isDarkMode
-                                ? CupertinoColors.systemGrey2
-                                : CupertinoColors.black),
+                                color: isDarkMode
+                                    ? CupertinoColors.systemGrey2
+                                    : CupertinoColors.black)
+                            .useSystemChineseFont(),
                       ),
                     ],
                   ),
