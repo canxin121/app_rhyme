@@ -134,7 +134,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
               musicListController: _pagingController,
             )),
         Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
           child: CupertinoSearchTextField(
             style: TextStyle(
               color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
