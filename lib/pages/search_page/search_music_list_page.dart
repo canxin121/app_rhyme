@@ -78,7 +78,6 @@ class _SearchMusicListState extends State<SearchMusicListPage>
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = Platform.isIOS || Platform.isAndroid;
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
@@ -139,8 +138,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
               musicListController: _pagingController,
             )),
         Padding(
-          padding: EdgeInsets.only(
-              left: 8.0, right: 8.0, bottom: 8.0, top: isMobile ? 10.0 : 8.0),
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
           child: CupertinoSearchTextField(
             style: TextStyle(
               color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
