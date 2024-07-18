@@ -225,7 +225,14 @@ class MusicContainer {
 
     if (source != null) {
       try {
-        await aggregator.fetchMusics(sources: [source]);
+        var musics = await aggregator.fetchMusics(sources: [source]);
+        if (musics.isEmpty) {
+          LogToast.error(
+              "切换音乐源失败",
+              "${info.name}切换音乐源失败: 在$source查找不到'${info.name}'歌曲.",
+              "[MusicContainer] Failed to change music source: Cannot find '${info.name}' in $source");
+          return false;
+        }
         await aggregator.setDefaultSource(source: source);
         currentMusic = aggregator.getDefaultMusic();
         info = currentMusic.getMusicInfo();

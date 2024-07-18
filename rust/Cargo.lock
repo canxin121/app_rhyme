@@ -1182,7 +1182,7 @@ dependencies = [
 [[package]]
 name = "music_api"
 version = "0.1.0"
-source = "git+https://github.com/canxin121/music_api#1c672e4e0ea2be0f9f46cee07f06a56221ecb0ca"
+source = "git+https://github.com/canxin121/music_api#c8cd48a2aedda1819fb2050630f7759487775efe"
 dependencies = [
  "aes",
  "anyhow",
@@ -1787,6 +1787,7 @@ dependencies = [
  "sea-query",
  "serde",
  "serde_json",
+ "sha2",
  "sqlx",
  "tokio",
 ]

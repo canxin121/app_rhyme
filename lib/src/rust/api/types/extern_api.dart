@@ -6,16 +6,19 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `calculate_hash`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`
 
 class ExternApi {
   final String? url;
   final String localPath;
+  final String? lastHash;
   final DateTime? lastModifiedTime;
 
   const ExternApi({
     this.url,
     required this.localPath,
+    this.lastHash,
     this.lastModifiedTime,
   });
 
@@ -32,7 +35,10 @@ class ExternApi {
 
   @override
   int get hashCode =>
-      url.hashCode ^ localPath.hashCode ^ lastModifiedTime.hashCode;
+      url.hashCode ^
+      localPath.hashCode ^
+      lastHash.hashCode ^
+      lastModifiedTime.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -41,5 +47,6 @@ class ExternApi {
           runtimeType == other.runtimeType &&
           url == other.url &&
           localPath == other.localPath &&
+          lastHash == other.lastHash &&
           lastModifiedTime == other.lastModifiedTime;
 }

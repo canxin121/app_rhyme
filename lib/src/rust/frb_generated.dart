@@ -2704,12 +2704,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ExternApi dco_decode_extern_api(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return ExternApi(
       url: dco_decode_opt_String(arr[0]),
       localPath: dco_decode_String(arr[1]),
-      lastModifiedTime: dco_decode_opt_box_autoadd_Chrono_Utc(arr[2]),
+      lastHash: dco_decode_opt_String(arr[2]),
+      lastModifiedTime: dco_decode_opt_box_autoadd_Chrono_Utc(arr[3]),
     );
   }
 
@@ -3370,11 +3371,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_url = sse_decode_opt_String(deserializer);
     var var_localPath = sse_decode_String(deserializer);
+    var var_lastHash = sse_decode_opt_String(deserializer);
     var var_lastModifiedTime =
         sse_decode_opt_box_autoadd_Chrono_Utc(deserializer);
     return ExternApi(
         url: var_url,
         localPath: var_localPath,
+        lastHash: var_lastHash,
         lastModifiedTime: var_lastModifiedTime);
   }
 
@@ -4102,6 +4105,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.url, serializer);
     sse_encode_String(self.localPath, serializer);
+    sse_encode_opt_String(self.lastHash, serializer);
     sse_encode_opt_box_autoadd_Chrono_Utc(self.lastModifiedTime, serializer);
   }
 

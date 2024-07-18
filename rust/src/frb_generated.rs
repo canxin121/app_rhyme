@@ -3543,11 +3543,13 @@ impl SseDecode for crate::api::types::extern_api::ExternApi {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_url = <Option<String>>::sse_decode(deserializer);
         let mut var_localPath = <String>::sse_decode(deserializer);
+        let mut var_lastHash = <Option<String>>::sse_decode(deserializer);
         let mut var_lastModifiedTime =
             <Option<chrono::DateTime<chrono::Utc>>>::sse_decode(deserializer);
         return crate::api::types::extern_api::ExternApi {
             url: var_url,
             local_path: var_localPath,
+            last_hash: var_lastHash,
             last_modified_time: var_lastModifiedTime,
         };
     }
@@ -4349,6 +4351,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::types::extern_api::ExternApi 
         [
             self.url.into_into_dart().into_dart(),
             self.local_path.into_into_dart().into_dart(),
+            self.last_hash.into_into_dart().into_dart(),
             self.last_modified_time.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -4729,6 +4732,7 @@ impl SseEncode for crate::api::types::extern_api::ExternApi {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<String>>::sse_encode(self.url, serializer);
         <String>::sse_encode(self.local_path, serializer);
+        <Option<String>>::sse_encode(self.last_hash, serializer);
         <Option<chrono::DateTime<chrono::Utc>>>::sse_encode(self.last_modified_time, serializer);
     }
 }
@@ -5106,6 +5110,5 @@ pub use io::*;
 #[cfg(target_family = "wasm")]
 #[path = "frb_generated.web.rs"]
 mod web;
-use music_api::music;
 #[cfg(target_family = "wasm")]
 pub use web::*;
