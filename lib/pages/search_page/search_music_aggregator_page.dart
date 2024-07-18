@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
 import 'package:app_rhyme/pages/search_page/combined_search_page.dart';
@@ -134,6 +136,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = Platform.isIOS || Platform.isAndroid;
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
@@ -179,11 +182,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
       // 下面地方如果直接使用safeArea会ios上底部有一块空白
       child: Column(
         children: [
-          const SafeArea(
-              child: SizedBox(
-            height: 0,
-            width: 0,
-          )),
+          Padding(padding: EdgeInsets.only(top: isMobile ? 70 : 40)),
           // 搜索框和过滤按钮
           Padding(
             padding: const EdgeInsets.only(top: 4.0, left: 8, right: 0),
