@@ -115,7 +115,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          python tools\replace.py
+          python tools/replace.py
 
       - uses: subosito/flutter-action@v2
         with:
@@ -192,7 +192,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          python tools\replace.py
+          python tools/replace.py
 
       - name: Set up signing files
         run: |
