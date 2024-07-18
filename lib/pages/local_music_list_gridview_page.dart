@@ -73,8 +73,9 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-        backgroundColor: backgroundColor,
-        navigationBar: CupertinoNavigationBar(
+      backgroundColor: backgroundColor,
+      child: Column(children: [
+        CupertinoNavigationBar(
           leading: Padding(
             padding: const EdgeInsets.only(left: 0.0),
             child: Align(
@@ -99,53 +100,53 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                 )),
           ),
         ),
-        child: musicLists.isEmpty
-            ? Center(
-                child: Text("没有歌单",
-                    style: TextStyle(color: textColor).useSystemChineseFont()))
-            : CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: SafeArea(
-                        child: SizedBox(height: Platform.isIOS ? 0 : 10)),
-                  ),
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: Platform.isIOS ? 0.0 : 10.0),
-                    sliver: SliverGrid(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.75,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          var musicList = musicLists[index];
-                          return MusicListImageCard(
-                            key: ValueKey(musicList.getMusiclistInfo().id),
-                            musicListW: musicList,
-                            online: false,
-                            showDesc: false,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) =>
-                                      LocalMusicContainerListPage(
-                                    musicList: musicList,
-                                  ),
-                                ),
+        Expanded(
+            child: musicLists.isEmpty
+                ? Center(
+                    child: Text("没有歌单",
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont()))
+                : CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: Platform.isIOS ? 0.0 : 10.0),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.75,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              var musicList = musicLists[index];
+                              return MusicListImageCard(
+                                key: ValueKey(musicList.getMusiclistInfo().id),
+                                musicListW: musicList,
+                                online: false,
+                                showDesc: false,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) =>
+                                          LocalMusicContainerListPage(
+                                        musicList: musicList,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                cachePic: globalConfig.savePicWhenAddMusicList,
                               );
                             },
-                            cachePic: globalConfig.savePicWhenAddMusicList,
-                          );
-                        },
-                        childCount: musicLists.length,
+                            childCount: musicLists.length,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ));
+                    ],
+                  ))
+      ]),
+    );
   }
 }
 

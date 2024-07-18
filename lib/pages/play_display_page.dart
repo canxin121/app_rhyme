@@ -163,8 +163,6 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             // 上方组件
             Column(
               children: [
-                // 在移动设备上，会触发safeArea，自动有一个合适的padding
-                // 而在桌面设备上，需要我们手动设定一个padding
                 if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
                   const Padding(padding: EdgeInsets.only(top: 40)),
                 if (Platform.isAndroid || Platform.isIOS)
