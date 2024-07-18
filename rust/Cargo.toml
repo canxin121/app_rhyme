@@ -31,4 +31,4 @@ serde_json = "1.0.119"
 chrono = { version = "0.4.38", features = ["serde"] }
 sha2 = "0.10.8"
 base64 = "0.22.1"
-rc4 = "0.1.0"
+rc4 = { git = "https://github.com/rsdump/rc4" }

@@ -1558,11 +1558,7 @@ dependencies = [
 [[package]]
 name = "rc4"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f1256e23efe6097f27aa82d6ca6889361c001586ae0f6917cbad072f05eb275"
-dependencies = [
- "cipher",
-]
+source = "git+https://github.com/rsdump/rc4#21d743ba3ebfe21d596ed632bdfc7385cbed57ce"
 
 [[package]]
 name = "redox_syscall"
