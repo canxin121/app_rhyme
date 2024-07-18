@@ -30,5 +30,5 @@ futures-util = "0.3.30"
 serde_json = "1.0.119"
 chrono = { version = "0.4.38", features = ["serde"] }
 sha2 = "0.10.8"
-rust-crypto = { git = "https://github.com/DaGenix/rust-crypto" }
 base64 = "0.22.1"
+rc4 = "0.1.0"
