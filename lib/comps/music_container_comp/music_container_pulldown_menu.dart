@@ -69,7 +69,7 @@ class _MusicContainerMenuState extends State<MusicContainerMenu> {
         } else if (snapshot.hasError) {
           return Text(
             'Error: ${snapshot.error}',
-            style: TextStyle().useSystemChineseFont(),
+            style: const TextStyle().useSystemChineseFont(),
           );
         } else {
           bool hasCache = snapshot.data ?? false;

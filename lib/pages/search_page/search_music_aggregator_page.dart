@@ -282,7 +282,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                           ),
                           child: Text(
                             '应用筛选条件',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: CupertinoColors.activeBlue,
                             ).useSystemChineseFont(),
                           ),
@@ -304,7 +304,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                           ),
                           child: Text(
                             '清空筛选条件',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: CupertinoColors.systemRed,
                             ).useSystemChineseFont(),
                           ),

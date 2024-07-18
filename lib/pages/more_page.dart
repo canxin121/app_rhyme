@@ -302,7 +302,7 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
               height: 50,
               child: Text(
                 "正常",
-                style: TextStyle(color: CupertinoColors.activeGreen)
+                style: const TextStyle(color: CupertinoColors.activeGreen)
                     .useSystemChineseFont(),
               ))));
     } else {
