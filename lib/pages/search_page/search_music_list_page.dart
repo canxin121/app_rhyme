@@ -135,9 +135,14 @@ class _SearchMusicListState extends State<SearchMusicListPage>
               },
               musicListController: _pagingController,
             )),
-        child: SafeArea(
-            child: Column(
+        // 下面地方如果直接使用safeArea会ios上底部有一块空白
+        child: Column(
           children: [
+            const SafeArea(
+                child: SizedBox(
+              height: 0,
+              width: 0,
+            )),
             Padding(
               padding: EdgeInsets.only(
                   left: 8.0,
@@ -210,7 +215,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                       crossAxisCount: 2, childAspectRatio: 0.7)),
             ),
           ],
-        )));
+        ));
   }
 }
 

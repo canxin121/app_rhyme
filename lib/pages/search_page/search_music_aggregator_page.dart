@@ -176,9 +176,14 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
             },
             fetchAllMusicAggregators: _fetchAllMusicAggregators,
           )),
-      child: SafeArea(
-          child: Column(
+      // 下面地方如果直接使用safeArea会ios上底部有一块空白
+      child: Column(
         children: [
+          const SafeArea(
+              child: SizedBox(
+            height: 0,
+            width: 0,
+          )),
           // 搜索框和过滤按钮
           Padding(
             padding: const EdgeInsets.only(top: 4.0, left: 8, right: 0),
@@ -358,7 +363,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
             ),
           ),
         ],
-      )),
+      ),
     );
   }
 }
