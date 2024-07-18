@@ -12,6 +12,7 @@ import 'package:app_rhyme/comps/music_container_comp/music_container_list_item.d
 import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/colors.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
@@ -109,6 +110,10 @@ class MutiSelectMusicContainerListPageState
     final bool isDarkMode = brightness == Brightness.dark;
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+    final Color dividerColor = isDarkMode
+        ? const Color.fromARGB(255, 41, 41, 43)
+        : const Color.fromARGB(255, 245, 245, 246);
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
@@ -166,34 +171,46 @@ class MutiSelectMusicContainerListPageState
                       triggerSelectionOnTap: true,
                       itemBuilder: (context, index, selected) {
                         final musicContainer = widget.musicContainers[index];
-                        return Row(
-                          key:
-                              ValueKey("${selected}_${musicContainer.info.id}"),
+                        return Column(
                           children: [
-                            Expanded(
-                              child: MusicContainerListItem(
-                                showMenu: false,
-                                musicContainer: musicContainer,
-                                musicListW: widget.musicList,
+                            Row(
+                              key: ValueKey(
+                                  "${selected}_${musicContainer.info.id}"),
+                              children: [
+                                Expanded(
+                                  child: MusicContainerListItem(
+                                    showMenu: false,
+                                    musicContainer: musicContainer,
+                                    musicListW: widget.musicList,
+                                  ),
+                                ),
+                                Icon(
+                                  selected
+                                      ? CupertinoIcons.check_mark_circled
+                                      : CupertinoIcons.circle,
+                                  color: selected
+                                      ? CupertinoColors.systemGreen
+                                      : CupertinoColors.systemGrey4,
+                                ),
+                              ],
+                            ),
+                            const Padding(padding: EdgeInsets.only(top: 10)),
+                            SizedBox(
+                              width: screenWidth * 0.85,
+                              child: Divider(
+                                color: dividerColor,
+                                height: 0.5,
                               ),
-                            ),
-                            Icon(
-                              selected
-                                  ? CupertinoIcons.check_mark_circled
-                                  : CupertinoIcons.circle,
-                              color: selected
-                                  ? CupertinoColors.systemGreen
-                                  : CupertinoColors.systemGrey4,
-                            ),
+                            )
                           ],
                         );
                       },
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 1,
-                        mainAxisSpacing: 8.0,
-                        crossAxisSpacing: 8.0,
-                        childAspectRatio: 8 / 1,
+                        mainAxisSpacing: 0,
+                        crossAxisSpacing: 0,
+                        childAspectRatio: 6,
                       ),
                     ),
                   ))
@@ -272,18 +289,21 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: handleCacheSelected,
           title: '缓存选中音乐',
+          icon: CupertinoIcons.cloud_download,
         ),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: handleDeleteCacheSelected,
           title: '删除音乐缓存',
+          icon: CupertinoIcons.delete,
         ),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: handleDeleteFromList,
           title: '从歌单删除',
+          icon: CupertinoIcons.trash,
         ),
       ],
       PullDownMenuItem(
@@ -293,6 +313,7 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
           await addMusicsToMusicList(context, musicContainers);
         },
         title: '添加到歌单',
+        icon: CupertinoIcons.add,
       ),
       PullDownMenuItem(
         itemTheme: PullDownMenuItemTheme(
@@ -301,6 +322,7 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
           await createNewMusicListFromMusics(context, musicContainers);
         },
         title: '创建新歌单',
+        icon: CupertinoIcons.add_circled,
       ),
       PullDownMenuItem(
         itemTheme: PullDownMenuItemTheme(

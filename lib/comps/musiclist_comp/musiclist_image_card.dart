@@ -13,13 +13,14 @@ class MusicListImageCard extends StatelessWidget {
   final bool online;
   final GestureTapCallback? onTap;
   final bool cachePic;
-  const MusicListImageCard({
-    super.key,
-    required this.musicListW,
-    required this.online,
-    this.onTap,
-    this.cachePic = false,
-  });
+  final bool showDesc;
+  const MusicListImageCard(
+      {super.key,
+      required this.musicListW,
+      required this.online,
+      this.onTap,
+      this.cachePic = false,
+      this.showDesc = true});
 
   @override
   Widget build(BuildContext context) {
@@ -75,28 +76,31 @@ class MusicListImageCard extends StatelessWidget {
               musicListInfo.name,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: textCOlor).useSystemChineseFont(),
+              style: TextStyle(color: textCOlor, fontSize: 16)
+                  .useSystemChineseFont(),
+              maxLines: 2,
             ),
           ),
         ),
-        const SizedBox(height: 4),
-        Flexible(
-          fit: FlexFit.loose,
-          child: Center(
-            child: Text(
-              musicListInfo.desc,
-              style: TextStyle(
-                color: isDarkMode
-                    ? CupertinoColors.systemGrey4
-                    : CupertinoColors.systemGrey,
-                fontSize: 16,
-              ).useSystemChineseFont(),
-              textAlign: TextAlign.center,
-              maxLines: 4,
-              overflow: TextOverflow.fade,
+        if (showDesc) const SizedBox(height: 4),
+        if (showDesc)
+          Flexible(
+            fit: FlexFit.loose,
+            child: Center(
+              child: Text(
+                musicListInfo.desc,
+                style: TextStyle(
+                  color: isDarkMode
+                      ? CupertinoColors.systemGrey4
+                      : CupertinoColors.systemGrey,
+                  fontSize: 12,
+                ).useSystemChineseFont(),
+                textAlign: TextAlign.center,
+                maxLines: 4,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-        ),
       ],
     );
 

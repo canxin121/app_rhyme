@@ -127,6 +127,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                             key: ValueKey(musicList.getMusiclistInfo().id),
                             musicListW: musicList,
                             online: false,
+                            showDesc: false,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -207,7 +208,7 @@ class MusicListGridPageMenu extends StatelessWidget {
             }
           },
           title: '打开歌单链接',
-          icon: CupertinoIcons.pencil,
+          icon: CupertinoIcons.link,
         ),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(

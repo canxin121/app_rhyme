@@ -103,18 +103,15 @@ class _SearchMusicListState extends State<SearchMusicListPage>
             ),
             trailing: SearchMusicListChoiceMenu(
               builder:
-                  (BuildContext context, Future<void> Function() showMenu) {
-                return GestureDetector(
-                  child: Text(
-                    '选项',
-                    style:
-                        TextStyle(color: activeIconRed).useSystemChineseFont(),
-                  ),
-                  onTapDown: (details) {
-                    showMenu();
-                  },
-                );
-              },
+                  (BuildContext context, Future<void> Function() showMenu) =>
+                      CupertinoButton(
+                          padding: const EdgeInsets.all(0),
+                          onPressed: showMenu,
+                          child: Text(
+                            '选项',
+                            style: TextStyle(color: activeIconRed)
+                                .useSystemChineseFont(),
+                          )),
               fetchAllMusicAggregators: _fetchAllMusicLists,
               openShareMusicList: () async {
                 var url = await showInputPlaylistShareLinkDialog(context);
@@ -183,9 +180,9 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                 );
               }, itemBuilder: (context, musicListW, index) {
                 return Container(
-                    padding:
-                        const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+                    padding: const EdgeInsets.only(left: 10, right: 10),
                     child: MusicListImageCard(
+                      showDesc: false,
                       musicListW: musicListW,
                       onTap: () {
                         Navigator.push(
@@ -200,7 +197,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                     ));
               }),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 0.7)),
+                  crossAxisCount: 2, childAspectRatio: 0.8)),
         ),
       ],
     ));

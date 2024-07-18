@@ -171,18 +171,15 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
               trailing: SearchMusicAggregatroChoiceMenu(
                 musicAggregatorController: _pagingController,
                 builder:
-                    (BuildContext context, Future<void> Function() showMenu) {
-                  return GestureDetector(
-                    child: Text(
-                      '选项',
-                      style: TextStyle(color: activeIconRed)
-                          .useSystemChineseFont(),
-                    ),
-                    onTapDown: (details) {
-                      showMenu();
-                    },
-                  );
-                },
+                    (BuildContext context, Future<void> Function() showMenu) =>
+                        CupertinoButton(
+                            padding: const EdgeInsets.all(0),
+                            onPressed: showMenu,
+                            child: Text(
+                              '选项',
+                              style: TextStyle(color: activeIconRed)
+                                  .useSystemChineseFont(),
+                            )),
                 fetchAllMusicAggregators: _fetchAllMusicAggregators,
               )),
           // 搜索框和过滤按钮

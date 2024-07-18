@@ -104,6 +104,7 @@ class ReorderLocalMusicListGridPageState
                             return SizedBox(
                                 width: screenWidth / 2 - 20,
                                 child: MusicListImageCard(
+                                  showDesc: false,
                                   key:
                                       ValueKey(musicList.getMusiclistInfo().id),
                                   musicListW: musicList,

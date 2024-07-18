@@ -152,7 +152,9 @@ class MutiSelectLocalMusicListGridPageState
           ),
           widget.musicLists.isEmpty
               ? Center(
-                child: Text("没有歌单", style: TextStyle(color: textColor).useSystemChineseFont()),
+                  child: Text("没有歌单",
+                      style:
+                          TextStyle(color: textColor).useSystemChineseFont()),
                 )
               : Expanded(
                   child: Align(
@@ -172,6 +174,7 @@ class MutiSelectLocalMusicListGridPageState
                             MusicListImageCard(
                               musicListW: musicList,
                               online: false,
+                              showDesc: false,
                               cachePic: globalConfig.savePicWhenAddMusicList,
                             ),
                             Align(
@@ -196,7 +199,7 @@ class MutiSelectLocalMusicListGridPageState
                         crossAxisCount: 2,
                         mainAxisSpacing: 8.0,
                         crossAxisSpacing: 8.0,
-                        childAspectRatio: 2 / 3,
+                        childAspectRatio: 0.75,
                       ),
                     ),
                   ),

@@ -248,6 +248,7 @@ class _MutiSelectOnlineMusicListGridPageState
                           children: [
                             MusicListImageCard(
                               musicListW: musicList,
+                              showDesc: false,
                               online: false,
                               cachePic: globalConfig.savePicWhenAddMusicList,
                             ),
@@ -273,7 +274,7 @@ class _MutiSelectOnlineMusicListGridPageState
                         crossAxisCount: 2,
                         mainAxisSpacing: 8.0,
                         crossAxisSpacing: 8.0,
-                        childAspectRatio: 2 / 3,
+                        childAspectRatio: 0.75,
                       ),
                     ),
                   ),
