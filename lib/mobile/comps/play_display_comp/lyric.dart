@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:app_rhyme/types/lyric_ui.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -7,65 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lyric/lyrics_reader.dart';
 import 'package:get/get.dart';
-
-class AppleMusicLyricUi extends LyricUI {
-  @override
-  TextStyle getPlayingMainTextStyle() {
-    return const TextStyle(
-      color: Colors.white,
-      fontSize: 30,
-      fontWeight: FontWeight.bold,
-    ).useSystemChineseFont();
-  }
-
-  @override
-  TextStyle getPlayingExtTextStyle() {
-    return const TextStyle(
-            color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)
-        .useSystemChineseFont();
-  }
-
-  @override
-  TextStyle getOtherMainTextStyle() {
-    return const TextStyle(
-      color: CupertinoColors.systemGrey,
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-    ).useSystemChineseFont();
-  }
-
-  @override
-  TextStyle getOtherExtTextStyle() {
-    return const TextStyle(
-      color: CupertinoColors.systemGrey,
-      fontSize: 14,
-    ).useSystemChineseFont();
-  }
-
-  @override
-  double getBlankLineHeight() => 16;
-
-  @override
-  double getLineSpace() => 26;
-
-  @override
-  double getInlineSpace() => 8;
-
-  @override
-  double getPlayingLineBias() => 0.4;
-
-  @override
-  LyricAlign getLyricHorizontalAlign() => LyricAlign.LEFT;
-
-  @override
-  bool enableLineAnimation() => true;
-
-  @override
-  bool enableHighlight() => false;
-
-  @override
-  bool initAnimation() => true;
-}
 
 class LyricDisplay extends StatefulWidget {
   final double maxHeight;

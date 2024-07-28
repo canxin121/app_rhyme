@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:app_rhyme/types/lyric_ui.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -8,76 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lyric/lyrics_reader.dart';
 import 'package:get/get.dart';
 
-class AppleMusicLyricUi extends LyricUI {
-  final bool isDarkMode;
-
-  AppleMusicLyricUi({this.isDarkMode = false});
-
-  @override
-  TextStyle getPlayingMainTextStyle() {
-    return TextStyle(
-      color: isDarkMode ? Colors.white : Colors.black,
-      fontSize: 30,
-      fontWeight: FontWeight.bold,
-    ).useSystemChineseFont();
-  }
-
-  @override
-  TextStyle getPlayingExtTextStyle() {
-    return TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: 22,
-            fontWeight: FontWeight.bold)
-        .useSystemChineseFont();
-  }
-
-  @override
-  TextStyle getOtherMainTextStyle() {
-    return TextStyle(
-      color: isDarkMode ? Colors.white70 : Colors.black54,
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-    ).useSystemChineseFont();
-  }
-
-  @override
-  TextStyle getOtherExtTextStyle() {
-    return TextStyle(
-      color: isDarkMode ? Colors.white70 : Colors.black54,
-      fontSize: 14,
-    ).useSystemChineseFont();
-  }
-
-  @override
-  double getBlankLineHeight() => 16;
-
-  @override
-  double getLineSpace() => 26;
-
-  @override
-  double getInlineSpace() => 8;
-
-  @override
-  double getPlayingLineBias() => 0.4;
-
-  @override
-  LyricAlign getLyricHorizontalAlign() => LyricAlign.LEFT;
-
-  @override
-  bool enableLineAnimation() => true;
-
-  @override
-  bool enableHighlight() => false;
-
-  @override
-  bool initAnimation() => true;
-}
-
 class LyricComp extends StatefulWidget {
   final double maxHeight;
-  final bool isDarkMode;
-  const LyricComp(
-      {super.key, required this.maxHeight, required this.isDarkMode});
+  const LyricComp({
+    super.key,
+    required this.maxHeight,
+  });
 
   @override
   LyricCompState createState() => LyricCompState();
@@ -92,7 +29,7 @@ class LyricCompState extends State<LyricComp> {
   @override
   void initState() {
     super.initState();
-    lyricUI = AppleMusicLyricUi(isDarkMode: widget.isDarkMode);
+    lyricUI = AppleMusicLyricUi();
     lyricModel = LyricsModelBuilder.create()
         .bindLyricToMain(globalAudioHandler.playingMusic.value?.info.lyric ??
             "[00:00.00]无歌词")
@@ -114,10 +51,8 @@ class LyricCompState extends State<LyricComp> {
 
   @override
   Widget build(BuildContext context) {
-    Color decorationColor =
-        widget.isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    Color iconColor =
-        widget.isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    Color decorationColor = CupertinoColors.white;
+    Color iconColor = CupertinoColors.white;
     return Obx(() => LyricsReader(
           playing: globalAudioHandler.playingMusic.value != null,
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -168,9 +103,7 @@ class LyricCompState extends State<LyricComp> {
 
 class LyricPopupRoute extends PopupRoute<void> {
   final double maxHeight;
-  final bool isDarkMode;
-  LyricPopupRoute(
-    this.isDarkMode, {
+  LyricPopupRoute({
     required this.maxHeight,
   });
 
@@ -192,7 +125,7 @@ class LyricPopupRoute extends PopupRoute<void> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    const containerWidth = 350.0;
+    const containerWidth = 450.0;
 
     return FadeTransition(
       opacity: animation,
@@ -201,7 +134,6 @@ class LyricPopupRoute extends PopupRoute<void> {
         child: LyricContainer(
           maxHeight: maxHeight,
           width: containerWidth,
-          isDarkMode: isDarkMode,
         ),
       ),
     );
@@ -211,24 +143,18 @@ class LyricPopupRoute extends PopupRoute<void> {
 class LyricContainer extends StatelessWidget {
   final double maxHeight;
   final double width;
-  final bool isDarkMode;
 
   const LyricContainer({
     super.key,
     required this.maxHeight,
     required this.width,
-    required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = isDarkMode
-        ? const Color.fromARGB(255, 46, 46, 46)
-        : const Color.fromARGB(255, 249, 249, 249);
+    Color backgroundColor = const Color.fromARGB(255, 46, 46, 46);
 
-    Color borderColor = isDarkMode
-        ? const Color.fromARGB(255, 62, 62, 62)
-        : const Color.fromARGB(255, 237, 237, 237);
+    Color borderColor = const Color.fromARGB(255, 62, 62, 62);
 
     return Container(
       height: maxHeight,
@@ -243,7 +169,6 @@ class LyricContainer extends StatelessWidget {
       ),
       child: LyricComp(
         maxHeight: maxHeight,
-        isDarkMode: isDarkMode,
       ),
     );
   }
@@ -253,7 +178,6 @@ void showLyricPopup(BuildContext context, bool isDarkMode) {
   Navigator.push(
     context,
     LyricPopupRoute(
-      isDarkMode,
       maxHeight: MediaQuery.of(context).size.height,
     ),
   );
