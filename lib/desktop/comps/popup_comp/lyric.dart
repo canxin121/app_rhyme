@@ -19,15 +19,16 @@ class AppleMusicLyricUi extends LyricUI {
       color: isDarkMode ? Colors.white : Colors.black,
       fontSize: 30,
       fontWeight: FontWeight.bold,
-    );
+    ).useSystemChineseFont();
   }
 
   @override
   TextStyle getPlayingExtTextStyle() {
     return TextStyle(
-        color: isDarkMode ? Colors.white : Colors.black,
-        fontSize: 22,
-        fontWeight: FontWeight.bold);
+            color: isDarkMode ? Colors.white : Colors.black,
+            fontSize: 22,
+            fontWeight: FontWeight.bold)
+        .useSystemChineseFont();
   }
 
   @override
@@ -36,7 +37,7 @@ class AppleMusicLyricUi extends LyricUI {
       color: isDarkMode ? Colors.white70 : Colors.black54,
       fontSize: 18,
       fontWeight: FontWeight.bold,
-    );
+    ).useSystemChineseFont();
   }
 
   @override
@@ -44,7 +45,7 @@ class AppleMusicLyricUi extends LyricUI {
     return TextStyle(
       color: isDarkMode ? Colors.white70 : Colors.black54,
       fontSize: 14,
-    );
+    ).useSystemChineseFont();
   }
 
   @override

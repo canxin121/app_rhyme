@@ -1,5 +1,6 @@
 import 'package:app_rhyme/mobile/comps/music_container_comp/music_container_list_item.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -92,9 +93,10 @@ class PlaylistContainer extends StatelessWidget {
                   child: Text(
                     '播放列表',
                     style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: textColor),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: textColor)
+                        .useSystemChineseFont(),
                   ),
                 ),
                 Padding(
@@ -105,7 +107,8 @@ class PlaylistContainer extends StatelessWidget {
                     },
                     child: Text(
                       '移除所有',
-                      style: TextStyle(fontSize: 16, color: textColor),
+                      style: TextStyle(fontSize: 16, color: textColor)
+                          .useSystemChineseFont(),
                     ),
                   ),
                 ),
