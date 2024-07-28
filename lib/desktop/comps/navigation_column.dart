@@ -102,6 +102,7 @@ class _MyNavListViewState extends State<MyNavListView> {
   @override
   Widget build(BuildContext context) {
     return NavListView(
+      initSelectedItem: '所有播放列表',
       children: [
         NavGroup(title: "搜索", icon: CupertinoIcons.search, items: [
           NavItem(
@@ -184,10 +185,11 @@ class NestedNavigator extends StatelessWidget {
 
 class NavListView extends StatefulWidget {
   final List<Widget> children;
-
+  final String initSelectedItem;
   const NavListView({
     super.key,
     required this.children,
+    required this.initSelectedItem,
   });
 
   @override
@@ -195,12 +197,18 @@ class NavListView extends StatefulWidget {
 }
 
 class _NavListViewState extends State<NavListView> {
-  String? _selectedItem;
+  late String _selectedItem;
 
   void _setItemSelected(String title) {
     setState(() {
       _selectedItem = title;
     });
+  }
+
+  @override
+  void initState() {
+    _selectedItem = widget.initSelectedItem;
+    super.initState();
   }
 
   @override
