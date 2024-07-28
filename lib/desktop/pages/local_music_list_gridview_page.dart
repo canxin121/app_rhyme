@@ -21,15 +21,16 @@ import 'package:pull_down_button/pull_down_button.dart';
 
 void Function() globalDesktopMusicListGridPageRefreshFunction = () {};
 
-class LocalMusicListGridPage extends StatefulWidget {
-  const LocalMusicListGridPage({super.key});
+class DesktopLocalMusicListGridPage extends StatefulWidget {
+  const DesktopLocalMusicListGridPage({super.key});
 
   @override
-  LocalMusicListGridPageState createState() => LocalMusicListGridPageState();
+  DesktopLocalMusicListGridPageState createState() =>
+      DesktopLocalMusicListGridPageState();
 }
 
-class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
-    with WidgetsBindingObserver {
+class DesktopLocalMusicListGridPageState
+    extends State<DesktopLocalMusicListGridPage> with WidgetsBindingObserver {
   List<MusicListW> musicLists = [];
 
   @override

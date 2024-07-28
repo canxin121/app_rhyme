@@ -73,3 +73,8 @@ bool isTablet(BuildContext context) {
 bool isDesktop() {
   return Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 }
+
+bool isWidthGreaterThanHeight(BuildContext context) {
+  final size = MediaQuery.of(context).size;
+  return size.width > size.height;
+}

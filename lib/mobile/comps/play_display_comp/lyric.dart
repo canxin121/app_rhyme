@@ -8,23 +8,90 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lyric/lyrics_reader.dart';
 import 'package:get/get.dart';
 
+class AppleMusicLyricUi extends LyricUI {
+  final bool isDarkMode;
+
+  AppleMusicLyricUi({this.isDarkMode = false});
+
+  @override
+  TextStyle getPlayingMainTextStyle() {
+    return TextStyle(
+      color: isDarkMode ? Colors.white : Colors.black,
+      fontSize: 30,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  @override
+  TextStyle getPlayingExtTextStyle() {
+    return TextStyle(
+        color: isDarkMode ? Colors.white : Colors.black,
+        fontSize: 22,
+        fontWeight: FontWeight.bold);
+  }
+
+  @override
+  TextStyle getOtherMainTextStyle() {
+    return TextStyle(
+      color: isDarkMode ? Colors.white70 : Colors.black54,
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  @override
+  TextStyle getOtherExtTextStyle() {
+    return TextStyle(
+      color: isDarkMode ? Colors.white70 : Colors.black54,
+      fontSize: 14,
+    );
+  }
+
+  @override
+  double getBlankLineHeight() => 16;
+
+  @override
+  double getLineSpace() => 26;
+
+  @override
+  double getInlineSpace() => 8;
+
+  @override
+  double getPlayingLineBias() => 0.4;
+
+  @override
+  LyricAlign getLyricHorizontalAlign() => LyricAlign.LEFT;
+
+  @override
+  bool enableLineAnimation() => true;
+
+  @override
+  bool enableHighlight() => false;
+
+  @override
+  bool initAnimation() => true;
+}
+
 class LyricDisplay extends StatefulWidget {
   final double maxHeight;
-  const LyricDisplay({super.key, required this.maxHeight});
+  final bool isDarkMode;
+  const LyricDisplay(
+      {super.key, required this.maxHeight, required this.isDarkMode});
 
   @override
   LyricDisplayState createState() => LyricDisplayState();
 }
 
 class LyricDisplayState extends State<LyricDisplay> {
+  late LyricUI lyricUI;
   var lyricModel =
       LyricsModelBuilder.create().bindLyricToMain("[00:00.00]无歌词").getModel();
-  var lyricUI = UINetease(lyricAlign: LyricAlign.CENTER, highlight: true);
   late StreamSubscription<MusicContainer?> stream;
 
   @override
   void initState() {
     super.initState();
+    lyricUI = AppleMusicLyricUi(isDarkMode: widget.isDarkMode);
     lyricModel = LyricsModelBuilder.create()
         .bindLyricToMain(globalAudioHandler.playingMusic.value?.info.lyric ??
             "[00:00.00]无歌词")
@@ -58,6 +125,7 @@ class LyricDisplayState extends State<LyricDisplay> {
           position: globalAudioUiController.position.value.inMilliseconds,
           lyricUi: lyricUI,
           size: Size(double.infinity, widget.maxHeight),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           selectLineBuilder: (progress, confirm) {
             return Row(
               children: [

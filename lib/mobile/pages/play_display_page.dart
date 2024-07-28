@@ -52,6 +52,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
     final backgroundColor = brightness == Brightness.dark
         ? CupertinoColors.black
         : CupertinoColors.white;
@@ -61,7 +62,6 @@ class SongDisplayPageState extends State<SongDisplayPage> {
 
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     List<Widget> topWidgets;
     switch (pageState) {
       case PageState.main:
@@ -130,9 +130,11 @@ class SongDisplayPageState extends State<SongDisplayPage> {
           ),
           // 应当占据剩下的空间
           LyricDisplay(
-              maxHeight: (Platform.isIOS)
-                  ? screenHeight * 0.87 - 290
-                  : screenHeight * 0.87 - 240)
+            maxHeight: (Platform.isIOS)
+                ? screenHeight * 0.87 - 290
+                : screenHeight * 0.87 - 240,
+            isDarkMode: isDarkMode,
+          )
         ];
         break;
     }

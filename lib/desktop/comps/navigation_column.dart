@@ -129,7 +129,7 @@ class _MyNavListViewState extends State<MyNavListView> {
               icon: CupertinoIcons.music_albums,
               onTap: () {
                 navigatorToPage(
-                  const LocalMusicListGridPage(),
+                  const DesktopLocalMusicListGridPage(),
                 );
               },
             ),

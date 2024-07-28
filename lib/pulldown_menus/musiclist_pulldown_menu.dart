@@ -1,6 +1,9 @@
+import 'package:app_rhyme/desktop/comps/navigation_column.dart';
+import 'package:app_rhyme/desktop/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
@@ -82,6 +85,17 @@ List<PullDownMenuEntry> localMusiclistItems(
             try {
               await SqlFactoryW.delMusiclist(
                   musiclistNames: [musicList.getMusiclistInfo().name]);
+              if (isDesktop() ||
+                  (context.mounted &&
+                      isTablet(context) &&
+                      isWidthGreaterThanHeight(context))) {
+                globalNavigatorToPage(const DesktopLocalMusicListGridPage());
+                globalSetNavItemSelected("所有播放列表");
+              } else {
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              }
               LogToast.success("删除歌单", "删除歌单成功",
                   "[LocalMusicListItemsPullDown] Succeed to delete music list");
               refreshMusicContainerListViewPage();

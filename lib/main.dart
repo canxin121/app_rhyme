@@ -1,5 +1,6 @@
 import 'package:app_rhyme/desktop/home.dart';
 import 'package:app_rhyme/mobile/home.dart';
+import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/mobile_device.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/audioControl/audio_controller.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isDesktop = false;
+  bool _isWidthGreaterThanHeight = false;
   @override
   void initState() {
     super.initState();
@@ -41,16 +42,11 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  bool isWidthGreaterThanHeight(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return size.width > size.height;
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        _isDesktop = isWidthGreaterThanHeight(context);
+        _isWidthGreaterThanHeight = isWidthGreaterThanHeight(context);
         return ToastificationWrapper(
           child: CupertinoApp(
             localizationsDelegates: const [
@@ -65,7 +61,9 @@ class _MyAppState extends State<MyApp> {
                     .useSystemChineseFont(),
               ),
             ),
-            home: _isDesktop ? const DesktopHome() : const MobileHome(),
+            home: _isWidthGreaterThanHeight
+                ? const DesktopHome()
+                : const MobileHome(),
           ),
         );
       },

@@ -119,6 +119,7 @@ class LyricCompState extends State<LyricComp> {
         widget.isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     return Obx(() => LyricsReader(
           playing: globalAudioHandler.playingMusic.value != null,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           emptyBuilder: () => Center(
             child: Text(
               "No lyrics",
@@ -239,12 +240,9 @@ class LyricContainer extends StatelessWidget {
           width: 0.5,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: LyricComp(
-          maxHeight: maxHeight,
-          isDarkMode: isDarkMode,
-        ),
+      child: LyricComp(
+        maxHeight: maxHeight,
+        isDarkMode: isDarkMode,
       ),
     );
   }

@@ -66,7 +66,7 @@ class _DesktopHomeState extends State<DesktopHome> {
                       return CupertinoPageRoute(
                         builder: (context) {
                           globalDesktopPageContext = context;
-                          return const LocalMusicListGridPage();
+                          return const DesktopLocalMusicListGridPage();
                         },
                       );
                     },
