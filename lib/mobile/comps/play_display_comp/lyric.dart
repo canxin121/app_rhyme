@@ -9,14 +9,10 @@ import 'package:flutter_lyric/lyrics_reader.dart';
 import 'package:get/get.dart';
 
 class AppleMusicLyricUi extends LyricUI {
-  final bool isDarkMode;
-
-  AppleMusicLyricUi({this.isDarkMode = false});
-
   @override
   TextStyle getPlayingMainTextStyle() {
-    return TextStyle(
-      color: isDarkMode ? Colors.white : Colors.black,
+    return const TextStyle(
+      color: Colors.white,
       fontSize: 30,
       fontWeight: FontWeight.bold,
     );
@@ -24,16 +20,14 @@ class AppleMusicLyricUi extends LyricUI {
 
   @override
   TextStyle getPlayingExtTextStyle() {
-    return TextStyle(
-        color: isDarkMode ? Colors.white : Colors.black,
-        fontSize: 22,
-        fontWeight: FontWeight.bold);
+    return const TextStyle(
+        color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold);
   }
 
   @override
   TextStyle getOtherMainTextStyle() {
-    return TextStyle(
-      color: isDarkMode ? Colors.white70 : Colors.black54,
+    return const TextStyle(
+      color: CupertinoColors.systemGrey,
       fontSize: 18,
       fontWeight: FontWeight.bold,
     );
@@ -41,8 +35,8 @@ class AppleMusicLyricUi extends LyricUI {
 
   @override
   TextStyle getOtherExtTextStyle() {
-    return TextStyle(
-      color: isDarkMode ? Colors.white70 : Colors.black54,
+    return const TextStyle(
+      color: CupertinoColors.systemGrey,
       fontSize: 14,
     );
   }
@@ -91,7 +85,7 @@ class LyricDisplayState extends State<LyricDisplay> {
   @override
   void initState() {
     super.initState();
-    lyricUI = AppleMusicLyricUi(isDarkMode: widget.isDarkMode);
+    lyricUI = AppleMusicLyricUi();
     lyricModel = LyricsModelBuilder.create()
         .bindLyricToMain(globalAudioHandler.playingMusic.value?.info.lyric ??
             "[00:00.00]无歌词")
