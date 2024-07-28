@@ -4,6 +4,7 @@ import 'package:app_rhyme/desktop/comps/popup_comp/playlist.dart';
 import 'package:app_rhyme/desktop/comps/popup_comp/volume_slider.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
+import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/time_parser.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -13,7 +14,9 @@ import 'package:get/get.dart';
 import 'package:interactive_slider/interactive_slider.dart';
 
 class ControlBar extends StatelessWidget {
-  const ControlBar({super.key});
+  const ControlBar({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,72 +26,68 @@ class ControlBar extends StatelessWidget {
         ? const Color.fromARGB(255, 42, 42, 42)
         : const Color.fromARGB(255, 247, 247, 247);
     Color dividerColor = getDividerColor(isDarkMode);
-
-    return WindowTitleBarBox(
-      child: GestureDetector(
-        onPanStart: (details) {
+    bool isDesktop_ = isDesktop();
+    final childWidget = GestureDetector(
+      onPanStart: (details) {
+        if (isDesktop_) {
           appWindow.startDragging();
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            border: Border(
-              bottom: BorderSide(
-                color: dividerColor,
-                width: 1,
-              ),
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border(
+            bottom: BorderSide(
+              color: dividerColor,
+              width: 1,
             ),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Padding(
-                        padding: const EdgeInsets.only(
-                            top: 10, bottom: 10, left: 30),
-                        child: ControlButton(
-                          buttonSize: 20,
-                          buttonSpacing: 10,
-                          isDarkMode: isDarkMode,
-                        )),
-                    Padding(
-                        padding: const EdgeInsets.only(
-                          left: 30,
-                        ),
-                        child: PlayDisplayCard(
-                          isDarkMode: isDarkMode,
-                        )),
-                    Padding(
-                        padding: const EdgeInsets.only(
-                          top: 10,
-                          bottom: 10,
-                          left: 30,
-                          right: 30,
-                        ),
-                        child: FunctionButtons(
-                          buttonSize: 20,
-                          buttonSpacing: 10,
-                          isDarkMode: isDarkMode,
-                        )),
-                  ],
-                ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 10, bottom: 10, left: 30),
+                    child: ControlButton(
+                      buttonSize: 20,
+                      buttonSpacing: 10,
+                      isDarkMode: isDarkMode,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30),
+                    child: PlayDisplayCard(isDarkMode: isDarkMode),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 10, bottom: 10, left: 30, right: 30),
+                    child: FunctionButtons(
+                      buttonSize: 20,
+                      buttonSpacing: 10,
+                      isDarkMode: isDarkMode,
+                    ),
+                  ),
+                ],
               ),
-              WindowButtons(
-                isDarkMode: isDarkMode,
-              ),
-            ],
-          ),
+            ),
+            if (isDesktop_) WindowButtons(isDarkMode: isDarkMode),
+          ],
         ),
       ),
     );
+
+    return isDesktop_ ? WindowTitleBarBox(child: childWidget) : childWidget;
   }
 }
 
 class WindowButtons extends StatefulWidget {
   const WindowButtons({super.key, required this.isDarkMode});
   final bool isDarkMode;
+
   @override
   WindowButtonsState createState() => WindowButtonsState();
 }
@@ -123,42 +122,44 @@ class WindowButtonsState extends State<WindowButtons> {
           ),
         ),
         SizedBox(
-            width: 40,
-            height: 40,
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: isMaximized
-                  ? Icon(
-                      CupertinoIcons.fullscreen_exit,
-                      color: buttonColor,
-                      size: 20,
-                    )
-                  : Icon(
-                      CupertinoIcons.fullscreen,
-                      color: buttonColor,
-                      size: 20,
-                    ),
-              onPressed: () {
-                appWindow.maximizeOrRestore();
-                setState(() {
-                  isMaximized = appWindow.isMaximized;
-                });
-              },
-            )),
+          width: 40,
+          height: 40,
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            child: isMaximized
+                ? Icon(
+                    CupertinoIcons.fullscreen_exit,
+                    color: buttonColor,
+                    size: 20,
+                  )
+                : Icon(
+                    CupertinoIcons.fullscreen,
+                    color: buttonColor,
+                    size: 20,
+                  ),
+            onPressed: () {
+              appWindow.maximizeOrRestore();
+              setState(() {
+                isMaximized = appWindow.isMaximized;
+              });
+            },
+          ),
+        ),
         SizedBox(
-            width: 40,
-            height: 40,
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: Icon(
-                CupertinoIcons.clear,
-                color: buttonColor,
-                size: 20,
-              ),
-              onPressed: () {
-                appWindow.close();
-              },
-            )),
+          width: 40,
+          height: 40,
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            child: Icon(
+              CupertinoIcons.clear,
+              color: buttonColor,
+              size: 20,
+            ),
+            onPressed: () {
+              appWindow.close();
+            },
+          ),
+        ),
       ],
     );
   }
@@ -167,6 +168,7 @@ class WindowButtonsState extends State<WindowButtons> {
 class PlayDisplayCard extends StatefulWidget {
   const PlayDisplayCard({super.key, required this.isDarkMode});
   final bool isDarkMode;
+
   @override
   PlayDisplayCardState createState() => PlayDisplayCardState();
 }
@@ -175,7 +177,6 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
   final ValueNotifier<bool> _isDragging = ValueNotifier<bool>(false);
   final InteractiveSliderController _progressController =
       InteractiveSliderController(0);
-
   late StreamSubscription<double> listen1;
 
   @override
@@ -223,124 +224,119 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
         : const Color.fromARGB(255, 230, 230, 230);
 
     return GestureDetector(
-        onPanStart: (details) {},
-        child: Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
-            child: Container(
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(3),
-                border: Border.all(
-                  color: borderColor,
-                  width: 1,
+      onPanStart: (details) {},
+      child: Padding(
+        padding: const EdgeInsets.only(top: 5, bottom: 5),
+        child: Container(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(3),
+            border: Border.all(
+              color: borderColor,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 30, 30, 35),
+                  borderRadius: BorderRadius.circular(3),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 30, 30, 35),
+                child: Obx(() => ClipRRect(
                       borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Obx(() => ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: imageCacheHelper(globalAudioHandler
-                              .playingMusic.value?.info.artPic),
-                        )),
-                  ),
-                  SizedBox(
-                    width: 300,
-                    child: Stack(
+                      child: imageCacheHelper(
+                          globalAudioHandler.playingMusic.value?.info.artPic),
+                    )),
+              ),
+              SizedBox(
+                width: 300,
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Center(
-                              child: Obx(() => Text(
-                                    globalAudioHandler
-                                            .playingMusic.value?.info.name ??
-                                        "Music",
-                                    style: TextStyle(
-                                            color: textColor, fontSize: 13)
+                        const SizedBox(height: 5),
+                        Center(
+                          child: Obx(() => Text(
+                                globalAudioHandler
+                                        .playingMusic.value?.info.name ??
+                                    "Music",
+                                style: TextStyle(color: textColor, fontSize: 13)
+                                    .useSystemChineseFont(),
+                              )),
+                        ),
+                        Center(
+                          child: Obx(() => Text(
+                                globalAudioHandler
+                                        .playingMusic.value?.info.artist
+                                        .join(", ") ??
+                                    "Artist",
+                                style:
+                                    TextStyle(color: textColor2, fontSize: 12)
                                         .useSystemChineseFont(),
-                                  )),
-                            ),
-                            Center(
-                              child: Obx(() => Text(
-                                    globalAudioHandler
-                                            .playingMusic.value?.info.artist
-                                            .join(", ") ??
-                                        "Artist",
-                                    style: TextStyle(
-                                            color: textColor2, fontSize: 12)
-                                        .useSystemChineseFont(),
-                                  )),
-                            ),
-                            Expanded(child: Container()),
-                          ],
+                              )),
                         ),
-                        Positioned(
-                          bottom: 8,
-                          left: 0,
-                          right: 0,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Obx(() => Text(
-                                      formatDuration(globalAudioUiController
-                                          .position.value.inSeconds),
-                                      style: TextStyle(
-                                        color: textColor2,
-                                        fontSize: 12,
-                                      ).useSystemChineseFont(),
-                                    )),
-                                Obx(() => Text(
-                                      formatDuration(globalAudioUiController
-                                          .duration.value.inSeconds),
-                                      style: TextStyle(
-                                        color: textColor2,
-                                        fontSize: 12,
-                                      ).useSystemChineseFont(),
-                                    )),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: -2,
-                          left: 0,
-                          right: 0,
-                          child: InteractiveSlider(
-                            controller: _progressController,
-                            backgroundColor: sliderBackgroundColor,
-                            foregroundColor: sliderForegroundColor,
-                            focusedMargin: const EdgeInsets.all(0),
-                            unfocusedMargin: const EdgeInsets.all(0),
-                            focusedHeight: 5,
-                            unfocusedHeight: 3,
-                            padding: const EdgeInsets.all(0),
-                            isDragging: _isDragging,
-                            onProgressUpdated: (value) {
-                              var toSeek =
-                                  globalAudioUiController.getToSeek(value);
-                              globalTalker.info(
-                                  "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
-                              globalAudioHandler.seek(toSeek);
-                            },
-                          ),
-                        ),
+                        Expanded(child: Container()),
                       ],
                     ),
-                  ),
-                ],
+                    Positioned(
+                      bottom: 8,
+                      left: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Obx(() => Text(
+                                  formatDuration(globalAudioUiController
+                                      .position.value.inSeconds),
+                                  style:
+                                      TextStyle(color: textColor2, fontSize: 12)
+                                          .useSystemChineseFont(),
+                                )),
+                            Obx(() => Text(
+                                  formatDuration(globalAudioUiController
+                                      .duration.value.inSeconds),
+                                  style:
+                                      TextStyle(color: textColor2, fontSize: 12)
+                                          .useSystemChineseFont(),
+                                )),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -2,
+                      left: 0,
+                      right: 0,
+                      child: InteractiveSlider(
+                        controller: _progressController,
+                        backgroundColor: sliderBackgroundColor,
+                        foregroundColor: sliderForegroundColor,
+                        focusedMargin: const EdgeInsets.all(0),
+                        unfocusedMargin: const EdgeInsets.all(0),
+                        focusedHeight: 5,
+                        unfocusedHeight: 3,
+                        padding: const EdgeInsets.all(0),
+                        isDragging: _isDragging,
+                        onProgressUpdated: (value) {
+                          var toSeek = globalAudioUiController.getToSeek(value);
+                          globalTalker.info(
+                              "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
+                          globalAudioHandler.seek(toSeek);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )));
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -348,11 +344,13 @@ class ControlButton extends StatefulWidget {
   final double buttonSize;
   final double buttonSpacing;
   final bool isDarkMode;
-  const ControlButton(
-      {super.key,
-      required this.buttonSize,
-      required this.buttonSpacing,
-      required this.isDarkMode});
+
+  const ControlButton({
+    super.key,
+    required this.buttonSize,
+    required this.buttonSpacing,
+    required this.isDarkMode,
+  });
 
   @override
   State<StatefulWidget> createState() => ControlButtonState();
@@ -410,11 +408,12 @@ class ControlButtonState extends State<ControlButton> {
 }
 
 class FunctionButtons extends StatelessWidget {
-  const FunctionButtons(
-      {super.key,
-      required this.buttonSize,
-      required this.buttonSpacing,
-      required this.isDarkMode});
+  const FunctionButtons({
+    super.key,
+    required this.buttonSize,
+    required this.buttonSpacing,
+    required this.isDarkMode,
+  });
   final double buttonSize;
   final double buttonSpacing;
   final bool isDarkMode;
@@ -428,20 +427,21 @@ class FunctionButtons extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         GestureDetector(
-            onTapDown: (details) {
-              final Offset tapPosition = details.globalPosition;
-              final Rect position =
-                  Rect.fromLTWH(tapPosition.dx, tapPosition.dy, 0, 0);
-              showVolumeSlider(context, position, isDarkMode);
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Icon(
-                CupertinoIcons.volume_up,
-                color: buttonColor,
-                size: buttonSize,
-              ),
-            )),
+          onTapDown: (details) {
+            final Offset tapPosition = details.globalPosition;
+            final Rect position =
+                Rect.fromLTWH(tapPosition.dx, tapPosition.dy, 0, 0);
+            showVolumeSlider(context, position, isDarkMode);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Icon(
+              CupertinoIcons.volume_up,
+              color: buttonColor,
+              size: buttonSize,
+            ),
+          ),
+        ),
         CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
