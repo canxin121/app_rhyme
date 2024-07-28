@@ -120,6 +120,7 @@ class Crypto {
       return await crypto.rc4DecryptFromBase64(
           key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
     } catch (e) {
+      globalTalker.error("[Crypto] $e");
       return "";
     }
   }
