@@ -44,3 +44,6 @@ app.*.map.json
 
 # Counter
 .VSCodeCounter
+
+# dist
+dist/

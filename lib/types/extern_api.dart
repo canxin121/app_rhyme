@@ -98,16 +98,30 @@ class $HttpHelper extends HttpHelper with $Bridge {
 
 class Crypto {
   Future<String> rc4DecryptFromBase64(String key, String input) async {
-    return await crypto.rc4DecryptFromBase64(key: key, input: input);
+    try {
+      return await crypto.rc4DecryptFromBase64(key: key, input: input);
+    } catch (e) {
+      globalTalker.error("[Crypto] $e");
+      return "";
+    }
   }
 
   Future<String> rc4EncryptToBase64(String key, String input) async {
-    return await crypto.rc4EncryptToBase64(key: key, input: input);
+    try {
+      return await crypto.rc4EncryptToBase64(key: key, input: input);
+    } catch (e) {
+      globalTalker.error("[Crypto] $e");
+      return "";
+    }
   }
 
   Future<String> rc4DecryptFromBase64_(String input) async {
-    return await crypto.rc4DecryptFromBase64(
-        key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
+    try {
+      return await crypto.rc4DecryptFromBase64(
+          key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
+    } catch (e) {
+      return "";
+    }
   }
 }
 

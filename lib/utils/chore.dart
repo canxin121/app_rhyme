@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -55,4 +56,20 @@ Future<void> exitApp() async {
   } else {
     exit(0);
   }
+}
+
+bool? globalIsTablet;
+bool isTablet(BuildContext context) {
+  if (globalIsTablet != null) {
+    return globalIsTablet!;
+  }
+  final mediaQuery = MediaQuery.of(context);
+  final size = mediaQuery.size;
+  final diagonal = sqrt(size.width * size.width + size.height * size.height);
+  globalIsTablet = diagonal > 600;
+  return globalIsTablet!;
+}
+
+bool isDesktop() {
+  return Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 }

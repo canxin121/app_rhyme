@@ -26,7 +26,6 @@ dependencies:
   chinese_font_library: ^1.1.0
   dart_eval: ^0.7.9
   file_picker: ^8.0.3
-  window_manager: ^0.3.8
   flutter_lyric:
     git: https://github.com/canxin121/flutter_lyric
   talker: ^4.1.5
@@ -56,6 +55,9 @@ dependencies:
   back_button_interceptor: ^7.0.3
   reorderables: ^0.6.0
   flutter_keyboard_visibility: ^6.0.0
+  better_cupertino_slider: ^1.0.0
+  bitsdojo_window: ^0.1.6
+
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,5 @@
+import 'package:app_rhyme/desktop/comps/navigation_column.dart';
+import 'package:app_rhyme/desktop/pages/online_music_container_listview_page.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart'
     as rust_api_music_cache;
 import 'package:app_rhyme/utils/cache_helper.dart';
@@ -6,14 +8,13 @@ import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/music_container_dialog.dart';
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
-import 'package:app_rhyme/pages/local_music_list_gridview_page.dart';
-import 'package:app_rhyme/pages/local_music_container_listview_page.dart';
-import 'package:app_rhyme/pages/online_music_list_page.dart';
+import 'package:app_rhyme/mobile/pages/online_music_list_page.dart';
 import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
 import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
+import 'package:app_rhyme/utils/refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -24,7 +25,7 @@ Future<void> deleteMusicsFromLocalMusicList(BuildContext context,
         musicListName: musicListW.getMusiclistInfo().name,
         ids:
             Int64List.fromList(musicContainers.map((e) => e.info.id).toList()));
-    await globalMusicContainerListPageRefreshFunction();
+    refreshMusicContainerListViewPage();
   } catch (e) {
     LogToast.error("删除音乐失败", "删除音乐失败: $e",
         "[deleteMusicsFromMusicList] Failed to delete music: $e");
@@ -44,7 +45,7 @@ Future<void> delMusicCache(MusicContainer musicContainer,
       return;
     }
     await rust_api_music_cache.deleteMusicCache(musicInfo: musicContainer.info);
-    await globalMusicContainerListPageRefreshFunction();
+    refreshMusicContainerListViewPage();
     if (showToast) {
       LogToast.success("删除缓存成功", "成功删除缓存: ${musicContainer.info.name}",
           "[deleteMusicCache] Successfully deleted cache: ${musicContainer.info.name}");
@@ -64,7 +65,7 @@ Future<void> cacheMusic(MusicContainer musicContainer) async {
     }
     await rust_api_music_cache.cacheMusic(
         musicInfo: musicContainer.info, playinfo: musicContainer.playInfo!);
-    await globalMusicContainerListPageRefreshFunction();
+    refreshMusicContainerListViewPage();
     LogToast.success("缓存成功", "成功缓存: ${musicContainer.info.name}",
         "[cacheMusic] Successfully cached: ${musicContainer.info.name}");
   } catch (e) {
@@ -85,7 +86,7 @@ Future<void> editMusicInfo(
         musics: [musicContainer.currentMusic], newInfos: [musicInfo]);
     LogToast.success(
         "编辑成功", "编辑音乐信息成功", "[editMusicInfo] Successfully edited music info");
-    await globalMusicContainerListPageRefreshFunction();
+    refreshMusicContainerListViewPage();
   } catch (e) {
     LogToast.error("编辑失败", "编辑音乐信息失败: $e",
         "[editMusicInfo] Failed to edit music info: $e");
@@ -93,20 +94,28 @@ Future<void> editMusicInfo(
 }
 
 Future<void> viewMusicAlbum(
-    BuildContext context, MusicContainer musicContainer) async {
+    BuildContext context, MusicContainer musicContainer, bool isDesktop) async {
   try {
     var result =
         await musicContainer.currentMusic.fetchAlbum(page: 1, limit: 30);
     var musicList = result.$1;
     var aggs = result.$2;
     if (context.mounted) {
-      Navigator.of(context).push(
-        CupertinoPageRoute(
-            builder: (context) => OnlineMusicListPage(
-                  musicList: musicList,
-                  firstPageMusicAggregators: aggs,
-                )),
-      );
+      if (isDesktop) {
+        globalSetNavItemSelected("");
+        globalNavigatorToPage(DesktopOnlineMusicListPage(
+          musicList: musicList,
+          firstPageMusicAggregators: aggs,
+        ));
+      } else {
+        Navigator.of(context).push(
+          CupertinoPageRoute(
+              builder: (context) => MobileOnlineMusicListPage(
+                    musicList: musicList,
+                    firstPageMusicAggregators: aggs,
+                  )),
+        );
+      }
     }
   } catch (e) {
     LogToast.error(
@@ -149,7 +158,7 @@ Future<void> addMusicsToMusicList(
       await SqlFactoryW.addMusics(
           musicsListName: targetMusicList.name,
           musics: musicContainers.map((e) => e.aggregator.clone()).toList());
-      await globalMusicContainerListPageRefreshFunction();
+      refreshMusicContainerListViewPage();
 
       LogToast.success("添加成功", "成功添加音乐到: ${targetMusicList.name}",
           "[addToMusicList] Successfully added musics to: ${targetMusicList.name}");
@@ -179,7 +188,7 @@ Future<void> createNewMusicListFromMusics(
   }
   try {
     await SqlFactoryW.createMusiclist(musicListInfos: [newMusicListInfo]);
-    globalMusicListGridPageRefreshFunction();
+    refreshMusicListGridViewPage();
     if (context.mounted) {
       LogToast.success("创建成功", "成功创建新歌单: ${newMusicListInfo.name}, 正在添加音乐",
           "[createNewMusicList] Successfully created new music list: ${newMusicListInfo.name}, adding musics");
@@ -214,8 +223,8 @@ Future<void> setMusicPicAsMusicListCover(
   try {
     await SqlFactoryW.changeMusiclistInfo(
         old: [oldMusicListInfo], new_: [newMusicListInfo]);
-    await globalMusicContainerListPageRefreshFunction();
-    globalMusicListGridPageRefreshFunction();
+    refreshMusicContainerListViewPage();
+    refreshMusicListGridViewPage();
     LogToast.success(
         "设置封面成功", "成功设置为封面", "[setAsMusicListCover] Successfully set as cover");
   } catch (e) {
@@ -233,7 +242,7 @@ Future<void> saveMusicList(
       cacheFileHelper(targetMusicListInfo.artPic, picCacheRoot);
     }
     await SqlFactoryW.createMusiclist(musicListInfos: [targetMusicListInfo]);
-    globalMusicListGridPageRefreshFunction();
+    refreshMusicListGridViewPage();
     var aggs = await musicList.fetchAllMusicAggregators(
         pagesPerBatch: 5,
         limit: 50,
@@ -248,7 +257,7 @@ Future<void> saveMusicList(
     }
     await SqlFactoryW.addMusics(
         musicsListName: targetMusicListInfo.name, musics: aggs);
-    globalMusicListGridPageRefreshFunction();
+    refreshMusicListGridViewPage();
     LogToast.success("保存歌单", "保存歌单'${targetMusicListInfo.name}'成功",
         "[OnlineMusicListItemsPullDown] Succeed to save music list '${targetMusicListInfo.name}'");
   } catch (e) {
@@ -279,7 +288,7 @@ Future<void> addAggsOfMusicListToTargetMusicList(
     }
     await SqlFactoryW.addMusics(
         musicsListName: targetMusicListInfo.name, musics: aggs);
-    await globalMusicContainerListPageRefreshFunction();
+    refreshMusicContainerListViewPage();
     LogToast.success(
         "添加歌曲",
         "添加歌单'${musicListInfo.name}'中的歌曲到'${targetMusicListInfo.name}'成功",
@@ -289,6 +298,25 @@ Future<void> addAggsOfMusicListToTargetMusicList(
         "添加歌曲",
         "添加歌单'${musicListInfo.name}'中的歌曲到'${targetMusicListInfo.name}'失败: $e",
         "[OnlineMusicListItemsPullDown] Failed to add music from '${musicListInfo.name}' to '${targetMusicListInfo.name}': $e");
+  }
+}
+
+Future<void> editMusicListInfo(
+    BuildContext context, MusicListW musicList) async {
+  var newMusicListInfo = await showMusicListInfoDialog(context,
+      defaultMusicList: musicList.getMusiclistInfo(), readonly: false);
+  if (newMusicListInfo != null) {
+    try {
+      await SqlFactoryW.changeMusiclistInfo(
+          old: [musicList.getMusiclistInfo()], new_: [newMusicListInfo]);
+      refreshMusicListGridViewPage();
+      refreshMusicContainerListViewPage();
+      LogToast.success("编辑歌单", "编辑歌单成功",
+          "[LocalMusicListItemsPullDown] Succeed to edit music list");
+    } catch (e) {
+      LogToast.error("编辑歌单", "编辑歌单失败: $e",
+          "[LocalMusicListItemsPullDown] Failed to edit music list: $e");
+    }
   }
 }
 
