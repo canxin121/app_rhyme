@@ -307,7 +307,7 @@ class _NavGroupState extends State<NavGroup> {
           secondChild: Column(
             children: widget.items.map((e) {
               return Padding(
-                padding: const EdgeInsets.only(left: 26),
+                padding: const EdgeInsets.only(left: 26, right: 10),
                 child: NavItem(
                   title: e.title,
                   icon: e.icon,
@@ -405,10 +405,12 @@ class _NavItemState extends State<NavItem> {
                       Expanded(
                         child: Text(
                           widget.title,
+                          maxLines: 2,
                           style: TextStyle(
                             color: isDarkMode
                                 ? CupertinoColors.white
                                 : CupertinoColors.black,
+                            overflow: TextOverflow.ellipsis,
                             fontSize: 13,
                           ).useSystemChineseFont(),
                         ),
