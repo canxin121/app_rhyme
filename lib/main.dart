@@ -48,24 +48,23 @@ class _MyAppState extends State<MyApp> {
       builder: (context, constraints) {
         _isWidthGreaterThanHeight = isWidthGreaterThanHeight(context);
         return ToastificationWrapper(
-          child: CupertinoApp(
-            localizationsDelegates: const [
-              DefaultMaterialLocalizations.delegate,
-              DefaultCupertinoLocalizations.delegate,
-              DefaultWidgetsLocalizations.delegate,
-            ],
-            theme: CupertinoThemeData(
-              applyThemeToAll: true,
-              textTheme: CupertinoTextThemeData(
-                textStyle: const TextStyle(color: CupertinoColors.black)
-                    .useSystemChineseFont(),
-              ),
+            child: CupertinoApp(
+          localizationsDelegates: const [
+            DefaultMaterialLocalizations.delegate,
+            DefaultCupertinoLocalizations.delegate,
+            DefaultWidgetsLocalizations.delegate,
+          ],
+          theme: CupertinoThemeData(
+            applyThemeToAll: true,
+            textTheme: CupertinoTextThemeData(
+              textStyle: const TextStyle(color: CupertinoColors.black)
+                  .useSystemChineseFont(),
             ),
-            home: _isWidthGreaterThanHeight
-                ? const DesktopHome()
-                : const MobileHome(),
           ),
-        );
+          home: _isWidthGreaterThanHeight
+              ? const DesktopHome()
+              : const MobileHome(),
+        ));
       },
     );
   }

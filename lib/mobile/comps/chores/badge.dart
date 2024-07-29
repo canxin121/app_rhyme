@@ -4,18 +4,17 @@ import 'package:flutter/material.dart';
 class Badge extends StatelessWidget {
   final String label;
   final VoidCallback? onClick;
+  final bool isDarkMode;
 
   const Badge({
     super.key,
     required this.label,
     this.onClick,
+    required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
-    final Brightness brightness = MediaQuery.of(context).platformBrightness;
-
-    final bool isDarkMode = brightness == Brightness.dark;
     Color backgroundColor =
         isDarkMode ? Colors.white : const Color.fromRGBO(0, 0, 0, 0.56);
     Color textColor = isDarkMode ? Colors.black : Colors.white;

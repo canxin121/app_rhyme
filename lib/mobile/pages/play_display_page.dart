@@ -51,14 +51,12 @@ class SongDisplayPageState extends State<SongDisplayPage> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final bool isDarkMode = brightness == Brightness.dark;
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.black
-        : CupertinoColors.white;
-    final textColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
+    const bool isDarkMode = true;
+    const animateBackgroundColor = CupertinoColors.white;
+    const backgroundColor1 = Color.fromARGB(255, 56, 56, 56);
+    const backgroundColor2 = Color.fromARGB(255, 31, 31, 31);
+
+    const textColor = CupertinoColors.white;
 
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -94,7 +92,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
               children: [
                 Text(
                   '待播清单',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: textColor,
                     fontSize: 16.0,
                   ).useSystemChineseFont(),
@@ -102,7 +100,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                 GestureDetector(
                   child: Text(
                     '删除所有',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: textColor,
                       fontSize: 16.0,
                     ).useSystemChineseFont(),
@@ -116,9 +114,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
           ),
           // 应当占据剩下的所有高度
           MusicListComp(
-            maxHeight: Platform.isIOS
-                ? screenHeight * 0.87 - 350
-                : screenHeight * 0.87 - 300,
+            maxHeight: screenHeight * 0.87 - 300,
           ),
         ];
         break;
@@ -130,9 +126,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
           ),
           // 应当占据剩下的空间
           LyricDisplay(
-            maxHeight: (Platform.isIOS)
-                ? screenHeight * 0.87 - 290
-                : screenHeight * 0.87 - 240,
+            maxHeight: screenHeight * 0.87 - 240,
             isDarkMode: isDarkMode,
           )
         ];
@@ -142,22 +136,15 @@ class SongDisplayPageState extends State<SongDisplayPage> {
     return DismissiblePage(
       isFullScreen: true,
       direction: DismissiblePageDismissDirection.down,
-      backgroundColor: backgroundColor,
+      backgroundColor: animateBackgroundColor,
       onDismissed: () => Navigator.of(context).pop(),
       child: Container(
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
-              colors: [
-                brightness == Brightness.dark
-                    ? CupertinoColors.darkBackgroundGray
-                    : CupertinoColors.systemGrey2,
-                brightness == Brightness.dark
-                    ? CupertinoColors.black
-                    : CupertinoColors.systemGrey,
-              ],
+              colors: [backgroundColor2, backgroundColor1],
             ),
           ),
           child: Stack(children: [
@@ -190,6 +177,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                   const ProgressSlider(
                     padding: EdgeInsets.only(
                         top: 10, bottom: 10, left: 20, right: 20),
+                    isDarkMode: true,
                   ),
                   // 占据 12 高度
                   const QualityTime(
@@ -206,6 +194,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                       )),
                   const VolumeSlider(
                     padding: EdgeInsets.only(left: 20, right: 20),
+                    isDarkMode: true,
                   ),
                   // if (!Platform.isIOS) const VolumeSlider(),
                   // 占据 55 的高度

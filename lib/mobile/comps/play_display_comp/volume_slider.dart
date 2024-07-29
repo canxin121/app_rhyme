@@ -6,7 +6,8 @@ import 'package:interactive_slider/interactive_slider.dart';
 
 class VolumeSlider extends StatefulWidget {
   final EdgeInsetsGeometry? padding;
-  const VolumeSlider({super.key, this.padding});
+  final bool isDarkMode;
+  const VolumeSlider({super.key, this.padding, required this.isDarkMode});
 
   @override
   State<StatefulWidget> createState() => VolumeSliderState();
@@ -31,14 +32,12 @@ class VolumeSliderState extends State<VolumeSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDarkMode =
-        MediaQuery.of(context).platformBrightness == Brightness.dark;
-
     return Container(
       padding: widget.padding,
       child: InteractiveSlider(
-        brightness: isDarkMode ? Brightness.light : Brightness.dark,
-        iconColor: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
+        brightness: widget.isDarkMode ? Brightness.light : Brightness.dark,
+        iconColor:
+            widget.isDarkMode ? CupertinoColors.white : CupertinoColors.black,
         controller: volumeController,
         padding: const EdgeInsets.all(0),
         onProgressUpdated: (value) {

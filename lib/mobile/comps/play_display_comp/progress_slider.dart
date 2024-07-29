@@ -7,7 +7,9 @@ import 'package:interactive_slider/interactive_slider.dart';
 
 class ProgressSlider extends StatefulWidget {
   final EdgeInsets padding;
-  const ProgressSlider({super.key, required this.padding});
+  final bool isDarkMode;
+  const ProgressSlider(
+      {super.key, required this.padding, required this.isDarkMode});
   @override
   ProgressSliderState createState() => ProgressSliderState();
 }
@@ -45,14 +47,11 @@ class ProgressSliderState extends State<ProgressSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode =
-        MediaQuery.of(context).platformBrightness == Brightness.dark;
-
     return Container(
       padding: widget.padding,
       child: GestureDetector(
         child: InteractiveSlider(
-          brightness: isDarkMode ? Brightness.light : Brightness.dark,
+          brightness: widget.isDarkMode ? Brightness.light : Brightness.dark,
           padding: const EdgeInsets.all(0),
           controller: _progressController,
           onProgressUpdated: (value) {

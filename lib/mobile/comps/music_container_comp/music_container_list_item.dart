@@ -1,4 +1,3 @@
-import 'package:app_rhyme/mobile/comps/chores/badge.dart';
 import 'package:app_rhyme/pulldown_menus/music_container_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/types/music_container.dart';
@@ -122,11 +121,9 @@ class _MusicContainerListItemState extends State<MusicContainerListItem> {
                   )
                 : _hasCache!
                     ? const Padding(
-                        padding: EdgeInsets.only(right: 8.0),
-                        child: Badge(
-                          label: '缓存',
-                        ),
-                      )
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Icon(CupertinoIcons.arrow_down_circle_fill,
+                            color: CupertinoColors.systemGrey2))
                     : const SizedBox.shrink(),
           // 具有误导性，暂时不显示
           // // 标志音乐信息来源的Badge

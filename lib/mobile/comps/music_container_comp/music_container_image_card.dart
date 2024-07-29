@@ -62,6 +62,7 @@ class MusicContainerImageCard extends StatelessWidget {
                         left: 3,
                         child: Badge(
                           label: sourceToShort(musicContainer.info.source),
+                          isDarkMode: isDarkMode,
                         ),
                       ),
                     Positioned(

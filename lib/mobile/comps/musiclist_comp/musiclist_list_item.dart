@@ -84,6 +84,7 @@ class MusicListListItem extends StatelessWidget {
           // 标志音乐信息来源的Badge
           Badge(
             label: sourceToShort(musicListW.source()),
+            isDarkMode: isDarkMode,
           ),
           // 歌曲的操作按钮
           GestureDetector(

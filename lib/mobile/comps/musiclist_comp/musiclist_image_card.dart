@@ -44,6 +44,7 @@ class MusicListImageCard extends StatelessWidget {
               left: 3,
               child: Badge(
                 label: sourceToShort(musicListW.source()),
+                isDarkMode: isDarkMode,
               ),
             ),
             Positioned(

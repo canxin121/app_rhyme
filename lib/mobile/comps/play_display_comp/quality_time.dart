@@ -25,15 +25,18 @@ class QualityTimeState extends State<QualityTime> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Obx(() => Text(
-                formatDuration(
-                    globalAudioUiController.position.value.inSeconds),
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                  color: CupertinoColors.systemGrey6,
-                  fontWeight: FontWeight.w300,
-                  fontSize: widget.fontHeight,
-                ).useSystemChineseFont(),
+          Obx(() => SizedBox(
+                width: 60,
+                child: Text(
+                  formatDuration(
+                      globalAudioUiController.position.value.inSeconds),
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: CupertinoColors.systemGrey6,
+                    fontWeight: FontWeight.w300,
+                    fontSize: widget.fontHeight,
+                  ).useSystemChineseFont(),
+                ),
               )),
           // 音质信息按钮
           GestureDetector(
@@ -53,21 +56,25 @@ class QualityTimeState extends State<QualityTime> {
             },
             child: Obx(() {
               return Badge(
+                isDarkMode: true,
                 label: globalAudioHandler
                         .playingMusic.value?.currentQuality.value?.short ??
                     "Quality",
               );
             }),
           ),
-          Obx(() => Text(
-                formatDuration(
-                    globalAudioUiController.duration.value.inSeconds),
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  color: CupertinoColors.systemGrey6,
-                  fontWeight: FontWeight.w300,
-                  fontSize: widget.fontHeight,
-                ).useSystemChineseFont(),
+          Obx(() => SizedBox(
+                width: 60,
+                child: Text(
+                  formatDuration(
+                      globalAudioUiController.duration.value.inSeconds),
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: CupertinoColors.systemGrey6,
+                    fontWeight: FontWeight.w300,
+                    fontSize: widget.fontHeight,
+                  ).useSystemChineseFont(),
+                ),
               )),
         ],
       ),
@@ -75,7 +82,6 @@ class QualityTimeState extends State<QualityTime> {
   }
 }
 
-// 选择变更后的quality的触发操作
 List<PullDownMenuEntry> qualitySelectPullDown(
         BuildContext context,
         List<Quality> qualitys,
