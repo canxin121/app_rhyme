@@ -151,10 +151,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             // 上方组件
             Column(
               children: [
-                if (Platform.isWindows || Platform.isLinux || Platform.isMacOS)
-                  const Padding(padding: EdgeInsets.only(top: 40)),
-                if (Platform.isAndroid || Platform.isIOS)
-                  const Padding(padding: EdgeInsets.only(top: 20)),
+                const Padding(padding: EdgeInsets.only(top: 40)),
                 ...topWidgets
               ],
             ),
