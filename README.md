@@ -15,6 +15,7 @@
 
 ### 功能:
 - 移动设备视图
+- 卓面设备视图
 - 自适应黑夜模式
 - 应用本体更新检测
 - 导入音源链接并自动检测更新
@@ -28,8 +29,9 @@
 - wifi/数据下音质选择
 ### 演示
 
-https://github.com/canxin121/app_rhyme/assets/69547456/a1b331ed-6e98-4ace-befc-3543981c6312
+https://github.com/canxin121/app_rhyme/assets/69547456/a1b331ed-6e98-4ace-befc-3543981c6312  
 
+https://github.com/user-attachments/assets/1664464e-02ea-49b3-ae17-c539ccf3154e  
 
 ------
 ## 说明
