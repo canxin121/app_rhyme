@@ -64,6 +64,7 @@ class _MyAppState extends State<MyApp> {
           home: _isWidthGreaterThanHeight
               ? const DesktopHome()
               : const MobileHome(),
+          // home:const MobileHome()
         ));
       },
     );

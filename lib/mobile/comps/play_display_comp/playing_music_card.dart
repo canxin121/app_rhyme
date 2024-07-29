@@ -34,8 +34,7 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: GestureDetector(
+    return GestureDetector(
       onTap: widget.onClick,
       onLongPress: widget.onPress,
       child: SizedBox(
@@ -103,6 +102,6 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
           ),
         ),
       ),
-    ));
+    );
   }
 }
