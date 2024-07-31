@@ -142,9 +142,9 @@ jobs:
       
       - name: Pack Installers
         run: |-
-          dart pub global activate flutter_distributor
+          dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
           flutter_distributor package --platform linux --targets appimage,deb,rpm
-
+          
       - name: Rename
         run: |
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.deb ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-linux-x86_64-${{ needs.get_version.outputs.app_version }}.deb

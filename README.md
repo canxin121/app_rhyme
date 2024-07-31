@@ -13,6 +13,14 @@
 2. Linux
 3. Macos
 
+### 安装说明
+1. linux依赖:  
+须自行安装：libmpv-dev mpv  
+例如使用apt:
+```bash
+sudo apt install libmpv-dev mpv
+```
+
 ### 功能:
 - 移动设备视图
 - 卓面设备视图

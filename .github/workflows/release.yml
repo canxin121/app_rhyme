@@ -144,7 +144,7 @@ jobs:
       
       - name: Pack Installers
         run: |-
-          dart pub global activate flutter_distributor
+          dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
           flutter_distributor package --platform linux --targets appimage,deb,rpm
 
       - name: Rename

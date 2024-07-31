@@ -24,7 +24,7 @@ Future<void> initGlobalAudioHandler() async {
   }
 
   // 测试后windows上，just_audio_background会导致播放异常，不使用表现反而更加正常
-  if (!Platform.isWindows) {
+  if (!Platform.isWindows && !Platform.isLinux) {
     await JustAudioBackground.init(
       androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
       androidNotificationChannelName: 'Audio playback',
@@ -225,48 +225,30 @@ class AudioHandler extends GetxController {
     }
   }
 
-  final Lock _clearReplaceMusicAllock = Lock();
   // App内手动触发，必定出现首次播放不触发index流的情况，故手动更新播放资源
   Future<void> clearReplaceMusicAll(List<MusicContainer> musics) async {
     if (musics.isEmpty) {
       return;
     }
-    await _clearReplaceMusicAllock.synchronized(() async {
-      // 先暂停
-      if (player.playing) {
-        await pause();
-      }
-      // 清空已有的列表
-      await clear();
+    // 先暂停
+    if (player.playing) {
+      await pause();
+    }
+    // 清空已有的列表
+    await clear();
 
-      // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)
-      bool shouldSeekNext = !await musics[0].updateAll();
-      musicList.add(musics[0]);
-      await audioSourceListLock.synchronized(() async {
-        await audioSourceList.add(musics[0].audioSource);
-      });
-      updatePlayingMusic(music: musics[0]);
-      // windows bug bypass
-      if (Platform.isWindows && isWindowsFirstPlay) {
-        await player.setAudioSource(audioSourceList);
-        isWindowsFirstPlay = false;
-      }
-
-      play();
-      // 接下来将剩下的所有的音乐添加进去，但是先不获取链接，使用lazy load
-      musicList.addAll(musics.sublist(1));
-
-      try {
-        await audioSourceListLock.synchronized(() async {
-          await audioSourceList
-              .addAll(musics.sublist(1).map((e) => e.audioSource).toList());
-        });
-      } catch (e) {
-        globalTalker
-            .error("[Music Handler] In clearReplaceMusicAll, Error occur: $e");
-      }
-      if (shouldSeekNext) await seekToNext();
-    });
+    // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)
+    bool shouldSeekNext = !await musics[0].updateAll();
+    // windows bug bypass
+    if (Platform.isWindows && isWindowsFirstPlay) {
+      await player.setAudioSource(audioSourceList);
+      isWindowsFirstPlay = false;
+    }
+    musicList.addAll(musics);
+    await audioSourceList.addAll(musics.map((e) => e.audioSource).toList());
+    await seek(Duration.zero, index: 0);
+    updatePlayingMusic(music: musics[0]);
+    if (shouldSeekNext) await seekToNext();
   }
 
   Future<void> clear() async {
@@ -436,12 +418,14 @@ class AudioUiController extends GetxController {
         update();
       }
     });
+
     globalAudioHandler.player.positionDiscontinuityStream.listen((event) {
       position.value = event.event.updatePosition;
       playProgress.value =
           position.value.inMicroseconds / duration.value.inMicroseconds;
       update();
     });
+
     globalAudioHandler.player.positionStream.listen((event) {
       position.value = event;
       playProgress.value =
