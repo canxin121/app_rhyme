@@ -22,6 +22,8 @@ late Connectivity globalConnectivity;
 ConnectivityStateSimple globalConnectivityStateSimple =
     ConnectivityStateSimple.none;
 
+late LastFmApi? globalLastFmApi;
+
 // 初始化全局变量
 // 即可用于在App启动时也可用于配置更新时
 Future<void> initGlobalVars() async {
@@ -49,4 +51,14 @@ Future<void> initGlobalVars() async {
       globalConnectivityStateSimple = ConnectivityStateSimple.none;
     }
   });
+
+  // Initialize LastFmApi with user's Last.fm API key and secret
+  if (globalConfig.lastFmApiKey != null && globalConfig.lastFmApiSecret != null) {
+    globalLastFmApi = LastFmApi(
+      apiKey: globalConfig.lastFmApiKey!,
+      apiSecret: globalConfig.lastFmApiSecret!,
+    );
+  } else {
+    globalLastFmApi = null;
+  }
 }

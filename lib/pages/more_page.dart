@@ -278,6 +278,46 @@ class MorePageState extends State<MorePage> with WidgetsBindingObserver {
                       })),
             ],
           ),
+          CupertinoFormSection.insetGrouped(
+            header: Text('Last.fm 设置',
+                style: TextStyle(color: textColor).useSystemChineseFont()),
+            children: [
+              CupertinoFormRow(
+                prefix: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      'API Key',
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
+                    )),
+                child: CupertinoTextField(
+                  placeholder: 'Enter Last.fm API Key',
+                  controller: TextEditingController(
+                      text: globalConfig.lastFmApiKey ?? ''),
+                  onChanged: (value) {
+                    globalConfig.lastFmApiKey = value;
+                    globalConfig.save();
+                  },
+                ),
+              ),
+              CupertinoFormRow(
+                prefix: Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      'API Secret',
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
+                    )),
+                child: CupertinoTextField(
+                  placeholder: 'Enter Last.fm API Secret',
+                  controller: TextEditingController(
+                      text: globalConfig.lastFmApiSecret ?? ''),
+                  onChanged: (value) {
+                    globalConfig.lastFmApiSecret = value;
+                    globalConfig.save();
+                  },
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

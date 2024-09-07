@@ -261,3 +261,18 @@ class ExternApiEvaler {
     }
   }
 }
+
+class LastFmApi {
+  final String apiKey;
+  final String apiSecret;
+
+  LastFmApi({required this.apiKey, required this.apiSecret});
+
+  Future<void> authenticate() async {
+    // Implement authentication logic with Last.fm API
+  }
+
+  Future<void> recordPlayedSong(String artist, String track) async {
+    // Implement logic to record played song to Last.fm
+  }
+}

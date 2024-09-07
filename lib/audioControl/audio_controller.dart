@@ -103,6 +103,7 @@ class AudioHandler extends GetxController {
       if (shouldUpdate) {
         updatePlayingMusic(music: musicList[index]);
       }
+      await recordToLastFm(musicList[index]); // P4a5d
     });
   }
 
@@ -377,6 +378,21 @@ class AudioHandler extends GetxController {
 
   bool get isPlaying {
     return player.playing;
+  }
+
+  Future<void> recordToLastFm(MusicContainer music) async {
+    if (globalConfig.lastFmApiKey != null && globalConfig.lastFmApiSecret != null) {
+      try {
+        final lastFmApi = LastFmApi(
+          apiKey: globalConfig.lastFmApiKey!,
+          apiSecret: globalConfig.lastFmApiSecret!,
+        );
+        await lastFmApi.recordPlayedSong(music.info.artist.join(", "), music.info.name);
+        globalTalker.info("[Music Handler] Successfully recorded played song to Last.fm: ${music.info.name}");
+      } catch (e) {
+        globalTalker.error("[Music Handler] Failed to record played song to Last.fm: $e");
+      }
+    }
   }
 }
 
