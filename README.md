@@ -4,6 +4,9 @@
 
 后端Rust库仓库[music_api](https://github.com/canxin121/music_api)，实现了`MusicAggregator`和`MusicList`的`Trait Object`封装。实现了便捷的跨(音乐)平台音乐`聚合`和`换源`，提供了统一的接口便于开发使用。
 
+### 最近动态:
+- 寻求sea-orm上游的动态表名Entity实现以重写music_api数据库
+
 ### 支持的音乐平台:
 - 网易云音乐
 - 酷我音乐
