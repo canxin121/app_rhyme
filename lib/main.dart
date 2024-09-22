@@ -1,12 +1,11 @@
 import 'package:app_rhyme/desktop/home.dart';
 import 'package:app_rhyme/mobile/home.dart';
 import 'package:app_rhyme/utils/chore.dart';
-import 'package:app_rhyme/utils/mobile_device.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/audioControl/audio_controller.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
 import 'package:app_rhyme/utils/bypass_netimg_error.dart';
-import 'package:app_rhyme/utils/desktop_device.dart';
+import 'package:app_rhyme/utils/device_set.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

@@ -2,22 +2,16 @@ import 'package:app_rhyme/desktop/comps/delegate.dart';
 import 'package:app_rhyme/desktop/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/pages/muti_select_pages/muti_select_local_music_list_gridview_page.dart';
-import 'package:app_rhyme/desktop/pages/online_music_container_listview_page.dart';
+import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-
-final PagingController<int, MusicListW> _pagingController =
-    PagingController(firstPageKey: 1);
-final TextEditingController _inputContentController = TextEditingController();
 
 class SearchMusicListPage extends StatefulWidget {
   const SearchMusicListPage({super.key});
@@ -28,6 +22,9 @@ class SearchMusicListPage extends StatefulWidget {
 
 class _SearchMusicListState extends State<SearchMusicListPage>
     with WidgetsBindingObserver {
+  final PagingController<int, Playlist> _pagingController =
+      PagingController(firstPageKey: 1);
+  final TextEditingController _inputContentController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -59,11 +56,12 @@ class _SearchMusicListState extends State<SearchMusicListPage>
       if (_inputContentController.value.text.isEmpty) {
         _pagingController.appendLastPage([]);
       }
-      var musiclists = await OnlineFactoryW.searchMusiclist(
-          sources: [sourceAll],
-          content: _inputContentController.value.text,
-          page: pageKey,
-          limit: 30);
+      var musiclists = await Playlist.searchOnline(
+        content: _inputContentController.value.text,
+        page: pageKey,
+        size: 30,
+        servers: [MusicServer.kuwo, MusicServer.netease],
+      );
       if (musiclists.isEmpty) {
         _pagingController.appendLastPage([]);
       } else {
@@ -117,15 +115,12 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                   openShareMusicList: () async {
                     var url = await showInputPlaylistShareLinkDialog(context);
                     if (url != null) {
-                      var result = await OnlineFactoryW.getMusiclistFromShare(
-                          shareUrl: url);
-                      var musicListW = result.$1;
-                      var musicAggregators = result.$2;
+                      var musicListW = await Playlist.getFromShare(share: url);
                       if (context.mounted) {
                         globalSetNavItemSelected("");
                         globalNavigatorToPage(DesktopOnlineMusicListPage(
-                            musicList: musicListW,
-                            firstPageMusicAggregators: musicAggregators));
+                          playlist: musicListW,
+                        ));
                       }
                     }
                   },
@@ -151,7 +146,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                 child: PagedGridView(
               padding: EdgeInsets.only(bottom: screenHeight * 0.2),
               pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<MusicListW>(
+              builderDelegate: PagedChildBuilderDelegate<Playlist>(
                   noItemsFoundIndicatorBuilder: (context) {
                 return Center(
                   child: Column(
@@ -166,15 +161,6 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                               : CupertinoColors.black,
                         ).useSystemChineseFont(),
                       ),
-                      Text(
-                        '点击右上角图标切换搜索单曲',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                                color: isDarkMode
-                                    ? CupertinoColors.systemGrey2
-                                    : CupertinoColors.black)
-                            .useSystemChineseFont(),
-                      ),
                     ],
                   ),
                 );
@@ -183,11 +169,11 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                     padding: const EdgeInsets.only(left: 10, right: 10),
                     child: MusicListImageCard(
                       showDesc: false,
-                      musicListW: musicListW,
+                      playlist: musicListW,
                       onTap: () {
                         globalSetNavItemSelected("");
                         globalNavigatorToPage(
-                            DesktopOnlineMusicListPage(musicList: musicListW));
+                            DesktopOnlineMusicListPage(playlist: musicListW));
                       },
                       online: true,
                     ));
@@ -217,7 +203,7 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
 
   final void Function() openShareMusicList;
   final Future<void> Function() fetchAllMusicAggregators;
-  final PagingController<int, MusicListW> musicListController;
+  final PagingController<int, Playlist> musicListController;
   final PullDownMenuButtonBuilder builder;
 
   @override
@@ -262,7 +248,7 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
               globalSetNavItemSelected("");
               globalNavigatorToPage(
                 DesktopMutiSelectLocalMusicListGridPage(
-                  musicLists: musicListController.itemList!,
+                  playlists: musicListController.itemList!,
                 ),
               );
             }

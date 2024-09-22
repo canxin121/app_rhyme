@@ -31,13 +31,13 @@ class LyricCompState extends State<LyricComp> {
     super.initState();
     lyricUI = AppleMusicLyricUi();
     lyricModel = LyricsModelBuilder.create()
-        .bindLyricToMain(globalAudioHandler.playingMusic.value?.info.lyric ??
-            "[00:00.00]无歌词")
+        .bindLyricToMain(
+            globalAudioHandler.playingMusic.value?.lyric ?? "[00:00.00]无歌词")
         .getModel();
     stream = globalAudioHandler.playingMusic.listen((p0) {
       setState(() {
         lyricModel = LyricsModelBuilder.create()
-            .bindLyricToMain(p0?.info.lyric ?? "[00:00.00]无歌词")
+            .bindLyricToMain(p0?.lyric ?? "[00:00.00]无歌词")
             .getModel();
       });
     });

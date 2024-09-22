@@ -1,8 +1,4 @@
-const String defaultArtPicPath = "assets/log-0.1.0.png";
+const String defaultCoverPath = "assets/log-0.1.0.png";
 
-const musicCacheRoot = "Music";
-const picCacheRoot = "Pic";
-
-const sourceAll = "All";
-const sourceWangYi = "WangYi";
-const sourceKuWo = "KuWo";
+const musicCacheFolder = "Music";
+const picCacheFolder = "Pic";

@@ -29,8 +29,8 @@ class MusicArtPicState extends State<MusicArtPic> {
               shadowStrength: Platform.isIOS ? 3 : 8,
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(18.0),
-              child: imageCacheHelper(
-                  globalAudioHandler.playingMusic.value?.info.artPic),
+              child: imageWithCache(
+                  globalAudioHandler.playingMusic.value?.currentMusic.cover),
             ))));
   }
 }

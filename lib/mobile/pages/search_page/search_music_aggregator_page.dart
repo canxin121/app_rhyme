@@ -1,12 +1,8 @@
-import 'package:app_rhyme/mobile/comps/music_container_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
 import 'package:app_rhyme/mobile/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
-import 'package:app_rhyme/types/music_container.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,14 +20,14 @@ class SearchMusicAggregatorPage extends StatefulWidget {
 
 class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
     with WidgetsBindingObserver {
-  final PagingController<int, MusicAggregatorW> _pagingController =
+  final PagingController<int, MusicAggregator> _pagingController =
       PagingController(firstPageKey: 1);
   final TextEditingController _inputContentController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _artistController = TextEditingController();
   final TextEditingController _albumController = TextEditingController();
-  MusicFuzzFilter? filter;
-  bool _isFilterSectionVisible = false;
+  // MusicFuzzFilter? filter;
+  // bool _isFilterSectionVisible = false;
 
   @override
   void initState() {
@@ -67,17 +63,15 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
 
       int originLength = _pagingController.itemList?.length ?? 0;
 
-      _pagingController.value = PagingState<int, MusicAggregatorW>(
+      _pagingController.value = PagingState<int, MusicAggregator>(
           nextPageKey: pageKey + 1,
-          itemList: await AggregatorOnlineFactoryW.searchMusicAggregator(
-              aggregators:
-                  _pagingController.itemList?.map((a) => a.clone()).toList() ??
-                      [],
-              sources: [sourceAll],
-              content: _inputContentController.value.text,
-              page: pageKey,
-              limit: 30,
-              filter: filter));
+          itemList: await MusicAggregator.searchOnline(
+            aggs: _pagingController.itemList ?? [],
+            servers: [MusicServer.kuwo, MusicServer.netease],
+            content: _inputContentController.value.text,
+            page: pageKey,
+            size: 30,
+          ));
 
       _pagingController.nextPageKey =
           _pagingController.itemList!.length > originLength
@@ -94,43 +88,43 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
     }
   }
 
-  void _applyFilter() {
-    setState(() {
-      // 如果三个输入框都为空，则不应用筛选条件
-      if (_nameController.text.isEmpty &&
-          _artistController.text.isEmpty &&
-          _albumController.text.isEmpty) {
-        filter = null;
-      } else {
-        filter = MusicFuzzFilter(
-          name: _nameController.text.isEmpty ? null : _nameController.text,
-          artist: _artistController.text.isNotEmpty
-              ? _artistController.text.split(',')
-              : [],
-          album: _albumController.text.isEmpty ? null : _albumController.text,
-        );
-      }
-      _isFilterSectionVisible = false;
-    });
-    _pagingController.refresh();
-  }
+  // void _applyFilter() {
+  //   setState(() {
+  //     // 如果三个输入框都为空，则不应用筛选条件
+  //     if (_nameController.text.isEmpty &&
+  //         _artistController.text.isEmpty &&
+  //         _albumController.text.isEmpty) {
+  //       filter = null;
+  //     } else {
+  //       filter = MusicFuzzFilter(
+  //         name: _nameController.text.isEmpty ? null : _nameController.text,
+  //         artist: _artistController.text.isNotEmpty
+  //             ? _artistController.text.split(',')
+  //             : [],
+  //         album: _albumController.text.isEmpty ? null : _albumController.text,
+  //       );
+  //     }
+  //     _isFilterSectionVisible = false;
+  //   });
+  //   _pagingController.refresh();
+  // }
 
-  void _clearFilter() {
-    setState(() {
-      _nameController.clear();
-      _artistController.clear();
-      _albumController.clear();
-      filter = null;
-      _isFilterSectionVisible = false;
-    });
-    _pagingController.refresh();
-  }
+  // void _clearFilter() {
+  //   setState(() {
+  //     _nameController.clear();
+  //     _artistController.clear();
+  //     _albumController.clear();
+  //     filter = null;
+  //     _isFilterSectionVisible = false;
+  //   });
+  //   _pagingController.refresh();
+  // }
 
-  void _toggleFilterSection() {
-    setState(() {
-      _isFilterSectionVisible = !_isFilterSectionVisible;
-    });
-  }
+  // void _toggleFilterSection() {
+  //   setState(() {
+  //     _isFilterSectionVisible = !_isFilterSectionVisible;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +133,8 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    // final Color textColor =
+    //     isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
@@ -179,150 +173,150 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                 fetchAllMusicAggregators: _fetchAllMusicAggregators,
               )),
           // 搜索框和过滤按钮
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0, left: 8, right: 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CupertinoSearchTextField(
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
-                    ).useSystemChineseFont(),
-                    controller: _inputContentController,
-                    onSubmitted: (String value) {
-                      if (value.isNotEmpty) {
-                        setState(() {
-                          _isFilterSectionVisible = false;
-                        });
-                        _pagingController.refresh();
-                      }
-                    },
-                  ),
-                ),
-                CupertinoButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: _toggleFilterSection,
-                  child: const Icon(
-                    CupertinoIcons.slider_horizontal_3,
-                    size: 25,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 4.0, left: 8, right: 0),
+          //   child: Row(
+          //     children: [
+          //       Expanded(
+          //         child: CupertinoSearchTextField(
+          //           style: TextStyle(
+          //             color: isDarkMode
+          //                 ? CupertinoColors.white
+          //                 : CupertinoColors.black,
+          //           ).useSystemChineseFont(),
+          //           controller: _inputContentController,
+          //           onSubmitted: (String value) {
+          //             if (value.isNotEmpty) {
+          //               setState(() {
+          //                 _isFilterSectionVisible = false;
+          //               });
+          //               _pagingController.refresh();
+          //             }
+          //           },
+          //         ),
+          //       ),
+          //       CupertinoButton(
+          //         padding: const EdgeInsets.all(0),
+          //         onPressed: _toggleFilterSection,
+          //         child: const Icon(
+          //           CupertinoIcons.slider_horizontal_3,
+          //           size: 25,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           // 编辑 MusicFuzzFilter 的 Section
-          if (_isFilterSectionVisible)
-            CupertinoFormSection.insetGrouped(
-              header: Text('筛选条件',
-                  style: TextStyle(color: textColor).useSystemChineseFont()),
-              children: [
-                CupertinoFormRow(
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Text('歌曲名',
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont()),
-                  ),
-                  child: CupertinoTextField(
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
-                    ).useSystemChineseFont(),
-                    controller: _nameController,
-                    placeholder: '输入曲名',
-                  ),
-                ),
-                CupertinoFormRow(
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Text('演唱者',
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont()),
-                  ),
-                  child: CupertinoTextField(
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
-                    ).useSystemChineseFont(),
-                    controller: _artistController,
-                    placeholder: '输入演唱者 (多个用逗号分隔)',
-                  ),
-                ),
-                CupertinoFormRow(
-                  prefix: Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Text('专辑名',
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont()),
-                  ),
-                  child: CupertinoTextField(
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? CupertinoColors.white
-                          : CupertinoColors.black,
-                    ).useSystemChineseFont(),
-                    controller: _albumController,
-                    placeholder: '输入专辑名',
-                  ),
-                ),
-                CupertinoFormRow(
-                  padding: EdgeInsets.zero,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CupertinoButton(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
-                        onPressed: _applyFilter,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 20),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: CupertinoColors.activeBlue,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Text(
-                            '应用筛选条件',
-                            style: const TextStyle(
-                              color: CupertinoColors.activeBlue,
-                            ).useSystemChineseFont(),
-                          ),
-                        ),
-                      ),
-                      CupertinoButton(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5, horizontal: 20),
-                        onPressed: _clearFilter,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 20),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: CupertinoColors.systemRed,
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Text(
-                            '清空筛选条件',
-                            style: const TextStyle(
-                              color: CupertinoColors.systemRed,
-                            ).useSystemChineseFont(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          // if (_isFilterSectionVisible)
+          //   CupertinoFormSection.insetGrouped(
+          //     header: Text('筛选条件',
+          //         style: TextStyle(color: textColor).useSystemChineseFont()),
+          //     children: [
+          //       CupertinoFormRow(
+          //         prefix: Padding(
+          //           padding: const EdgeInsets.only(right: 10.0),
+          //           child: Text('歌曲名',
+          //               style:
+          //                   TextStyle(color: textColor).useSystemChineseFont()),
+          //         ),
+          //         child: CupertinoTextField(
+          //           style: TextStyle(
+          //             color: isDarkMode
+          //                 ? CupertinoColors.white
+          //                 : CupertinoColors.black,
+          //           ).useSystemChineseFont(),
+          //           controller: _nameController,
+          //           placeholder: '输入曲名',
+          //         ),
+          //       ),
+          //       CupertinoFormRow(
+          //         prefix: Padding(
+          //           padding: const EdgeInsets.only(right: 10.0),
+          //           child: Text('演唱者',
+          //               style:
+          //                   TextStyle(color: textColor).useSystemChineseFont()),
+          //         ),
+          //         child: CupertinoTextField(
+          //           style: TextStyle(
+          //             color: isDarkMode
+          //                 ? CupertinoColors.white
+          //                 : CupertinoColors.black,
+          //           ).useSystemChineseFont(),
+          //           controller: _artistController,
+          //           placeholder: '输入演唱者 (多个用逗号分隔)',
+          //         ),
+          //       ),
+          //       CupertinoFormRow(
+          //         prefix: Padding(
+          //           padding: const EdgeInsets.only(right: 10.0),
+          //           child: Text('专辑名',
+          //               style:
+          //                   TextStyle(color: textColor).useSystemChineseFont()),
+          //         ),
+          //         child: CupertinoTextField(
+          //           style: TextStyle(
+          //             color: isDarkMode
+          //                 ? CupertinoColors.white
+          //                 : CupertinoColors.black,
+          //           ).useSystemChineseFont(),
+          //           controller: _albumController,
+          //           placeholder: '输入专辑名',
+          //         ),
+          //       ),
+          //       CupertinoFormRow(
+          //         padding: EdgeInsets.zero,
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //           children: [
+          //             CupertinoButton(
+          //               padding: const EdgeInsets.symmetric(
+          //                   vertical: 5, horizontal: 20),
+          //               onPressed: _applyFilter,
+          //               child: Container(
+          //                 padding: const EdgeInsets.symmetric(
+          //                     vertical: 5, horizontal: 20),
+          //                 decoration: BoxDecoration(
+          //                   border: Border.all(
+          //                     color: CupertinoColors.activeBlue,
+          //                     width: 1.0,
+          //                   ),
+          //                   borderRadius: BorderRadius.circular(8.0),
+          //                 ),
+          //                 child: Text(
+          //                   '应用筛选条件',
+          //                   style: const TextStyle(
+          //                     color: CupertinoColors.activeBlue,
+          //                   ).useSystemChineseFont(),
+          //                 ),
+          //               ),
+          //             ),
+          //             CupertinoButton(
+          //               padding: const EdgeInsets.symmetric(
+          //                   vertical: 5, horizontal: 20),
+          //               onPressed: _clearFilter,
+          //               child: Container(
+          //                 padding: const EdgeInsets.symmetric(
+          //                     vertical: 5, horizontal: 20),
+          //                 decoration: BoxDecoration(
+          //                   border: Border.all(
+          //                     color: CupertinoColors.systemRed,
+          //                     width: 1.0,
+          //                   ),
+          //                   borderRadius: BorderRadius.circular(8.0),
+          //                 ),
+          //                 child: Text(
+          //                   '清空筛选条件',
+          //                   style: const TextStyle(
+          //                     color: CupertinoColors.systemRed,
+          //                   ).useSystemChineseFont(),
+          //                 ),
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ],
+          //   ),
           Expanded(
             child: PagedListView.separated(
               pagingController: _pagingController,
@@ -334,7 +328,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                 indent: 30,
                 endIndent: 30,
               ),
-              builderDelegate: PagedChildBuilderDelegate<MusicAggregatorW>(
+              builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
                 noItemsFoundIndicatorBuilder: (context) {
                   return Center(
                     child: Column(
@@ -373,7 +367,7 @@ class _SearchMusicAggregatorPageState extends State<SearchMusicAggregatorPage>
                 },
                 itemBuilder: (context, musicAggregator, index) =>
                     MusicContainerListItem(
-                  musicContainer: MusicContainer(musicAggregator),
+                  musicAgg: musicAggregator,
                 ),
               ),
             ),
@@ -392,7 +386,7 @@ class SearchMusicAggregatroChoiceMenu extends StatelessWidget {
     required this.fetchAllMusicAggregators,
     required this.musicAggregatorController,
   });
-  final PagingController<int, MusicAggregatorW> musicAggregatorController;
+  final PagingController<int, MusicAggregator> musicAggregatorController;
   final Future<void> Function() fetchAllMusicAggregators;
   final PullDownMenuButtonBuilder builder;
 
@@ -438,9 +432,7 @@ class SearchMusicAggregatroChoiceMenu extends StatelessWidget {
                 context,
                 CupertinoPageRoute(
                   builder: (context) => MutiSelectMusicContainerListPage(
-                      musicContainers: musicAggregatorController.itemList!
-                          .map((e) => MusicContainer(e))
-                          .toList()),
+                      musicAggs: musicAggregatorController.itemList!),
                 ),
               );
             }

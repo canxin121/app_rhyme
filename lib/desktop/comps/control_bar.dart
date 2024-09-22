@@ -245,8 +245,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                 ),
                 child: Obx(() => ClipRRect(
                       borderRadius: BorderRadius.circular(3),
-                      child: imageCacheHelper(
-                          globalAudioHandler.playingMusic.value?.info.artPic),
+                      child: imageWithCache(globalAudioHandler
+                          .playingMusic.value?.currentMusic.cover),
                     )),
               ),
               SizedBox(
@@ -259,8 +259,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                         const SizedBox(height: 5),
                         Center(
                           child: Obx(() => Text(
-                                globalAudioHandler
-                                        .playingMusic.value?.info.name ??
+                                globalAudioHandler.playingMusic.value
+                                        ?.currentMusic.name ??
                                     "Music",
                                 style: TextStyle(color: textColor, fontSize: 13)
                                     .useSystemChineseFont(),
@@ -268,8 +268,9 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                         ),
                         Center(
                           child: Obx(() => Text(
-                                globalAudioHandler
-                                        .playingMusic.value?.info.artist
+                                globalAudioHandler.playingMusic.value
+                                        ?.currentMusic.artists
+                                        .map((e) => e.name)
                                         .join(", ") ??
                                     "Artist",
                                 style:

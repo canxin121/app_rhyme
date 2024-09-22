@@ -1,11 +1,10 @@
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/play_button.dart';
 import 'package:app_rhyme/desktop/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/reorder_pages/reorder_local_music_list_page.dart';
+import 'package:app_rhyme/desktop/pages/reorder_pages/reorder_music_agg_page.dart';
 import 'package:app_rhyme/dialogs/confirm_dialog.dart';
-import 'package:app_rhyme/pulldown_menus/musiclist_pulldown_menu.dart';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/chore.dart';
@@ -23,20 +22,19 @@ class MusicListHeader extends StatelessWidget {
     super.key,
     required this.isDarkMode,
     required this.screenWidth,
-    required this.musicList,
+    required this.playlist,
     this.pagingController,
-    this.musicContainers,
+    this.musicAggs,
     this.fetchAllMusicAggregators,
   });
-  final MusicListW musicList;
-  final PagingController<int, MusicAggregatorW>? pagingController;
-  final List<MusicContainer>? musicContainers;
+  final Playlist playlist;
+  final PagingController<int, MusicAggregator>? pagingController;
+  final List<MusicAggregator>? musicAggs;
   final Future<void> Function()? fetchAllMusicAggregators;
   final bool isDarkMode;
   final double screenWidth;
   @override
   Widget build(BuildContext context) {
-    MusicListInfo musicListInfo = musicList.getMusiclistInfo();
     return SliverToBoxAdapter(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -50,7 +48,7 @@ class MusicListHeader extends StatelessWidget {
             margin: const EdgeInsets.all(10),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5.0),
-              child: imageCacheHelper(musicListInfo.artPic,
+              child: imageWithCache(playlist.cover,
                   cacheNow: globalConfig.savePicWhenAddMusicList,
                   width: 250,
                   height: 250),
@@ -65,7 +63,7 @@ class MusicListHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  musicListInfo.name,
+                  playlist.name,
                   textAlign: TextAlign.left,
                   style: TextStyle(
                           color: isDarkMode
@@ -78,7 +76,7 @@ class MusicListHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  musicListInfo.desc,
+                  playlist.summary ?? "",
                   maxLines: 4,
                   textAlign: TextAlign.left,
                   style: TextStyle(
@@ -96,9 +94,9 @@ class MusicListHeader extends StatelessWidget {
                     buildButton(context,
                         icon: CupertinoIcons.play_fill,
                         label: "播放", onPressed: () async {
-                      if (musicContainers != null) {
-                        await globalAudioHandler
-                            .clearReplaceMusicAll(musicContainers!);
+                      if (musicAggs != null) {
+                        await globalAudioHandler.clearReplaceMusicAll(
+                            musicAggs!.map((e) => MusicContainer(e)).toList());
                       } else {
                         await fetchAllMusicAggregators!();
                         await globalAudioHandler.clearReplaceMusicAll(
@@ -111,9 +109,11 @@ class MusicListHeader extends StatelessWidget {
                     buildButton(context,
                         icon: CupertinoIcons.shuffle,
                         label: "随机播放", onPressed: () async {
-                      if (musicContainers != null) {
+                      if (musicAggs != null) {
                         await globalAudioHandler.clearReplaceMusicAll(
-                            shuffleList(musicContainers!));
+                            shuffleList(musicAggs!
+                                .map((e) => MusicContainer(e))
+                                .toList()));
                       } else {
                         await fetchAllMusicAggregators!();
                         await globalAudioHandler.clearReplaceMusicAll(
@@ -136,7 +136,7 @@ class MusicListHeader extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    if (musicContainers != null)
+                    if (musicAggs != null)
                       CupertinoButton(
                           padding: EdgeInsets.zero,
                           child: Icon(
@@ -145,9 +145,9 @@ class MusicListHeader extends StatelessWidget {
                             size: 20,
                           ),
                           onPressed: () async {
-                            editMusicListInfo(context, musicList);
+                            editPlaylistListInfo(context, playlist);
                           }),
-                    if (musicContainers != null)
+                    if (musicAggs != null)
                       CupertinoButton(
                           padding: EdgeInsets.zero,
                           child: Icon(
@@ -160,11 +160,12 @@ class MusicListHeader extends StatelessWidget {
                                     context, "确定要缓存所有音乐吗?")) ??
                                 false;
                             if (!confirm) return;
-                            for (var musicContainer in musicContainers!) {
-                              await cacheMusic(musicContainer);
+                            for (var musicAgg in musicAggs!) {
+                              await cacheMusicContainer(
+                                  MusicContainer(musicAgg));
                             }
                           }),
-                    if (musicContainers == null)
+                    if (musicAggs == null)
                       GestureDetector(
                           onTapDown: (details) {
                             Rect position = Rect.fromPoints(
@@ -172,14 +173,14 @@ class MusicListHeader extends StatelessWidget {
                               details.globalPosition,
                             );
                             showMusicListMenu(
-                                context, musicList, true, position);
+                                context, playlist, position, false);
                           },
                           child: Icon(
                             CupertinoIcons.ellipsis,
                             color: activeIconRed,
                             size: 20,
                           )),
-                    if (musicContainers != null)
+                    if (musicAggs != null)
                       DesktopLocalMusicListChoicMenu(
                           builder: (context, showMenu) => CupertinoButton(
                               padding: EdgeInsets.zero,
@@ -189,8 +190,8 @@ class MusicListHeader extends StatelessWidget {
                                 color: activeIconRed,
                                 size: 20,
                               )),
-                          musicList: musicList,
-                          musicContainers: musicContainers!)
+                          playlist: playlist,
+                          musicAggs: musicAggs!)
                   ],
                 )),
           ),
@@ -205,35 +206,33 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
   const DesktopLocalMusicListChoicMenu({
     super.key,
     required this.builder,
-    required this.musicList,
-    required this.musicContainers,
+    required this.playlist,
+    required this.musicAggs,
   });
 
   final PullDownMenuButtonBuilder builder;
-  final MusicListW musicList;
-  final List<MusicContainer> musicContainers;
+  final Playlist playlist;
+  final List<MusicAggregator> musicAggs;
 
   @override
   Widget build(BuildContext context) {
-    MusicListInfo musicListInfo = musicList.getMusiclistInfo();
-
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuHeader(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          leading: imageCacheHelper(musicListInfo.artPic),
-          title: musicListInfo.name,
-          subtitle: musicListInfo.desc,
+          leading: imageWithCache(playlist.cover),
+          title: playlist.name,
+          subtitle: playlist.summary,
         ),
         const PullDownMenuDivider.large(),
-        ...localMusiclistItems(context, musicList),
+        ...localMusiclistItems(context, playlist, true),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
-            for (var musicContainer in musicContainers) {
-              await cacheMusic(musicContainer);
+            for (var musicAgg in musicAggs) {
+              await cacheMusicContainer(MusicContainer(musicAgg));
             }
           },
           title: '缓存歌单所有音乐',
@@ -243,8 +242,8 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
-            for (var musicContainer in musicContainers) {
-              await delMusicCache(musicContainer, showToast: false);
+            for (var musicContainer in musicAggs) {
+              await delMusicAggregatorCache(musicContainer, showToast: false);
             }
             LogToast.success("删除所有音乐缓存", "删除所有音乐缓存成功",
                 "[LocalMusicListChoicMenu] Successfully deleted all music caches");
@@ -257,8 +256,7 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
             globalNavigatorToPage(DesktopReorderLocalMusicListPage(
-              musicContainers: musicContainers,
-              musicList: musicList,
+              playlist: playlist,
             ));
           },
           title: "手动排序",
@@ -269,8 +267,8 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
             globalNavigatorToPage(DesktopMutiSelectMusicContainerListPage(
-              musicList: musicList,
-              musicContainers: musicContainers,
+              playlist: playlist,
+              musicAggs: musicAggs,
             ));
           },
           title: "多选操作",

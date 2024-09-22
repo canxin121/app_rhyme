@@ -1,48 +1,36 @@
 import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/types/playinfo.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
-import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 
-// 这个结构代表了待播音乐的信息
 class MusicContainer {
-  late MusicAggregatorW aggregator;
-  late MusicW currentMusic;
-  late MusicInfo info;
-  late String? extra;
-  // 从Api or 本地获取的真实待播放的音质信息
-  late Rx<Quality?> currentQuality;
+  late MusicAggregator musicAggregator;
+  late int currentIndex;
+
   PlayInfo? playInfo;
-  // 待播放的音频资源
+  String? lyric;
   late AudioSource audioSource;
-  // 已经使用过的音乐源，用于自动换源时选择下一个源
-  List<String> usedSources = [];
-  // 上次更新时间，用于判断是否需要更新
+  List<MusicServer> usedServers = [];
   DateTime lastUpdate = DateTime(1999);
 
-  MusicContainer(MusicAggregatorW aggregator_) {
-    aggregator = aggregator_;
-    currentMusic = aggregator_.getDefaultMusic();
-    info = currentMusic.getMusicInfo();
-    _updateQuality();
+  MusicContainer(MusicAggregator musicAgg) {
+    musicAggregator = musicAgg;
+    currentIndex = 0;
     audioSource = AudioSource.asset("assets/blank.mp3", tag: _toMediaItem());
   }
+
+  Music get currentMusic => musicAggregator.musics[currentIndex];
 
   // 使上次更新时间过期
   setOutdate() {
     lastUpdate = DateTime(1999);
-  }
-
-  String toCacheFileName() {
-    return "${info.name}_${info.artist.join(",")}_${currentQuality.value!.short}.${currentQuality.value!.format ?? "unknown"}";
   }
 
   // 检查音乐是否需要更新
@@ -55,15 +43,6 @@ class MusicContainer {
           DateTime.now().difference(lastUpdate).abs().inSeconds >= 1800;
     } catch (_) {
       return true;
-    }
-  }
-
-  // 是否有缓存
-  Future<bool> hasCache() async {
-    try {
-      return hasCachePlayinfo(musicInfo: info);
-    } catch (e) {
-      return false;
     }
   }
 
@@ -80,29 +59,32 @@ class MusicContainer {
     return success;
   }
 
-  Future<PlayInfo?> getCurrentMusicPlayInfo([Quality? quality_]) async {
+  Future<PlayInfo?> getUpdatePlayInfo([Quality? selectedQuality]) async {
     // 更新当前音质, 每次都更新以适配网络变化
-    _updateQuality(quality_);
-
-    late Quality finalQuality;
-    if (quality_ != null) {
-      finalQuality = quality_;
-    } else if (currentQuality.value != null) {
-      finalQuality = currentQuality.value!;
-    } else {
-      LogToast.error("获取播放信息失败", "未找到可用音质",
-          "[getCurrentMusicPlayInfo] Failed to get play info, no quality found");
+    if (currentMusic.qualities.isEmpty) {
+      LogToast.error("获取播放信息", "获取播放信息失败: 无音质可选",
+          "[getCurrentMusicPlayInfo] Failed to get play info, no qualities");
       return null;
     }
-    // 更新extra信息
-    extra = currentMusic.getExtraInfo(quality: finalQuality);
 
-    // // 有本地缓存直接返回
+    late Quality targetQuality;
+    if (selectedQuality != null) {
+      targetQuality = selectedQuality;
+    } else {
+      targetQuality = autoPickQuality(currentMusic.qualities);
+    }
+
+    // 有本地缓存直接返回
     try {
-      playInfo = await getCachePlayinfo(musicInfo: info);
+      var musicCache = await getCacheMusic(music: currentMusic);
+      if (musicCache != null) {
+        playInfo = musicCache.$1;
+        lyric = musicCache.$2;
+      }
+
       if (playInfo != null) {
-        globalTalker.info("[getCurrentMusicPlayInfo] 使用缓存歌曲: ${info.name}");
-        currentQuality.value = playInfo!.quality;
+        globalTalker
+            .info("[getCurrentMusicPlayInfo] 使用缓存歌曲: ${currentMusic.name}");
         return playInfo!;
       }
       // ignore: empty_catches
@@ -117,18 +99,17 @@ class MusicContainer {
     }
 
     // 有第三方api，使用api进行请求
-    playInfo =
-        await globalExternApiEvaler!.getMusicPlayInfo(info.source, extra!);
+    playInfo = await globalExternApiEvaler!
+        .getMusicPlayInfo(currentMusic, targetQuality);
 
     // 如果第三方api查找不到，直接返回null
     if (playInfo == null) {
       globalTalker.error(
-          "[getCurrentMusicPlayInfo] 第三方音乐源无法获取到playinfo: [${info.source}]${info.name}");
+          "[getCurrentMusicPlayInfo] 第三方音乐源无法获取到playinfo: [${currentMusic.server}]${currentMusic.name}");
       return null;
     } else {
-      currentQuality.value = playInfo!.quality;
       globalTalker.info(
-          "[getCurrentMusicPlayInfo] 使用第三方Api请求获取playinfo: [${info.source}]${info.name}");
+          "[getCurrentMusicPlayInfo] 使用第三方Api请求获取playinfo: [${currentMusic.server}]${currentMusic.name}");
       return playInfo;
     }
   }
@@ -136,51 +117,48 @@ class MusicContainer {
   // 将音乐信息转化为MediaItem, 用于AudioService在系统显示音频信息
   MediaItem _toMediaItem() {
     Uri? artUri;
-    if (info.artPic != null) {
-      artUri = Uri.parse(info.artPic!);
+    if (currentMusic.cover != null) {
+      artUri = Uri.parse(currentMusic.cover!);
     } else {
       artUri = null;
     }
     return MediaItem(
-        id: extra.hashCode.toString(),
-        title: info.name,
-        album: info.album,
+        id: currentMusic.hashCode.toString(),
+        title: currentMusic.name,
+        album: currentMusic.album,
         artUri: artUri,
-        artist: info.artist.join(","));
+        artist: currentMusic.artists.map((e) => e.name).join(","));
   }
 
+  // 更新歌词
   Future<void> _updateLyric() async {
-    if (info.lyric == null || info.lyric!.isEmpty) {
+    if (lyric == null || lyric!.isEmpty) {
       try {
-        var lyric = await aggregator.fetchLyric();
-        globalTalker.info("[MusicContainer] 更新 '${info.name}' 歌词成功");
-        info.lyric = lyric;
+        lyric = await currentMusic.getLyric();
+        globalTalker.info("[MusicContainer] 更新 '${currentMusic.name}' 歌词成功");
       } catch (e) {
         LogToast.error("更新歌词失败", "在线更新歌词失败: $e",
             "[MusicContainer] Failed to update lyric: $e");
-        info.lyric = "[00:00.00]获取歌词失败";
+        lyric = "[00:00.00]获取歌词失败";
       }
     }
   }
 
+  // 更新音频资源
   Future<bool> _updateAudioSource([Quality? quality]) async {
     lastUpdate = DateTime.now();
-    if (quality != null) extra = currentMusic.getExtraInfo(quality: quality);
     while (true) {
       try {
-        playInfo = await getCurrentMusicPlayInfo(quality);
+        playInfo = await getUpdatePlayInfo(quality);
       } catch (e) {
         playInfo = null;
       }
       if (playInfo != null) {
-        // 更新当前音质
-        currentQuality.value = playInfo!.quality;
-
         if (playInfo!.uri.contains("http")) {
           if ((Platform.isIOS || Platform.isMacOS) &&
               ((playInfo!.quality.format != null &&
                       playInfo!.quality.format!.contains("flac")) ||
-                  (playInfo!.quality.short.contains("flac")))) {
+                  (playInfo!.quality.summary.contains("flac")))) {
             audioSource = ProgressiveAudioSource(Uri.parse(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
@@ -194,7 +172,7 @@ class MusicContainer {
           if ((Platform.isIOS || Platform.isMacOS) &&
               ((playInfo!.quality.format != null &&
                       playInfo!.quality.format!.contains("flac")) ||
-                  (playInfo!.quality.short.contains("flac")))) {
+                  (playInfo!.quality.summary.contains("flac")))) {
             audioSource = ProgressiveAudioSource(Uri.file(playInfo!.uri),
                 tag: _toMediaItem(),
                 options: const ProgressiveAudioSourceOptions(
@@ -204,11 +182,12 @@ class MusicContainer {
             audioSource = AudioSource.file(playInfo!.uri, tag: _toMediaItem());
           }
         }
-        globalTalker.info("[MusicContainer] 更新 '${info.name}' 音频资源成功");
+        globalTalker
+            .info("[MusicContainer] 更新 '${musicAggregator.name}' 音频资源成功");
         return true;
       } else {
-        LogToast.error("更新播放资源失败", "${info.name}更新播放资源失败, 尝试换源播放",
-            "[MusicContainer] Failed to update audio source, try to change source");
+        // LogToast.error("更新播放资源失败", "${musicAggregator.name}更新播放资源失败, 尝试换源播放",
+        //     "[MusicContainer] Failed to update audio source, try to change source");
         bool changed = await _changeSource();
         if (!changed) {
           return false;
@@ -217,32 +196,55 @@ class MusicContainer {
     }
   }
 
-  Future<bool> _changeSource([String? source]) async {
-    // 换源表明弃用当前源，将其移到usedSource中
-    usedSources.add(currentMusic.source());
-    // 根据usedSource来获得下一个源
-    source ??= nextSource(usedSources);
+  // 切换音乐源         
+  Future<bool> _changeSource([MusicServer? server]) async {
+    usedServers.add(currentMusic.server);
+    server ??= nextSource(usedServers);
 
-    if (source != null) {
+    if (server != null) {
       try {
-        var musics = await aggregator.fetchMusics(sources: [source]);
-        if (musics.isEmpty) {
+        var hasServer = musicAggregator.musics.where((e) {
+          return e.server == server;
+        }).isNotEmpty;
+
+        if (!hasServer) {
+          try {
+            musicAggregator =
+                await musicAggregator.fetchServerOnline(servers: [server]);
+          } catch (e) {
+            musicAggregator = (e as dynamic).field0;
+            throw (e as dynamic).field1;
+          }
+        }
+
+        var index = musicAggregator.musics.indexWhere((e) {
+          return e.server == server;
+        });
+
+        if (index == -1) {
           LogToast.error(
               "切换音乐源失败",
-              "${info.name}切换音乐源失败: 在$source查找不到'${info.name}'歌曲.",
-              "[MusicContainer] Failed to change music source: Cannot find '${info.name}' in $source");
+              "'${musicAggregator.name}'切换音乐源失败: 在$server查找不到'${musicAggregator.name}'歌曲.",
+              "[MusicContainer] Failed to change music source: Cannot find '${musicAggregator.name}' in $server");
           return false;
         }
-        await aggregator.setDefaultSource(source: source);
-        currentMusic = aggregator.getDefaultMusic();
-        info = currentMusic.getMusicInfo();
-        extra = currentMusic.getExtraInfo(quality: info.defaultQuality!);
+        currentIndex = index;
+
+        if (musicAggregator.fromDb) {
+          await musicAggregator.saveToDb();
+          await musicAggregator.changeDefaultServerInDb(
+              server: currentMusic.server);
+          musicAggregator.defaultServer = server;
+        }
+
         audioSource =
             AudioSource.asset("assets/blank.mp3", tag: _toMediaItem());
-        LogToast.info("切换音乐源成功", "${info.name}默认音源切换为$source",
-            "[MusicContainer] Successfully changed music source to $source");
+        // LogToast.info("切换音乐源成功", "${musicAggregator.name}默认音源切换为$server",
+        //     "[MusicContainer] Successfully changed music source to $server");
       } catch (e) {
-        LogToast.error("切换音乐源失败", "${info.name}切换音乐源失败: $e",
+        LogToast.error(
+            "'${musicAggregator.name}'切换音乐源失败",
+            "${musicAggregator.name}切换音乐源失败: $e",
             "[MusicContainer] Failed to change music source: $e");
 
         return false;
@@ -250,21 +252,6 @@ class MusicContainer {
       return true;
     } else {
       return false;
-    }
-  }
-
-  void _updateQuality([Quality? quality]) {
-    if (quality != null) {
-      currentQuality.value = quality;
-      extra = currentMusic.getExtraInfo(quality: quality);
-    } else {
-      if (info.qualities.isNotEmpty) {
-        currentQuality = autoPickQuality(info.qualities).obs;
-        extra = currentMusic.getExtraInfo(quality: currentQuality.value!);
-      } else {
-        currentQuality.value = null;
-        extra = null;
-      }
     }
   }
 }

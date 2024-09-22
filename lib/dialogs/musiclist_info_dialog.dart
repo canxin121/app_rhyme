@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
@@ -9,17 +9,17 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<MusicListInfo?> showMusicListInfoDialog(BuildContext context,
-    {MusicListInfo? defaultMusicList, bool readonly = false}) async {
-  return showCupertinoDialog<MusicListInfo>(
+Future<Playlist?> showMusicListInfoDialog(BuildContext context,
+    {Playlist? defaultPlaylist, bool readonly = false}) async {
+  return showCupertinoDialog<Playlist>(
     context: context,
     builder: (BuildContext context) =>
-        MusicListDialog(defaultMusicList: defaultMusicList, readonly: readonly),
+        MusicListDialog(defaultMusicList: defaultPlaylist, readonly: readonly),
   );
 }
 
 class MusicListDialog extends StatefulWidget {
-  final MusicListInfo? defaultMusicList;
+  final Playlist? defaultMusicList;
   final bool readonly;
 
   const MusicListDialog(
@@ -41,13 +41,9 @@ class MusicListDialogState extends State<MusicListDialog> {
     nameController =
         TextEditingController(text: widget.defaultMusicList?.name ?? '');
     descController =
-        TextEditingController(text: widget.defaultMusicList?.desc ?? '');
-    if (widget.defaultMusicList != null) {
-      image = imageCacheHelper(widget.defaultMusicList!.artPic);
-    } else {
-      image = ExtendedImage.asset(defaultArtPicPath);
-    }
-    artPicPath = widget.defaultMusicList?.artPic ?? '';
+        TextEditingController(text: widget.defaultMusicList?.summary ?? '');
+    image = imageWithCache(widget.defaultMusicList?.cover);
+    artPicPath = widget.defaultMusicList?.cover ?? '';
   }
 
   @override
@@ -84,8 +80,9 @@ class MusicListDialogState extends State<MusicListDialog> {
                     if (imageFile != null) {
                       setState(() {
                         artPicPath = imageFile.path;
-                        image = ExtendedImage.file(File(artPicPath));
-                        cacheFileHelper(imageFile.path, picCacheRoot);
+                        // image = ExtendedImage.file(File(artPicPath));
+                        image = imageWithCache(artPicPath);
+                        cacheFileFromUriWrapper(imageFile.path, picCacheFolder);
                       });
                     }
                   },
@@ -169,14 +166,21 @@ class MusicListDialogState extends State<MusicListDialog> {
         if (!widget.readonly)
           CupertinoDialogAction(
             isDefaultAction: true,
-            onPressed: () {
+            onPressed: () async {
               if (nameController.text.isNotEmpty) {
-                Navigator.of(context).pop(MusicListInfo(
-                  id: 0,
-                  name: nameController.text,
-                  artPic: artPicPath,
-                  desc: descController.text,
-                ));
+                if (widget.defaultMusicList != null) {
+                  widget.defaultMusicList!.name = nameController.text;
+                  widget.defaultMusicList!.summary = descController.text;
+                  widget.defaultMusicList!.cover = artPicPath;
+                  Navigator.of(context).pop(widget.defaultMusicList!);
+                } else {
+                  Navigator.of(context).pop(await Playlist.newInstance(
+                    name: nameController.text,
+                    summary: descController.text,
+                    cover: artPicPath,
+                    subscriptions: [],
+                  ));
+                }
               }
             },
             child: Text(

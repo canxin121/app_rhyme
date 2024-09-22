@@ -1,5 +1,7 @@
+// 涉及非常多bug的bypass, 很难run, 需要谨慎修改
+
 import 'dart:io';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:app_rhyme/types/music_container.dart';
@@ -91,7 +93,7 @@ class AudioHandler extends GetxController {
           allowFailedTimes = 3;
           if (isPlaying) await pause();
           LogToast.error("播放失败!", "播放失败次数过多，暂停播放!",
-              "[LazyLoadMusic] Failed to lazy load music '${musicList[index].info.name}' to many times, stop playing.");
+              "[LazyLoadMusic] Failed to lazy load music '${musicList[index].musicAggregator.name}' to many times, stop playing.");
 
           return;
         } else {
@@ -122,7 +124,7 @@ class AudioHandler extends GetxController {
         var current = player.currentIndex;
         if (!await musicList[index].updateAll(quality)) {
           globalTalker.info(
-              "[Music Handler] LazyLoad Music Failed to updateAudioSource: ${musicList[index].info.name}");
+              "[Music Handler] LazyLoad Music Failed to updateAudioSource: ${musicList[index].musicAggregator.name}");
           return;
         }
         // 先将播放器暂停下来
@@ -144,7 +146,7 @@ class AudioHandler extends GetxController {
           await player.seek(Duration.zero, index: current);
           play();
           globalTalker.info(
-              "[Music Hanlder] LazyLoad Music Succeed: ${musicList[index].info.name}");
+              "[Music Hanlder] LazyLoad Music Succeed: ${musicList[index].musicAggregator.name}");
         });
       });
     } catch (e) {
@@ -164,8 +166,8 @@ class AudioHandler extends GetxController {
       if (player.playing) await pause();
       await audioSourceListLock.synchronized(() async {
         // 删去原来的相同音乐并添加新的音乐到最后
-        var index = musicList
-            .indexWhere((element) => element.extra == musicContainer.extra);
+        var index = musicList.indexWhere(
+            (element) => element.hashCode == musicContainer.hashCode);
         if (index != -1) {
           musicList.removeAt(index);
           await audioSourceList.removeAt(index);
@@ -184,7 +186,9 @@ class AudioHandler extends GetxController {
       // 播放新的音乐
       await seek(Duration.zero, index: audioSourceList.length - 1);
     } catch (e) {
-      LogToast.error("添加音乐播放失败", "添加音乐 '${musicContainer.info.name}' 播放失败!",
+      LogToast.error(
+          "添加音乐播放失败",
+          "添加音乐 '${musicContainer.musicAggregator.name}' 播放失败!",
           "[Music Handler] In addMusicPlay, error occur: $e");
     }
   }
@@ -193,8 +197,8 @@ class AudioHandler extends GetxController {
   Future<void> replacePlayingMusic(Quality quality_) async {
     try {
       if (playingMusic.value == null) return;
-      int index = musicList
-          .indexWhere((element) => element.extra == playingMusic.value!.extra);
+      int index = musicList.indexWhere(
+          (element) => element.hashCode == playingMusic.value!.hashCode);
 
       if (index != -1) {
         await tryLazyLoadMusic(index, quality: quality_, force: true);
@@ -211,10 +215,10 @@ class AudioHandler extends GetxController {
   Future<void> replaceMusic(MusicContainer music) async {
     try {
       int index =
-          musicList.indexWhere((element) => element.extra == music.extra);
+          musicList.indexWhere((element) => element.hashCode == music.hashCode);
       if (index != -1) {
         if (index == player.currentIndex) {
-          await replacePlayingMusic(musicList[index].info.defaultQuality!);
+          await replacePlayingMusic(musicList[index].playInfo!.quality);
           // await tryLazyLoadMusic(index, force: true);
         } else {
           musicList[index].setOutdate();
@@ -335,10 +339,10 @@ class AudioHandler extends GetxController {
         }
         String name;
         if (index != null) {
-          name = musicList[index].info.name;
+          name = musicList[index].musicAggregator.name;
           await tryLazyLoadMusic(index);
         } else {
-          name = playingMusic.value?.info.name ?? "No Music";
+          name = playingMusic.value?.musicAggregator.name ?? "No Music";
         }
         await player.seek(position, index: index);
         play();
@@ -371,7 +375,7 @@ class AudioHandler extends GetxController {
       playingMusic.value = null;
     }
     globalTalker.info(
-        "[Music Handler] Succeed to updatePlayingMusic:  [${playingMusic.value?.info.source ?? "No music"}]${playingMusic.value?.info.name ?? "No music"}");
+        "[Music Handler] Succeed to updatePlayingMusic:  [${playingMusic.value?.musicAggregator.defaultServer ?? "No music"}]${playingMusic.value?.musicAggregator.defaultServer ?? "No music"}");
     update();
   }
 

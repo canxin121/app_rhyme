@@ -1,6 +1,5 @@
-import 'package:app_rhyme/pulldown_menus/musiclist_pulldown_menu.dart';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -11,7 +10,7 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 class MusicListImageCard extends StatefulWidget {
-  final MusicListW musicListW;
+  final Playlist playlist;
   final bool online;
   final GestureTapCallback? onTap;
   final bool cachePic;
@@ -19,7 +18,7 @@ class MusicListImageCard extends StatefulWidget {
 
   const MusicListImageCard(
       {super.key,
-      required this.musicListW,
+      required this.playlist,
       required this.online,
       this.onTap,
       this.cachePic = false,
@@ -34,7 +33,6 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
 
   @override
   Widget build(BuildContext context) {
-    MusicListInfo musicListInfo = widget.musicListW.getMusiclistInfo();
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
     final Color textColor =
@@ -59,10 +57,11 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
               List<PullDownMenuEntry> menuItems;
               if (!widget.online) {
                 // 本地歌单的歌曲
-                menuItems = localMusiclistItems(context, widget.musicListW);
+                menuItems =
+                    localMusiclistItems(context, widget.playlist, false);
               } else {
                 // 在线的歌曲
-                menuItems = onlineMusicListItems(context, widget.musicListW);
+                menuItems = onlineMusicListItems(context, widget.playlist);
               }
               showPullDownMenu(
                   context: context, items: menuItems, position: position);
@@ -71,8 +70,11 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(5.0),
-                  child: imageCacheHelper(musicListInfo.artPic,
-                      cacheNow: widget.cachePic),
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                    child: imageWithCache(widget.playlist.cover,
+                        cacheNow: widget.cachePic),
+                  ),
                 ),
                 if (_hovering)
                   Positioned.fill(
@@ -80,7 +82,7 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                       color: CupertinoColors.systemGrey.withOpacity(0.1),
                     ),
                   ),
-                if (_hovering || isTablet(context))
+                if (_hovering || !isTablet(context))
                   Positioned(
                     bottom: 8,
                     right: 8,
@@ -90,8 +92,8 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                           details.globalPosition,
                           details.globalPosition,
                         );
-                        showMusicListMenu(context, widget.musicListW,
-                            widget.online, position);
+                        showMusicListMenu(
+                            context, widget.playlist, position, false);
                       },
                       child: Icon(
                         CupertinoIcons.ellipsis_circle,
@@ -100,15 +102,13 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                       ),
                     ),
                   ),
-                if (_hovering || isTablet(context))
+                if (_hovering || !isTablet(context))
                   Positioned(
                     bottom: 8,
                     left: 8,
                     child: GestureDetector(
                       onTap: () async {
-                        var aggs = await widget.musicListW
-                            .fetchAllMusicAggregators(
-                                pagesPerBatch: 5, limit: 50, withLyric: false);
+                        var aggs = await widget.playlist.getMusicsFromDb();
                         await globalAudioHandler.clearReplaceMusicAll(
                             aggs.map((e) => MusicContainer(e)).toList());
                       },
@@ -128,7 +128,7 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
           fit: FlexFit.loose,
           child: Center(
             child: Text(
-              musicListInfo.name,
+              widget.playlist.name,
               textAlign: TextAlign.center,
               overflow: TextOverflow.visible,
               style: TextStyle(color: textColor, fontSize: 16)
@@ -143,7 +143,7 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
             fit: FlexFit.loose,
             child: Center(
               child: Text(
-                musicListInfo.desc,
+                widget.playlist.summary ?? "",
                 style: TextStyle(
                   color: isDarkMode
                       ? CupertinoColors.systemGrey4

@@ -34,14 +34,17 @@ class MusicInfoState extends State<MusicInfo> {
                   children: [
                     TextSpan(
                       text:
-                          "${globalAudioHandler.playingMusic.value?.info.name ?? "Music"}\n",
+                          "${globalAudioHandler.playingMusic.value?.currentMusic.name ?? "Music"}\n",
                       style: TextStyle(
                               fontSize: widget.titleHeight,
                               color: CupertinoColors.systemGrey6)
                           .useSystemChineseFont(),
                     ),
                     TextSpan(
-                      text: globalAudioHandler.playingMusic.value?.info.artist
+                      text: globalAudioHandler
+                              .playingMusic.value?.currentMusic.artists
+                              .map((e) => e.name)
+                              .toList()
                               .join(", ") ??
                           "Artist",
                       style: TextStyle(

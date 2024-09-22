@@ -1,6 +1,6 @@
-import 'package:app_rhyme/utils/const_vars.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 
-String? nextSource(List<String> availableSources) {
+MusicServer? nextSource(List<MusicServer> availableSources) {
   // 传入已经使用过的源，返回下一个可用的源，如果没有下一个源了，返回 null
   // 顺序：酷我 => 网易
 
@@ -8,20 +8,9 @@ String? nextSource(List<String> availableSources) {
     return null;
   }
 
-  if (availableSources.contains(sourceKuWo)) {
-    return sourceWangYi;
+  if (availableSources.contains(MusicServer.kuwo)) {
+    return MusicServer.netease;
   } else {
-    return sourceKuWo;
-  }
-}
-
-String sourceToShort(String source) {
-  switch (source) {
-    case sourceKuWo:
-      return 'kw';
-    case sourceWangYi:
-      return 'wy';
-    default:
-      return source;
+    return MusicServer.kuwo;
   }
 }

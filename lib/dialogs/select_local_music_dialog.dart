@@ -1,16 +1,15 @@
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/musiclist_list_item.dart';
+import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_list_item.dart';
 import 'package:flutter/cupertino.dart';
 
-Future<MusicListW?> showMusicListSelectionDialog(BuildContext context) async {
-  var musicLists = await SqlFactoryW.getAllMusiclists();
+Future<Playlist?> showMusicListSelectionDialog(BuildContext context) async {
+  var musicLists = await Playlist.getFromDb();
   if (context.mounted) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
 
-    return await showCupertinoModalPopup<MusicListW>(
+    return await showCupertinoModalPopup<Playlist>(
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
@@ -26,7 +25,7 @@ Future<MusicListW?> showMusicListSelectionDialog(BuildContext context) async {
                 Navigator.pop(context, musicLists[index]);
               },
               child: MusicListListItem(
-                musicListW: musicLists[index],
+                playlist: musicLists[index],
                 online: false,
                 onTap: () {
                   Navigator.of(context).pop(musicLists[index]);

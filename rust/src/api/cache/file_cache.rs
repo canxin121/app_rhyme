@@ -1,10 +1,8 @@
 use anyhow::Result;
 use futures::StreamExt as _;
-use music_api::util::CLIENT;
+use music_api::CLIENT;
 use std::hash::{DefaultHasher, Hash as _, Hasher as _};
 use std::path::PathBuf;
-use std::thread::sleep;
-use std::time::Duration;
 use tokio::io::AsyncWriteExt;
 
 use crate::api::utils::path_util::url_encode_special_chars;
@@ -20,24 +18,72 @@ pub fn gen_hash(str_: &str) -> String {
     format!("{:x}", hasher.finish())
 }
 
+/// cache file
+/// uri: file path or url
+/// filename: file name, if None, use hash value
+/// custom_root: custom storage path, if None, use root path of the app
 #[flutter_rust_bridge::frb]
-pub async fn cache_file(
-    file: &str,
-    cache_path: &str,
+pub async fn cache_file_from_uri(
+    uri: &str,
+    cache_folder: &str,
     filename: Option<String>,
-    export_root: Option<String>,
+    custom_root: Option<String>,
 ) -> Result<String, anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
     let filename = match filename {
-        None => gen_hash(file),
+        None => gen_hash(uri),
         Some(filename) => url_encode_special_chars(&filename),
     };
-    let mut root_path = match export_root {
+
+    let mut root_path = match custom_root {
         Some(export_root) => export_root.into(),
         None => ROOT_PATH.read().await.clone(),
     };
 
-    root_path.push(cache_path);
+    root_path.push(cache_folder);
+
+    if !root_path.exists() {
+        tokio::fs::create_dir_all(&root_path).await?;
+    }
+
+    let filepath = root_path
+        .join(&filename)
+        .to_string_lossy()
+        .to_string()
+        .replace("\r", "");
+    if uri.starts_with("http") {
+        let response = CLIENT.get(uri).send().await?;
+        let mut stream = response.bytes_stream();
+        let mut file = tokio::fs::File::create(&filepath).await?;
+        while let Some(chunk) = stream.next().await {
+            let data = chunk?;
+            file.write_all(&data).await?;
+        }
+    } else {
+        tokio::fs::copy(uri, &filepath).await?;
+    }
+
+    Ok(filepath)
+}
+
+/// cache file from content
+/// content: file content
+/// filename: file name
+/// custom_root: custom storage path, if None, use root path of the app
+pub async fn cache_file_from_content(
+    content: String,
+    cache_folder: &str,
+    filename: String,
+    custom_root: Option<String>,
+) -> Result<String, anyhow::Error> {
+    let _ = FILE_OP_SEMAPHORE.acquire().await?;
+
+    let mut root_path = match custom_root {
+        Some(export_root) => export_root.into(),
+        None => ROOT_PATH.read().await.clone(),
+    };
+
+    root_path.push(cache_folder);
 
     if !root_path.exists() {
         tokio::fs::create_dir_all(&root_path).await?;
@@ -49,70 +95,34 @@ pub async fn cache_file(
         .to_string()
         .replace("\r", "");
 
-    if file.starts_with("http") {
-        let response = CLIENT.get(file).send().await?;
-        let mut stream = response.bytes_stream();
-        let mut file = tokio::fs::File::create(&filepath).await?;
-        while let Some(chunk) = stream.next().await {
-            let data = chunk?;
-            file.write_all(&data).await?;
-        }
-    } else {
-        tokio::fs::copy(file, &filepath).await?;
-    }
+    let mut file = tokio::fs::File::create(&filepath).await?;
+    file.write_all(content.as_bytes()).await?;
 
     Ok(filepath)
 }
 
+// get cached file path from uri
+// uri: file path or url
+// root: root path of the app
+// filename: file name, if None, use hash value
+// custom_root: custom storage path, if None, use root path of the app
 #[flutter_rust_bridge::frb(sync)]
-pub fn use_cache_file(
-    file: &str,
-    cache_path: &str,
+pub fn get_cache_file_from_uri(
+    uri: &str,
+    cache_folder: &str,
     filename: Option<String>,
-    export_root: Option<String>,
+    root: String,
+    custom_root: Option<String>,
 ) -> Option<String> {
     let filename = match filename {
-        None => gen_hash(file),
+        None => gen_hash(uri),
         Some(filename) => url_encode_special_chars(&filename),
     };
 
-    let mut attempts = 0;
-    let max_attempts = 5;
-    let mut root_path = match export_root {
-        Some(export_root) => {
-            let mut root_path: PathBuf = export_root.into();
-            root_path.push(cache_path);
-            let filepath = root_path.join(&filename);
+    let mut folder = PathBuf::from(custom_root.unwrap_or(root));
+    folder.push(cache_folder);
 
-            if filepath.exists() {
-                return Some(filepath.to_string_lossy().into_owned());
-            } else {
-                None
-            }
-        }
-        None => {
-            let mut root = None;
-
-            while attempts < max_attempts {
-                match ROOT_PATH.try_read() {
-                    Ok(lock) => {
-                        root = Some(lock.clone());
-                        break;
-                    }
-                    Err(_) => {
-                        attempts += 1;
-                        sleep(Duration::from_millis(10)); // 等待 10 毫秒后重试
-                    }
-                }
-            }
-
-            let root = root;
-            root
-        }
-    }?;
-
-    root_path.push(cache_path);
-    let filepath = root_path.join(&filename);
+    let filepath = folder.join(&filename);
 
     if filepath.exists() {
         Some(filepath.to_string_lossy().into_owned())
@@ -121,26 +131,30 @@ pub fn use_cache_file(
     }
 }
 
+// delete cached file
+// uri: file path or url
+// filename: file name, if None, use hash value
+// custom_root: custom storage path, if None, use root path of the app
 #[flutter_rust_bridge::frb]
-pub async fn delete_cache_file(
-    file: &str,
-    cache_path: &str,
+pub async fn delete_cache_file_with_uri(
+    uri: &str,
+    cache_folder: &str,
     filename: Option<String>,
-    export_root: Option<String>,
+    custom_root: Option<String>,
 ) -> Result<(), anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
 
     let filename = match filename {
-        None => gen_hash(file),
+        None => gen_hash(uri),
         Some(filename) => url_encode_special_chars(&filename),
     };
 
-    let mut root_path = match export_root {
+    let mut root_path = match custom_root {
         Some(export_root) => export_root.into(),
         None => ROOT_PATH.read().await.clone(),
     };
 
-    root_path.push(cache_path);
+    root_path.push(cache_folder);
 
     let filepath = root_path.join(&filename);
 

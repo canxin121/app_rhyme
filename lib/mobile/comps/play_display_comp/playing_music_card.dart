@@ -56,8 +56,9 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                     shadowStrength: Platform.isIOS ? 4 : 8,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4.0),
-                    child: imageCacheHelper(
-                        globalAudioHandler.playingMusic.value?.info.artPic,
+                    child: imageWithCache(
+                        globalAudioHandler
+                            .playingMusic.value?.currentMusic.cover,
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,
@@ -72,7 +73,8 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                     children: <Widget>[
                       Obx(
                         () => Text(
-                          globalAudioHandler.playingMusic.value?.info.name ??
+                          globalAudioHandler
+                                  .playingMusic.value?.currentMusic.name ??
                               "Music",
                           style: const TextStyle(
                             color: CupertinoColors.systemGrey6,
@@ -83,7 +85,9 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                       ),
                       const SizedBox(height: 3.0),
                       Obx(() => Text(
-                            globalAudioHandler.playingMusic.value?.info.artist
+                            globalAudioHandler
+                                    .playingMusic.value?.currentMusic.artists
+                                    .map((e) => e.name)
                                     .join(", ") ??
                                 "Artist",
                             style: const TextStyle(

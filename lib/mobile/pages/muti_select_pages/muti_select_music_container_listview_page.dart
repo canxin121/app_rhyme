@@ -1,6 +1,5 @@
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
-
+import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
@@ -8,22 +7,20 @@ import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
-import 'package:app_rhyme/mobile/comps/music_container_comp/music_container_list_item.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 class MutiSelectMusicContainerListPage extends StatefulWidget {
-  final List<MusicContainer> musicContainers;
-  final MusicListW? musicList;
+  final List<MusicAggregator> musicAggs;
+  final Playlist? musicList;
 
   const MutiSelectMusicContainerListPage({
     super.key,
     this.musicList,
-    required this.musicContainers,
+    required this.musicAggs,
   });
 
   @override
@@ -59,9 +56,8 @@ class MutiSelectMusicContainerListPageState
 
   void handleDeleteSelected() {
     setState(() {
-      widget.musicContainers.removeWhere((element) => controller
-          .value.selectedIndexes
-          .contains(widget.musicContainers.indexOf(element)));
+      widget.musicAggs.removeWhere((element) => controller.value.selectedIndexes
+          .contains(widget.musicAggs.indexOf(element)));
       controller.clear();
     });
   }
@@ -72,7 +68,7 @@ class MutiSelectMusicContainerListPageState
 
   void handleSelectAll() {
     Set<int> selectAllSet =
-        Set.from(List.generate(widget.musicContainers.length, (i) => i));
+        Set.from(List.generate(widget.musicAggs.length, (i) => i));
     setState(() {
       controller.clear();
       controller.dispose();
@@ -90,9 +86,8 @@ class MutiSelectMusicContainerListPageState
   }
 
   void handleReverseSelect() {
-    Set<int> selectAllSet = Set.from(List.generate(
-        widget.musicContainers.length, (i) => i,
-        growable: false));
+    Set<int> selectAllSet = Set.from(
+        List.generate(widget.musicAggs.length, (i) => i, growable: false));
     selectAllSet.removeAll(controller.value.selectedIndexes);
     setState(() {
       controller.clear();
@@ -139,9 +134,9 @@ class MutiSelectMusicContainerListPageState
                 style: TextStyle(color: activeIconRed).useSystemChineseFont(),
               ),
             ),
-            musicListW: widget.musicList,
-            musicContainers: controller.value.selectedIndexes
-                .map((index) => widget.musicContainers[index])
+            playlist: widget.musicList,
+            musicAggs: controller.value.selectedIndexes
+                .map((index) => widget.musicAggs[index])
                 .toList(),
             cancelSelectAll: handleCancelSelectAll,
             selectAll: handleSelectAll,
@@ -149,7 +144,7 @@ class MutiSelectMusicContainerListPageState
           ),
         ),
         Expanded(
-            child: widget.musicContainers.isEmpty
+            child: widget.musicAggs.isEmpty
                 ? Center(
                     child: Text(
                       "没有音乐",
@@ -167,21 +162,21 @@ class MutiSelectMusicContainerListPageState
                       gridController: controller,
                       padding: const EdgeInsets.only(
                           bottom: 100, top: 10, left: 10, right: 10),
-                      itemCount: widget.musicContainers.length,
+                      itemCount: widget.musicAggs.length,
                       triggerSelectionOnTap: true,
                       itemBuilder: (context, index, selected) {
-                        final musicContainer = widget.musicContainers[index];
+                        final musicContainer = widget.musicAggs[index];
                         return Column(
                           children: [
                             Row(
                               key: ValueKey(
-                                  "${selected}_${musicContainer.info.id}"),
+                                  "${selected}_${musicContainer.name}_${musicContainer.artist}"),
                               children: [
                                 Expanded(
                                   child: MusicContainerListItem(
                                     showMenu: false,
-                                    musicContainer: musicContainer,
-                                    musicListW: widget.musicList,
+                                    musicAgg: musicContainer,
+                                    playlist: widget.musicList,
                                   ),
                                 ),
                                 Icon(
@@ -224,8 +219,8 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   const MutiSelectLocalMusicContainerListChoiceMenu({
     super.key,
     required this.builder,
-    required this.musicListW,
-    required this.musicContainers,
+    required this.playlist,
+    required this.musicAggs,
     required this.refresh,
     required this.cancelSelectAll,
     required this.selectAll,
@@ -234,8 +229,8 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   });
 
   final PullDownMenuButtonBuilder builder;
-  final MusicListW? musicListW;
-  final List<MusicContainer> musicContainers;
+  final Playlist? playlist;
+  final List<MusicAggregator> musicAggs;
   final void Function() refresh;
   final void Function() cancelSelectAll;
   final void Function() selectAll;
@@ -243,8 +238,8 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   final void Function() reverseSelect;
 
   Future<void> handleCacheSelected() async {
-    for (var musicContainer in musicContainers) {
-      await cacheMusic(musicContainer);
+    for (var musicAgg in musicAggs) {
+      await cacheMusicContainer(MusicContainer(musicAgg));
       refresh();
     }
     LogToast.success("缓存选中音乐", "缓存选中音乐成功",
@@ -252,8 +247,12 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   }
 
   Future<void> handleDeleteCacheSelected() async {
-    for (var musicContainer in musicContainers) {
-      await delMusicCache(musicContainer, showToast: false);
+    for (var musicAgg in musicAggs) {
+      var defaultMusic = getMusicAggregatorDefaultMusic(musicAgg);
+      if (defaultMusic == null) {
+        continue;
+      }
+      await deleteMusicCache(musicInfo: defaultMusic);
       refresh();
     }
     LogToast.success("删除选中音乐缓存", "删除选中音乐缓存成功",
@@ -261,13 +260,11 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   }
 
   Future<void> handleDeleteFromList() async {
-    if (musicListW != null) {
-      MusicListInfo musicListInfo = musicListW!.getMusiclistInfo();
-      SqlFactoryW.delMusics(
-        musicListName: musicListInfo.name,
-        ids: Int64List.fromList(musicContainers.map((e) => e.info.id).toList()),
-      );
-      refreshMusicContainerListViewPage();
+    if (playlist != null) {
+      for (var musicAgg in musicAggs) {
+        await musicAgg.delFromDb();
+      }
+      refreshMusicAggregatorListViewPage();
       delSelected();
     }
   }
@@ -275,14 +272,13 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<PullDownMenuEntry> menuItems = [
-      if (musicListW != null) ...[
+      if (playlist != null) ...[
         PullDownMenuHeader(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          leading: imageCacheHelper(musicListW!.getMusiclistInfo().artPic),
-          title: musicListW!.getMusiclistInfo().name,
-          subtitle: musicListW!.getMusiclistInfo().desc,
-        ),
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            leading: imageWithCache(playlist!.cover),
+            title: playlist!.name,
+            subtitle: playlist!.summary),
         const PullDownMenuDivider.large(),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
@@ -310,7 +306,7 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
         itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
-          await addMusicsToMusicList(context, musicContainers);
+          await addMusicsToPlayList(context, musicAggs);
         },
         title: '添加到歌单',
         icon: CupertinoIcons.add,
@@ -319,7 +315,7 @@ class MutiSelectLocalMusicContainerListChoiceMenu extends StatelessWidget {
         itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
-          await createNewMusicListFromMusics(context, musicContainers);
+          await createNewMusicListFromMusics(context, musicAggs);
         },
         title: '创建新歌单',
         icon: CupertinoIcons.add_circled,

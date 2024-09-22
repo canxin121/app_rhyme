@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/src/rust/api/music_api/plugin_fn.dart';
 import 'package:app_rhyme/src/rust/api/types/playinfo.dart';
 import 'package:app_rhyme/src/rust/api/utils/crypto.dart' as crypto;
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -117,10 +119,13 @@ class Crypto {
 
   Future<String> rc4DecryptFromBase64_(String input) async {
     try {
-      return await crypto.rc4DecryptFromBase64(
-          key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
+      // TODO: secret
+      // return await crypto.rc4DecryptFromBase64(
+      //     key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
+
+      return await crypto.rc4DecryptFromBase64(key: "rhyme666", input: input);
     } catch (e) {
-      globalTalker.error("[Crypto] $e");
+      globalTalker.error("[Crypto] $e");      
       return "";
     }
   }
@@ -242,13 +247,12 @@ class ExternApiEvaler {
         isBridge: true);
   }
 
-  Future<PlayInfo?> getMusicPlayInfo(
-    String source,
-    String extra,
-  ) async {
+  Future<PlayInfo?> getMusicPlayInfo(Music music, Quality quality) async {
     try {
+      var server = music.server.toString();
+      var payload = await musicToJson(music: music, quality: quality);
       var resultFuture = runTime.executeLib("package:api/main.dart",
-          "getMusicPlayInfo", [$String(source), $String(extra)]) as Future;
+          "getMusicPlayInfo", [$String(server), $String(payload)]) as Future;
       dynamic result = await resultFuture;
       if (result.runtimeType != $null) {
         return playInfoFromObject(result.$reified);

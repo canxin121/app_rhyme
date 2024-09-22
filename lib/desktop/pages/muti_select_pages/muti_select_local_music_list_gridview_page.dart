@@ -1,22 +1,21 @@
 import 'package:app_rhyme/desktop/comps/delegate.dart';
 import 'package:app_rhyme/desktop/comps/musiclist_comp/musiclist_image_card.dart';
 import 'package:app_rhyme/desktop/home.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 class DesktopMutiSelectLocalMusicListGridPage extends StatefulWidget {
-  final List<MusicListW> musicLists;
+  final List<Playlist> playlists;
 
   const DesktopMutiSelectLocalMusicListGridPage(
-      {super.key, required this.musicLists});
+      {super.key, required this.playlists});
 
   @override
   DesktopMutiSelectLocalMusicListGridPageState createState() =>
@@ -50,7 +49,7 @@ class DesktopMutiSelectLocalMusicListGridPageState
 
   void handleSelectAll() {
     Set<int> selectAllSet =
-        Set.from(List.generate(widget.musicLists.length, (i) => i));
+        Set.from(List.generate(widget.playlists.length, (i) => i));
     setState(() {
       controller.clear();
       controller.dispose();
@@ -69,7 +68,7 @@ class DesktopMutiSelectLocalMusicListGridPageState
 
   void handleReverseSelect() {
     Set<int> selectAllSet = Set.from(
-        List.generate(widget.musicLists.length, (i) => i, growable: false));
+        List.generate(widget.playlists.length, (i) => i, growable: false));
     selectAllSet.removeAll(controller.value.selectedIndexes);
     setState(() {
       controller.clear();
@@ -89,20 +88,19 @@ class DesktopMutiSelectLocalMusicListGridPageState
       );
       return;
     }
-    List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
-        .map((index) => widget.musicLists[index])
+    List<Playlist> selectedPlayists = controller.value.selectedIndexes
+        .map((index) => widget.playlists[index])
         .toList();
     try {
-      await SqlFactoryW.delMusiclist(
-          musiclistNames: selectedMusicLists
-              .map((musicList) => musicList.getMusiclistInfo().name)
-              .toList());
+      for (var playlist in selectedPlayists) {
+        await playlist.delFromDb();
+      }
       setState(() {
-        widget.musicLists
-            .removeWhere((musicList) => selectedMusicLists.contains(musicList));
+        widget.playlists
+            .removeWhere((musicList) => selectedPlayists.contains(musicList));
         controller.clear();
       });
-      refreshMusicListGridViewPage();
+      refreshPlaylistGridViewPage();
       LogToast.success(
         "删除歌单成功",
         "删除歌单成功",
@@ -153,7 +151,7 @@ class DesktopMutiSelectLocalMusicListGridPageState
               reverseSelect: handleReverseSelect,
             ),
           ),
-          widget.musicLists.isEmpty
+          widget.playlists.isEmpty
               ? Center(
                   child: Text("没有歌单",
                       style:
@@ -167,15 +165,15 @@ class DesktopMutiSelectLocalMusicListGridPageState
                       gridController: controller,
                       padding: const EdgeInsets.only(
                           bottom: 100, top: 10, left: 10, right: 10),
-                      itemCount: widget.musicLists.length,
+                      itemCount: widget.playlists.length,
                       triggerSelectionOnTap: true,
                       itemBuilder: (context, index, selected) {
-                        final musicList = widget.musicLists[index];
+                        final musicList = widget.playlists[index];
                         return Stack(
                           key: ValueKey("${selected}_${musicList.hashCode}"),
                           children: [
                             MusicListImageCard(
-                              musicListW: musicList,
+                              playlist: musicList,
                               online: false,
                               showDesc: false,
                               cachePic: globalConfig.savePicWhenAddMusicList,

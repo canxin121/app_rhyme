@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use music_api::SqlFactory;
+use music_api::data::set_db;
 use tokio::fs::create_dir_all;
 
 use crate::api::{CONFIG, ROOT_PATH};
@@ -54,8 +54,14 @@ pub async fn init_backend(store_root: String) -> Result<Config, anyhow::Error> {
         del_old_data().await?;
     }
 
-    let db_path_str = db_path.to_str().unwrap().to_string();
-    SqlFactory::init_from_path(&db_path_str).await.unwrap();
+    if !db_path.exists() {
+        let parent = db_path.parent().unwrap();
+        create_dir_all(parent).await?;
+        // 创建空的db文件
+        tokio::fs::File::create(&db_path).await?;
+    }
+    let db_uri = format!("sqlite://{}", db_path.to_str().unwrap());
+    set_db(&db_uri).await?;
 
     Ok(config)
 }

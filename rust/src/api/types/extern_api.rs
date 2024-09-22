@@ -1,7 +1,7 @@
 use crate::api::ROOT_PATH;
 use chrono::{DateTime, Utc};
 use flutter_rust_bridge::frb;
-use music_api::util::CLIENT;
+use music_api::CLIENT;
 use reqwest::header::{HeaderValue, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

@@ -1,12 +1,10 @@
-import 'package:app_rhyme/mobile/comps/musiclist_comp/musiclist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/mobile/pages/muti_select_pages/muti_select_online_music_list_gridview_page.dart';
-import 'package:app_rhyme/mobile/pages/online_music_list_page.dart';
+import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +20,7 @@ class SearchMusicListPage extends StatefulWidget {
 
 class _SearchMusicListState extends State<SearchMusicListPage>
     with WidgetsBindingObserver {
-  final PagingController<int, MusicListW> _pagingController =
+  final PagingController<int, Playlist> _pagingController =
       PagingController(firstPageKey: 1);
   final TextEditingController _inputContentController = TextEditingController();
 
@@ -59,11 +57,11 @@ class _SearchMusicListState extends State<SearchMusicListPage>
       if (_inputContentController.value.text.isEmpty) {
         _pagingController.appendLastPage([]);
       }
-      var musiclists = await OnlineFactoryW.searchMusiclist(
-          sources: [sourceAll],
+      var musiclists = await Playlist.searchOnline(
+          servers: [MusicServer.kuwo, MusicServer.netease],
           content: _inputContentController.value.text,
           page: pageKey,
-          limit: 30);
+          size: 30);
       if (musiclists.isEmpty) {
         _pagingController.appendLastPage([]);
       } else {
@@ -116,16 +114,13 @@ class _SearchMusicListState extends State<SearchMusicListPage>
               openShareMusicList: () async {
                 var url = await showInputPlaylistShareLinkDialog(context);
                 if (url != null) {
-                  var result =
-                      await OnlineFactoryW.getMusiclistFromShare(shareUrl: url);
-                  var musicListW = result.$1;
-                  var musicAggregators = result.$2;
+                  var musicListW = await Playlist.getFromShare(share: url);
+
                   if (context.mounted) {
                     Navigator.of(context).push(
                       CupertinoPageRoute(
                           builder: (context) => MobileOnlineMusicListPage(
-                                musicList: musicListW,
-                                firstPageMusicAggregators: musicAggregators,
+                                playlist: musicListW,
                               )),
                     );
                   }
@@ -151,7 +146,7 @@ class _SearchMusicListState extends State<SearchMusicListPage>
           child: PagedGridView(
               padding: EdgeInsets.only(bottom: screenHeight * 0.2),
               pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<MusicListW>(
+              builderDelegate: PagedChildBuilderDelegate<Playlist>(
                   noItemsFoundIndicatorBuilder: (context) {
                 return Center(
                   child: Column(
@@ -183,13 +178,13 @@ class _SearchMusicListState extends State<SearchMusicListPage>
                     padding: const EdgeInsets.only(left: 10, right: 10),
                     child: MusicListImageCard(
                       showDesc: false,
-                      musicListW: musicListW,
+                      playlist: musicListW,
                       onTap: () {
                         Navigator.push(
                           context,
                           CupertinoPageRoute(
                               builder: (context) => MobileOnlineMusicListPage(
-                                    musicList: musicListW,
+                                    playlist: musicListW,
                                   )),
                         );
                       },
@@ -216,7 +211,7 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
 
   final void Function() openShareMusicList;
   final Future<void> Function() fetchAllMusicAggregators;
-  final PagingController<int, MusicListW> musicListController;
+  final PagingController<int, Playlist> musicListController;
   final PullDownMenuButtonBuilder builder;
 
   @override
@@ -268,7 +263,7 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
               Navigator.of(context).push(
                 CupertinoPageRoute(
                   builder: (context) => MutiSelectOnlineMusicListGridPage(
-                    musicLists: musicListController.itemList!,
+                    playlists: musicListController.itemList!,
                   ),
                 ),
               );

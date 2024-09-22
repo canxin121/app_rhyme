@@ -1,7 +1,6 @@
 import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -9,16 +8,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/musiclist_image_card.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 class MutiSelectOnlineMusicListGridPage extends StatefulWidget {
-  final List<MusicListW> musicLists;
+  final List<Playlist> playlists;
 
-  const MutiSelectOnlineMusicListGridPage(
-      {super.key, required this.musicLists});
+  const MutiSelectOnlineMusicListGridPage({super.key, required this.playlists});
 
   @override
   _MutiSelectOnlineMusicListGridPageState createState() =>
@@ -52,7 +49,7 @@ class _MutiSelectOnlineMusicListGridPageState
 
   void handleSelectAll() {
     Set<int> selectAllSet =
-        Set.from(List.generate(widget.musicLists.length, (i) => i));
+        Set.from(List.generate(widget.playlists.length, (i) => i));
     setState(() {
       controller.clear();
       controller.dispose();
@@ -71,7 +68,7 @@ class _MutiSelectOnlineMusicListGridPageState
 
   void handleReverseSelect() {
     Set<int> selectAllSet = Set.from(
-        List.generate(widget.musicLists.length, (i) => i, growable: false));
+        List.generate(widget.playlists.length, (i) => i, growable: false));
     selectAllSet.removeAll(controller.value.selectedIndexes);
     setState(() {
       controller.clear();
@@ -92,11 +89,13 @@ class _MutiSelectOnlineMusicListGridPageState
       return;
     }
     try {
-      List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
-          .map((index) => widget.musicLists[index])
+      List<Playlist> selectedMusicLists = controller.value.selectedIndexes
+          .map((index) => widget.playlists[index])
           .toList();
       for (var musicList in selectedMusicLists) {
-        await saveMusicList(musicList, musicList.getMusiclistInfo());
+        await saveMusicList(
+          musicList,
+        );
       }
       LogToast.success(
         "保存歌单成功",
@@ -117,22 +116,21 @@ class _MutiSelectOnlineMusicListGridPageState
       LogToast.warning(
         "没有选中的歌单",
         "没有选中的歌单",
-        "[MutiSelectOnlineMusicListGridPage] No music list selected",
+        "[MutiSelectOnlinMusicListGridPage] No music list selected",
       );
       return;
     }
 
     try {
-      MusicListW? targetMusicList = await showMusicListSelectionDialog(context);
+      Playlist? targetMusicList = await showMusicListSelectionDialog(context);
       if (targetMusicList == null) return;
 
-      List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
-          .map((index) => widget.musicLists[index])
+      List<Playlist> selectedMusicLists = controller.value.selectedIndexes
+          .map((index) => widget.playlists[index])
           .toList();
 
       for (var musicList in selectedMusicLists) {
-        await addAggsOfMusicListToTargetMusicList(
-            musicList, targetMusicList.getMusiclistInfo());
+        await addAggsOfMusicListToTargetMusicList(musicList, targetMusicList);
       }
       LogToast.success(
         "添加到目标歌单成功",
@@ -159,19 +157,17 @@ class _MutiSelectOnlineMusicListGridPageState
     }
 
     try {
-      List<MusicListW> selectedMusicLists = controller.value.selectedIndexes
-          .map((index) => widget.musicLists[index])
+      List<Playlist> selectedMusicLists = controller.value.selectedIndexes
+          .map((index) => widget.playlists[index])
           .toList();
-      MusicListInfo? targetMusicListInfo = await showMusicListInfoDialog(
-          context,
-          defaultMusicList: selectedMusicLists.first.getMusiclistInfo());
-      if (targetMusicListInfo == null) return;
+      Playlist? targetPlaylist = await showMusicListInfoDialog(context,
+          defaultPlaylist: selectedMusicLists.first);
+      if (targetPlaylist == null) return;
 
-      await SqlFactoryW.createMusiclist(musicListInfos: [targetMusicListInfo]);
-      refreshMusicListGridViewPage();
+      await targetPlaylist.insertToDb();
+      refreshPlaylistGridViewPage();
       for (var musicList in selectedMusicLists) {
-        await addAggsOfMusicListToTargetMusicList(
-            musicList, targetMusicListInfo);
+        await addAggsOfMusicListToTargetMusicList(musicList, targetPlaylist);
       }
       LogToast.success(
         "保存为新建歌单",
@@ -225,7 +221,7 @@ class _MutiSelectOnlineMusicListGridPageState
               saveAsNewMusicList: handleSaveAsNewMusicList,
             ),
           ),
-          widget.musicLists.isEmpty
+          widget.playlists.isEmpty
               ? Center(
                   child: Text("没有歌单",
                       style:
@@ -239,15 +235,15 @@ class _MutiSelectOnlineMusicListGridPageState
                       gridController: controller,
                       padding: const EdgeInsets.only(
                           bottom: 100, top: 10, left: 10, right: 10),
-                      itemCount: widget.musicLists.length,
+                      itemCount: widget.playlists.length,
                       triggerSelectionOnTap: true,
                       itemBuilder: (context, index, selected) {
-                        final musicList = widget.musicLists[index];
+                        final musicList = widget.playlists[index];
                         return Stack(
                           key: ValueKey("${selected}_${musicList.hashCode}"),
                           children: [
                             MusicListImageCard(
-                              musicListW: musicList,
+                              playlist: musicList,
                               showDesc: false,
                               online: false,
                               cachePic: globalConfig.savePicWhenAddMusicList,

@@ -1,11 +1,10 @@
 import 'package:app_rhyme/desktop/home.dart';
-import 'package:app_rhyme/desktop/pages/local_music_container_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/local_music_list_gridview_page.dart';
+import 'package:app_rhyme/desktop/pages/local_music_agg_listview_page.dart';
+import 'package:app_rhyme/desktop/pages/local_playlist_gridview_page.dart';
 import 'package:app_rhyme/desktop/pages/search_pages/search_music_aggregator_page.dart';
 import 'package:app_rhyme/desktop/pages/search_pages/search_music_list_page.dart';
-import 'package:app_rhyme/pages/more_page.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/common_pages/more_page.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,7 +40,7 @@ class MyNavListContainer extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: imageCacheHelper("", width: 30, height: 30),
+                child: imageWithCache("", width: 30, height: 30),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -69,10 +68,10 @@ class MyNavListView extends StatefulWidget {
 }
 
 class _MyNavListViewState extends State<MyNavListView> {
-  List<MusicListW> musicLists = [];
+  List<Playlist> musicLists = [];
 
   Future<void> refresh() async {
-    musicLists = await SqlFactoryW.getAllMusiclists();
+    musicLists = await Playlist.getFromDb();
     setState(() {});
   }
 
@@ -109,15 +108,19 @@ class _MyNavListViewState extends State<MyNavListView> {
             title: '搜索单曲',
             icon: CupertinoIcons.search,
             onTap: () {
+              globalSetNavItemSelected("###SearchSingleMusicAggregator###");
               navigatorToPage(const SearchMusicAggregatorPage());
             },
+            identity: '###SearchSingleMusicAggregator###',
           ),
           NavItem(
             title: '搜索歌单',
             icon: CupertinoIcons.search,
             onTap: () {
+              globalSetNavItemSelected("###SearchMusicList###");
               navigatorToPage(const SearchMusicListPage());
             },
+            identity: "###SearchMusicList###",
           )
         ]),
         NavGroup(
@@ -128,25 +131,28 @@ class _MyNavListViewState extends State<MyNavListView> {
               title: '所有播放列表',
               icon: CupertinoIcons.music_albums,
               onTap: () {
+                globalSetNavItemSelected("###AllPlaylist###");
                 navigatorToPage(
                   const DesktopLocalMusicListGridPage(),
                 );
               },
+              identity: '###AllPlaylist###',
             ),
             ...musicLists.map(
               (e) {
-                var title = e.getMusiclistInfo().name;
+                var title = e.name;
                 return NavItem(
                   title: title,
                   icon: CupertinoIcons.music_albums,
                   onTap: () {
-                    globalSetNavItemSelected(title);
+                    globalSetNavItemSelected("###Playlist_${e.identity}###");
                     navigatorToPage(
                       LocalMusicContainerListPage(
-                        musicList: e,
+                        playlist: e,
                       ),
                     );
                   },
+                  identity: "###Playlist_${e.identity}###",
                 );
               },
             )
@@ -156,10 +162,12 @@ class _MyNavListViewState extends State<MyNavListView> {
           title: '设置',
           icon: CupertinoIcons.settings,
           onTap: () {
+            globalSetNavItemSelected("###Setting###");
             navigatorToPage(
               const MorePage(),
             );
           },
+          identity: '###Setting###',
         ),
       ],
     );
@@ -231,11 +239,12 @@ class _NavListViewState extends State<NavListView> {
             return NavItem(
               title: item.title,
               icon: item.icon,
-              isSelected: _selectedItem == item.title,
+              isSelected: _selectedItem == item.identity,
               onTap: () {
                 _setItemSelected(item.title);
                 item.onTap();
               },
+              identity: '###Widget_$index###',
             );
           } else if (item is NavGroup) {
             return NavGroup(
@@ -300,6 +309,7 @@ class _NavGroupState extends State<NavGroup> {
                 _isExpanded = !_isExpanded;
               });
             },
+            identity: '###NavGroup###',
           ),
         ),
         AnimatedCrossFade(
@@ -311,11 +321,12 @@ class _NavGroupState extends State<NavGroup> {
                 child: NavItem(
                   title: e.title,
                   icon: e.icon,
-                  isSelected: e.title == widget.selectedSubItem,
+                  isSelected: e.identity == widget.selectedSubItem,
                   onTap: () {
                     widget.onSubItemSelected?.call(e.title);
                     e.onTap();
                   },
+                  identity: '###NavGroup_###',
                 ),
               );
             }).toList(),
@@ -336,6 +347,7 @@ class NavItem extends StatefulWidget {
   final bool isSelected;
   final bool? isExpanded;
   final VoidCallback onTap;
+  final String identity;
 
   const NavItem({
     super.key,
@@ -344,6 +356,7 @@ class NavItem extends StatefulWidget {
     this.isSelected = false,
     this.isExpanded,
     required this.onTap,
+    required this.identity,
   });
 
   @override

@@ -1,4 +1,4 @@
-import 'package:app_rhyme/mobile/comps/music_container_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +30,7 @@ class MusicListComp extends StatelessWidget {
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: MusicContainerListItem(
-                    musicContainer: musics[index],
+                    musicAgg: musics[index].musicAggregator,
                     isDark: true,
                     onTap: () {
                       globalAudioHandler.seek(Duration.zero, index: index);

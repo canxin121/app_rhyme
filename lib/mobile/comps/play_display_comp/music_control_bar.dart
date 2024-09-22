@@ -64,14 +64,15 @@ class _MusicControlBarState extends State<MusicControlBar>
                 padding: const EdgeInsets.all(8.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(6.0),
-                  child: Obx(() => imageCacheHelper(
-                      globalAudioHandler.playingMusic.value?.info.artPic)),
+                  child: Obx(() => imageWithCache(globalAudioHandler
+                      .playingMusic.value?.currentMusic.cover)),
                 ),
               ),
               Expanded(
                 child: Obx(
                   () => Text(
-                    globalAudioHandler.playingMusic.value?.info.name ?? "Music",
+                    globalAudioHandler.playingMusic.value?.currentMusic.name ??
+                        "Music",
                     style: TextStyle(fontSize: 15.0, color: textColor)
                         .useSystemChineseFont(),
                     textAlign: TextAlign.left,

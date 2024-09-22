@@ -9,46 +9,47 @@ import 'package:flutter/material.dart';
 // 将url转换为本地缓存路径
 // 如果本地缓存存在，则返回本地缓存路径
 // 如果本地缓存不存在，则返回原始url
-// 如果cacheNow为true，则立即缓存文件, 并返回原始url
-String _useFileCacheHelper(String url, String cacheRoot,
+// 如果cacheNow为true，则立即后台缓存文件, 并返回原始url
+String _getFileCacheWithUriWrapper(String uri, String cacheFolder,
     {String? filename, bool cacheNow = false}) {
-  var localSource = useCacheFile(
-      file: url,
-      cachePath: cacheRoot,
+  var localSource = getCacheFileFromUri(
+      uri: uri,
+      cacheFolder: cacheFolder,
       filename: filename,
-      exportRoot: globalConfig.exportCacheRoot);
+      customRoot: globalConfig.exportCacheRoot,
+      root: globalDocumentPath);
 
   if (localSource != null) {
     return localSource;
   } else {
     if (cacheNow) {
-      cacheFileHelper(url, cacheRoot, filename: filename);
+      cacheFileFromUriWrapper(uri, cacheFolder, filename: filename);
     }
-    return url;
+    return uri;
   }
 }
 
-Future<String> cacheFileHelper(String url, String cacheRoot,
+Future<String> cacheFileFromUriWrapper(String uri, String cacheFolder,
     {String? filename}) async {
-  return await cacheFile(
-    file: url,
-    cachePath: cacheRoot,
+  return await cacheFileFromUri(
+    uri: uri,
+    cacheFolder: cacheFolder,
     filename: filename,
-    exportRoot: globalConfig.exportCacheRoot,
+    customRoot: globalConfig.exportCacheRoot,
   );
 }
 
-Future<void> deleteFileCacheHelper(String url, String cacheRoot,
+Future<void> deleteFileCacheWithUriWrapper(String uri, String cacheFolder,
     {String? filename}) async {
-  await deleteCacheFile(
-    file: url,
-    cachePath: cacheRoot,
+  await deleteCacheFileWithUri(
+    uri: uri,
+    cacheFolder: cacheFolder,
     filename: filename,
-    exportRoot: globalConfig.exportCacheRoot,
+    customRoot: globalConfig.exportCacheRoot,
   );
 }
 
-ExtendedImage imageCacheHelper(
+ExtendedImage imageWithCache(
   String? url, {
   bool cacheNow = false,
   double? width,
@@ -60,16 +61,20 @@ ExtendedImage imageCacheHelper(
   // 先判断url是否为空
   if (url == null || url.isEmpty) {
     return ExtendedImage.asset(
-      defaultArtPicPath,
+      defaultCoverPath,
       width: width,
       height: height,
       fit: fit,
       scale: scale,
       borderRadius: borderRadius,
+      clearMemoryCacheIfFailed: true,
+      clearMemoryCacheWhenDispose: true,
+      enableMemoryCache: false,
     );
   }
 
-  String? uri = _useFileCacheHelper(url, picCacheRoot, cacheNow: cacheNow);
+  String? uri =
+      _getFileCacheWithUriWrapper(url, picCacheFolder, cacheNow: cacheNow);
 
   if (uri.startsWith("http")) {
     return ExtendedImage.network(
@@ -78,8 +83,10 @@ ExtendedImage imageCacheHelper(
       height: height,
       fit: fit,
       scale: scale ?? 1.0,
-      enableMemoryCache: true,
       borderRadius: borderRadius,
+      clearMemoryCacheIfFailed: true,
+      clearMemoryCacheWhenDispose: true,
+      enableMemoryCache: false,
     );
   } else {
     return ExtendedImage.file(
@@ -89,6 +96,9 @@ ExtendedImage imageCacheHelper(
       fit: fit,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
+      clearMemoryCacheIfFailed: true,
+      clearMemoryCacheWhenDispose: true,
+      enableMemoryCache: false,
     );
   }
 }

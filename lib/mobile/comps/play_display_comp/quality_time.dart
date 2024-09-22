@@ -1,4 +1,4 @@
-import 'package:app_rhyme/src/rust/api/bind/mirrors.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/mobile/comps/chores/badge.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -42,7 +42,7 @@ class QualityTimeState extends State<QualityTime> {
           GestureDetector(
             onTapDown: (details) {
               List<Quality>? qualityOptions =
-                  globalAudioHandler.playingMusic.value?.info.qualities;
+                  globalAudioHandler.playingMusic.value?.currentMusic.qualities;
               if (qualityOptions != null && qualityOptions.isNotEmpty) {
                 showPullDownMenu(
                     context: context,
@@ -58,7 +58,7 @@ class QualityTimeState extends State<QualityTime> {
               return Badge(
                 isDarkMode: true,
                 label: globalAudioHandler
-                        .playingMusic.value?.currentQuality.value?.short ??
+                        .playingMusic.value?.playInfo?.quality.summary ??
                     "Quality",
               );
             }),
@@ -96,7 +96,7 @@ List<PullDownMenuEntry> qualitySelectPullDown(
         (quality) => PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
                 textStyle: const TextStyle().useSystemChineseFont()),
-            title: quality.short,
+            title: quality.summary,
             onTap: () async {
               await onSelect(quality);
             }),
