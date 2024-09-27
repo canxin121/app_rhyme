@@ -1,13 +1,14 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class MusicContainerList extends StatelessWidget {
+class MusicAggregatorList extends StatelessWidget {
   final Playlist playlist;
   final List<MusicAggregator> musicAggs;
 
-  const MusicContainerList({
+  const MusicAggregatorList({
     super.key,
     required this.musicAggs,
     required this.playlist,
@@ -24,17 +25,19 @@ class MusicContainerList extends StatelessWidget {
           if (index == 0) {
             return const MusicAggregatorListHeaderRow();
           }
-          final musicContainer = musicAggs[index - 1];
+          final musicAgg = musicAggs[index - 1];
           return Padding(
             padding: const EdgeInsets.only(
               top: 2,
               bottom: 2,
             ),
-            child: MusicAggregatorListItem(
-              musicAgg: musicContainer,
+            child: DesktopMusicAggregatorListItem(
+              key: ValueKey(musicAgg.identity()),
+              musicAgg: musicAgg,
               isDarkMode: isDarkMode,
               hasBackgroundColor: index % 2 == 1,
               playlist: playlist,
+              cacheImageNow: globalConfig.storageConfig.savePic,
             ),
           );
         },

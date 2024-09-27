@@ -57,8 +57,8 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4.0),
                     child: imageWithCache(
-                        globalAudioHandler
-                            .playingMusic.value?.currentMusic.cover,
+                        globalAudioHandler.playingMusic.value?.currentMusic
+                            .getCover(size: 250),
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,

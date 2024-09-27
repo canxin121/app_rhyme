@@ -16,7 +16,7 @@ import 'package:flutter/cupertino.dart';
 // 2. 在线的歌曲: musicListW == null && index == -1
 // 3. 播放列表的歌曲: musicListW == null && index != -1
 
-class MusicContainerListItem extends StatefulWidget {
+class MobileMusicAggregatorListItem extends StatefulWidget {
   final MusicAggregator musicAgg;
   final Playlist? playlist;
   final bool? isDark;
@@ -25,7 +25,7 @@ class MusicContainerListItem extends StatefulWidget {
   final bool showMenu;
   final int index;
 
-  const MusicContainerListItem({
+  const MobileMusicAggregatorListItem({
     super.key,
     required this.musicAgg,
     this.playlist,
@@ -37,10 +37,12 @@ class MusicContainerListItem extends StatefulWidget {
   });
 
   @override
-  _MusicContainerListItemState createState() => _MusicContainerListItemState();
+  _MobileMusicAggregatorListItemState createState() =>
+      _MobileMusicAggregatorListItemState();
 }
 
-class _MusicContainerListItemState extends State<MusicContainerListItem> {
+class _MobileMusicAggregatorListItemState
+    extends State<MobileMusicAggregatorListItem> {
   Music? defaultMusic;
   bool _hasCache = false;
 
@@ -54,7 +56,8 @@ class _MusicContainerListItemState extends State<MusicContainerListItem> {
     if (defaultMusic == null) {
       return;
     }
-    bool cacheStatus = await hasCacheMusic(music: defaultMusic!);
+    bool cacheStatus = await hasCacheMusic(
+        music: defaultMusic!, documentFolder: globalDocumentPath);
     if (mounted) {
       setState(() {
         _hasCache = cacheStatus;
@@ -84,7 +87,7 @@ class _MusicContainerListItemState extends State<MusicContainerListItem> {
           // 歌曲的封面
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: imageWithCache(defaultMusic!.cover,
+            child: imageWithCache(defaultMusic!.getCover(size: 250),
                 width: 40,
                 height: 40,
                 fit: BoxFit.cover,

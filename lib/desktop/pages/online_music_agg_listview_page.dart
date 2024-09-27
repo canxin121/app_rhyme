@@ -1,14 +1,13 @@
+import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
-import 'package:app_rhyme/desktop/comps/musiclist_comp/musiclist_header.dart';
+import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/home.dart';
-import 'package:app_rhyme/desktop/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
+import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -36,7 +35,7 @@ class DesktopOnlineMusicListPageState
     _pagingController.addPageRequestListener((pageKey) {
       _fetchMusicAggregators(pageKey);
     });
-    
+
     if (widget.firstPageMusicAggregators != null) {
       _pagingController.appendPage(
         widget.firstPageMusicAggregators!,
@@ -81,6 +80,7 @@ class DesktopOnlineMusicListPageState
         ? CupertinoColors.white
         : CupertinoColors.black;
     double screenWidth = MediaQuery.of(context).size.width;
+    final ScrollController controller = ScrollController();
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -96,71 +96,74 @@ class DesktopOnlineMusicListPageState
               color: textColor,
             ),
             onPressed: () {
-              if (globalDesktopPageContext.mounted) {
-                Navigator.of(globalDesktopPageContext).pop();
-              }
+              globalPopPage();
             }),
       ),
       backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-      child: CustomScrollView(
-        slivers: <Widget>[
-          const SliverToBoxAdapter(
-            child: SafeArea(child: SizedBox()),
-          ),
-          MusicListHeader(
-            playlist: widget.playlist,
-            isDarkMode: isDarkMode,
-            screenWidth: screenWidth,
-            pagingController: _pagingController,
-            fetchAllMusicAggregators: _fetchAllMusics,
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 20),
-          ),
-          PagedSliverList(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
-                noItemsFoundIndicatorBuilder: (context) {
-              return Center(
-                child: Text(
-                  '没有找到任何音乐',
-                  style: TextStyle(color: textColor).useSystemChineseFont(),
+      child: CupertinoScrollbar(
+          thickness: 10,
+          radius: const Radius.circular(10),
+          controller: controller,
+          child: CustomScrollView(
+            controller: controller,
+            slivers: <Widget>[
+              const SliverToBoxAdapter(
+                child: SafeArea(child: SizedBox()),
+              ),
+              MusicListHeader(
+                playlist: widget.playlist,
+                isDarkMode: isDarkMode,
+                screenWidth: screenWidth,
+                pagingController: _pagingController,
+                fetchAllMusicAggregators: _fetchAllMusics,
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 20),
+              ),
+              PagedSliverList(
+                pagingController: _pagingController,
+                builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
+                    noItemsFoundIndicatorBuilder: (context) {
+                  return Center(
+                    child: Text(
+                      '没有找到任何音乐',
+                      style: TextStyle(color: textColor).useSystemChineseFont(),
+                    ),
+                  );
+                }, itemBuilder: (context, musicAggregator, index) {
+                  if (index == 0) {
+                    return Column(
+                      children: [
+                        const MusicAggregatorListHeaderRow(),
+                        DesktopMusicAggregatorListItem(
+                          musicAgg: musicAggregator,
+                          isDarkMode: isDarkMode,
+                          hasBackgroundColor: index % 2 == 1,
+                        )
+                      ],
+                    );
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                        top: 2,
+                        bottom: 2,
+                      ),
+                      child: DesktopMusicAggregatorListItem(
+                        musicAgg: musicAggregator,
+                        isDarkMode: isDarkMode,
+                        hasBackgroundColor: index % 2 == 1,
+                      ),
+                    );
+                  }
+                }),
+              ),
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 200),
                 ),
-              );
-            }, itemBuilder: (context, musicAggregator, index) {
-              if (index == 0) {
-                return Column(
-                  children: [
-                    const MusicAggregatorListHeaderRow(),
-                    MusicAggregatorListItem(
-                      musicAgg: musicAggregator,
-                      isDarkMode: isDarkMode,
-                      hasBackgroundColor: index % 2 == 1,
-                    )
-                  ],
-                );
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.only(
-                    top: 2,
-                    bottom: 2,
-                  ),
-                  child: MusicAggregatorListItem(
-                    musicAgg: musicAggregator,
-                    isDarkMode: isDarkMode,
-                    hasBackgroundColor: index % 2 == 1,
-                  ),
-                );
-              }
-            }),
-          ),
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.only(top: 200),
-            ),
-          ),
-        ],
-      ),
+              ),
+            ],
+          )),
     );
   }
 }
@@ -186,12 +189,13 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
         PullDownMenuHeader(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          leading: imageWithCache(playlist.cover),
+          leading: imageWithCache(playlist.getCover(size: 250),
+              height: 100, width: 100),
           title: playlist.name,
           subtitle: playlist.summary ?? "",
         ),
         const PullDownMenuDivider.large(),
-        ...onlineMusicListItems(context, playlist),
+        ...playlistMenuItems(context, playlist, true, true),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
@@ -209,8 +213,12 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
             if (musicAggregatorsController.itemList == null) return;
 
             if (context.mounted) {
-              globalNavigatorToPage(DesktopMutiSelectMusicContainerListPage(
-                  musicAggs: musicAggregatorsController.itemList!));
+              globalNavigatorToPage(
+                  MusicAggregatorMultiSelectionPage(
+                    musicAggs: musicAggregatorsController.itemList!,
+                    isDesktop: true,
+                  ),
+                  replace: false);
             }
           },
           title: "多选操作",

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -44,7 +43,8 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
     durationController =
         TextEditingController(text: widget.music?.duration?.toString() ?? '');
     if (widget.music != null) {
-      image = imageWithCache(widget.music?.cover);
+      image = imageWithCache(widget.music?.getCover(size: 250),
+          width: 100, height: 100);
       artists = List.from(widget.music!.artists);
     }
     artPicPath = widget.music?.cover ?? '';
@@ -84,7 +84,8 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
                     if (imageFile != null) {
                       setState(() {
                         artPicPath = imageFile.path;
-                        image = imageWithCache(artPicPath);
+                        image =
+                            imageWithCache(artPicPath, width: 100, height: 100);
                         cacheFileFromUriWrapper(imageFile.path, picCacheFolder);
                       });
                     }
@@ -102,7 +103,6 @@ class MusicInfoDialogState extends State<MusicInfoDialog> {
               ),
             ),
           ),
-          // Section for "歌曲"
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Column(

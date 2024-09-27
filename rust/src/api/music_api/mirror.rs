@@ -1,10 +1,12 @@
 use flutter_rust_bridge::frb;
 pub use music_api::data::interface::{
     artist::{Artist, ArtistVec},
+    json::{DatabaseJson, PlaylistJson, PlaylistJsonVec,MusicAggregatorJsonVec},
     music_aggregator::{Music, MusicAggregator},
     playlist::{Playlist, PlaylistType},
     playlist_subscription::PlayListSubscription,
     quality::{Quality, QualityVec},
+    results::PlaylistUpdateSubscriptionResult,
     server::MusicServer,
 };
 
@@ -108,3 +110,20 @@ pub struct _PlayListSubscription {
     #[frb(non_final)]
     pub share: String,
 }
+
+#[frb(mirror(PlaylistUpdateSubscriptionResult))]
+pub struct _PlaylistUpdateSubscriptionResult {
+    pub errors: Vec<(String, String)>,
+}
+
+#[frb(mirror(PlaylistJson))]
+pub struct _PlaylistJson {
+    pub playlist: Playlist,
+    pub music_aggregators: Vec<MusicAggregator>,
+}
+
+#[frb(mirror(PlaylistJsonVec))]
+pub struct _PlaylistJsonVec(pub Vec<PlaylistJson>);
+
+#[frb(mirror(MusicAggregatorJsonVec))]
+pub struct _MusicAggregatorJsonVec(pub Vec<MusicAggregator>);

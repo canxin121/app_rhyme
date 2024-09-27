@@ -12,7 +12,6 @@ import 'package:app_rhyme/utils/time_parser.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 
 class MusicAggregatorListHeaderRow extends StatelessWidget {
   const MusicAggregatorListHeaderRow({super.key});
@@ -51,28 +50,31 @@ class MusicAggregatorListHeaderRow extends StatelessWidget {
   }
 }
 
-class MusicAggregatorListItem extends StatefulWidget {
+class DesktopMusicAggregatorListItem extends StatefulWidget {
   final Playlist? playlist;
   final MusicAggregator musicAgg;
   final bool isDarkMode;
   final bool hasBackgroundColor;
   final void Function()? onTap;
+  final bool cacheImageNow;
 
-  const MusicAggregatorListItem({
+  const DesktopMusicAggregatorListItem({
     super.key,
     required this.musicAgg,
     required this.isDarkMode,
     required this.hasBackgroundColor,
     this.onTap,
     this.playlist,
+    this.cacheImageNow = false,
   });
 
   @override
-  _MusicAggregatorListItemState createState() =>
-      _MusicAggregatorListItemState();
+  _DesktopMusicAggregatorListItemState createState() =>
+      _DesktopMusicAggregatorListItemState();
 }
 
-class _MusicAggregatorListItemState extends State<MusicAggregatorListItem> {
+class _DesktopMusicAggregatorListItemState
+    extends State<DesktopMusicAggregatorListItem> {
   bool isHovered = false;
   Music? defaultMusic;
   @override
@@ -115,40 +117,9 @@ class _MusicAggregatorListItemState extends State<MusicAggregatorListItem> {
           final Offset tapPosition = details.globalPosition;
           final Rect position =
               Rect.fromLTWH(tapPosition.dx, tapPosition.dy, 0, 0);
-          List menuItems;
-          if (widget.playlist == null) {
-            menuItems = onlineMusicContainerItems(
-                context, widget.musicAgg, defaultMusic!, true);
-          } else {
-            bool hasCache = await hasCacheMusic(music: defaultMusic!);
-            if (context.mounted) {
-              menuItems = localMusicAggregetorPullDownItems(
-                  context,
-                  widget.playlist!,
-                  widget.musicAgg,
-                  defaultMusic!,
-                  hasCache,
-                  true);
-            } else {
-              return;
-            }
-          }
-          if (context.mounted) {
-            showPullDownMenu(
-                context: context,
-                items: [
-                  PullDownMenuHeader(
-                      itemTheme: PullDownMenuItemTheme(
-                          textStyle: const TextStyle().useSystemChineseFont()),
-                      leading: imageWithCache(defaultMusic!.cover),
-                      title: defaultMusic!.name,
-                      subtitle:
-                          defaultMusic!.artists.map((e) => e.name).join(", ")),
-                  const PullDownMenuDivider.large(),
-                  ...menuItems,
-                ],
-                position: position);
-          }
+          await showMusicAggregatorMenu(
+              context, widget.musicAgg, true, position,
+              playlist: widget.playlist);
         },
         child: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10),
@@ -247,7 +218,7 @@ class MusicCell extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(2.0),
           child: imageWithCache(
-            music.cover,
+            music.getCover(size: 250),
             width: 40,
             height: 40,
             fit: BoxFit.cover,
@@ -371,7 +342,8 @@ class _OptionsCellState extends State<OptionsCell> {
   @override
   void initState() {
     super.initState();
-    hasCacheMusic(music: widget.music).then((value) {
+    hasCacheMusic(music: widget.music, documentFolder: globalDocumentPath)
+        .then((value) {
       if (mounted) {
         setState(() {
           hasCache = value;
@@ -380,7 +352,8 @@ class _OptionsCellState extends State<OptionsCell> {
     });
 
     _cacheUpdateSubscription = cacheUpdateStream.listen((_) {
-      hasCacheMusic(music: widget.music).then((value) {
+      hasCacheMusic(music: widget.music, documentFolder: globalDocumentPath)
+          .then((value) {
         if (mounted) {
           setState(() {
             hasCache = value;
@@ -403,7 +376,7 @@ class _OptionsCellState extends State<OptionsCell> {
       children: [
         if (hasCache)
           Positioned(
-            right: 50,
+            right: 40,
             child: Icon(
               CupertinoIcons.arrow_down_circle_fill,
               color: widget.isDarkMode

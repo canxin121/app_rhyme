@@ -1,12 +1,12 @@
+import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/mobile/comps/chores/button.dart';
-import 'package:app_rhyme/mobile/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
+import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
 import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -123,7 +123,7 @@ class DesktopOnlineMusicListPageState extends State<MobileOnlineMusicListPage> {
                     constraints: BoxConstraints(
                       maxWidth: screenWidth * 0.7,
                     ),
-                    child: MusicListImageCard(
+                    child: MobileMusicListImageCard(
                         playlist: widget.playlist, online: true),
                   ),
                 )),
@@ -202,7 +202,7 @@ class DesktopOnlineMusicListPageState extends State<MobileOnlineMusicListPage> {
                 },
                 itemBuilder: (context, musicAggregator, index) => Padding(
                       padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: MusicContainerListItem(
+                      child: MobileMusicAggregatorListItem(
                         musicAgg: musicAggregator,
                       ),
                     )),
@@ -239,12 +239,13 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
         PullDownMenuHeader(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          leading: imageWithCache(playlist.cover),
+          leading: imageWithCache(playlist.getCover(size: 250),
+              height: 100, width: 100),
           title: playlist.name,
           subtitle: playlist.summary,
         ),
         const PullDownMenuDivider.large(),
-        ...onlineMusicListItems(context, playlist),
+        ...playlistMenuItems(context, playlist, false, true),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
@@ -267,8 +268,10 @@ class OnlineMusicListChoicMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => MutiSelectMusicContainerListPage(
-                      musicAggs: musicContainers),
+                  builder: (context) => MusicAggregatorMultiSelectionPage(
+                    musicAggs: musicContainers,
+                    isDesktop: false,
+                  ),
                 ),
               );
             }

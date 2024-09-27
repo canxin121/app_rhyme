@@ -1,14 +1,12 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list.dart';
-import 'package:app_rhyme/desktop/comps/musiclist_comp/musiclist_header.dart';
-import 'package:app_rhyme/desktop/home.dart';
+import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:flutter/cupertino.dart';
 
-Future<void> Function() globalDesktopMusicContainerListPageRefreshFunction =
+Future<void> Function() globalDesktopMusicAggregatorListPageRefreshFunction =
     () async {};
-void Function() globalMusicContainerListPagePopFunction = () {};
 
 class LocalMusicContainerListPage extends StatefulWidget {
   final Playlist playlist;
@@ -32,8 +30,7 @@ class LocalMusicContainerListPageState
   void initState() {
     playlist = widget.playlist;
     WidgetsBinding.instance.addObserver(this);
-    // 设置全局的更新函数
-    globalDesktopMusicContainerListPageRefreshFunction = () async {
+    globalDesktopMusicAggregatorListPageRefreshFunction = () async {
       var newPlaylist =
           await Playlist.findInDb(id: int.parse(playlist.identity));
       setState(() {
@@ -43,9 +40,6 @@ class LocalMusicContainerListPageState
       });
       await loadMusicContainers();
     };
-    globalMusicContainerListPagePopFunction = () {
-      Navigator.of(globalDesktopPageContext).pop(context);
-    };
     loadMusicContainers();
     super.initState();
   }
@@ -53,17 +47,13 @@ class LocalMusicContainerListPageState
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    // 清空全局的更新函数
-    globalDesktopMusicContainerListPageRefreshFunction = () async {};
-    globalMusicContainerListPagePopFunction = () {};
+    globalDesktopMusicAggregatorListPageRefreshFunction = () async {};
     super.dispose();
   }
 
   @override
   void didChangePlatformBrightness() {
-    setState(() {
-      // 重建界面以响应亮暗模式变化
-    });
+    setState(() {});
   }
 
   Future<void> loadMusicContainers() async {
@@ -88,26 +78,31 @@ class LocalMusicContainerListPageState
     final bool isDarkMode = brightness == Brightness.dark;
 
     double screenWidth = MediaQuery.of(context).size.width;
-
+    final ScrollController controller = ScrollController();
     return CupertinoPageScaffold(
       backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-      child: CustomScrollView(
-        slivers: <Widget>[
-          MusicListHeader(
-            playlist: playlist,
-            musicAggs: musicAggs,
-            isDarkMode: isDarkMode,
-            screenWidth: screenWidth,
-          ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 20),
-          ),
-          MusicContainerList(
-            musicAggs: musicAggs,
-            playlist: playlist,
-          ),
-        ],
-      ),
+      child: CupertinoScrollbar(
+          controller: controller,
+          thickness: 10,
+          radius: const Radius.circular(10),
+          child: CustomScrollView(
+            controller: controller,
+            slivers: <Widget>[
+              MusicListHeader(
+                playlist: playlist,
+                musicAggs: musicAggs,
+                isDarkMode: isDarkMode,
+                screenWidth: screenWidth,
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 20),
+              ),
+              MusicAggregatorList(
+                musicAggs: musicAggs,
+                playlist: playlist,
+              ),
+            ],
+          )),
     );
   }
 }

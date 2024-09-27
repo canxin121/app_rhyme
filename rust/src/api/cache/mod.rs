@@ -1,10 +1,12 @@
+use std::sync::{Arc, LazyLock};
+
+use tokio::sync::Semaphore;
+
+pub mod cache_op;
+pub mod database_op;
 pub mod file_cache;
 pub mod fs_util;
 pub mod music_cache;
-use lazy_static::lazy_static;
-use std::sync::Arc;
-use tokio::sync::Semaphore;
 
-lazy_static! {
-    static ref FILE_OP_SEMAPHORE: Arc<Semaphore> = Arc::new(Semaphore::new(30));
-}
+pub const FILE_OP_SEMAPHORE: LazyLock<Arc<Semaphore>> =
+    LazyLock::new(|| Arc::new(Semaphore::new(30)));

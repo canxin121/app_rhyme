@@ -245,8 +245,11 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                 ),
                 child: Obx(() => ClipRRect(
                       borderRadius: BorderRadius.circular(3),
-                      child: imageWithCache(globalAudioHandler
-                          .playingMusic.value?.currentMusic.cover),
+                      child: imageWithCache(
+                          globalAudioHandler.playingMusic.value?.currentMusic
+                              .getCover(size: 250),
+                          width: 46,
+                          height: 46),
                     )),
               ),
               SizedBox(
@@ -258,25 +261,36 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                       children: [
                         const SizedBox(height: 5),
                         Center(
-                          child: Obx(() => Text(
-                                globalAudioHandler.playingMusic.value
-                                        ?.currentMusic.name ??
-                                    "Music",
-                                style: TextStyle(color: textColor, fontSize: 13)
-                                    .useSystemChineseFont(),
-                              )),
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: Obx(() => Text(
+                                    globalAudioHandler.playingMusic.value
+                                            ?.currentMusic.name ??
+                                        "Music",
+                                    style: TextStyle(
+                                            color: textColor, fontSize: 13)
+                                        .useSystemChineseFont(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ))),
                         ),
                         Center(
-                          child: Obx(() => Text(
-                                globalAudioHandler.playingMusic.value
-                                        ?.currentMusic.artists
-                                        .map((e) => e.name)
-                                        .join(", ") ??
-                                    "Artist",
-                                style:
-                                    TextStyle(color: textColor2, fontSize: 12)
-                                        .useSystemChineseFont(),
-                              )),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 20),
+                            child: Obx(() => Text(
+                                  globalAudioHandler.playingMusic.value
+                                          ?.currentMusic.artists
+                                          .map((e) => e.name)
+                                          .join(", ") ??
+                                      "Artist",
+                                  style:
+                                      TextStyle(color: textColor2, fontSize: 12)
+                                          .useSystemChineseFont(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
+                          ),
                         ),
                         Expanded(child: Container()),
                       ],
@@ -296,6 +310,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                                   style:
                                       TextStyle(color: textColor2, fontSize: 12)
                                           .useSystemChineseFont(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 )),
                             Obx(() => Text(
                                   formatDuration(globalAudioUiController
@@ -303,6 +319,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                                   style:
                                       TextStyle(color: textColor2, fontSize: 12)
                                           .useSystemChineseFont(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 )),
                           ],
                         ),

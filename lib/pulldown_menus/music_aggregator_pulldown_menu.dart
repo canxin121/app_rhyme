@@ -10,18 +10,6 @@ import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
-// 有三种使用场景: 1. 本地歌单的歌曲 2. 在线的歌曲 3. 播放列表
-// 区分:
-// 1. 本地歌单的歌曲: musicListW != null && index == -1
-// 2. 在线的歌曲: musicListW == null && index == -1
-// 3. 播放列表的歌曲: musicListW == null && index != -1
-
-// 可执行的操作:
-// 1. 本地歌单的歌曲:查看详情, 缓存 or 取消缓存, 从歌单删除, 编辑信息, 搜索匹配信息,
-// 查看专辑, 添加到歌单, 创建新歌单, 用作歌单的封面
-// 2. 在线的歌曲:查看详情, 添加到歌单, 创建新歌单,  查看专辑
-// 3. 播放列表的歌曲:查看详情, 从播放列表删除, , 查看专辑,添加到歌单, 创建新歌单
-
 Future<void> showMusicAggregatorMenu(
   BuildContext context,
   MusicAggregator musicAgg,
@@ -38,28 +26,24 @@ Future<void> showMusicAggregatorMenu(
   }
   List<dynamic> menuItems;
 
-  if (playlist == null && index == -1) {
-    // 在线的歌曲
-    menuItems =
-        onlineMusicContainerItems(context, musicAgg, defaultMusic, isDesktop);
-  } else if (playlist == null && index != -1) {
-    // 播放列表的歌曲
-    menuItems =
-        _playlistItems(context, index, musicAgg, defaultMusic, isDesktop);
-  } else {
-    // 本地歌单的音乐
+  if (index == -1) {
     bool hasCache = false;
-    hasCache = await hasCacheMusic(music: defaultMusic);
+    hasCache = await hasCacheMusic(
+        music: defaultMusic, documentFolder: globalDocumentPath);
     if (!context.mounted) return;
-    menuItems = localMusicAggregetorPullDownItems(
-        context, playlist!, musicAgg, defaultMusic, hasCache, isDesktop);
+    menuItems = _musicAggregetorPullDownItems(
+        context, playlist, musicAgg, defaultMusic, hasCache, isDesktop);
+  } else {
+    menuItems =
+        _playinglistItems(context, index, musicAgg, defaultMusic, isDesktop);
   }
 
   List<PullDownMenuEntry> items = [
     PullDownMenuHeader(
       itemTheme: PullDownMenuItemTheme(
           textStyle: const TextStyle().useSystemChineseFont()),
-      leading: imageWithCache(defaultMusic.cover),
+      leading: imageWithCache(defaultMusic.getCover(size: 250),
+          height: 50, width: 50),
       title: defaultMusic.name,
       subtitle: defaultMusic.artists.map((e) => e.name).join(", "),
     ),
@@ -69,7 +53,7 @@ Future<void> showMusicAggregatorMenu(
   showPullDownMenu(context: context, items: items, position: position);
 }
 
-List<dynamic> _playlistItems(BuildContext context, int index,
+List<dynamic> _playinglistItems(BuildContext context, int index,
     MusicAggregator musicAgg, Music defaultMusic, bool isDesktop) {
   return [
     PullDownMenuActionsRow.medium(
@@ -124,47 +108,9 @@ List<dynamic> _playlistItems(BuildContext context, int index,
   ];
 }
 
-List<dynamic> onlineMusicContainerItems(BuildContext context,
-    MusicAggregator musicAgg, Music defaultMusic, bool isDesktop) {
-  return [
-    PullDownMenuActionsRow.medium(
-      items: [
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => createNewMusicListFromMusics(context, [musicAgg]),
-          title: '创建新歌单',
-          icon: CupertinoIcons.add_circled,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => addMusicsToPlayList(context, [musicAgg]),
-          title: '添加到歌单',
-          icon: CupertinoIcons.add,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => viewMusicAlbum(context, defaultMusic, isDesktop),
-          title: '查看专辑',
-          icon: CupertinoIcons.music_albums,
-        ),
-      ],
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => showMusicInfoDialog(context, defaultMusicInfo: defaultMusic),
-      title: '查看详情',
-      icon: CupertinoIcons.photo,
-    ),
-  ];
-}
-
-List<dynamic> localMusicAggregetorPullDownItems(
+List<dynamic> _musicAggregetorPullDownItems(
     BuildContext context,
-    Playlist playlist,
+    Playlist? playlist,
     MusicAggregator musicAgg,
     Music defaultMusic,
     bool hasCache,
@@ -172,13 +118,40 @@ List<dynamic> localMusicAggregetorPullDownItems(
   return [
     PullDownMenuActionsRow.medium(
       items: [
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => deleteMusicAggregatorFromDb(context, [musicAgg]),
-          title: '从歌单删除',
-          icon: CupertinoIcons.delete,
-        ),
+        /// 在线歌曲
+        if (!musicAgg.fromDb)
+          PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            onTap: () => createNewMusicListFromMusics(context, [musicAgg]),
+            title: '创建新歌单',
+            icon: CupertinoIcons.add_circled,
+          ),
+
+        /// 在线歌曲
+        if (!musicAgg.fromDb)
+          PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            onTap: () => addMusicsToPlayList(context, [musicAgg]),
+            title: '添加到歌单',
+            icon: CupertinoIcons.add,
+          ),
+
+        /// 数据库内歌曲
+        if (musicAgg.fromDb && playlist != null)
+          PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            onTap: () => deleteMusicAggsFromDbPlaylist(
+              [musicAgg],
+              playlist,
+            ),
+            title: '从歌单删除',
+            icon: CupertinoIcons.delete,
+          ),
+
+        /// 通用
         if (hasCache)
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
@@ -196,21 +169,24 @@ List<dynamic> localMusicAggregetorPullDownItems(
             title: '缓存音乐',
             icon: CupertinoIcons.cloud_download,
           ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            var music = getMusicAggregatorDefaultMusic(musicAgg);
-            if (music == null) {
-              LogToast.error("编辑信息失败", "无法编辑信息: 未找到音乐信息",
-                  "[MusicContainer] Failed to edit music info: Cannot find music info");
-              return;
-            }
-            await editMusicInfo(context, music);
-          },
-          title: '编辑信息',
-          icon: CupertinoIcons.pencil,
-        ),
+
+        /// 数据库内歌曲
+        if (musicAgg.fromDb)
+          PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            onTap: () async {
+              var music = getMusicAggregatorDefaultMusic(musicAgg);
+              if (music == null) {
+                LogToast.error("编辑信息失败", "无法编辑信息: 未找到音乐信息",
+                    "[MusicContainer] Failed to edit music info: Cannot find music info");
+                return;
+              }
+              await editMusicInfo(context, music);
+            },
+            title: '编辑信息',
+            icon: CupertinoIcons.pencil,
+          ),
       ],
     ),
     PullDownMenuItem(
@@ -241,12 +217,13 @@ List<dynamic> localMusicAggregetorPullDownItems(
       title: '创建新歌单',
       icon: CupertinoIcons.add_circled,
     ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => setMusicCoverAsMusicListCover(defaultMusic, playlist),
-      title: '用作歌单的封面',
-      icon: CupertinoIcons.photo_fill_on_rectangle_fill,
-    ),
+    if (playlist != null && playlist.fromDb)
+      PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
+        onTap: () => setMusicCoverAsPlaylistCover(defaultMusic, playlist),
+        title: '用作歌单的封面',
+        icon: CupertinoIcons.photo_fill_on_rectangle_fill,
+      ),
   ];
 }

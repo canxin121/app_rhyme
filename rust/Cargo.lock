@@ -186,9 +186,9 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.82"
+version = "0.1.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a27b8a3a6e1a44fa4c8baf1f653e4172e81486d4941f2237e20dc2d0cf4ddff1"
+checksum = "721cae7de5c34fbb2acd27e21e6d2cf7b886dce0c27388d46c4e6c47ea4318dd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -673,9 +673,9 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge"
-version = "2.2.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5db18c05aac3922abfe24282af9128947d2b27856f3d6a4f30888bffa976855a"
+checksum = "6ff967a5893be60d849e4362910762acdc275febe44333153a11dcec1bca2cd2"
 dependencies = [
  "allo-isolate",
  "android_logger",
@@ -691,6 +691,7 @@ dependencies = [
  "futures",
  "js-sys",
  "lazy_static",
+ "log",
  "oslog",
  "threadpool",
  "tokio",
@@ -701,9 +702,9 @@ dependencies = [
 
 [[package]]
 name = "flutter_rust_bridge_macros"
-version = "2.2.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f83de8013ddf893c420794e8a722f941eeca7f4939b46434282d66b676a0997c"
+checksum = "d48b4d3fae9d29377b19134a38386d8792bde70b9448cde49e96391bcfc8fed1"
 dependencies = [
  "hex",
  "md-5",
@@ -1282,7 +1283,7 @@ dependencies = [
 [[package]]
 name = "music_api"
 version = "0.1.0"
-source = "git+https://github.com/canxin121/music_api#e4e96659f39bbfaeb632468261001fb3e633a661"
+source = "git+https://github.com/canxin121/music_api#a673413b488e8f3d8b6635d195a466322c05e8f7"
 dependencies = [
  "aes",
  "anyhow",
@@ -1307,8 +1308,6 @@ dependencies = [
  "rsa",
  "sea-orm",
  "sea-orm-migration",
- "sea-query",
- "sea-query-binder",
  "serde",
  "serde_json",
  "sha2",
@@ -1950,7 +1949,6 @@ version = "0.1.0"
 dependencies = [
  "aes",
  "anyhow",
- "async-trait",
  "base64 0.22.1",
  "cbc",
  "chrono",
@@ -1963,7 +1961,6 @@ dependencies = [
  "generic-array 1.1.0",
  "hex",
  "jemallocator",
- "lazy_static",
  "log",
  "md-5",
  "music_api",
@@ -1984,7 +1981,6 @@ dependencies = [
  "serde_json",
  "serial_test",
  "sha2",
- "sqlx",
  "tokio",
  "tracing-subscriber",
  "urlencoding",
@@ -2510,6 +2506,7 @@ dependencies = [
  "sha2",
  "sqlx-core",
  "sqlx-mysql",
+ "sqlx-postgres",
  "sqlx-sqlite",
  "syn 1.0.109",
  "tempfile",

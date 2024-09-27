@@ -1,17 +1,17 @@
 import 'dart:io';
+import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
+import 'package:app_rhyme/common_pages/reorder_page/playlist.dart';
 import 'package:app_rhyme/desktop/comps/delegate.dart';
-import 'package:app_rhyme/desktop/comps/musiclist_comp/musiclist_image_card.dart';
+import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/pages/local_music_agg_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/muti_select_pages/muti_select_local_music_list_gridview_page.dart';
 import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/reorder_pages/reorder_playlist_grid_page.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
+import 'package:app_rhyme/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -30,15 +30,25 @@ class DesktopLocalMusicListGridPage extends StatefulWidget {
 
 class DesktopLocalMusicListGridPageState
     extends State<DesktopLocalMusicListGridPage> with WidgetsBindingObserver {
-  List<Playlist> musicLists = [];
+  List<Playlist> playlists = [];
 
   @override
   void initState() {
     super.initState();
-    globalDesktopMusicListGridPageRefreshFunction = () {
-      loadMusicLists();
+
+    globalDesktopMusicListGridPageRefreshFunction = () async {
+      try {
+        var newPlaylists = await Playlist.getFromDb();
+        setState(() {
+          playlists = newPlaylists;
+        });
+      } catch (e) {
+        LogToast.error("加载歌单列表", "加载歌单列表失败: $e",
+            "[loadMusicLists] Failed to load music lists: $e");
+      }
     };
-    loadMusicLists();
+
+    refreshPlaylistGridViewPage();
   }
 
   @override
@@ -53,18 +63,6 @@ class DesktopLocalMusicListGridPageState
     setState(() {});
   }
 
-  void loadMusicLists() async {
-    try {
-      var newMusicLists = await Playlist.getFromDb();
-      setState(() {
-        musicLists = newMusicLists;
-      });
-    } catch (e) {
-      LogToast.error("加载歌单列表", "加载歌单列表失败: $e",
-          "[loadMusicLists] Failed to load music lists: $e");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
@@ -73,6 +71,8 @@ class DesktopLocalMusicListGridPageState
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color backgroundColor = getPrimaryBackgroundColor(isDarkMode);
     final Color navigatorBarColor = getNavigatorBarColor(isDarkMode);
+    final ScrollController controller = ScrollController();
+
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
       child: Column(children: [
@@ -93,6 +93,7 @@ class DesktopLocalMusicListGridPageState
             ),
           ),
           trailing: MusicListGridPageMenu(
+            playlists: playlists,
             builder: (context, showMenu) => CupertinoButton(
                 padding: const EdgeInsets.all(0),
                 onPressed: showMenu,
@@ -104,50 +105,54 @@ class DesktopLocalMusicListGridPageState
         ),
         Expanded(
             child: SafeArea(
-          child: musicLists.isEmpty
+          child: playlists.isEmpty
               ? Center(
                   child: Text("没有歌单",
                       style:
                           TextStyle(color: textColor).useSystemChineseFont()))
-              : CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: Platform.isIOS ? 0.0 : 10.0),
-                      sliver: SliverGrid(
-                        gridDelegate:
-                            const SliverGridDelegateWithResponsiveColumnCount(
-                          minColumnWidth: 200.0,
-                          mainAxisSpacing: 10.0,
-                          crossAxisSpacing: 10.0,
-                          minColumnCount: 4,
-                          maxColumnCount: 8,
-                        ),
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            var musicList = musicLists[index];
-                            return MusicListImageCard(
-                              key: ValueKey(musicList.identity),
-                              playlist: musicList,
-                              online: false,
-                              showDesc: false,
-                              onTap: () {
-                                globalSetNavItemSelected(
-                                    "###Playlist_${musicList.identity}###");
-                                globalNavigatorToPage(
-                                    LocalMusicContainerListPage(
-                                  playlist: musicList,
-                                ));
-                              },
-                              cachePic: globalConfig.savePicWhenAddMusicList,
-                            );
-                          },
-                          childCount: musicLists.length,
+              : CupertinoScrollbar(
+                  thickness: 10,
+                  radius: const Radius.circular(10),
+                  controller: controller,
+                  child: CustomScrollView(
+                    controller: controller,
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: Platform.isIOS ? 0.0 : 10.0),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithResponsiveColumnCount(
+                            minColumnWidth: 200.0,
+                            mainAxisSpacing: 10.0,
+                            crossAxisSpacing: 10.0,
+                            minColumnCount: 4,
+                            maxColumnCount: 8,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              var musicList = playlists[index];
+                              return DesktopPlaylistImageCard(
+                                key: ValueKey(musicList.identity),
+                                playlist: musicList,
+                                showDesc: false,
+                                onTap: () {
+                                  globalSetNavItemSelected(
+                                      "###Playlist_${musicList.identity}###");
+                                  globalNavigatorToPage(
+                                      LocalMusicContainerListPage(
+                                    playlist: musicList,
+                                  ));
+                                },
+                                cachePic: globalConfig.storageConfig.savePic,
+                              );
+                            },
+                            childCount: playlists.length,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  )),
         ))
       ]),
     );
@@ -159,7 +164,9 @@ class MusicListGridPageMenu extends StatelessWidget {
   const MusicListGridPageMenu({
     super.key,
     required this.builder,
+    required this.playlists,
   });
+  final List<Playlist> playlists;
   final PullDownMenuButtonBuilder builder;
 
   @override
@@ -171,7 +178,7 @@ class MusicListGridPageMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             if (context.mounted) {
-              var playlist = await showMusicListInfoDialog(context);
+              var playlist = await showPlaylistInfoDialog(context);
               if (playlist != null) {
                 try {
                   await playlist.insertToDb();
@@ -197,9 +204,11 @@ class MusicListGridPageMenu extends StatelessWidget {
               try {
                 var playlist = await Playlist.getFromShare(share: url);
                 if (context.mounted) {
-                  globalNavigatorToPage(DesktopOnlineMusicListPage(
-                    playlist: playlist,
-                  ));
+                  globalNavigatorToPage(
+                      DesktopOnlineMusicListPage(
+                        playlist: playlist,
+                      ),
+                      replace: false);
                 }
               } catch (e) {
                 LogToast.error("打开歌单链接", "打开歌单链接失败: $e",
@@ -216,7 +225,8 @@ class MusicListGridPageMenu extends StatelessWidget {
           onTap: () async {
             if (context.mounted) {
               globalNavigatorToPage(
-                  const DesktopReorderLocalMusicListGridPage());
+                  PlaylistReorderPage(playlists: playlists, isDesktop: true),
+                  replace: false);
             }
           },
           title: '手动排序',
@@ -228,8 +238,10 @@ class MusicListGridPageMenu extends StatelessWidget {
           onTap: () async {
             if (context.mounted) {
               var playlists = await Playlist.getFromDb();
-              globalNavigatorToPage(DesktopMutiSelectLocalMusicListGridPage(
-                  playlists: playlists));
+              globalNavigatorToPage(
+                  PlaylistMultiSelectionPage(
+                      playlists: playlists, isDesktop: true),
+                  replace: false);
             }
           },
           title: '多选操作',

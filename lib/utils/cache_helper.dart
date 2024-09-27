@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:app_rhyme/src/rust/api/cache/file_cache.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 // 将url转换为本地缓存路径
 // 如果本地缓存存在，则返回本地缓存路径
@@ -16,8 +15,8 @@ String _getFileCacheWithUriWrapper(String uri, String cacheFolder,
       uri: uri,
       cacheFolder: cacheFolder,
       filename: filename,
-      customRoot: globalConfig.exportCacheRoot,
-      root: globalDocumentPath);
+      customCacheRoot: globalConfig.storageConfig.customCacheRoot,
+      documentFolder: globalDocumentPath);
 
   if (localSource != null) {
     return localSource;
@@ -32,11 +31,11 @@ String _getFileCacheWithUriWrapper(String uri, String cacheFolder,
 Future<String> cacheFileFromUriWrapper(String uri, String cacheFolder,
     {String? filename}) async {
   return await cacheFileFromUri(
-    uri: uri,
-    cacheFolder: cacheFolder,
-    filename: filename,
-    customRoot: globalConfig.exportCacheRoot,
-  );
+      uri: uri,
+      cacheFolder: cacheFolder,
+      filename: filename,
+      customCacheRoot: globalConfig.storageConfig.customCacheRoot,
+      documentFolder: globalDocumentPath);
 }
 
 Future<void> deleteFileCacheWithUriWrapper(String uri, String cacheFolder,
@@ -45,7 +44,8 @@ Future<void> deleteFileCacheWithUriWrapper(String uri, String cacheFolder,
     uri: uri,
     cacheFolder: cacheFolder,
     filename: filename,
-    customRoot: globalConfig.exportCacheRoot,
+    customCacheRoot: globalConfig.storageConfig.customCacheRoot,
+    documentFolder: globalDocumentPath,
   );
 }
 
@@ -64,11 +64,11 @@ ExtendedImage imageWithCache(
       defaultCoverPath,
       width: width,
       height: height,
+      cacheWidth: width?.toInt(),
+      cacheHeight: height?.toInt(),
       fit: fit,
       scale: scale,
       borderRadius: borderRadius,
-      clearMemoryCacheIfFailed: true,
-      clearMemoryCacheWhenDispose: true,
       enableMemoryCache: false,
     );
   }
@@ -81,24 +81,68 @@ ExtendedImage imageWithCache(
       uri,
       width: width,
       height: height,
+      cacheWidth: width?.toInt(),
+      cacheHeight: height?.toInt(),
       fit: fit,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
-      clearMemoryCacheIfFailed: true,
-      clearMemoryCacheWhenDispose: true,
       enableMemoryCache: false,
+      loadStateChanged: (state) {
+        switch (state.extendedImageLoadState) {
+          case LoadState.loading:
+            return const CupertinoActivityIndicator();
+          case LoadState.completed:
+            return state.completedWidget;
+          case LoadState.failed:
+            return ExtendedImage.asset(
+              defaultCoverPath,
+              width: width,
+              height: height,
+              cacheWidth: width?.toInt(),
+              cacheHeight: height?.toInt(),
+              fit: fit,
+              scale: scale,
+              borderRadius: borderRadius,
+              clearMemoryCacheIfFailed: true,
+              clearMemoryCacheWhenDispose: true,
+              enableMemoryCache: false,
+            );
+        }
+      },
     );
   } else {
     return ExtendedImage.file(
       File(uri),
       width: width,
       height: height,
+      cacheWidth: width?.toInt(),
+      cacheHeight: height?.toInt(),
       fit: fit,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
-      clearMemoryCacheIfFailed: true,
-      clearMemoryCacheWhenDispose: true,
       enableMemoryCache: false,
+      loadStateChanged: (state) {
+        switch (state.extendedImageLoadState) {
+          case LoadState.loading:
+            return const CupertinoActivityIndicator();
+          case LoadState.completed:
+            return state.completedWidget;
+          case LoadState.failed:
+            return ExtendedImage.asset(
+              defaultCoverPath,
+              width: width,
+              height: height,
+              cacheWidth: width?.toInt(),
+              cacheHeight: height?.toInt(),
+              fit: fit,
+              scale: scale,
+              borderRadius: borderRadius,
+              clearMemoryCacheIfFailed: true,
+              clearMemoryCacheWhenDispose: true,
+              enableMemoryCache: false,
+            );
+        }
+      },
     );
   }
 }

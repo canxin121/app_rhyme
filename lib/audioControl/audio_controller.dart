@@ -13,7 +13,6 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:synchronized/synchronized.dart';
 
-// 初始化所有和Audio相关的内容
 Future<void> initGlobalAudioHandler() async {
   if (Platform.isLinux) {
     JustAudioMediaKit.ensureInitialized(
@@ -39,6 +38,9 @@ Future<void> initGlobalAudioHandler() async {
   await session.configure(const AudioSessionConfiguration.music());
 
   globalAudioHandler = AudioHandler();
+  Future.delayed(const Duration(seconds: 1), () {
+    globalAudioHandler.pause();
+  });
 }
 
 // Windows 平台的just_audio实现存在bug
@@ -375,7 +377,7 @@ class AudioHandler extends GetxController {
       playingMusic.value = null;
     }
     globalTalker.info(
-        "[Music Handler] Succeed to updatePlayingMusic:  [${playingMusic.value?.musicAggregator.defaultServer ?? "No music"}]${playingMusic.value?.musicAggregator.defaultServer ?? "No music"}");
+        "[Music Handler] Succeed to updatePlayingMusic:  [${playingMusic.value?.musicAggregator.defaultServer ?? "No music"}]${playingMusic.value?.musicAggregator.name ?? "No music"}");
     update();
   }
 

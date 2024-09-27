@@ -2,7 +2,7 @@ import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/mobile/comps/play_display_comp/music_control_bar.dart';
 import 'package:app_rhyme/mobile/pages/local_playlist_gridview_page.dart';
-import 'package:app_rhyme/common_pages/more_page.dart';
+import 'package:app_rhyme/common_pages/setting_page.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,7 +28,7 @@ class MobileHomeState extends State<MobileHome> {
   final List<Widget> _pages = [
     const LocalMusicListGridPage(),
     const CombinedSearchPage(),
-    const MorePage(),
+    const SettingPage(),
   ];
 
   @override

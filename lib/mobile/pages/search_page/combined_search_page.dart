@@ -1,8 +1,8 @@
-import 'package:app_rhyme/mobile/pages/search_page/search_music_aggregator_page.dart';
-import 'package:app_rhyme/mobile/pages/search_page/search_music_list_page.dart';
+import 'package:app_rhyme/common_pages/search_page/music_aggregator.dart';
+import 'package:app_rhyme/common_pages/search_page/playlist.dart';
 import 'package:flutter/cupertino.dart';
 
-void Function() globalToggleSearchPage = () {};
+void Function() globalMobileToggleSearchPage = () {};
 
 class CombinedSearchPage extends StatefulWidget {
   const CombinedSearchPage({super.key});
@@ -23,14 +23,14 @@ class _CombinedSearchPageState extends State<CombinedSearchPage>
 
   @override
   void initState() {
-    globalToggleSearchPage = _onToggle;
+    globalMobileToggleSearchPage = _onToggle;
     WidgetsBinding.instance.addObserver(this); // 添加观察者
     super.initState();
   }
 
   @override
   void dispose() {
-    globalToggleSearchPage = () {};
+    globalMobileToggleSearchPage = () {};
     WidgetsBinding.instance.removeObserver(this); // 移除观察者
     super.dispose();
   }
@@ -52,8 +52,12 @@ class _CombinedSearchPageState extends State<CombinedSearchPage>
       child: IndexedStack(
         index: _selectedIndex,
         children: const [
-          SearchMusicAggregatorPage(),
-          SearchMusicListPage(),
+          MusicAggregatorSearchPage(
+            isDesktop: false,
+          ),
+          PlaylistSearchPage(
+            isDesktop: false,
+          ),
         ],
       ),
     );

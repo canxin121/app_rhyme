@@ -1,6 +1,6 @@
+import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
+import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
 import 'package:app_rhyme/mobile/comps/chores/button.dart';
-import 'package:app_rhyme/mobile/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
-import 'package:app_rhyme/mobile/pages/reorder_pages/reorder_local_music_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -142,7 +142,7 @@ class LocalMusicContainerListPageState
                 constraints: BoxConstraints(
                   maxWidth: screenWidth * 0.7,
                 ),
-                child: MusicListImageCard(
+                child: MobileMusicListImageCard(
                   playlist: playist,
                   online: false,
                 ),
@@ -209,11 +209,11 @@ class LocalMusicContainerListPageState
                       const Padding(padding: EdgeInsets.only(top: 5)),
                     Padding(
                       padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: MusicContainerListItem(
+                      child: MobileMusicAggregatorListItem(
                         key: ValueKey(musicAgg.identity()),
                         musicAgg: musicAgg,
                         playlist: widget.playlist,
-                        cachePic: globalConfig.savePicWhenAddMusicList,
+                        cachePic: globalConfig.storageConfig.savePic,
                       ),
                     ),
                     if (!isLastItem)
@@ -263,12 +263,13 @@ class LocalMusicListChoicMenu extends StatelessWidget {
         PullDownMenuHeader(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          leading: imageWithCache(playlist.cover),
+          leading: imageWithCache(playlist.getCover(size: 250),
+              height: 100, width: 100),
           title: playlist.name,
           subtitle: playlist.summary,
         ),
         const PullDownMenuDivider.large(),
-        ...localMusiclistItems(context, playlist, true),
+        ...playlistMenuItems(context, playlist, false, true),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
@@ -300,9 +301,10 @@ class LocalMusicListChoicMenu extends StatelessWidget {
             Navigator.push(
               context,
               CupertinoPageRoute(
-                builder: (context) => ReorderLocalMusicListPage(
-                  musicAggs: musicAggs,
+                builder: (context) => MuiscAggregatorReorderPage(
+                  musicAggregators: musicAggs,
                   playlist: playlist,
+                  isDesktop: false,
                 ),
               ),
             );
@@ -317,9 +319,10 @@ class LocalMusicListChoicMenu extends StatelessWidget {
             Navigator.push(
               context,
               CupertinoPageRoute(
-                builder: (context) => MutiSelectMusicContainerListPage(
-                  musicList: playlist,
+                builder: (context) => MusicAggregatorMultiSelectionPage(
+                  playlist: playlist,
                   musicAggs: musicAggs,
+                  isDesktop: false,
                 ),
               ),
             );

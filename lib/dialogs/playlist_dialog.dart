@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -9,27 +8,27 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<Playlist?> showMusicListInfoDialog(BuildContext context,
+Future<Playlist?> showPlaylistInfoDialog(BuildContext context,
     {Playlist? defaultPlaylist, bool readonly = false}) async {
   return showCupertinoDialog<Playlist>(
     context: context,
     builder: (BuildContext context) =>
-        MusicListDialog(defaultMusicList: defaultPlaylist, readonly: readonly),
+        PlaylistDialog(defaultMusicList: defaultPlaylist, readonly: readonly),
   );
 }
 
-class MusicListDialog extends StatefulWidget {
+class PlaylistDialog extends StatefulWidget {
   final Playlist? defaultMusicList;
   final bool readonly;
 
-  const MusicListDialog(
+  const PlaylistDialog(
       {super.key, this.defaultMusicList, this.readonly = false});
 
   @override
-  MusicListDialogState createState() => MusicListDialogState();
+  PlaylistDialogState createState() => PlaylistDialogState();
 }
 
-class MusicListDialogState extends State<MusicListDialog> {
+class PlaylistDialogState extends State<PlaylistDialog> {
   late TextEditingController nameController;
   late TextEditingController descController;
   late ExtendedImage image;
@@ -43,7 +42,7 @@ class MusicListDialogState extends State<MusicListDialog> {
     descController =
         TextEditingController(text: widget.defaultMusicList?.summary ?? '');
     image = imageWithCache(widget.defaultMusicList?.cover);
-    artPicPath = widget.defaultMusicList?.cover ?? '';
+    artPicPath = widget.defaultMusicList?.getCover(size: 250) ?? '';
   }
 
   @override
@@ -69,6 +68,7 @@ class MusicListDialogState extends State<MusicListDialog> {
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           GestureDetector(
             onTap: widget.readonly
@@ -81,7 +81,8 @@ class MusicListDialogState extends State<MusicListDialog> {
                       setState(() {
                         artPicPath = imageFile.path;
                         // image = ExtendedImage.file(File(artPicPath));
-                        image = imageWithCache(artPicPath);
+                        image =
+                            imageWithCache(artPicPath, width: 100, height: 100);
                         cacheFileFromUriWrapper(imageFile.path, picCacheFolder);
                       });
                     }
@@ -101,9 +102,21 @@ class MusicListDialogState extends State<MusicListDialog> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              '歌单',
+              style: TextStyle(
+                color: isDarkMode
+                    ? CupertinoColors.systemGrey2
+                    : CupertinoColors.black,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
             child: CupertinoTextField(
               controller: nameController,
-              placeholder: '歌单名字',
+              placeholder: '歌单',
               readOnly: widget.readonly,
               style: TextStyle(
                 color:
@@ -120,6 +133,15 @@ class MusicListDialogState extends State<MusicListDialog> {
                     : CupertinoColors.white,
                 borderRadius: BorderRadius.circular(5.0),
               ),
+            ),
+          ),
+          Text(
+            '介绍',
+            style: TextStyle(
+              color: isDarkMode
+                  ? CupertinoColors.systemGrey2
+                  : CupertinoColors.black,
+              fontSize: 14,
             ),
           ),
           Padding(
@@ -172,7 +194,7 @@ class MusicListDialogState extends State<MusicListDialog> {
                   widget.defaultMusicList!.name = nameController.text;
                   widget.defaultMusicList!.summary = descController.text;
                   widget.defaultMusicList!.cover = artPicPath;
-                  Navigator.of(context).pop(widget.defaultMusicList!);
+                  Navigator.of(context).pop(widget.defaultMusicList);
                 } else {
                   Navigator.of(context).pop(await Playlist.newInstance(
                     name: nameController.text,

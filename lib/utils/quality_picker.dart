@@ -1,10 +1,9 @@
 import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/types/chore.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-
-enum QualityOption { low, medium, high, highest }
 
 String qualityOptionToString(QualityOption qualityOption) {
   switch (qualityOption) {
@@ -89,15 +88,15 @@ Quality autoPickQuality(List<Quality> qualities) {
     switch (globalConnectivityStateSimple) {
       case ConnectivityStateSimple.wifi:
         return autoPickQualityByOption(
-            qualities, stringToQualityOption(globalConfig.wifiAutoQuality));
+            qualities, globalConfig.qualityConfig.wifiAutoQuality);
       case ConnectivityStateSimple.mobile:
         return autoPickQualityByOption(
-            qualities, stringToQualityOption(globalConfig.mobileAutoQuality));
+            qualities, globalConfig.qualityConfig.mobileAutoQuality);
       case ConnectivityStateSimple.none:
         return qualities.last;
     }
   } else {
     return autoPickQualityByOption(
-        qualities, stringToQualityOption(globalConfig.wifiAutoQuality));
+        qualities, globalConfig.qualityConfig.wifiAutoQuality);
   }
 }

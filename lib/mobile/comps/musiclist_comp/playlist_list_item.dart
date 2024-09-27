@@ -38,7 +38,7 @@ class MusicListListItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: imageWithCache(
-                playlist.cover,
+                playlist.getCover(size: 250),
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
@@ -90,7 +90,7 @@ class MusicListListItem extends StatelessWidget {
                 details.globalPosition,
                 details.globalPosition,
               );
-              showMusicListMenu(context, playlist, position, true);
+              showPlaylistMenu(context, playlist, position, false, true);
             },
             child: Icon(
               CupertinoIcons.ellipsis,

@@ -1,16 +1,18 @@
+import 'package:app_rhyme/common_pages/search_page/music_aggregator.dart';
+import 'package:app_rhyme/common_pages/search_page/playlist.dart';
 import 'package:app_rhyme/desktop/home.dart';
 import 'package:app_rhyme/desktop/pages/local_music_agg_listview_page.dart';
 import 'package:app_rhyme/desktop/pages/local_playlist_gridview_page.dart';
-import 'package:app_rhyme/desktop/pages/search_pages/search_music_aggregator_page.dart';
-import 'package:app_rhyme/desktop/pages/search_pages/search_music_list_page.dart';
-import 'package:app_rhyme/common_pages/more_page.dart';
+import 'package:app_rhyme/common_pages/setting_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 void Function() globalDesktopMusicListNavColumnRefreshFunction = () {};
-void Function(Widget page) globalNavigatorToPage = (Widget page) {
+void Function() globalPopPage = () {};
+void Function(Widget page, {bool replace}) globalNavigatorToPage =
+    (Widget page, {bool replace = true}) {
   return;
 };
 void Function(String item) globalSetNavItemSelected = (String item) {};
@@ -75,13 +77,28 @@ class _MyNavListViewState extends State<MyNavListView> {
     setState(() {});
   }
 
-  void navigatorToPage(Widget page) {
+  void navigatorToPage(Widget page, {bool replace = true}) {
     if (globalDesktopNavigatorKey.currentContext == null) return;
-    Navigator.of(globalDesktopNavigatorKey.currentContext!).push(
-      CupertinoPageRoute(
-        builder: (context) => NestedNavigator(child: page),
-      ),
-    );
+    if (replace) {
+      Navigator.of(globalDesktopNavigatorKey.currentContext!).pushReplacement(
+        CupertinoPageRoute(
+          builder: (context) => NestedNavigator(child: page),
+        ),
+      );
+    } else {
+      Navigator.of(globalDesktopNavigatorKey.currentContext!).push(
+        CupertinoPageRoute(
+          builder: (context) => NestedNavigator(child: page),
+        ),
+      );
+    }
+  }
+
+  void popPage() {
+    var navigator = Navigator.of(globalDesktopNavigatorKey.currentContext!);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   @override
@@ -89,6 +106,7 @@ class _MyNavListViewState extends State<MyNavListView> {
     refresh();
     globalDesktopMusicListNavColumnRefreshFunction = refresh;
     globalNavigatorToPage = navigatorToPage;
+    globalPopPage = popPage;
     super.initState();
   }
 
@@ -103,13 +121,26 @@ class _MyNavListViewState extends State<MyNavListView> {
     return NavListView(
       initSelectedItem: '所有播放列表',
       children: [
+        NavItem(
+          title: '设置',
+          icon: CupertinoIcons.settings,
+          onTap: () {
+            globalSetNavItemSelected("###Setting###");
+            navigatorToPage(
+              const SettingPage(),
+            );
+          },
+          identity: '###Setting###',
+        ),
         NavGroup(title: "搜索", icon: CupertinoIcons.search, items: [
           NavItem(
             title: '搜索单曲',
             icon: CupertinoIcons.search,
             onTap: () {
               globalSetNavItemSelected("###SearchSingleMusicAggregator###");
-              navigatorToPage(const SearchMusicAggregatorPage());
+              navigatorToPage(const MusicAggregatorSearchPage(
+                isDesktop: true,
+              ));
             },
             identity: '###SearchSingleMusicAggregator###',
           ),
@@ -118,7 +149,9 @@ class _MyNavListViewState extends State<MyNavListView> {
             icon: CupertinoIcons.search,
             onTap: () {
               globalSetNavItemSelected("###SearchMusicList###");
-              navigatorToPage(const SearchMusicListPage());
+              navigatorToPage(const PlaylistSearchPage(
+                isDesktop: true,
+              ));
             },
             identity: "###SearchMusicList###",
           )
@@ -157,17 +190,6 @@ class _MyNavListViewState extends State<MyNavListView> {
               },
             )
           ],
-        ),
-        NavItem(
-          title: '设置',
-          icon: CupertinoIcons.settings,
-          onTap: () {
-            globalSetNavItemSelected("###Setting###");
-            navigatorToPage(
-              const MorePage(),
-            );
-          },
-          identity: '###Setting###',
         ),
       ],
     );

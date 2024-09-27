@@ -2,11 +2,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<T> shuffleList<T>(List<T> items) {
@@ -36,20 +34,6 @@ void openProjectLink() async {
   }
 }
 
-Future<String?> pickDirectory() async {
-  // 请求存储权限
-  if (await Permission.manageExternalStorage.request().isGranted) {
-    // 使用file_picker选择目录
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    return selectedDirectory;
-  } else {
-    // 权限被拒绝
-    LogToast.error("未授予存储权限", "请在设置中授予AppRhyme存储权限",
-        "[pickDirectory] Storage permission not granted");
-    return null;
-  }
-}
-
 Future<void> exitApp() async {
   if (Platform.isAndroid || Platform.isIOS) {
     await FlutterExitApp.exitApp(iosForceExit: true);
@@ -60,6 +44,10 @@ Future<void> exitApp() async {
 
 bool? globalIsTablet;
 bool isTablet(BuildContext context) {
+  if (isDesktop()) {
+    return false;
+  }
+
   if (globalIsTablet != null) {
     return globalIsTablet!;
   }
@@ -78,4 +66,3 @@ bool isWidthGreaterThanHeight(BuildContext context) {
   final size = MediaQuery.of(context).size;
   return size.width > size.height;
 }
-  

@@ -120,12 +120,10 @@ class Crypto {
   Future<String> rc4DecryptFromBase64_(String input) async {
     try {
       // TODO: secret
-      // return await crypto.rc4DecryptFromBase64(
-      //     key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
-
-      return await crypto.rc4DecryptFromBase64(key: "rhyme666", input: input);
+      return await crypto.rc4DecryptFromBase64(
+          key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
     } catch (e) {
-      globalTalker.error("[Crypto] $e");      
+      globalTalker.error("[Crypto] $e");
       return "";
     }
   }
@@ -230,9 +228,9 @@ class $Crypto extends Crypto with $Bridge {
   void $bridgeSet(String identifier, $Value value) {}
 }
 
-class ExternApiEvaler {
+class ExternalApiEvaler {
   late Runtime runTime;
-  ExternApiEvaler(String path) {
+  ExternalApiEvaler(String path) {
     final compile = Compiler();
     compile.defineBridgeClasses([$HttpHelper.$declaration]);
     var file = File(path);

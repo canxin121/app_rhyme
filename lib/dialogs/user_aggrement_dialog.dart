@@ -158,6 +158,6 @@ Future<void> showUserAgreement(BuildContext context) async {
     await exitApp();
   } else {
     globalConfig.userAgreement = true;
-    globalConfig.save();
+    globalConfig.save(documentFolder: globalDocumentPath);
   }
 }

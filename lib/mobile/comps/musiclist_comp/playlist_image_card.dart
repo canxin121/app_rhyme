@@ -6,13 +6,13 @@ import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 
-class MusicListImageCard extends StatelessWidget {
+class MobileMusicListImageCard extends StatelessWidget {
   final Playlist playlist;
   final bool online;
   final GestureTapCallback? onTap;
   final bool cachePic;
   final bool showDesc;
-  const MusicListImageCard(
+  const MobileMusicListImageCard(
       {super.key,
       required this.playlist,
       required this.online,
@@ -34,7 +34,8 @@ class MusicListImageCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
-              child: imageWithCache(playlist.cover, cacheNow: cachePic),
+              child: imageWithCache(playlist.getCover(size: 250),
+                  height: 100, width: 100, cacheNow: cachePic),
             ),
             Positioned(
               top: 3,
@@ -51,7 +52,7 @@ class MusicListImageCard extends StatelessWidget {
                 onTapDown: (details) {
                   Rect position = Rect.fromLTWH(details.globalPosition.dx,
                       details.globalPosition.dy, 0, 0);
-                  showMusicListMenu(context, playlist, position, false);
+                  showPlaylistMenu(context, playlist, position, false, false);
                 },
                 child: Icon(
                   CupertinoIcons.ellipsis_circle,

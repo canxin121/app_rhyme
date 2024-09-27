@@ -1,21 +1,30 @@
 #![allow(unused, non_camel_case_types)]
 use anyhow::Result;
 use flutter_rust_bridge::frb;
-use music_api::data::interface::{
-    music_aggregator::{Music, MusicAggregator},
-    playlist::Playlist,
-    playlist_subscription::PlayListSubscription,
-    server::MusicServer,
+use music_api::{
+    data::interface::{
+        json::{MusicAggregatorJsonVec, PlaylistJsonVec},
+        music_aggregator::{Music, MusicAggregator},
+        playlist::Playlist,
+        playlist_subscription::PlayListSubscription,
+        results::PlaylistUpdateSubscriptionResult,
+        server::MusicServer,
+    },
+    server::kuwo::web_api::music,
 };
 
 #[frb(external)]
 impl Music {
+    /// get music cover of specific size
+    #[frb(sync)]
+    pub fn get_cover(&self, size: u16) -> Option<String> {}
+
     /// Search music online
     pub async fn search_online(
         servers: Vec<MusicServer>,
         content: String,
-        page: u32,
-        size: u32,
+        page: i64,
+        size: i64,
     ) -> Result<Vec<Music>> {
     }
 
@@ -37,6 +46,7 @@ impl Music {
 
 #[frb(external)]
 impl MusicAggregator {
+    #[frb(sync)]
     pub fn identity(&self) -> String {}
 
     pub fn from_music(music: Music) -> Self {}
@@ -50,8 +60,8 @@ impl MusicAggregator {
         aggs: Vec<MusicAggregator>,
         servers: Vec<MusicServer>,
         content: String,
-        page: u32,
-        size: u32,
+        page: i64,
+        size: i64,
     ) -> Result<Vec<Self>, (Vec<Self>, String)> {
     }
     /// take ownership
@@ -72,12 +82,16 @@ impl MusicAggregator {
 
 #[frb(external)]
 impl Playlist {
+    /// get playlist cover of specific size
+    #[frb(sync)]
+    pub fn get_cover(&self, size: u16) -> Option<String> {}
+
     /// Search playlist online
     pub async fn search_online(
         servers: Vec<MusicServer>,
         content: String,
-        page: u32,
-        size: u32,
+        page: i64,
+        size: i64,
     ) -> Result<Vec<Playlist>> {
     }
 
@@ -117,10 +131,17 @@ impl Playlist {
 
     /// get all music aggregators from db
     pub async fn get_musics_from_db(&self) -> Result<Vec<MusicAggregator>> {}
+
+    /// update playlist music aggregator of subscribed playlist into db playlist
+    pub async fn update_subscription(&self) -> Result<PlaylistUpdateSubscriptionResult> {}
+
+    pub async fn del_music_agg(&self, music_agg_identity: String) -> anyhow::Result<()> {}
 }
 
 #[frb(external)]
 impl MusicServer {
+    #[frb(sync)]
+    pub fn all() -> Vec<MusicServer> {}
     #[frb(sync)]
     pub fn length() -> usize {}
     #[frb(sync)]
@@ -129,15 +150,52 @@ impl MusicServer {
 
 #[frb]
 pub async fn set_db(database_url: &str) -> Result<(), anyhow::Error> {
-    music_api::data::set_db(database_url).await
+    music_api::data::interface::database::set_db(database_url).await
 }
 
 #[frb]
-pub async fn db_inited() -> bool {
-    music_api::data::db_inited().await
+pub async fn close_db() -> Result<(), anyhow::Error> {
+    music_api::data::interface::database::close_db().await
 }
 
 #[frb]
-pub async fn close_db() {
-    music_api::data::close_db().await
+pub async fn clear_db() -> Result<(), anyhow::Error> {
+    music_api::data::interface::database::clear_db().await
+}
+
+#[frb]
+pub async fn reinit_db() -> Result<(), anyhow::Error> {
+    music_api::data::interface::database::reinit_db().await
+}
+
+#[frb(external)]
+impl PlaylistJsonVec {
+    pub fn to_json(&self) -> anyhow::Result<String> {}
+
+    pub fn from_json(json: &str) -> anyhow::Result<Self> {}
+
+    pub async fn save_to(&self, path: &str) -> anyhow::Result<()> {}
+
+    pub async fn load_from(path: &str) -> anyhow::Result<Self> {}
+
+    /// takes ownership
+    pub async fn insert_to_db(self) -> anyhow::Result<()> {}
+}
+
+#[frb(external)]
+impl MusicAggregatorJsonVec {
+    pub fn to_json(&self) -> anyhow::Result<String> {}
+
+    pub fn from_json(json: &str) -> anyhow::Result<Self> {}
+
+    pub async fn save_to(&self, path: &str) -> anyhow::Result<()> {}
+
+    pub async fn load_from(path: &str) -> anyhow::Result<Self> {}
+}
+
+#[frb]
+pub async fn clone_music_aggs(
+    music_aggs: &Vec<MusicAggregator>,
+) -> anyhow::Result<Vec<MusicAggregator>> {
+    Ok(music_aggs.clone())
 }

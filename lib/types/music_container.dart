@@ -76,7 +76,8 @@ class MusicContainer {
 
     // 有本地缓存直接返回
     try {
-      var musicCache = await getCacheMusic(music: currentMusic);
+      var musicCache = await getCacheMusic(
+          music: currentMusic, documentFolder: globalDocumentPath);
       if (musicCache != null) {
         playInfo = musicCache.$1;
         lyric = musicCache.$2;
@@ -91,7 +92,7 @@ class MusicContainer {
     } catch (e) {}
 
     // 没有本地缓存，也没有第三方api，直接返回null
-    if (globalConfig.externApi == null) {
+    if (globalConfig.externalApi == null) {
       // 未导入第三方音乐源，应当toast提示用户
       LogToast.error("获取播放信息失败", "未导入第三方音乐源，无法在线获取播放信息",
           "[getCurrentMusicPlayInfo] Failed to get play info, no extern api");
@@ -99,7 +100,7 @@ class MusicContainer {
     }
 
     // 有第三方api，使用api进行请求
-    playInfo = await globalExternApiEvaler!
+    playInfo = await globalExternalApiEvaler!
         .getMusicPlayInfo(currentMusic, targetQuality);
 
     // 如果第三方api查找不到，直接返回null
@@ -196,7 +197,7 @@ class MusicContainer {
     }
   }
 
-  // 切换音乐源         
+  // 切换音乐源
   Future<bool> _changeSource([MusicServer? server]) async {
     usedServers.add(currentMusic.server);
     server ??= nextSource(usedServers);
@@ -241,12 +242,13 @@ class MusicContainer {
             AudioSource.asset("assets/blank.mp3", tag: _toMediaItem());
         // LogToast.info("切换音乐源成功", "${musicAggregator.name}默认音源切换为$server",
         //     "[MusicContainer] Successfully changed music source to $server");
+        globalTalker.log(
+            "[MusicContainer] 成功切换音乐源: ${musicAggregator.name}默认音源切换为$server");
       } catch (e) {
         LogToast.error(
             "'${musicAggregator.name}'切换音乐源失败",
             "${musicAggregator.name}切换音乐源失败: $e",
             "[MusicContainer] Failed to change music source: $e");
-
         return false;
       }
       return true;

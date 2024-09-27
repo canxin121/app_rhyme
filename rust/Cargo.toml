@@ -7,17 +7,14 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-flutter_rust_bridge = { version = "=2.2.0", features = ["chrono"] }
-lazy_static = "1.5.0"
+flutter_rust_bridge = { version = "=2.4.0", features = ["chrono"] }
 rayon = "1.10.0"
-sqlx = "0.7.4"
 futures = "0.3.30"
 futures-util = "0.3.30"
 chrono = { version = "0.4.38", features = ["serde"] }
 base64 = "0.22.1"
 rc4 = { git = "https://github.com/rsdump/rc4" }
 aes = "0.8.4"
-async-trait = "0.1.82"
 cbc = "0.1.2"
 crypto = "0.5.1"
 ecb = "0.1.2"

@@ -1,7 +1,7 @@
+import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
+import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/play_button.dart';
-import 'package:app_rhyme/desktop/pages/muti_select_pages/muti_select_music_container_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/reorder_pages/reorder_music_agg_page.dart';
 import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
@@ -33,6 +33,7 @@ class MusicListHeader extends StatelessWidget {
   final Future<void> Function()? fetchAllMusicAggregators;
   final bool isDarkMode;
   final double screenWidth;
+
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -48,8 +49,8 @@ class MusicListHeader extends StatelessWidget {
             margin: const EdgeInsets.all(10),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5.0),
-              child: imageWithCache(playlist.cover,
-                  cacheNow: globalConfig.savePicWhenAddMusicList,
+              child: imageWithCache(playlist.getCover(size: 250),
+                  cacheNow: globalConfig.storageConfig.savePic,
                   width: 250,
                   height: 250),
             ),
@@ -94,32 +95,50 @@ class MusicListHeader extends StatelessWidget {
                     buildButton(context,
                         icon: CupertinoIcons.play_fill,
                         label: "播放", onPressed: () async {
-                      if (musicAggs != null) {
-                        await globalAudioHandler.clearReplaceMusicAll(
-                            musicAggs!.map((e) => MusicContainer(e)).toList());
-                      } else {
-                        await fetchAllMusicAggregators!();
-                        await globalAudioHandler.clearReplaceMusicAll(
-                            pagingController!.itemList!
-                                .map((e) => MusicContainer(e))
-                                .toList());
+                      try {
+                        if (musicAggs != null) {
+                          await globalAudioHandler.clearReplaceMusicAll(
+                              musicAggs!
+                                  .map((e) => MusicContainer(e))
+                                  .toList());
+                        } else if (pagingController != null &&
+                            pagingController!.itemList != null) {
+                          await fetchAllMusicAggregators!();
+                          await globalAudioHandler.clearReplaceMusicAll(
+                              pagingController!.itemList!
+                                  .map((e) => MusicContainer(e))
+                                  .toList());
+                        } else {
+                          throw "musicAggs and pagingController is null";
+                        }
+                      } catch (e) {
+                        LogToast.error("播放全部", "播放失败",
+                            "[MusicListHeader] play all failed");
                       }
                     }),
                     const SizedBox(width: 10),
                     buildButton(context,
                         icon: CupertinoIcons.shuffle,
                         label: "随机播放", onPressed: () async {
-                      if (musicAggs != null) {
-                        await globalAudioHandler.clearReplaceMusicAll(
-                            shuffleList(musicAggs!
-                                .map((e) => MusicContainer(e))
-                                .toList()));
-                      } else {
-                        await fetchAllMusicAggregators!();
-                        await globalAudioHandler.clearReplaceMusicAll(
-                            shuffleList(pagingController!.itemList!
-                                .map((e) => MusicContainer(e))
-                                .toList()));
+                      try {
+                        if (musicAggs != null) {
+                          await globalAudioHandler.clearReplaceMusicAll(
+                              shuffleList(musicAggs!
+                                  .map((e) => MusicContainer(e))
+                                  .toList()));
+                        } else if (pagingController != null &&
+                            pagingController!.itemList != null) {
+                          await fetchAllMusicAggregators!();
+                          await globalAudioHandler.clearReplaceMusicAll(
+                              shuffleList(pagingController!.itemList!
+                                  .map((e) => MusicContainer(e))
+                                  .toList()));
+                        } else {
+                          throw "musicAggs and pagingController is null";
+                        }
+                      } catch (e) {
+                        LogToast.error("随机播放", "播放失败",
+                            "[MusicListHeader] shuffle play all failed");
                       }
                     }),
                   ],
@@ -172,8 +191,8 @@ class MusicListHeader extends StatelessWidget {
                               details.globalPosition,
                               details.globalPosition,
                             );
-                            showMusicListMenu(
-                                context, playlist, position, false);
+                            showPlaylistMenu(
+                                context, playlist, position, true, false);
                           },
                           child: Icon(
                             CupertinoIcons.ellipsis,
@@ -221,12 +240,13 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
         PullDownMenuHeader(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          leading: imageWithCache(playlist.cover),
+          leading: imageWithCache(playlist.getCover(size: 250),
+              width: 40, height: 40),
           title: playlist.name,
           subtitle: playlist.summary,
         ),
         const PullDownMenuDivider.large(),
-        ...localMusiclistItems(context, playlist, true),
+        ...playlistMenuItems(context, playlist, true, true),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
@@ -255,9 +275,13 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
-            globalNavigatorToPage(DesktopReorderLocalMusicListPage(
-              playlist: playlist,
-            ));
+            globalNavigatorToPage(
+                MuiscAggregatorReorderPage(
+                  musicAggregators: musicAggs,
+                  playlist: playlist,
+                  isDesktop: true,
+                ),
+                replace: false);
           },
           title: "手动排序",
           icon: CupertinoIcons.sort_up_circle,
@@ -266,10 +290,13 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
-            globalNavigatorToPage(DesktopMutiSelectMusicContainerListPage(
-              playlist: playlist,
-              musicAggs: musicAggs,
-            ));
+            globalNavigatorToPage(
+                MusicAggregatorMultiSelectionPage(
+                  playlist: playlist,
+                  musicAggs: musicAggs,
+                  isDesktop: true,
+                ),
+                replace: false);
           },
           title: "多选操作",
           icon: CupertinoIcons.selection_pin_in_out,

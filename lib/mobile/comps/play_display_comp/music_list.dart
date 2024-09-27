@@ -29,7 +29,7 @@ class MusicListComp extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: MusicContainerListItem(
+                  child: MobileMusicAggregatorListItem(
                     musicAgg: musics[index].musicAggregator,
                     isDark: true,
                     onTap: () {

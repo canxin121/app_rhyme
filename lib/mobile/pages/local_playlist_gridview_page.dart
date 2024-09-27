@@ -1,16 +1,16 @@
 import 'dart:io';
-
-import 'package:app_rhyme/mobile/pages/muti_select_pages/muti_select_local_music_list_gridview_page.dart';
-import 'package:app_rhyme/mobile/pages/reorder_pages/reorder_local_playlist_grid_page.dart';
+import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
+import 'package:app_rhyme/common_pages/reorder_page/playlist.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
-import 'package:app_rhyme/dialogs/musiclist_info_dialog.dart';
+import 'package:app_rhyme/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/mobile/pages/local_music_aggregator_listview_page.dart';
 import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
 import 'package:app_rhyme/utils/colors.dart';
+import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -120,7 +120,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               var playlisy = playlists[index];
-                              return MusicListImageCard(
+                              return MobileMusicListImageCard(
                                 key: ValueKey(playlisy.identity),
                                 playlist: playlisy,
                                 online: false,
@@ -136,7 +136,7 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                                     ),
                                   );
                                 },
-                                cachePic: globalConfig.savePicWhenAddMusicList,
+                                cachePic: globalConfig.storageConfig.savePic,
                               );
                             },
                             childCount: playlists.length,
@@ -169,11 +169,11 @@ class MusicListGridPageMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             if (context.mounted) {
-              var playlist = await showMusicListInfoDialog(context);
+              var playlist = await showPlaylistInfoDialog(context);
               if (playlist != null) {
                 try {
                   await playlist.insertToDb();
-                  globalMobileMusicListGridPageRefreshFunction();
+                  refreshPlaylistGridViewPage();
                   LogToast.success("创建歌单", "创建歌单成功",
                       "[MusicListGridPageMenu] Successfully created music list");
                 } catch (e) {
@@ -213,7 +213,10 @@ class MusicListGridPageMenu extends StatelessWidget {
             if (context.mounted) {
               Navigator.of(context).push(
                 CupertinoPageRoute(
-                  builder: (context) => const ReorderLocalMusicListGridPage(),
+                  builder: (context) => PlaylistReorderPage(
+                    playlists: playlists,
+                    isDesktop: false,
+                  ),
                 ),
               );
             }
@@ -228,8 +231,10 @@ class MusicListGridPageMenu extends StatelessWidget {
             if (context.mounted) {
               Navigator.of(context).push(
                 CupertinoPageRoute(
-                    builder: (context) =>
-                        MutiSelectLocalMusicListGridPage(playlists: playlists)),
+                    builder: (context) => PlaylistMultiSelectionPage(
+                          playlists: playlists,
+                          isDesktop: false,
+                        )),
               );
             }
           },

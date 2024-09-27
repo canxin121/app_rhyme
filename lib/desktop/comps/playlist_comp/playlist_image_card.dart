@@ -4,31 +4,30 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 
-class MusicListImageCard extends StatefulWidget {
+class DesktopPlaylistImageCard extends StatefulWidget {
   final Playlist playlist;
-  final bool online;
   final GestureTapCallback? onTap;
   final bool cachePic;
   final bool showDesc;
 
-  const MusicListImageCard(
+  const DesktopPlaylistImageCard(
       {super.key,
       required this.playlist,
-      required this.online,
       this.onTap,
       this.cachePic = false,
       this.showDesc = true});
 
   @override
-  _MusicListImageCardState createState() => _MusicListImageCardState();
+  _DesktopPlaylistImageCardState createState() =>
+      _DesktopPlaylistImageCardState();
 }
 
-class _MusicListImageCardState extends State<MusicListImageCard> {
+class _DesktopPlaylistImageCardState extends State<DesktopPlaylistImageCard> {
   bool _hovering = false;
 
   @override
@@ -54,17 +53,7 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
               final Offset tapPosition = details.globalPosition;
               final Rect position =
                   Rect.fromLTWH(tapPosition.dx, tapPosition.dy, 0, 0);
-              List<PullDownMenuEntry> menuItems;
-              if (!widget.online) {
-                // 本地歌单的歌曲
-                menuItems =
-                    localMusiclistItems(context, widget.playlist, false);
-              } else {
-                // 在线的歌曲
-                menuItems = onlineMusicListItems(context, widget.playlist);
-              }
-              showPullDownMenu(
-                  context: context, items: menuItems, position: position);
+              showPlaylistMenu(context, widget.playlist, position, true, false);
             },
             child: Stack(
               children: [
@@ -72,9 +61,9 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                   borderRadius: BorderRadius.circular(5.0),
                   child: AspectRatio(
                     aspectRatio: 1.0,
-                    child: imageWithCache(widget.playlist.cover,
-                        cacheNow: widget.cachePic),
-                  ),
+                    child: imageWithCache(widget.playlist.getCover(size: 250),
+                        cacheNow: widget.cachePic, width: 250, height: 250),
+                  ), // 100x100
                 ),
                 if (_hovering)
                   Positioned.fill(
@@ -82,7 +71,7 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                       color: CupertinoColors.systemGrey.withOpacity(0.1),
                     ),
                   ),
-                if (_hovering || !isTablet(context))
+                if (_hovering || isTablet(context))
                   Positioned(
                     bottom: 8,
                     right: 8,
@@ -92,8 +81,8 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                           details.globalPosition,
                           details.globalPosition,
                         );
-                        showMusicListMenu(
-                            context, widget.playlist, position, false);
+                        showPlaylistMenu(
+                            context, widget.playlist, position, true, false);
                       },
                       child: Icon(
                         CupertinoIcons.ellipsis_circle,
@@ -102,15 +91,30 @@ class _MusicListImageCardState extends State<MusicListImageCard> {
                       ),
                     ),
                   ),
-                if (_hovering || !isTablet(context))
+                if (_hovering || isTablet(context))
                   Positioned(
                     bottom: 8,
                     left: 8,
                     child: GestureDetector(
-                      onTap: () async {
-                        var aggs = await widget.playlist.getMusicsFromDb();
-                        await globalAudioHandler.clearReplaceMusicAll(
-                            aggs.map((e) => MusicContainer(e)).toList());
+                      onTap: () async { 
+                        try {
+                          List<MusicAggregator> aggs;
+                          if (widget.playlist.fromDb) {
+                            aggs = await widget.playlist.getMusicsFromDb();
+                          } else {
+                            LogToast.info("获取歌曲", "正在获取歌曲，请稍等",
+                                "[PlaylistImageCard] fetching musics, please wait");
+
+                            aggs = await widget.playlist
+                                .fetchMusicsOnline(page: 1, limit: 2333);
+                          }
+
+                          await globalAudioHandler.clearReplaceMusicAll(
+                              aggs.map((e) => MusicContainer(e)).toList());
+                        } catch (e) {
+                          LogToast.error("播放全部", "播放失败: $e",
+                              "[PlaylistImageCard] play all failed: $e");
+                        }
                       },
                       child: Icon(
                         CupertinoIcons.play_circle,

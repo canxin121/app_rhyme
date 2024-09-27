@@ -12,7 +12,7 @@ void refreshPlaylistGridViewPage() {
 }
 
 void refreshMusicAggregatorListViewPage() {
-  globalDesktopMusicContainerListPageRefreshFunction();
+  globalDesktopMusicAggregatorListPageRefreshFunction();
   globalMobileMusicContainerListPageRefreshFunction();
   globalNotifyMusicContainerCacheUpdated();
 }

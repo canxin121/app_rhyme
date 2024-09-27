@@ -58,7 +58,8 @@ class MusicContainerImageCard extends StatelessWidget {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12.0),
-                        child: imageWithCache(defaultMusic.cover),
+                        child: imageWithCache(defaultMusic.getCover(size: 250),
+                            width: 100, height: 100),
                       ),
                     ),
                     if (!musicAgg.fromDb)
