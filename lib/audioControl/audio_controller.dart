@@ -45,7 +45,7 @@ Future<void> initGlobalAudioHandler() async {
 
 // Windows 平台的just_audio实现存在bug
 // 不能传入空的ConcatenatingAudioSource
-// 因此使用
+// 因此记录到第一次播放时再初始化
 bool isWindowsFirstPlay = true;
 
 class AudioHandler extends GetxController {
@@ -212,35 +212,14 @@ class AudioHandler extends GetxController {
     }
   }
 
-  // App内手动触发, 但选择使用index流来LazyLoad
-  // 此函数用在下载/删除缓存时，对应替换musicList中的歌曲，因此出现不会首次播放的情况
-  Future<void> replaceMusic(MusicContainer music) async {
-    try {
-      int index =
-          musicList.indexWhere((element) => element.hashCode == music.hashCode);
-      if (index != -1) {
-        if (index == player.currentIndex) {
-          await replacePlayingMusic(musicList[index].playInfo!.quality);
-          // await tryLazyLoadMusic(index, force: true);
-        } else {
-          musicList[index].setOutdate();
-        }
-      }
-    } catch (e) {
-      globalTalker.error("[Music Handler]  In replaceMusic, error occur: $e");
-    }
-  }
-
   // App内手动触发，必定出现首次播放不触发index流的情况，故手动更新播放资源
   Future<void> clearReplaceMusicAll(List<MusicContainer> musics) async {
     if (musics.isEmpty) {
       return;
     }
-    // 先暂停
     if (player.playing) {
       await pause();
     }
-    // 清空已有的列表
     await clear();
 
     // 对于第一首音乐，主动获取其播放信息(因为无法触发index流)

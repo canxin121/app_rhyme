@@ -63,7 +63,6 @@ dev_dependencies:
   package_rename: ^1.7.1
   flutter_lints: ^5.0.0
   icons_launcher: ^3.0.0
-  msix: ^3.16.8
 
 icons_launcher:
   image_path: "assets/log-0.1.0.png"

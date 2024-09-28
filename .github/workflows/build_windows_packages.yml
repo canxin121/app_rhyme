@@ -56,20 +56,12 @@ jobs:
       - name: Distribute Packages
         run: |
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
-          flutter_distributor package --platform windows --targets exe,msix
+          flutter_distributor package --platform windows --targets exe
         shell: pwsh
 
       - name: Rename Packages 
         run: |
-          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.msix ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.msix
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
-
-      - name: Upload msix Package
-        uses: actions/upload-artifact@v4
-        with:
-            name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_msix
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.msix
-            compression-level: 9
 
       - name: Upload exe Package
         uses: actions/upload-artifact@v4
