@@ -69,11 +69,11 @@ class DesktopMusicAggregatorListItem extends StatefulWidget {
   });
 
   @override
-  _DesktopMusicAggregatorListItemState createState() =>
-      _DesktopMusicAggregatorListItemState();
+  DesktopMusicAggregatorListItemState createState() =>
+      DesktopMusicAggregatorListItemState();
 }
 
-class _DesktopMusicAggregatorListItemState
+class DesktopMusicAggregatorListItemState
     extends State<DesktopMusicAggregatorListItem> {
   bool isHovered = false;
   Music? defaultMusic;
@@ -332,10 +332,10 @@ class OptionsCell extends StatefulWidget {
   });
 
   @override
-  _OptionsCellState createState() => _OptionsCellState();
+  OptionsCellState createState() => OptionsCellState();
 }
 
-class _OptionsCellState extends State<OptionsCell> {
+class OptionsCellState extends State<OptionsCell> {
   bool hasCache = false;
   StreamSubscription<void>? _cacheUpdateSubscription;
 

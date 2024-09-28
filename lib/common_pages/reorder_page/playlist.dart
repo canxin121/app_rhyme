@@ -1,6 +1,6 @@
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/refresh.dart';

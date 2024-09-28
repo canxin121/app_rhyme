@@ -21,7 +21,6 @@ class MusicContainerImageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 获取当前主题的亮度
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
     Music? defaultMusic = getMusicAggregatorDefaultMusic(musicAgg);
@@ -59,7 +58,7 @@ class MusicContainerImageCard extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12.0),
                         child: imageWithCache(defaultMusic.getCover(size: 250),
-                            width: 100, height: 100),
+                            cacheWidth: 100, cacheHeight: 100),
                       ),
                     ),
                     if (!musicAgg.fromDb)

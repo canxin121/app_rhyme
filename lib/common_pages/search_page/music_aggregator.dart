@@ -3,6 +3,7 @@ import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart'
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -21,11 +22,11 @@ class MusicAggregatorSearchPage extends StatefulWidget {
   const MusicAggregatorSearchPage({super.key, required this.isDesktop});
 
   @override
-  _MusicAggregatorSearchPageState createState() =>
-      _MusicAggregatorSearchPageState();
+  MusicAggregatorSearchPageState createState() =>
+      MusicAggregatorSearchPageState();
 }
 
-class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
+class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -91,7 +92,7 @@ class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final ScrollController scrollController = ScrollController();
     return CupertinoPageScaffold(
-      backgroundColor: getNavigatorBarColor(isDarkMode),
+      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
       child: Column(
         children: [
           CupertinoNavigationBar(
@@ -110,7 +111,7 @@ class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
                 ),
               ),
             ),
-            trailing: _Menu(
+            trailing: SearchMusicAggregatorChoiceMenu(
               pagingController: _pagingController,
               builder:
                   (BuildContext context, Future<void> Function() showMenu) =>
@@ -123,24 +124,19 @@ class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
                 ),
               ),
               fetchAllMusicAggregators: _fetchAllMusicAggregators,
+              isDesktop: widget.isDesktop,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 4.0, left: 8, right: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CupertinoSearchTextField(
-                    style: TextStyle(color: textColor).useSystemChineseFont(),
-                    controller: _inputContentController,
-                    onSubmitted: (String value) {
-                      if (value.isNotEmpty) {
-                        _pagingController.refresh();
-                      }
-                    },
-                  ),
-                ),
-              ],
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
+            child: CupertinoSearchTextField(
+              style: TextStyle(color: textColor).useSystemChineseFont(),
+              controller: _inputContentController,
+              onSubmitted: (String value) {
+                if (value.isNotEmpty) {
+                  _pagingController.refresh();
+                }
+              },
             ),
           ),
           if (widget.isDesktop &&
@@ -175,7 +171,7 @@ class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
       child: PagedListView(
         scrollController: scrollController,
         pagingController: _pagingController,
-        padding: EdgeInsets.only(bottom: screenHeight * 0.1),
+        padding: EdgeInsets.only(bottom: screenHeight * 0.2),
         builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
           noItemsFoundIndicatorBuilder: (context) => Center(
             child: Column(
@@ -216,7 +212,7 @@ class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
         child: PagedListView.separated(
           scrollController: scrollController,
           pagingController: _pagingController,
-          padding: EdgeInsets.only(bottom: screenHeight * 0.1),
+          padding: EdgeInsets.only(bottom: screenHeight * 0.2),
           separatorBuilder: (context, index) => Divider(
             color: isDarkMode
                 ? CupertinoColors.systemGrey
@@ -257,20 +253,32 @@ class _MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
 }
 
 @immutable
-class _Menu extends StatelessWidget {
-  const _Menu({
+class SearchMusicAggregatorChoiceMenu extends StatelessWidget {
+  const SearchMusicAggregatorChoiceMenu({super.key, 
     required this.builder,
     required this.fetchAllMusicAggregators,
     required this.pagingController,
+    required this.isDesktop,
   });
   final PagingController<int, MusicAggregator> pagingController;
   final Future<void> Function() fetchAllMusicAggregators;
   final PullDownMenuButtonBuilder builder;
+  final bool isDesktop;
 
   @override
   Widget build(BuildContext context) {
     return PullDownButton(
       itemBuilder: (context) => [
+        if (!isDesktop)
+          PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            onTap: () {
+              globalMobileToggleSearchPage();
+            },
+            title: "搜索歌单",
+            icon: CupertinoIcons.music_albums,
+          ),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),

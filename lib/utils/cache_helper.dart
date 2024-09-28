@@ -54,6 +54,8 @@ ExtendedImage imageWithCache(
   bool cacheNow = false,
   double? width,
   double? height,
+  double? cacheWidth,
+  double? cacheHeight,
   BoxFit? fit,
   double? scale = 0.1,
   BorderRadius? borderRadius,
@@ -64,12 +66,12 @@ ExtendedImage imageWithCache(
       defaultCoverPath,
       width: width,
       height: height,
-      cacheWidth: width?.toInt(),
-      cacheHeight: height?.toInt(),
+      cacheWidth: cacheWidth?.toInt() ?? width?.toInt(),
+      cacheHeight: cacheHeight?.toInt() ?? height?.toInt(),
       fit: fit,
       scale: scale,
       borderRadius: borderRadius,
-      enableMemoryCache: false,
+      enableMemoryCache: true,
     );
   }
 
@@ -86,11 +88,14 @@ ExtendedImage imageWithCache(
       fit: fit,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
-      enableMemoryCache: false,
+      enableMemoryCache: true,
       loadStateChanged: (state) {
         switch (state.extendedImageLoadState) {
           case LoadState.loading:
-            return const CupertinoActivityIndicator();
+            return const SizedBox(
+                height: 200,
+                width: 200,
+                child: Center(child: CupertinoActivityIndicator()));
           case LoadState.completed:
             return state.completedWidget;
           case LoadState.failed:
@@ -105,7 +110,7 @@ ExtendedImage imageWithCache(
               borderRadius: borderRadius,
               clearMemoryCacheIfFailed: true,
               clearMemoryCacheWhenDispose: true,
-              enableMemoryCache: false,
+              enableMemoryCache: true,
             );
         }
       },
@@ -120,7 +125,7 @@ ExtendedImage imageWithCache(
       fit: fit,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
-      enableMemoryCache: false,
+      enableMemoryCache: true,
       loadStateChanged: (state) {
         switch (state.extendedImageLoadState) {
           case LoadState.loading:
@@ -139,7 +144,7 @@ ExtendedImage imageWithCache(
               borderRadius: borderRadius,
               clearMemoryCacheIfFailed: true,
               clearMemoryCacheWhenDispose: true,
-              enableMemoryCache: false,
+              enableMemoryCache: true,
             );
         }
       },

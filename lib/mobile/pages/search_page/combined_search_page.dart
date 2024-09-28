@@ -8,10 +8,10 @@ class CombinedSearchPage extends StatefulWidget {
   const CombinedSearchPage({super.key});
 
   @override
-  _CombinedSearchPageState createState() => _CombinedSearchPageState();
+  CombinedSearchPageState createState() => CombinedSearchPageState();
 }
 
-class _CombinedSearchPageState extends State<CombinedSearchPage>
+class CombinedSearchPageState extends State<CombinedSearchPage>
     with WidgetsBindingObserver {
   int _selectedIndex = 0;
 

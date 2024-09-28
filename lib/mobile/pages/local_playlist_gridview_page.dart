@@ -4,7 +4,7 @@ import 'package:app_rhyme/common_pages/reorder_page/playlist.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/mobile/pages/local_music_aggregator_listview_page.dart';

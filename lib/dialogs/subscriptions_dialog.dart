@@ -20,11 +20,10 @@ class EditSubscriptionsDialog extends StatefulWidget {
   const EditSubscriptionsDialog({super.key, this.subscriptions});
 
   @override
-  _EditSubscriptionsDialogState createState() =>
-      _EditSubscriptionsDialogState();
+  EditSubscriptionsDialogState createState() => EditSubscriptionsDialogState();
 }
 
-class _EditSubscriptionsDialogState extends State<EditSubscriptionsDialog> {
+class EditSubscriptionsDialogState extends State<EditSubscriptionsDialog> {
   late List<PlayListSubscription> subscriptions;
 
   @override

@@ -258,7 +258,7 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                       talker: globalTalker,
                     ));
                   } else {
-                    Navigator.of(context).pushReplacement(
+                    Navigator.of(context).push(
                       CupertinoPageRoute(
                           builder: (context) => TalkerScreen(
                                 talker: globalTalker,

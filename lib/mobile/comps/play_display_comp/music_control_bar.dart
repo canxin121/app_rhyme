@@ -10,10 +10,10 @@ class MusicControlBar extends StatefulWidget {
   const MusicControlBar({super.key, required this.maxHeight});
 
   @override
-  _MusicControlBarState createState() => _MusicControlBarState();
+  MusicControlBarState createState() => MusicControlBarState();
 }
 
-class _MusicControlBarState extends State<MusicControlBar>
+class MusicControlBarState extends State<MusicControlBar>
     with WidgetsBindingObserver {
   @override
   void initState() {

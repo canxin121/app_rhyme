@@ -66,10 +66,10 @@ class MyNavListView extends StatefulWidget {
   const MyNavListView({super.key});
 
   @override
-  _MyNavListViewState createState() => _MyNavListViewState();
+  MyNavListViewState createState() => MyNavListViewState();
 }
 
-class _MyNavListViewState extends State<MyNavListView> {
+class MyNavListViewState extends State<MyNavListView> {
   List<Playlist> musicLists = [];
 
   Future<void> refresh() async {
@@ -223,10 +223,10 @@ class NavListView extends StatefulWidget {
   });
 
   @override
-  _NavListViewState createState() => _NavListViewState();
+  NavListViewState createState() => NavListViewState();
 }
 
-class _NavListViewState extends State<NavListView> {
+class NavListViewState extends State<NavListView> {
   late String _selectedItem;
 
   void _setItemSelected(String title) {
@@ -306,10 +306,10 @@ class NavGroup extends StatefulWidget {
   });
 
   @override
-  _NavGroupState createState() => _NavGroupState();
+  NavGroupState createState() => NavGroupState();
 }
 
-class _NavGroupState extends State<NavGroup> {
+class NavGroupState extends State<NavGroup> {
   bool _isExpanded = true;
 
   @override
@@ -382,10 +382,10 @@ class NavItem extends StatefulWidget {
   });
 
   @override
-  _NavItemState createState() => _NavItemState();
+  NavItemState createState() => NavItemState();
 }
 
-class _NavItemState extends State<NavItem> {
+class NavItemState extends State<NavItem> {
   bool _isHovered = false;
 
   void _onHover(bool isHovered) {

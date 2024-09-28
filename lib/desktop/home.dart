@@ -13,10 +13,10 @@ class DesktopHome extends StatefulWidget {
   const DesktopHome({super.key});
 
   @override
-  _DesktopHomeState createState() => _DesktopHomeState();
+  DesktopHomeState createState() => DesktopHomeState();
 }
 
-class _DesktopHomeState extends State<DesktopHome> {
+class DesktopHomeState extends State<DesktopHome> {
   @override
   void initState() {
     super.initState();

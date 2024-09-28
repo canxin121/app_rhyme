@@ -10,7 +10,7 @@ class MusicArtPic extends StatefulWidget {
   const MusicArtPic({
     super.key,
     required this.padding,
-  }); // 修改构造函数
+  });
 
   @override
   State<StatefulWidget> createState() => MusicArtPicState();
@@ -32,8 +32,8 @@ class MusicArtPicState extends State<MusicArtPic> {
               child: imageWithCache(
                   globalAudioHandler.playingMusic.value?.currentMusic
                       .getCover(size: 250),
-                  height: 100,
-                  width: 100),
+                  cacheHeight: 250,
+                  cacheWidth: 250),
             ))));
   }
 }

@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/utils/colors.dart';
 
 class PlaylistMultiSelectionPage extends StatefulWidget {

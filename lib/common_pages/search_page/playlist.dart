@@ -2,9 +2,10 @@ import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/desktop/utils/colors.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
+import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -20,10 +21,10 @@ class PlaylistSearchPage extends StatefulWidget {
   final bool isDesktop;
 
   @override
-  _SearchMusicListState createState() => _SearchMusicListState();
+  SearchMusicListState createState() => SearchMusicListState();
 }
 
-class _SearchMusicListState extends State<PlaylistSearchPage>
+class SearchMusicListState extends State<PlaylistSearchPage>
     with WidgetsBindingObserver {
   final PagingController<int, Playlist> _pagingController =
       PagingController(firstPageKey: 1);
@@ -81,6 +82,8 @@ class _SearchMusicListState extends State<PlaylistSearchPage>
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
     final ScrollController scrollController = ScrollController();
+    final Color textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
       backgroundColor: getPrimaryBackgroundColor(isDarkMode),
@@ -97,14 +100,12 @@ class _SearchMusicListState extends State<PlaylistSearchPage>
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 24,
-                    color: isDarkMode
-                        ? CupertinoColors.white
-                        : CupertinoColors.black,
+                    color: textColor,
                   ).useSystemChineseFont(),
                 ),
               ),
             ),
-            trailing: SearchMusicListChoiceMenu(
+            trailing: SearchPlaylistChoiceMenu(
               builder:
                   (BuildContext context, Future<void> Function() showMenu) =>
                       CupertinoButton(
@@ -123,10 +124,7 @@ class _SearchMusicListState extends State<PlaylistSearchPage>
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
             child: CupertinoSearchTextField(
-              style: TextStyle(
-                color:
-                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ).useSystemChineseFont(),
+              style: TextStyle(color: textColor).useSystemChineseFont(),
               controller: _inputContentController,
               onSubmitted: (String value) {
                 if (value.isNotEmpty) {
@@ -153,21 +151,15 @@ class _SearchMusicListState extends State<PlaylistSearchPage>
                           Text(
                             '输入关键词以搜索歌单',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: isDarkMode
-                                  ? CupertinoColors.systemGrey2
-                                  : CupertinoColors.black,
-                            ).useSystemChineseFont(),
+                            style: TextStyle(color: textColor)
+                                .useSystemChineseFont(),
                           ),
                           if (!widget.isDesktop)
                             Text(
                               '点击右上角图标切换搜索单曲',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: isDarkMode
-                                    ? CupertinoColors.systemGrey2
-                                    : CupertinoColors.black,
-                              ).useSystemChineseFont(),
+                              style: TextStyle(color: textColor)
+                                  .useSystemChineseFont(),
                             ),
                         ],
                       ),
@@ -227,8 +219,8 @@ class _SearchMusicListState extends State<PlaylistSearchPage>
 }
 
 @immutable
-class SearchMusicListChoiceMenu extends StatelessWidget {
-  const SearchMusicListChoiceMenu({
+class SearchPlaylistChoiceMenu extends StatelessWidget {
+  const SearchPlaylistChoiceMenu({
     super.key,
     required this.builder,
     required this.fetchAllMusicAggregators,
@@ -245,6 +237,16 @@ class SearchMusicListChoiceMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PullDownButton(
       itemBuilder: (context) => [
+        if (!isDesktop)
+          PullDownMenuItem(
+            itemTheme: PullDownMenuItemTheme(
+                textStyle: const TextStyle().useSystemChineseFont()),
+            onTap: () {
+              globalMobileToggleSearchPage();
+            },
+            title: "搜索歌曲",
+            icon: CupertinoIcons.double_music_note,
+          ),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont(),

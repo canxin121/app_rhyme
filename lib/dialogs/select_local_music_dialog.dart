@@ -1,6 +1,6 @@
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_list_item.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_list_item.dart';
 import 'package:flutter/cupertino.dart';
 
 Future<Playlist?> showMusicListSelectionDialog(BuildContext context) async {

@@ -37,11 +37,11 @@ class MobileMusicAggregatorListItem extends StatefulWidget {
   });
 
   @override
-  _MobileMusicAggregatorListItemState createState() =>
-      _MobileMusicAggregatorListItemState();
+  MobileMusicAggregatorListItemState createState() =>
+      MobileMusicAggregatorListItemState();
 }
 
-class _MobileMusicAggregatorListItemState
+class MobileMusicAggregatorListItemState
     extends State<MobileMusicAggregatorListItem> {
   Music? defaultMusic;
   bool _hasCache = false;

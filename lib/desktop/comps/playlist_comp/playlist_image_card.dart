@@ -23,11 +23,11 @@ class DesktopPlaylistImageCard extends StatefulWidget {
       this.showDesc = true});
 
   @override
-  _DesktopPlaylistImageCardState createState() =>
-      _DesktopPlaylistImageCardState();
+  DesktopPlaylistImageCardState createState() =>
+      DesktopPlaylistImageCardState();
 }
 
-class _DesktopPlaylistImageCardState extends State<DesktopPlaylistImageCard> {
+class DesktopPlaylistImageCardState extends State<DesktopPlaylistImageCard> {
   bool _hovering = false;
 
   @override

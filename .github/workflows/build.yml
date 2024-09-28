@@ -45,7 +45,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "beta"
+          channel: "stable"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -119,7 +119,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: "beta"
+          channel: "stable"
       
       - name: Install Flutter Dependency
         run: flutter pub get
@@ -190,7 +190,7 @@ jobs:
         env:
           SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
-          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }} 
         run: |
           python tools/replace.py
 
@@ -215,29 +215,11 @@ jobs:
         with:
           channel: "stable"
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: 17
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
       - name: Install Flutter Dependency
         run: flutter pub get
 
-      - name: Install Rusti
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Cargo-Ndk
-        run: cargo install cargo-ndk --version 2.11.0 --force
-
-      - name: Install android ndk
-        uses: nttld/setup-ndk@v1
-        id: install-ndk
-        with:
-          ndk-version: r22b
 
       - name: Activate Dependencies
         shell: pwsh
@@ -262,46 +244,3 @@ jobs:
           name: AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.zip
           path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme-release-windows-x86_64-${{ needs.get_version.outputs.app_version }}-setup.exe
           compression-level: 9
-      
-      - name: Flutter build apk abi
-        run: flutter build apk --release --split-per-abi --verbose
-      
-      - name: Flutter build apk
-        run: flutter build apk --release --verbose
-      
-      - name: Upload APK1
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk
-          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-          compression-level: 9
-
-      - name: Upload APK2
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.zip
-          path: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
-          compression-level: 9
-
-      - name: Upload APK3
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.zip
-          path: build/app/outputs/flutter-apk/app-x86_64-release.apk
-          compression-level: 9
-
-      - name: Upload APK4
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.zip
-          path: build/app/outputs/flutter-apk/app-release.apk
-          compression-level: 9            
-
-      - name: Rename APKs
-        run: |
-          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-arm64_v8a-${{needs.get_version.outputs.app_version}}.apk
-          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-armeabi_v7a-${{needs.get_version.outputs.app_version}}.apk
-          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-x86_64-${{needs.get_version.outputs.app_version}}.apk
-          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme-release-android-unknown-${{needs.get_version.outputs.app_version}}.apk
-  
-

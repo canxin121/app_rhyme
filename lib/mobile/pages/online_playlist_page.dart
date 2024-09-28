@@ -6,7 +6,7 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
-import 'package:app_rhyme/mobile/comps/musiclist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';

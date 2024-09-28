@@ -1,5 +1,5 @@
 name: app_rhyme
-description: "A Powerfull CrossPlatform Music App"
+description: "A Powerfull CrossPlatform Music App Made By Flutter and Rust"
 publish_to: "none"
 
 version: 1.0.9
@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
   rust_lib_app_rhyme:
     path: rust_builder
-
   cupertino_icons: ^1.0.6
   flutter_rust_bridge: 2.4.0
   interactive_slider:
@@ -32,13 +31,12 @@ dependencies:
   just_audio_background: ^0.0.1-beta.11
   audio_session: ^0.1.19
   talker_flutter: ^4.1.5
-  pull_down_button: ^0.9.4
+  pull_down_button: ^0.10.1
   glassmorphism_ui: ^0.3.0
   toastification: ^2.0.0
-  synchronized: ^3.1.0+1
+  synchronized: ^3.3.0+3
   just_audio_media_kit: ^2.0.0
   media_kit_libs_linux: any
-  # media_kit_libs_windows_audio: any
   just_audio: ^0.9.38
   just_audio_windows:
     git:
@@ -46,7 +44,6 @@ dependencies:
       path: just_audio_windows
   package_info_plus: ^8.0.0
   drag_select_grid_view: ^0.6.2
-
   extended_image: ^8.2.1
   url_launcher: ^6.3.0
   connectivity_plus: ^6.0.3
@@ -55,30 +52,31 @@ dependencies:
   back_button_interceptor: ^7.0.3
   reorderables: ^0.6.0
   flutter_keyboard_visibility: ^6.0.0
-  better_cupertino_slider: ^1.0.0
   bitsdojo_window: ^0.1.6
-
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^3.0.0
   integration_test:
     sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
-  package_rename: ^1.5.3
+  package_rename: ^1.7.1
+  flutter_lints: ^5.0.0
+  icons_launcher: ^3.0.0
 
-flutter_launcher_icons:
+icons_launcher:
   image_path: "assets/log-0.1.0.png"
-  android: true
-  ios: true
-  remove_alpha_ios: true
-  windows:
-    generate: true
-    icon_size: 256
-  macos:
-    generate: true
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+    windows:
+      enable: true
+    linux:
+      enable: true
+    macos:
+      enable: true
 
 package_rename_config:
   android:
