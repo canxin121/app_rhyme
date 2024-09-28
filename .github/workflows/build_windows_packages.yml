@@ -40,10 +40,10 @@ jobs:
         shell: pwsh
 
       - name: Setup Inno Setup 6
-        shell: pwsh
         run: |-
-          winget install --id JRSoftware.InnoSetup -e --silent --accept-package-agreements --accept-source-agreements
+          tools/innosetup-6.3.3.exe /VERYSILENT
           Copy-Item "./tools/ChineseSimplified.isl" -Destination "C:\Program Files (x86)\Inno Setup 6\Languages"
+        shell: pwsh
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
