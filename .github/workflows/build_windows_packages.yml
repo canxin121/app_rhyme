@@ -57,8 +57,9 @@ jobs:
         run: |
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
           flutter_distributor package --platform windows --targets exe,msix
+        shell: pwsh
 
-      - name: Rename Packages
+      - name: Rename Packages 
         run: |
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.msix ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.msix
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
