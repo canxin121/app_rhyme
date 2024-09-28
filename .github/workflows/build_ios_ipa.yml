@@ -1,0 +1,70 @@
+name: Build Ios Ipa 
+on:
+  workflow_dispatch:
+    
+jobs:
+  get_version:
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.fetch_version.outputs.app_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Fetch Version
+        id: fetch_version
+        run: |
+          sudo snap install yq
+          app_version=$(yq eval '.version' pubspec.yaml)
+          echo "::set-output name=app_version::$app_version"
+
+  build_and_push:
+    name: Build and Push Ios Ipa 
+    needs: get_version
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          chmod a+x tools/key_replace_macox_unknown    
+          tools/key_replace_macox_unknown
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable 
+
+      - name: Flutter Build Ios 
+        run: |-
+          flutter build ios --release --no-codesign --verbose
+
+      - name: Unbitcode
+        run: |-
+          chmod 777 tools/unbitcode.sh
+          sh tools/unbitcode.sh
+
+      - name: Create Ipa
+        run: |-
+          mkdir -p Payload
+          mv ./build/ios/iphoneos/Runner.app Payload
+          zip -r -y AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa Payload/Runner.app
+
+      - name: Upload AppImage Package
+        uses: actions/upload-artifact@v4
+        with:
+            name: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}_ipa
+            path: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa
+            compression-level: 9
