@@ -1,0 +1,73 @@
+name: Build Macos Packages 
+on:
+  workflow_dispatch:
+    
+jobs:
+  get_version:
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.fetch_version.outputs.app_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Fetch Version
+        id: fetch_version
+        run: |
+          sudo snap install yq
+          app_version=$(yq eval '.version' pubspec.yaml)
+          echo "::set-output name=app_version::$app_version"
+
+  build_and_push:
+    name: Build and Push Macos Packages 
+    needs: get_version
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          chmod a+x tools/key_replace_macox_unknown    
+          tools/key_replace_macox_unknown
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+
+      - name: Setup Depencies
+        run: |-
+          npm install -g appdmg
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable 
+    
+      - name: Package Dmg 
+        run: |-
+          dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
+          flutter_distributor package --platform macos --target dmg
+
+      - name: Rename Dmg
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.dmg ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
+
+      - name: Upload AppImage Package
+        uses: actions/upload-artifact@v4
+        with:
+            name: AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}_dmg
+            path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
+            compression-level: 9
