@@ -1,0 +1,9 @@
+app_id: 2722A838-D7FE-E272-F7DC-C40FF845DD16
+publisher: canxin121
+publisher_url: https://github.com/canxin121/app_rhyme
+display_name: AppRhyme
+create_desktop_icon: true
+install_dir_name: AppRhyme
+script_template: inno_setup.iss
+locales:
+  - zh
