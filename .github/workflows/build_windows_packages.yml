@@ -42,12 +42,6 @@ jobs:
       - name: Setup Inno Setup 6
         run: |-
           tools/innosetup-6.3.3.exe /VERYSILENT
-          Copy-Item "./tools/ChineseSimplified.isl" -Destination "C:\Program Files (x86)\Inno Setup 6\Languages"
-          Get-ChildItem "C:\"
-          Get-ChildItem "C:\Program Files (x86)\"
-          Get-ChildItem "C:\Program Files (x86)\Inno Setup 6\"
-          Get-ChildItem "C:\Program Files (x86)\Inno Setup 6\Languages"
-
 
         shell: pwsh
 
