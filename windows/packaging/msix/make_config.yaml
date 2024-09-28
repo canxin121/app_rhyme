@@ -4,3 +4,4 @@ publisher_display_name: canxin
 identity_name: canxin.app.rhyme
 logo_path: assets/log-0.1.0.png 
 execution_alias: app_rhyme
+install_certificate: false
