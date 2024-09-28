@@ -1,0 +1,305 @@
+name: Release All Packages 
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+jobs:
+  get_version:
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.fetch_version.outputs.app_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Fetch Version
+        id: fetch_version
+        run: |
+          sudo snap install yq
+          app_version=$(yq eval '.version' pubspec.yaml)
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
+
+  release_android_apks:
+    name: Build and Push Android APKs
+    needs: get_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up signing files
+        env:
+          APK_SIGN_PWD: "${{ secrets.APK_SIGN_PWD }}"
+          APK_SIGN_ALIAS: "${{ secrets.APK_SIGN_ALIAS }}"
+          APK_SIGN_JKS: "${{ secrets.APK_SIGN_JKS }}"
+        run: |
+          chmod a+x tools/generate_jks_linux_amd64
+          tools/generate_jks_linux_amd64
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          chmod a+x tools/key_replace_linux_amd64    
+          tools/key_replace_linux_amd64
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable 
+
+      - name: Build APK
+        run: flutter build apk --release    
+
+      - name: Build APK (split per ABI)
+        run: flutter build apk --release --split-per-abi
+
+      - name: Rename APKs
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_unknown.apk
+          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_armeabi-v7a.apk
+          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_arm64-v8a.apk
+          mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_x86_64.apk
+      
+      - name: Release Apks
+        uses: softprops/action-gh-release@v1
+        with:
+          files: >
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_unknown.apk
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_armeabi-v7a.apk
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_arm64-v8a.apk
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_x86_64.apk
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+  release_ios_ipa:
+    name: Build and Push Ios Ipa
+    needs: get_version
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          chmod a+x tools/key_replace_macox_unknown
+          tools/key_replace_macox_unknown
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter Build Ios
+        run: |-
+          flutter build ios --release --no-codesign --verbose
+
+      - name: Unbitcode
+        run: |-
+          chmod 777 tools/unbitcode.sh
+          sh tools/unbitcode.sh
+
+      - name: Create Ipa
+        run: |-
+          mkdir -p Payload
+          mv ./build/ios/iphoneos/Runner.app Payload
+          zip -r -y AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa Payload/Runner.app
+
+      - name: Release Ipa 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: >
+            AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+
+  release_windows_setup_exe:
+    name: Build and Push Windows Packages 
+    needs: get_version
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          tools/key_replace_windows_amd64
+        shell: pwsh
+
+      - name: Setup Inno Setup 6
+        run: |-
+          tools/innosetup-6.3.3.exe /VERYSILENT
+
+        shell: pwsh
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable 
+  
+      - name: Distribute Packages
+        run: |
+          dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
+          flutter_distributor package --platform windows --targets exe
+        shell: pwsh
+
+      - name: Rename Packages 
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
+
+      - name: Release exe Package 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: >
+            dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+  release_linux_packages:
+    name: Build and Push Linux Packages 
+    needs: get_version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          chmod a+x tools/key_replace_linux_amd64    
+          tools/key_replace_linux_amd64
+
+      - name: Setup Dependencies
+        run: |
+            sudo apt-get update -y
+            sudo apt install -y locate rpm patchelf libwebkit2gtk-4.1-dev
+            sudo apt-get install -y ninja-build libgtk-3-dev libfuse2 libasound2-dev
+
+            wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+            chmod a+x appimagetool
+            sudo mv appimagetool /usr/local/bin/
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable 
+
+      - name: Distribute Packages
+        run: |
+          dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
+          flutter_distributor package --platform linux --targets rpm,deb,appimage
+
+      - name: Rename Packages
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.deb ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.rpm ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.AppImage ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage
+      
+      - name: Release Packages 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: >
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage 
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+  release_macos_package:
+    name: Build and Push Macos Packages 
+    needs: get_version
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Replace key
+        env:
+          SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
+          SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
+          SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
+        run: |
+          chmod a+x tools/key_replace_macox_unknown    
+          tools/key_replace_macox_unknown
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+
+      - name: Setup Depencies
+        run: |-
+          npm install -g appdmg
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable 
+    
+      - name: Package Dmg 
+        run: |-
+          dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
+          flutter_distributor package --platform macos --target dmg
+
+      - name: Rename Dmg
+        run: |
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.dmg ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
+
+      - name: Release Dmg Package 
+        uses: softprops/action-gh-release@v1
+        with:
+          files: >
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
