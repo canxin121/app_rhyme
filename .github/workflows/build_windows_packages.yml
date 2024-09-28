@@ -19,6 +19,7 @@ jobs:
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
           echo "::set-output name=app_version::$app_version"
+
   build_and_push:
     name: Build and Push Windows Packages 
     needs: get_version
@@ -59,19 +60,19 @@ jobs:
 
       - name: Rename Packages
         run: |
-          mv ./dist/${{ steps.vars.outputs.app_version }}/*.msix ./dist/${{ steps.vars.outputs.app_version }}/AppRhyme_windows_${{ steps.vars.outputs.app_version }}_x86-64.msix
-          mv ./dist/${{ steps.vars.outputs.app_version }}/*.exe ./dist/${{ steps.vars.outputs.app_version }}/AppRhyme_windows_${{ steps.vars.outputs.app_version }}_x86-64.exe
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.msix ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.msix
+          mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
 
       - name: Upload msix Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_windows_${{ steps.vars.outputs.app_version }}_x86-64_msix
-            path: dist/${{ steps.vars.outputs.app_version }}/AppRhyme_windows_${{ steps.vars.outputs.app_version }}_x86-64.msix
+            name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_msix
+            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.msix
             compression-level: 9
 
       - name: Upload exe Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_windows_${{ steps.vars.outputs.app_version }}_x86-64_exe
-            path: dist/${{ steps.vars.outputs.app_version }}/AppRhyme_windows_${{ steps.vars.outputs.app_version }}_x86-64.exe
+            name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_exe
+            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
             compression-level: 9
