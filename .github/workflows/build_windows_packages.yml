@@ -56,7 +56,7 @@ jobs:
       - name: Distribute Packages
         run: |
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
-          flutter_distributor package --platform windows --targets msix,exe
+          flutter_distributor package --platform windows --targets exe,msix
 
       - name: Rename Packages
         run: |
