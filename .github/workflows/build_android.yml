@@ -16,16 +16,16 @@ jobs:
           APK_SIGN_ALIAS: "${{ secrets.APK_SIGN_ALIAS }}"
           APK_SIGN_JKS: "${{ secrets.APK_SIGN_JKS }}"
         run: |
-          chmod a+x tools/generate_jks
-          tools/generate_jks
+          chmod a+x tools/generate_jks_linux_amd64
+          tools/generate_jks_linux_amd64
       - name: Replace key
         env:
           SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          chmod a+x tools/key_replace    
-          tools/key_replace
+          chmod a+x tools/key_replace_linux_amd64    
+          tools/key_replace_linux_amd64
       - name: Clone repository
         uses: actions/checkout@v4
       - name: Install Rust
