@@ -18,7 +18,7 @@ jobs:
         run: |
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
-          echo "app_version=$app_version" >> $GITHUB_ENV
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
 
   build_and_push:
     name: Build and Push Macos Packages 
