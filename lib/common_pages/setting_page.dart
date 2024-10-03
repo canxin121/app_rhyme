@@ -8,11 +8,12 @@ import 'package:app_rhyme/dialogs/input_extern_api_link_dialog.dart';
 import 'package:app_rhyme/dialogs/quality_select_dialog.dart';
 import 'package:app_rhyme/dialogs/wait_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache/cache_op.dart';
-import 'package:app_rhyme/src/rust/api/cache/database_op.dart';
 import 'package:app_rhyme/src/rust/api/music_api/fns.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
 import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/src/rust/api/types/external_api.dart';
+import 'package:app_rhyme/src/rust/api/utils/database.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/chore.dart';
@@ -21,16 +22,18 @@ import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
+import 'package:app_rhyme/utils/refresh.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({super.key});
-
+  const SettingPage({super.key, required this.isDesktop});
+  final bool isDesktop;
   @override
   SettingPageState createState() => SettingPageState();
 }
@@ -60,32 +63,24 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
+    final isDarkMode = brightness == Brightness.dark;
     final textColor = brightness == Brightness.dark
         ? CupertinoColors.white
         : CupertinoColors.black;
-    final iconColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.systemGrey6
-        : CupertinoColors.systemGroupedBackground;
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: backgroundColor,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '设置',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-                color: textColor,
-              ).useSystemChineseFont(),
-            ),
+        backgroundColor: getNavigatorBarColor(isDarkMode),
+        leading: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '设置',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              color: textColor,
+            ).useSystemChineseFont(),
           ),
         ),
       ),
@@ -115,59 +110,28 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                         ),
                       ))),
               CupertinoFormRow(
-                  prefix: Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: Text(
-                        '版本号',
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont(),
-                      )),
-                  child: Container(
-                      padding: const EdgeInsets.only(right: 10),
-                      alignment: Alignment.centerRight,
-                      height: 40,
-                      child: Text(
-                        globalPackageInfo.version,
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont(),
-                      ))),
-              CupertinoFormRow(
                 prefix: Text(
-                  '检查更新',
+                  '版本号',
                   style: TextStyle(color: textColor).useSystemChineseFont(),
                 ),
                 child: CupertinoButton(
                   onPressed: () async {
                     await checkVersionUpdate(context, true);
                   },
-                  child: Icon(CupertinoIcons.cloud, color: iconColor),
+                  child: Text(
+                    globalPackageInfo.version,
+                    style: TextStyle(color: CupertinoColors.activeBlue)
+                        .useSystemChineseFont(),
+                  ),
                 ),
-              ),
-              CupertinoFormRow(
-                prefix: Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Text(
-                      '自动检查更新',
-                      style: TextStyle(color: textColor).useSystemChineseFont(),
-                    )),
-                child: CupertinoSwitch(
-                    value: globalConfig.updateConfig.versionAutoUpdate,
-                    onChanged: (value) {
-                      if (value !=
-                          globalConfig.updateConfig.versionAutoUpdate) {
-                        globalConfig.updateConfig.versionAutoUpdate = value;
-                        globalConfig.save(documentFolder: globalDocumentPath);
-                        setState(() {});
-                      }
-                    }),
               ),
               CupertinoFormRow(
                 prefix: Text(
-                  '项目链接',
+                  '项目仓库',
                   style: TextStyle(color: textColor).useSystemChineseFont(),
                 ),
                 child: CupertinoButton(
-                  onPressed: openProjectLink,
+                  onPressed: openProjectRepoLink,
                   child: Text(
                     'github.com/canxin121/app_rhyme',
                     style: TextStyle(color: textColor).useSystemChineseFont(),
@@ -213,7 +177,9 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                        builder: (context) => const StorageConfigPage()),
+                        builder: (context) => StorageConfigPage(
+                              isDesktop: widget.isDesktop,
+                            )),
                   );
                 },
                 child: const Icon(CupertinoIcons.right_chevron),
@@ -306,18 +272,14 @@ class QualityConfigPageState extends State<QualityConfigPage>
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    final textColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
-
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.systemGrey6
-        : CupertinoColors.systemGroupedBackground;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: getNavigatorBarColor(isDarkMode),
         middle: Text('音质设置', style: TextStyle(color: textColor)),
       ),
       child: ListView(
@@ -408,17 +370,14 @@ class UpdateConfigPageState extends State<UpdateConfigPage>
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    final textColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.systemGrey6
-        : CupertinoColors.systemGroupedBackground;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: backgroundColor,
+        backgroundColor: getNavigatorBarColor(isDarkMode),
         middle: Text('更新设置', style: TextStyle(color: textColor)),
       ),
       child: ListView(
@@ -459,7 +418,8 @@ class UpdateConfigPageState extends State<UpdateConfigPage>
 }
 
 class StorageConfigPage extends StatefulWidget {
-  const StorageConfigPage({super.key});
+  const StorageConfigPage({super.key, required this.isDesktop});
+  final bool isDesktop;
 
   @override
   StorageConfigPageState createState() => StorageConfigPageState();
@@ -485,7 +445,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
     setState(() {});
   }
 
-  Future<void> useNewCacheRoot(bool needMove) async {
+  Future<void> useNewCacheRoot(bool needMove, bool isDesktop) async {
     var newCustomCacheRoot = await pickDirectory();
     if (newCustomCacheRoot == null) return;
     if (globalConfig.storageConfig.customCacheRoot != null &&
@@ -501,7 +461,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
       await closeDb();
       if (needMove) {
         if (mounted) {
-          await showWaitDialog(context, "正在移动数据中,稍后将自动退出应用以应用更改");
+          await showWaitDialog(context, isDesktop, "正在移动数据中,稍后将自动退出应用以应用更改");
         }
 
         await moveCacheData(
@@ -509,7 +469,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
             newCustomCacheRoot: newCustomCacheRoot);
       } else {
         if (mounted) {
-          await showWaitDialog(context, "正在清理旧数据中,稍后将自动退出应用以应用更改");
+          await showWaitDialog(context, isDesktop, "正在清理旧数据中,稍后将自动退出应用以应用更改");
         }
         await delOldCacheData(documentPath: globalDocumentPath);
       }
@@ -521,8 +481,10 @@ class StorageConfigPageState extends State<StorageConfigPage>
         context.findAncestorStateOfType<SettingPageState>()?.refresh();
       }
     } finally {
-      if (mounted) {
-        Navigator.pop(context);
+      if (widget.isDesktop) {
+        globalPopPage();
+      } else {
+        if (mounted) Navigator.pop(context);
       }
       setState(() {});
     }
@@ -531,17 +493,14 @@ class StorageConfigPageState extends State<StorageConfigPage>
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    final textColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.systemGrey6
-        : CupertinoColors.systemGroupedBackground;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
         middle: Text('储存设置', style: TextStyle(color: textColor)),
-        backgroundColor: backgroundColor,
+        backgroundColor: getNavigatorBarColor(isDarkMode),
       ),
       child: ListView(
         children: [
@@ -552,12 +511,11 @@ class StorageConfigPageState extends State<StorageConfigPage>
                 prefix: Text('缓存封面',
                     style: TextStyle(color: textColor).useSystemChineseFont()),
                 child: CupertinoSwitch(
-                  value: globalConfig.storageConfig.savePic,
-                  onChanged: (value) {
-                    setState(() {
-                      globalConfig.storageConfig.savePic = value;
-                      globalConfig.save(documentFolder: globalDocumentPath);
-                    });
+                  value: globalConfig.storageConfig.saveCover,
+                  onChanged: (value) async {
+                    globalConfig.storageConfig.saveCover = value;
+                    globalConfig.save(documentFolder: globalDocumentPath);
+                    setState(() {});
                   },
                 ),
               ),
@@ -597,12 +555,12 @@ class StorageConfigPageState extends State<StorageConfigPage>
                       var confirm = await showConfirmationDialog(
                           context,
                           "注意!\n"
-                          "'移动数据文件夹'将会将当前使用的缓存文件夹下的缓存数据迁移到新的文件夹下\n"
+                          "该功能将会将当前使用的缓存文件夹下的缓存数据迁移到新的文件夹下\n"
                           "请确保新的文件夹下没有AppRhyme的数据, 否则会导致该目标文件夹中数据完全丢失!!!\n"
                           "如果你想直接使用指定文件夹下的数据, 请使用'使用缓存文件夹'功能\n"
                           "是否继续?");
                       if (confirm != null && confirm) {
-                        await useNewCacheRoot(true);
+                        await useNewCacheRoot(true, widget.isDesktop);
                       }
                     },
                     child: const Icon(CupertinoIcons.folder),
@@ -618,13 +576,13 @@ class StorageConfigPageState extends State<StorageConfigPage>
                       var confirm = await showConfirmationDialog(
                           context,
                           "注意!\n"
-                          "‘使用缓存文件夹’将会直接使用指定文件夹下的缓存数据, 请确保目标文件夹下有正确的缓存数据\n"
+                          "该功能将会直接使用指定文件夹下的缓存数据, 请确保目标文件夹下有正确的缓存数据\n"
                           "这将会导致当前使用的缓存文件夹下的缓存数据完全丢失!!!\n"
                           "如果你想移动缓存数据到目标文件夹, 请使用'移动缓存文件夹'功能\n"
                           "是否继续?");
 
                       if (confirm != null && confirm) {
-                        await useNewCacheRoot(false);
+                        await useNewCacheRoot(false, widget.isDesktop);
                       }
                     },
                     child: const Icon(
@@ -635,7 +593,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
               ],
             ),
           CupertinoFormSection.insetGrouped(
-            header: Text('歌单Sql设置', style: TextStyle(color: textColor)),
+            header: Text('数据库Sql设置', style: TextStyle(color: textColor)),
             children: [
               CupertinoFormRow(
                 prefix: Text('当前数据库',
@@ -666,28 +624,46 @@ class StorageConfigPageState extends State<StorageConfigPage>
                     var confirm = await showConfirmationDialog(
                         context,
                         "注意!\n"
-                        "该功能将会将当前使用的歌曲数据库迁移到新的数据库中\n"
+                        "该功能可能导致数据丢失, 请先备份一份数据库Json文件后使用"
+                        "该功能将会将当前使用的歌单数据库迁移到新的数据库中\n"
                         "请确保目标数据库中没有AppRhyme的数据, 否则会导致该目标数据库中数据完全丢失!!!\n"
                         "如果你想直接使用目标数据库下的数据, 请使用'使用歌单数据库'功能\n"
                         "是否继续?");
                     if (confirm == null || !confirm) return;
                     if (!context.mounted) return;
-                    var newDbUrl = await showDatabaseUrlDialog(context);
+                    var newDbUrl = await showNewDatabaseUrlDialog(context);
                     if (newDbUrl == null) return;
                     if (!context.mounted) return;
-                    await showWaitDialog(context, "正在移动数据中");
                     try {
-                      await moveDatabase(
-                          documentFolder: globalDocumentPath,
-                          newDbUrl: newDbUrl);
+                      verifySqliteUrl(sqliteUrl: newDbUrl);
+                    } catch (e) {
+                      LogToast.error("数据库设置", "sqlite数据库链接有误: $e",
+                          "[storageConfig.moveDatabase] failed: $e");
+                      return;
+                    }
+                    await showWaitDialog(context, widget.isDesktop, "正在移动数据中");
+                    try {
+                      globalConfig.storageConfig.customDb = newDbUrl;
+                      globalConfig.save(documentFolder: globalDocumentPath);
+                      var musicDataJson =
+                          await MusicDataJsonWrapper.fromDatabase();
+                      await clearDb();
+                      await setDb(databaseUrl: newDbUrl);
+                      await clearDb();
+                      await musicDataJson.applyToDb();
+
+                      refreshMusicAggregatorListViewPage();
+                      refreshPlaylistGridViewPage();
                       LogToast.success("数据库设置", "数据库移动成功",
                           "[storageConfig.moveDatabase] success");
                     } catch (e) {
                       LogToast.error("数据库设置", "数据库移动失败: $e",
                           "[storageConfig.moveDatabase] failed: $e");
                     } finally {
-                      if (context.mounted) {
-                        Navigator.pop(context);
+                      if (widget.isDesktop) {
+                        globalPopPage();
+                      } else {
+                        if (context.mounted) Navigator.pop(context);
                       }
                       setState(() {});
                     }
@@ -697,7 +673,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
               ),
               CupertinoFormRow(
                 prefix: Text(
-                  '切换歌单数据库',
+                  '使用歌单数据库',
                   style: TextStyle(color: textColor).useSystemChineseFont(),
                 ),
                 child: CupertinoButton(
@@ -711,21 +687,37 @@ class StorageConfigPageState extends State<StorageConfigPage>
                         "是否继续?");
                     if (confirm == null || !confirm) return;
                     if (!context.mounted) return;
-                    var newDbUrl = await showDatabaseUrlDialog(context);
-                    if (newDbUrl == null) return;
+                    var dbUrl = await showExistDatabaseUrlDialog(context);
+                    if (dbUrl == null) return;
                     if (!context.mounted) return;
-                    await showWaitDialog(context, "正在清除数据中");
+                    await showWaitDialog(context, widget.isDesktop, "正在清除数据中");
+
                     try {
+                      verifySqliteUrl(sqliteUrl: dbUrl);
+                    } catch (e) {
+                      LogToast.error("数据库设置", "sqlite数据库链接有误: $e",
+                          "[storageConfig.moveDatabase] failed: $e");
+                      return;
+                    }
+                    try {
+                      globalConfig.storageConfig.customDb = dbUrl;
+                      globalConfig.save(documentFolder: globalDocumentPath);
+
                       await clearDb();
-                      await setDb(databaseUrl: newDbUrl);
+                      await setDb(databaseUrl: dbUrl);
+                      refreshMusicAggregatorListViewPage();
+                      refreshPlaylistGridViewPage();
+
                       LogToast.success("数据库设置", "数据库设置成功",
                           "[storageConfig.moveDatabase] success");
                     } catch (e) {
                       LogToast.error("数据库设置", "数据库设置失败: $e",
                           "[storageConfig.moveDatabase] failed: $e");
                     } finally {
-                      if (context.mounted) {
-                        Navigator.pop(context);
+                      if (widget.isDesktop) {
+                        globalPopPage();
+                      } else {
+                        if (context.mounted) Navigator.pop(context);
                       }
                       setState(() {});
                     }
@@ -736,7 +728,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
             ],
           ),
           CupertinoFormSection.insetGrouped(
-              header: Text('歌单Json设置', style: TextStyle(color: textColor)),
+              header: Text('数据库Json设置', style: TextStyle(color: textColor)),
               children: [
                 CupertinoFormRow(
                   prefix: Text(
@@ -762,7 +754,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
                       String filePath = "$directory/$filename";
                       try {
                         var databaseJson =
-                            await DatabaseJsonWrapper.getFromDb();
+                            await MusicDataJsonWrapper.fromDatabase();
                         await databaseJson.saveTo(path: filePath);
                         LogToast.success("数据库导出", "数据库导出为json成功: $filePath",
                             "[storageConfig.exportDatabase] success: $filePath");
@@ -783,30 +775,50 @@ class StorageConfigPageState extends State<StorageConfigPage>
                   ),
                   child: CupertinoButton(
                     onPressed: () async {
-                      var confirm = await showConfirmationDialog(
-                          context,
-                          "注意!\n"
-                          "该功能可以将数据库Json文件导入数据库, 包含所有歌单和其中的歌曲\n"
-                          "这将会导致当前使用的数据库下的歌单数据完全丢失!!!\n"
-                          "请选择要导入的数据库Json文件, 请确保Json文件是从相同版本的AppRhyme中导出的\n"
-                          "是否继续?");
-                      if (confirm == null || !confirm) return;
-                      String? filePath = await pickFile();
-                      if (filePath == null) return;
-                      if (!context.mounted) return;
-                      await showWaitDialog(context, "正在应用数据库Json文件, 请稍等");
+                      await importDatabaseJson(context, widget.isDesktop);
+                    },
+                    child: const Icon(CupertinoIcons.arrow_down_doc_fill),
+                  ),
+                ),
+              ]),
+          CupertinoFormSection.insetGrouped(
+              header: Text('导入Json文件', style: TextStyle(color: textColor)),
+              children: [
+                CupertinoFormRow(
+                  prefix: Text(
+                    '导入任意json文件',
+                    style: TextStyle(color: textColor).useSystemChineseFont(),
+                  ),
+                  child: CupertinoButton(
+                    onPressed: () async {
+                      var file = await pickFile();
+                      if (file == null) return;
                       try {
-                        var databaseJson =
-                            await DatabaseJsonWrapper.loadFrom(path: filePath);
-                        await databaseJson.applyToDb();
-                        LogToast.success("导入数据库", "从Json文件导入数据库成功",
-                            "[storageConfig.importDatabase] succeed to imprt json file to database");
+                        var musicDataJson =
+                            await MusicDataJsonWrapper.loadFrom(path: file);
+                        switch (await musicDataJson.getType()) {
+                          case MusicDataType.database:
+                            if (context.mounted) {
+                              await importDatabaseJson(
+                                  context, widget.isDesktop,
+                                  musicDataJson: musicDataJson);
+                            }
+                          case MusicDataType.playlists:
+                            if (context.mounted) {
+                              await importPlaylistJson(
+                                  context, widget.isDesktop,
+                                  musicDataJson: musicDataJson);
+                            }
+                          case MusicDataType.musicAggregators:
+                            if (context.mounted) {
+                              await importMusicAggrgegatorJson(
+                                  context, widget.isDesktop,
+                                  musicDataJson: musicDataJson);
+                            }
+                        }
                       } catch (e) {
-                        LogToast.error("导入数据库", "从Json文件导入数据库失败: $e",
-                            "[storageConfig.importDatabase] failed: $e");
-                      } finally {
-                        if (context.mounted) Navigator.of(context).pop();
-                        setState(() {});
+                        LogToast.error(
+                            "导入Json文件", "$e", "[storageConfig.importJson] $e");
                       }
                     },
                     child: const Icon(CupertinoIcons.arrow_down_doc_fill),
@@ -849,17 +861,14 @@ class ExternalApiConfigPageState extends State<ExternalApiConfigPage>
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    final textColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.systemGrey6
-        : CupertinoColors.systemGroupedBackground;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
         middle: Text('第三方音源设置', style: TextStyle(color: textColor)),
-        backgroundColor: backgroundColor,
+        backgroundColor: getNavigatorBarColor(isDarkMode),
       ),
       child: ListView(
         children: [
@@ -1069,12 +1078,9 @@ class WindowConfigPageState extends State<WindowConfigPage>
   @override
   Widget build(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
-    final textColor = brightness == Brightness.dark
-        ? CupertinoColors.white
-        : CupertinoColors.black;
-    final backgroundColor = brightness == Brightness.dark
-        ? CupertinoColors.systemGrey6
-        : CupertinoColors.systemGroupedBackground;
+    final bool isDarkMode = brightness == Brightness.dark;
+    final textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     globalConfig.windowConfig ??= WindowConfig.default_();
 
     if (globalConfig.windowConfig == null) {
@@ -1084,10 +1090,10 @@ class WindowConfigPageState extends State<WindowConfigPage>
     }
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
         middle: Text('窗口设置(重启后生效)', style: TextStyle(color: textColor)),
-        backgroundColor: backgroundColor,
+        backgroundColor: getNavigatorBarColor(isDarkMode),
       ),
       child: ListView(
         children: [
@@ -1101,7 +1107,7 @@ class WindowConfigPageState extends State<WindowConfigPage>
                       style: TextStyle(color: textColor).useSystemChineseFont(),
                     ),
                     child: CupertinoButton(
-                      onPressed: openProjectLink,
+                      onPressed: openProjectRepoLink,
                       child: Text(
                         "${appWindow.size.width} - ${appWindow.size.height}",
                         style:

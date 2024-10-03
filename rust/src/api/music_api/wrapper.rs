@@ -1,16 +1,22 @@
-use flutter_rust_bridge::frb;
-use music_api::data::interface::json::DatabaseJson;
+use music_api::data::interface::{
+    json::{MusicDataJson, MusicDataType},
+    music_aggregator::MusicAggregator,
+    playlist::Playlist,
+};
 
-#[frb]
-pub struct DatabaseJsonWrapper(DatabaseJson);
+pub struct MusicDataJsonWrapper(MusicDataJson);
 
-impl DatabaseJsonWrapper {
-    pub fn from_json(json: &str) -> anyhow::Result<Self> {
-        DatabaseJson::from_json(json).map(|db| Self(db))
+impl MusicDataJsonWrapper {
+    pub fn get_type(&self) -> MusicDataType {
+        self.0.get_type()
     }
 
     pub fn to_json(&self) -> anyhow::Result<String> {
         self.0.to_json()
+    }
+
+    pub fn from_json(json: &str) -> anyhow::Result<Self> {
+        Ok(MusicDataJsonWrapper(MusicDataJson::from_json(json)?))
     }
 
     pub async fn save_to(&self, path: &str) -> anyhow::Result<()> {
@@ -18,15 +24,29 @@ impl DatabaseJsonWrapper {
     }
 
     pub async fn load_from(path: &str) -> anyhow::Result<Self> {
-        DatabaseJson::load_from(path).await.map(|db| Self(db))
-    }
-
-    pub async fn get_from_db() -> anyhow::Result<Self> {
-        DatabaseJson::get_from_db().await.map(|db| Self(db))
+        Ok(MusicDataJsonWrapper(MusicDataJson::load_from(path).await?))
     }
 
     /// takes ownership
-    pub async fn apply_to_db(self) -> anyhow::Result<()> {
-        self.0.apply_to_db().await
+    pub async fn apply_to_db(self, playlist_id: Option<i64>) -> anyhow::Result<()> {
+        self.0.apply_to_db(playlist_id).await
+    }
+
+    pub async fn from_database() -> anyhow::Result<Self> {
+        Ok(MusicDataJsonWrapper(MusicDataJson::from_database().await?))
+    }
+
+    pub async fn from_playlists(playlists: Vec<Playlist>) -> anyhow::Result<Self> {
+        Ok(MusicDataJsonWrapper(
+            MusicDataJson::from_playlists(playlists).await?,
+        ))
+    }
+
+    pub async fn from_music_aggregators(
+        music_aggregators: Vec<MusicAggregator>,
+    ) -> anyhow::Result<Self> {
+        Ok(MusicDataJsonWrapper(
+            MusicDataJson::from_music_aggregators(music_aggregators).await?,
+        ))
     }
 }

@@ -55,21 +55,16 @@ impl MusicAggregator {
 
     pub async fn del_from_db(&self) -> Result<(), anyhow::Error> {}
 
-    /// take ownership
     pub async fn search_online(
         aggs: Vec<MusicAggregator>,
         servers: Vec<MusicServer>,
         content: String,
         page: i64,
         size: i64,
-    ) -> Result<Vec<Self>, (Vec<Self>, String)> {
+    ) -> anyhow::Result<Vec<Self>> {
     }
-    /// take ownership
-    pub async fn fetch_server_online(
-        self,
-        servers: Vec<MusicServer>,
-    ) -> Result<Self, (Self, String)> {
-    }
+
+    pub async fn fetch_server_online(self, servers: Vec<MusicServer>) -> anyhow::Result<Self> {}
 
     pub async fn change_default_server_in_db(
         &self,
@@ -166,36 +161,4 @@ pub async fn clear_db() -> Result<(), anyhow::Error> {
 #[frb]
 pub async fn reinit_db() -> Result<(), anyhow::Error> {
     music_api::data::interface::database::reinit_db().await
-}
-
-#[frb(external)]
-impl PlaylistJsonVec {
-    pub fn to_json(&self) -> anyhow::Result<String> {}
-
-    pub fn from_json(json: &str) -> anyhow::Result<Self> {}
-
-    pub async fn save_to(&self, path: &str) -> anyhow::Result<()> {}
-
-    pub async fn load_from(path: &str) -> anyhow::Result<Self> {}
-
-    /// takes ownership
-    pub async fn insert_to_db(self) -> anyhow::Result<()> {}
-}
-
-#[frb(external)]
-impl MusicAggregatorJsonVec {
-    pub fn to_json(&self) -> anyhow::Result<String> {}
-
-    pub fn from_json(json: &str) -> anyhow::Result<Self> {}
-
-    pub async fn save_to(&self, path: &str) -> anyhow::Result<()> {}
-
-    pub async fn load_from(path: &str) -> anyhow::Result<Self> {}
-}
-
-#[frb]
-pub async fn clone_music_aggs(
-    music_aggs: &Vec<MusicAggregator>,
-) -> anyhow::Result<Vec<MusicAggregator>> {
-    Ok(music_aggs.clone())
 }

@@ -118,7 +118,7 @@ pub struct StorageConfig {
     // 添加歌单时是否保存封面
     #[frb(non_final)]
     #[serde(default = "default_true")]
-    pub save_pic: bool,
+    pub save_cover: bool,
     // 自定义的歌曲/图片数据缓存路径
     #[frb(non_final)]
     #[serde(default)]
@@ -132,7 +132,7 @@ pub struct StorageConfig {
 impl Default for StorageConfig {
     fn default() -> Self {
         Self {
-            save_pic: true,
+            save_cover: true,
             custom_cache_root: None,
             custom_db: None,
         }

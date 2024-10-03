@@ -23,10 +23,10 @@ generic-array = "1.1.0"
 hex = "0.4.3"
 log = "0.4.22"
 md-5 = "0.10.6"
-once_cell = "1.19.0"
+once_cell = "1.20.1"
 rand = "0.8.5"
-regex = "1.10.6"
-reqwest = { version = "0.12.7", features = [
+regex = "1.11.0"
+reqwest = { version = "0.12.8", features = [
     "json",
     "rustls-tls",
     "rustls-tls-webpki-roots",
@@ -57,11 +57,11 @@ music_api = { git = "https://github.com/canxin121/music_api" }
 anyhow = "1.0.89"
 
 [dev-dependencies]
-serial_test = "*"
+serial_test = "3.1.1"
 
 [profile.release]
 lto = true
 strip = true
-opt-level = "z"   # Optimize for size.
+opt-level = "z"
 codegen-units = 1
 panic = "abort"

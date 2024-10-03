@@ -1,7 +1,8 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
-import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/utils/colors.dart';
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -93,6 +94,7 @@ class LocalMusicContainerListPageState
                 musicAggs: musicAggs,
                 isDarkMode: isDarkMode,
                 screenWidth: screenWidth,
+                cacheCover: globalConfig.storageConfig.saveCover,
               ),
               const SliverToBoxAdapter(
                 child: SizedBox(height: 20),
@@ -100,6 +102,7 @@ class LocalMusicContainerListPageState
               MusicAggregatorList(
                 musicAggs: musicAggs,
                 playlist: playlist,
+                cacheCover: globalConfig.storageConfig.saveCover,
               ),
             ],
           )),

@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.4.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1068175996;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 2094486458;
 
 // Section: executor
 
@@ -120,49 +120,6 @@ fn wire__crate__api__cache__cache_op__move_cache_data_impl(
                             &api_document_path,
                             api_old_custom_cache_root,
                             api_new_custom_cache_root,
-                        )
-                        .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__cache__database_op__move_database_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "move_database",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_document_folder = <String>::sse_decode(&mut deserializer);
-            let api_custom_root = <Option<String>>::sse_decode(&mut deserializer);
-            let api_new_db_url = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok = crate::api::cache::database_op::move_database(
-                            api_document_folder,
-                            api_custom_root,
-                            api_new_db_url,
                         )
                         .await?;
                         Ok(output_ok)
@@ -679,45 +636,6 @@ fn wire__crate__api__music_api__fns__clear_db_impl(
         },
     )
 }
-fn wire__crate__api__music_api__fns__clone_music_aggs_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "clone_music_aggs",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_music_aggs = <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_decode(
-                &mut deserializer,
-            );
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::music_api::fns::clone_music_aggs(&api_music_aggs).await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
 fn wire__crate__api__music_api__fns__close_db_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -908,7 +826,7 @@ fn wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_imp
                 <Vec<crate::api::music_api::mirror::MusicServer>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, (crate::api::music_api::mirror::MusicAggregator, String)>(
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok =
                             crate::api::music_api::mirror::MusicAggregator::fetch_server_online(
@@ -992,167 +910,6 @@ fn wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
         },
     )
 }
-fn wire__crate__api__music_api__mirror__music_aggregator_json_vec_from_json_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "music_aggregator_json_vec_from_json",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_json = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || {
-                        let output_ok =
-                            crate::api::music_api::mirror::MusicAggregatorJsonVec::from_json(
-                                &api_json,
-                            )?;
-                        Ok(output_ok)
-                    })(),
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__music_aggregator_json_vec_load_from_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "music_aggregator_json_vec_load_from",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::music_api::mirror::MusicAggregatorJsonVec::load_from(
-                                &api_path,
-                            )
-                            .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__music_aggregator_json_vec_save_to_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "music_aggregator_json_vec_save_to",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::music_api::mirror::MusicAggregatorJsonVec>::sse_decode(
-                &mut deserializer,
-            );
-            let api_path = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::music_api::mirror::MusicAggregatorJsonVec::save_to(
-                                &api_that, &api_path,
-                            )
-                            .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__music_aggregator_json_vec_to_json_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "music_aggregator_json_vec_to_json",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::music_api::mirror::MusicAggregatorJsonVec>::sse_decode(
-                &mut deserializer,
-            );
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || {
-                        let output_ok =
-                            crate::api::music_api::mirror::MusicAggregatorJsonVec::to_json(
-                                &api_that,
-                            )?;
-                        Ok(output_ok)
-                    })(),
-                )
-            }
-        },
-    )
-}
 fn wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1224,10 +981,7 @@ fn wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(
             let api_size = <i64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<
-                    _,
-                    (Vec<crate::api::music_api::mirror::MusicAggregator>, String),
-                >(
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok =
                             crate::api::music_api::mirror::MusicAggregator::search_online(
@@ -1997,197 +1751,6 @@ fn wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(
         },
     )
 }
-fn wire__crate__api__music_api__mirror__playlist_json_vec_from_json_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "playlist_json_vec_from_json",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_json = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || {
-                        let output_ok =
-                            crate::api::music_api::mirror::PlaylistJsonVec::from_json(&api_json)?;
-                        Ok(output_ok)
-                    })(),
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__playlist_json_vec_insert_to_db_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "playlist_json_vec_insert_to_db",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that =
-                <crate::api::music_api::mirror::PlaylistJsonVec>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::music_api::mirror::PlaylistJsonVec::insert_to_db(api_that)
-                                .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__playlist_json_vec_load_from_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "playlist_json_vec_load_from",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::music_api::mirror::PlaylistJsonVec::load_from(&api_path)
-                                .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__playlist_json_vec_save_to_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "playlist_json_vec_save_to",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that =
-                <crate::api::music_api::mirror::PlaylistJsonVec>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok = crate::api::music_api::mirror::PlaylistJsonVec::save_to(
-                            &api_that, &api_path,
-                        )
-                        .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__music_api__mirror__playlist_json_vec_to_json_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "playlist_json_vec_to_json",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that =
-                <crate::api::music_api::mirror::PlaylistJsonVec>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || {
-                        let output_ok =
-                            crate::api::music_api::mirror::PlaylistJsonVec::to_json(&api_that)?;
-                        Ok(output_ok)
-                    })(),
-                )
-            }
-        },
-    )
-}
 fn wire__crate__api__music_api__mirror__playlist_new_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2395,7 +1958,7 @@ fn wire__crate__api__music_api__plugin_fn__music_to_json_impl(
         },
     )
 }
-fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_apply_to_db_impl(
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_apply_to_db_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2403,7 +1966,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_apply_to_db_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "DatabaseJsonWrapper_apply_to_db",
+            debug_name: "MusicDataJsonWrapper_apply_to_db",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2417,14 +1980,16 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_apply_to_db_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <DatabaseJsonWrapper>::sse_decode(&mut deserializer);
+            let api_that = <MusicDataJsonWrapper>::sse_decode(&mut deserializer);
+            let api_playlist_id = <Option<i64>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok =
-                            crate::api::music_api::wrapper::DatabaseJsonWrapper::apply_to_db(
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::apply_to_db(
                                 api_that,
+                                api_playlist_id,
                             )
                             .await?;
                         Ok(output_ok)
@@ -2435,7 +2000,44 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_apply_to_db_impl(
         },
     )
 }
-fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_from_json_impl(
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_database_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "MusicDataJsonWrapper_from_database",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::from_database()
+                                .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_json_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2443,7 +2045,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_from_json_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "DatabaseJsonWrapper_from_json",
+            debug_name: "MusicDataJsonWrapper_from_json",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2463,7 +2065,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_from_json_impl(
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || {
                         let output_ok =
-                            crate::api::music_api::wrapper::DatabaseJsonWrapper::from_json(
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::from_json(
                                 &api_json,
                             )?;
                         Ok(output_ok)
@@ -2473,7 +2075,22 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_from_json_impl(
         },
     )
 }
-fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_get_from_db_impl(
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_music_aggregators_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "MusicDataJsonWrapper_from_music_aggregators", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_music_aggregators = <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>((move || async move {
+                         let output_ok = crate::api::music_api::wrapper::MusicDataJsonWrapper::from_music_aggregators(api_music_aggregators).await?;   Ok(output_ok)
+                    })().await)
+                } })
+}
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_playlists_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2481,7 +2098,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_get_from_db_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "DatabaseJsonWrapper_get_from_db",
+            debug_name: "MusicDataJsonWrapper_from_playlists",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2495,13 +2112,17 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_get_from_db_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_playlists =
+                <Vec<crate::api::music_api::mirror::Playlist>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok =
-                            crate::api::music_api::wrapper::DatabaseJsonWrapper::get_from_db()
-                                .await?;
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::from_playlists(
+                                api_playlists,
+                            )
+                            .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -2510,7 +2131,60 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_get_from_db_impl(
         },
     )
 }
-fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_load_from_impl(
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_get_type_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "MusicDataJsonWrapper_get_type",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_that = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let mut api_that_guard = None;
+                    let decode_indices_ =
+                        flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
+                            flutter_rust_bridge::for_generated::LockableOrderInfo::new(
+                                &api_that, 0, false,
+                            ),
+                        ]);
+                    for i in decode_indices_ {
+                        match i {
+                            0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
+                            _ => unreachable!(),
+                        }
+                    }
+                    let api_that_guard = api_that_guard.unwrap();
+                    let output_ok = Result::<_, ()>::Ok(
+                        crate::api::music_api::wrapper::MusicDataJsonWrapper::get_type(
+                            &*api_that_guard,
+                        ),
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_load_from_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2518,7 +2192,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_load_from_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "DatabaseJsonWrapper_load_from",
+            debug_name: "MusicDataJsonWrapper_load_from",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2538,7 +2212,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_load_from_impl(
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
                         let output_ok =
-                            crate::api::music_api::wrapper::DatabaseJsonWrapper::load_from(
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::load_from(
                                 &api_path,
                             )
                             .await?;
@@ -2550,7 +2224,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_load_from_impl(
         },
     )
 }
-fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_save_to_impl(
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_save_to_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2558,7 +2232,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_save_to_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "DatabaseJsonWrapper_save_to",
+            debug_name: "MusicDataJsonWrapper_save_to",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2573,7 +2247,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_save_to_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>,
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>,
             >>::sse_decode(&mut deserializer);
             let api_path = <String>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -2598,7 +2272,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_save_to_impl(
                         }
                         let api_that_guard = api_that_guard.unwrap();
                         let output_ok =
-                            crate::api::music_api::wrapper::DatabaseJsonWrapper::save_to(
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::save_to(
                                 &*api_that_guard,
                                 &api_path,
                             )
@@ -2611,7 +2285,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_save_to_impl(
         },
     )
 }
-fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_to_json_impl(
+fn wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_to_json_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2619,7 +2293,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_to_json_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "DatabaseJsonWrapper_to_json",
+            debug_name: "MusicDataJsonWrapper_to_json",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2634,7 +2308,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_to_json_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>,
+                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>,
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
@@ -2655,7 +2329,7 @@ fn wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_to_json_impl(
                         }
                         let api_that_guard = api_that_guard.unwrap();
                         let output_ok =
-                            crate::api::music_api::wrapper::DatabaseJsonWrapper::to_json(
+                            crate::api::music_api::wrapper::MusicDataJsonWrapper::to_json(
                                 &*api_that_guard,
                             )?;
                         Ok(output_ok)
@@ -3293,6 +2967,43 @@ fn wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(
         },
     )
 }
+fn wire__crate__api__utils__database__verify_sqlite_url_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "verify_sqlite_url",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_sqlite_url = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::utils::database::verify_sqlite_url(api_sqlite_url).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__utils__http_helper__send_request_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3409,11 +3120,6 @@ const _: fn() = || {
         let _: crate::api::music_api::mirror::MusicServer = MusicAggregator.default_server;
     }
     {
-        let MusicAggregatorJsonVec_ =
-            None::<crate::api::music_api::mirror::MusicAggregatorJsonVec>.unwrap();
-        let _: Vec<crate::api::music_api::mirror::MusicAggregator> = MusicAggregatorJsonVec_.0;
-    }
-    {
         let PlayListSubscription =
             None::<crate::api::music_api::mirror::PlayListSubscription>.unwrap();
         let _: String = PlayListSubscription.name;
@@ -3437,15 +3143,6 @@ const _: fn() = || {
             Playlist.subscription;
     }
     {
-        let PlaylistJson = None::<crate::api::music_api::mirror::PlaylistJson>.unwrap();
-        let _: crate::api::music_api::mirror::Playlist = PlaylistJson.playlist;
-        let _: Vec<crate::api::music_api::mirror::MusicAggregator> = PlaylistJson.music_aggregators;
-    }
-    {
-        let PlaylistJsonVec_ = None::<crate::api::music_api::mirror::PlaylistJsonVec>.unwrap();
-        let _: Vec<crate::api::music_api::mirror::PlaylistJson> = PlaylistJsonVec_.0;
-    }
-    {
         let PlaylistUpdateSubscriptionResult =
             None::<crate::api::music_api::mirror::PlaylistUpdateSubscriptionResult>.unwrap();
         let _: Vec<(String, String)> = PlaylistUpdateSubscriptionResult.errors;
@@ -3462,7 +3159,7 @@ const _: fn() = || {
 // Section: related_funcs
 
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>
+    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>
 );
 
 // Section: dart2rust
@@ -3475,11 +3172,11 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
-impl SseDecode for DatabaseJsonWrapper {
+impl SseDecode for MusicDataJsonWrapper {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>,
+            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>,
         >>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
@@ -3494,7 +3191,7 @@ impl SseDecode for std::collections::HashMap<String, String> {
 }
 
 impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>
+    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3757,20 +3454,6 @@ impl SseDecode for Vec<crate::api::music_api::mirror::Playlist> {
     }
 }
 
-impl SseDecode for Vec<crate::api::music_api::mirror::PlaylistJson> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<crate::api::music_api::mirror::PlaylistJson>::sse_decode(
-                deserializer,
-            ));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3860,12 +3543,16 @@ impl SseDecode for crate::api::music_api::mirror::MusicAggregator {
     }
 }
 
-impl SseDecode for crate::api::music_api::mirror::MusicAggregatorJsonVec {
+impl SseDecode for crate::api::music_api::mirror::MusicDataType {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_field0 =
-            <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_decode(deserializer);
-        return crate::api::music_api::mirror::MusicAggregatorJsonVec(var_field0);
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::music_api::mirror::MusicDataType::Database,
+            1 => crate::api::music_api::mirror::MusicDataType::Playlists,
+            2 => crate::api::music_api::mirror::MusicDataType::MusicAggregators,
+            _ => unreachable!("Invalid variant for MusicDataType: {}", inner),
+        };
     }
 }
 
@@ -4059,28 +3746,6 @@ impl SseDecode for crate::api::music_api::mirror::Playlist {
     }
 }
 
-impl SseDecode for crate::api::music_api::mirror::PlaylistJson {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_playlist = <crate::api::music_api::mirror::Playlist>::sse_decode(deserializer);
-        let mut var_musicAggregators =
-            <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_decode(deserializer);
-        return crate::api::music_api::mirror::PlaylistJson {
-            playlist: var_playlist,
-            music_aggregators: var_musicAggregators,
-        };
-    }
-}
-
-impl SseDecode for crate::api::music_api::mirror::PlaylistJsonVec {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_field0 =
-            <Vec<crate::api::music_api::mirror::PlaylistJson>>::sse_decode(deserializer);
-        return crate::api::music_api::mirror::PlaylistJsonVec(var_field0);
-    }
-}
-
 impl SseDecode for crate::api::music_api::mirror::PlaylistType {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -4144,26 +3809,6 @@ impl SseDecode for crate::api::types::config::QualityOption {
             3 => crate::api::types::config::QualityOption::Low,
             _ => unreachable!("Invalid variant for QualityOption: {}", inner),
         };
-    }
-}
-
-impl SseDecode for (Vec<crate::api::music_api::mirror::MusicAggregator>, String) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_field0 =
-            <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_decode(deserializer);
-        let mut var_field1 = <String>::sse_decode(deserializer);
-        return (var_field0, var_field1);
-    }
-}
-
-impl SseDecode for (crate::api::music_api::mirror::MusicAggregator, String) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_field0 =
-            <crate::api::music_api::mirror::MusicAggregator>::sse_decode(deserializer);
-        let mut var_field1 = <String>::sse_decode(deserializer);
-        return (var_field0, var_field1);
     }
 }
 
@@ -4248,11 +3893,11 @@ impl SseDecode for crate::api::types::version::Release {
 impl SseDecode for crate::api::types::config::StorageConfig {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_savePic = <bool>::sse_decode(deserializer);
+        let mut var_saveCover = <bool>::sse_decode(deserializer);
         let mut var_customCacheRoot = <Option<String>>::sse_decode(deserializer);
         let mut var_customDb = <Option<String>>::sse_decode(deserializer);
         return crate::api::types::config::StorageConfig {
-            save_pic: var_savePic,
+            save_cover: var_saveCover,
             custom_cache_root: var_customCacheRoot,
             custom_db: var_customDb,
         };
@@ -4343,68 +3988,56 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        3 => wire__crate__api__cache__database_op__move_database_impl(
+        3 => wire__crate__api__cache__file_cache__cache_file_from_content_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        4 => wire__crate__api__cache__file_cache__cache_file_from_content_impl(
+        4 => wire__crate__api__cache__file_cache__cache_file_from_uri_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        5 => wire__crate__api__cache__file_cache__cache_file_from_uri_impl(
+        5 => wire__crate__api__cache__file_cache__delete_cache_file_with_uri_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        6 => wire__crate__api__cache__file_cache__delete_cache_file_with_uri_impl(
+        6 => wire__crate__api__cache__file_cache__gen_hash_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__cache__music_cache__cache_music_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        7 => wire__crate__api__cache__file_cache__gen_hash_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__cache__music_cache__cache_music_impl(
+        9 => wire__crate__api__cache__music_cache__delete_music_cache_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        10 => wire__crate__api__cache__music_cache__delete_music_cache_impl(
+        10 => wire__crate__api__cache__music_cache__get_cache_music_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__cache__music_cache__get_cache_music_impl(
+        11 => wire__crate__api__cache__music_cache__has_cache_music_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        12 => wire__crate__api__cache__music_cache__has_cache_music_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        13 => wire__crate__api__init__init_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__init__init_backend_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__music_api__fns__clear_db_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__music_api__fns__clone_music_aggs_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        17 => wire__crate__api__music_api__fns__close_db_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__music_api__fns__reinit_db_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__music_api__fns__set_db_impl(port, ptr, rust_vec_len, data_len),
-        20 => {
+        12 => wire__crate__api__init__init_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__init__init_backend_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__music_api__fns__clear_db_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__music_api__fns__close_db_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__music_api__fns__reinit_db_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__music_api__fns__set_db_impl(port, ptr, rust_vec_len, data_len),
+        18 => {
             wire__crate__api__music_api__mirror__music_aggregator_change_default_server_in_db_impl(
                 port,
                 ptr,
@@ -4412,313 +4045,285 @@ fn pde_ffi_dispatcher_primary_impl(
                 data_len,
             )
         }
-        21 => wire__crate__api__music_api__mirror__music_aggregator_del_from_db_impl(
+        19 => wire__crate__api__music_api__mirror__music_aggregator_del_from_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_impl(
+        20 => wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        23 => wire__crate__api__music_api__mirror__music_aggregator_from_music_impl(
+        21 => wire__crate__api__music_api__mirror__music_aggregator_from_music_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        25 => wire__crate__api__music_api__mirror__music_aggregator_json_vec_from_json_impl(
+        23 => wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        26 => wire__crate__api__music_api__mirror__music_aggregator_json_vec_load_from_impl(
+        24 => wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        27 => wire__crate__api__music_api__mirror__music_aggregator_json_vec_save_to_impl(
+        25 => wire__crate__api__music_api__mirror__music_aggregator_update_order_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        28 => wire__crate__api__music_api__mirror__music_aggregator_json_vec_to_json_impl(
+        26 => wire__crate__api__music_api__mirror__music_get_album_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(
+        28 => wire__crate__api__music_api__mirror__music_get_lyric_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        30 => wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(
+        29 => wire__crate__api__music_api__mirror__music_insert_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        31 => wire__crate__api__music_api__mirror__music_aggregator_update_order_to_db_impl(
+        30 => wire__crate__api__music_api__mirror__music_search_online_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        32 => wire__crate__api__music_api__mirror__music_get_album_impl(
+        34 => wire__crate__api__music_api__mirror__music_update_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        34 => wire__crate__api__music_api__mirror__music_get_lyric_impl(
+        35 => wire__crate__api__music_api__mirror__playlist_add_aggs_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        35 => wire__crate__api__music_api__mirror__music_insert_to_db_impl(
+        36 => wire__crate__api__music_api__mirror__playlist_del_from_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        36 => wire__crate__api__music_api__mirror__music_search_online_impl(
+        37 => wire__crate__api__music_api__mirror__playlist_del_music_agg_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        40 => wire__crate__api__music_api__mirror__music_update_to_db_impl(
+        38 => wire__crate__api__music_api__mirror__playlist_fetch_musics_online_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        41 => wire__crate__api__music_api__mirror__playlist_add_aggs_to_db_impl(
+        39 => wire__crate__api__music_api__mirror__playlist_find_in_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        42 => wire__crate__api__music_api__mirror__playlist_del_from_db_impl(
+        41 => wire__crate__api__music_api__mirror__playlist_get_from_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        43 => wire__crate__api__music_api__mirror__playlist_del_music_agg_impl(
+        42 => wire__crate__api__music_api__mirror__playlist_get_from_share_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        44 => wire__crate__api__music_api__mirror__playlist_fetch_musics_online_impl(
+        43 => wire__crate__api__music_api__mirror__playlist_get_musics_from_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        45 => wire__crate__api__music_api__mirror__playlist_find_in_db_impl(
+        44 => wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        47 => wire__crate__api__music_api__mirror__playlist_get_from_db_impl(
+        45 => wire__crate__api__music_api__mirror__playlist_new_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        48 => wire__crate__api__music_api__mirror__playlist_get_from_share_impl(
+        46 => wire__crate__api__music_api__mirror__playlist_search_online_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        49 => wire__crate__api__music_api__mirror__playlist_get_musics_from_db_impl(
+        47 => wire__crate__api__music_api__mirror__playlist_update_subscription_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        50 => wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(
+        48 => wire__crate__api__music_api__mirror__playlist_update_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        51 => wire__crate__api__music_api__mirror__playlist_json_vec_from_json_impl(
+        49 => wire__crate__api__music_api__plugin_fn__music_to_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        52 => wire__crate__api__music_api__mirror__playlist_json_vec_insert_to_db_impl(
+        50 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_apply_to_db_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        53 => wire__crate__api__music_api__mirror__playlist_json_vec_load_from_impl(
+        51 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_database_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        54 => wire__crate__api__music_api__mirror__playlist_json_vec_save_to_impl(
+        52 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        55 => wire__crate__api__music_api__mirror__playlist_json_vec_to_json_impl(
+        53 => {
+            wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_music_aggregators_impl(
+                port,
+                ptr,
+                rust_vec_len,
+                data_len,
+            )
+        }
+        54 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_from_playlists_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        56 => wire__crate__api__music_api__mirror__playlist_new_impl(
+        55 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_get_type_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        57 => wire__crate__api__music_api__mirror__playlist_search_online_impl(
+        56 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_load_from_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        58 => wire__crate__api__music_api__mirror__playlist_update_subscription_impl(
+        57 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_save_to_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        59 => wire__crate__api__music_api__mirror__playlist_update_to_db_impl(
+        58 => wire__crate__api__music_api__wrapper__MusicDataJsonWrapper_to_json_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        60 => wire__crate__api__music_api__plugin_fn__music_to_json_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        61 => wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_apply_to_db_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        62 => wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_from_json_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        63 => wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_get_from_db_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        64 => wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_load_from_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        65 => wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_save_to_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        66 => wire__crate__api__music_api__wrapper__DatabaseJsonWrapper_to_json_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        67 => {
+        59 => {
             wire__crate__api__types__config__config_default_impl(port, ptr, rust_vec_len, data_len)
         }
-        70 => wire__crate__api__types__config__config_load_impl(port, ptr, rust_vec_len, data_len),
-        71 => wire__crate__api__types__config__config_save_impl(port, ptr, rust_vec_len, data_len),
-        72 => {
+        62 => wire__crate__api__types__config__config_load_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__api__types__config__config_save_impl(port, ptr, rust_vec_len, data_len),
+        64 => {
             wire__crate__api__types__config__config_update_impl(port, ptr, rust_vec_len, data_len)
         }
-        73 => wire__crate__api__types__config__quality_config_default_impl(
+        65 => wire__crate__api__types__config__quality_config_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        74 => wire__crate__api__types__config__storage_config_default_impl(
+        66 => wire__crate__api__types__config__storage_config_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        75 => wire__crate__api__types__config__update_config_default_impl(
+        67 => wire__crate__api__types__config__update_config_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        77 => wire__crate__api__types__external_api__external_api_config_fetch_update_impl(
+        69 => wire__crate__api__types__external_api__external_api_config_fetch_update_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        78 => wire__crate__api__types__external_api__external_api_config_from_path_impl(
+        70 => wire__crate__api__types__external_api__external_api_config_from_path_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        79 => wire__crate__api__types__external_api__external_api_config_from_url_impl(
+        71 => wire__crate__api__types__external_api__external_api_config_from_url_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        80 => {
+        72 => {
             wire__crate__api__types__version__check_update_impl(port, ptr, rust_vec_len, data_len)
         }
-        81 => wire__crate__api__types__version__get_release_impl(port, ptr, rust_vec_len, data_len),
-        82 => wire__crate__api__utils__crypto__rc4_decrypt_from_base64_impl(
+        73 => wire__crate__api__types__version__get_release_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__api__utils__crypto__rc4_decrypt_from_base64_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        83 => wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(
+        75 => wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        84 => wire__crate__api__utils__http_helper__send_request_impl(
+        76 => wire__crate__api__utils__database__verify_sqlite_url_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        85 => wire__crate__api__utils__path_util__url_encode_special_chars_impl(
+        77 => wire__crate__api__utils__http_helper__send_request_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        78 => wire__crate__api__utils__path_util__url_encode_special_chars_impl(
             port,
             ptr,
             rust_vec_len,
@@ -4736,44 +4341,44 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        8 => wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
+        7 => wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        24 => wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
+        22 => wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        33 => {
+        27 => {
             wire__crate__api__music_api__mirror__music_get_cover_impl(ptr, rust_vec_len, data_len)
         }
-        37 => {
+        31 => {
             wire__crate__api__music_api__mirror__music_server_all_impl(ptr, rust_vec_len, data_len)
         }
-        38 => wire__crate__api__music_api__mirror__music_server_length_impl(
+        32 => wire__crate__api__music_api__mirror__music_server_length_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        39 => wire__crate__api__music_api__mirror__music_server_to_string_impl(
+        33 => wire__crate__api__music_api__mirror__music_server_to_string_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        46 => wire__crate__api__music_api__mirror__playlist_get_cover_impl(
+        40 => wire__crate__api__music_api__mirror__playlist_get_cover_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        68 => wire__crate__api__types__config__config_get_sql_url_impl(ptr, rust_vec_len, data_len),
-        69 => wire__crate__api__types__config__config_get_storage_folder_impl(
+        60 => wire__crate__api__types__config__config_get_sql_url_impl(ptr, rust_vec_len, data_len),
+        61 => wire__crate__api__types__config__config_get_storage_folder_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        76 => {
+        68 => {
             wire__crate__api__types__config__window_config_default_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -4783,19 +4388,19 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<DatabaseJsonWrapper> {
+impl flutter_rust_bridge::IntoDart for FrbWrapper<MusicDataJsonWrapper> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
             .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<DatabaseJsonWrapper>
+    for FrbWrapper<MusicDataJsonWrapper>
 {
 }
 
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<DatabaseJsonWrapper>> for DatabaseJsonWrapper {
-    fn into_into_dart(self) -> FrbWrapper<DatabaseJsonWrapper> {
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<MusicDataJsonWrapper>> for MusicDataJsonWrapper {
+    fn into_into_dart(self) -> FrbWrapper<MusicDataJsonWrapper> {
         self.into()
     }
 }
@@ -4992,23 +4597,24 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::music_api::mirror:
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart
-    for FrbWrapper<crate::api::music_api::mirror::MusicAggregatorJsonVec>
-{
+impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::api::music_api::mirror::MusicDataType> {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.0 .0.into_into_dart().into_dart()].into_dart()
+        match self.0 {
+            crate::api::music_api::mirror::MusicDataType::Database => 0.into_dart(),
+            crate::api::music_api::mirror::MusicDataType::Playlists => 1.into_dart(),
+            crate::api::music_api::mirror::MusicDataType::MusicAggregators => 2.into_dart(),
+            _ => unreachable!(),
+        }
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<crate::api::music_api::mirror::MusicAggregatorJsonVec>
+    for FrbWrapper<crate::api::music_api::mirror::MusicDataType>
 {
 }
-impl
-    flutter_rust_bridge::IntoIntoDart<
-        FrbWrapper<crate::api::music_api::mirror::MusicAggregatorJsonVec>,
-    > for crate::api::music_api::mirror::MusicAggregatorJsonVec
+impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::music_api::mirror::MusicDataType>>
+    for crate::api::music_api::mirror::MusicDataType
 {
-    fn into_into_dart(self) -> FrbWrapper<crate::api::music_api::mirror::MusicAggregatorJsonVec> {
+    fn into_into_dart(self) -> FrbWrapper<crate::api::music_api::mirror::MusicDataType> {
         self.into()
     }
 }
@@ -5108,44 +4714,6 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::music_api::mirror:
     for crate::api::music_api::mirror::Playlist
 {
     fn into_into_dart(self) -> FrbWrapper<crate::api::music_api::mirror::Playlist> {
-        self.into()
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::api::music_api::mirror::PlaylistJson> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.0.playlist.into_into_dart().into_dart(),
-            self.0.music_aggregators.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<crate::api::music_api::mirror::PlaylistJson>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::music_api::mirror::PlaylistJson>>
-    for crate::api::music_api::mirror::PlaylistJson
-{
-    fn into_into_dart(self) -> FrbWrapper<crate::api::music_api::mirror::PlaylistJson> {
-        self.into()
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<crate::api::music_api::mirror::PlaylistJsonVec> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.0 .0.into_into_dart().into_dart()].into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for FrbWrapper<crate::api::music_api::mirror::PlaylistJsonVec>
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<crate::api::music_api::mirror::PlaylistJsonVec>>
-    for crate::api::music_api::mirror::PlaylistJsonVec
-{
-    fn into_into_dart(self) -> FrbWrapper<crate::api::music_api::mirror::PlaylistJsonVec> {
         self.into()
     }
 }
@@ -5301,7 +4869,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::types::version::Release>
 impl flutter_rust_bridge::IntoDart for crate::api::types::config::StorageConfig {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.save_pic.into_into_dart().into_dart(),
+            self.save_cover.into_into_dart().into_dart(),
             self.custom_cache_root.into_into_dart().into_dart(),
             self.custom_db.into_into_dart().into_dart(),
         ]
@@ -5372,10 +4940,15 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
-impl SseEncode for DatabaseJsonWrapper {
+impl SseEncode for MusicDataJsonWrapper {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
+        <RustOpaqueMoi<
+            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>,
+        >>::sse_encode(
+            flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self),
+            serializer,
+        );
     }
 }
 
@@ -5387,7 +4960,7 @@ impl SseEncode for std::collections::HashMap<String, String> {
 }
 
 impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>
+    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5573,16 +5146,6 @@ impl SseEncode for Vec<crate::api::music_api::mirror::Playlist> {
     }
 }
 
-impl SseEncode for Vec<crate::api::music_api::mirror::PlaylistJson> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::api::music_api::mirror::PlaylistJson>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5641,10 +5204,20 @@ impl SseEncode for crate::api::music_api::mirror::MusicAggregator {
     }
 }
 
-impl SseEncode for crate::api::music_api::mirror::MusicAggregatorJsonVec {
+impl SseEncode for crate::api::music_api::mirror::MusicDataType {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_encode(self.0, serializer);
+        <i32>::sse_encode(
+            match self {
+                crate::api::music_api::mirror::MusicDataType::Database => 0,
+                crate::api::music_api::mirror::MusicDataType::Playlists => 1,
+                crate::api::music_api::mirror::MusicDataType::MusicAggregators => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -5794,24 +5367,6 @@ impl SseEncode for crate::api::music_api::mirror::Playlist {
     }
 }
 
-impl SseEncode for crate::api::music_api::mirror::PlaylistJson {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::music_api::mirror::Playlist>::sse_encode(self.playlist, serializer);
-        <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_encode(
-            self.music_aggregators,
-            serializer,
-        );
-    }
-}
-
-impl SseEncode for crate::api::music_api::mirror::PlaylistJsonVec {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::music_api::mirror::PlaylistJson>>::sse_encode(self.0, serializer);
-    }
-}
-
 impl SseEncode for crate::api::music_api::mirror::PlaylistType {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5874,22 +5429,6 @@ impl SseEncode for crate::api::types::config::QualityOption {
     }
 }
 
-impl SseEncode for (Vec<crate::api::music_api::mirror::MusicAggregator>, String) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_encode(self.0, serializer);
-        <String>::sse_encode(self.1, serializer);
-    }
-}
-
-impl SseEncode for (crate::api::music_api::mirror::MusicAggregator, String) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::music_api::mirror::MusicAggregator>::sse_encode(self.0, serializer);
-        <String>::sse_encode(self.1, serializer);
-    }
-}
-
 impl SseEncode
     for (
         Option<crate::api::music_api::mirror::Playlist>,
@@ -5946,7 +5485,7 @@ impl SseEncode for crate::api::types::version::Release {
 impl SseEncode for crate::api::types::config::StorageConfig {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.save_pic, serializer);
+        <bool>::sse_encode(self.save_cover, serializer);
         <Option<String>>::sse_encode(self.custom_cache_root, serializer);
         <Option<String>>::sse_encode(self.custom_db, serializer);
     }
@@ -6027,17 +5566,17 @@ mod io {
     flutter_rust_bridge::frb_generated_boilerplate_io!();
 
     #[no_mangle]
-    pub extern "C" fn frbgen_app_rhyme_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+    pub extern "C" fn frbgen_app_rhyme_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
         ptr: *const std::ffi::c_void,
     ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>::increment_strong_count(ptr as _);
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>>::increment_strong_count(ptr as _);
     }
 
     #[no_mangle]
-    pub extern "C" fn frbgen_app_rhyme_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+    pub extern "C" fn frbgen_app_rhyme_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
         ptr: *const std::ffi::c_void,
     ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>::decrement_strong_count(ptr as _);
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>>::decrement_strong_count(ptr as _);
     }
 }
 #[cfg(not(target_family = "wasm"))]
@@ -6066,17 +5605,17 @@ mod web {
     flutter_rust_bridge::frb_generated_boilerplate_web!();
 
     #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
         ptr: *const std::ffi::c_void,
     ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>::increment_strong_count(ptr as _);
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>>::increment_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
         ptr: *const std::ffi::c_void,
     ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<DatabaseJsonWrapper>>::decrement_strong_count(ptr as _);
+        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<MusicDataJsonWrapper>>::decrement_strong_count(ptr as _);
     }
 }
 #[cfg(target_family = "wasm")]

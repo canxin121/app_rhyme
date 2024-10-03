@@ -1,7 +1,7 @@
 use flutter_rust_bridge::frb;
 pub use music_api::data::interface::{
     artist::{Artist, ArtistVec},
-    json::{DatabaseJson, PlaylistJson, PlaylistJsonVec,MusicAggregatorJsonVec},
+    json::{DatabaseJson, MusicAggregatorJsonVec, MusicDataType, PlaylistJson, PlaylistJsonVec},
     music_aggregator::{Music, MusicAggregator},
     playlist::{Playlist, PlaylistType},
     playlist_subscription::PlayListSubscription,
@@ -127,3 +127,10 @@ pub struct _PlaylistJsonVec(pub Vec<PlaylistJson>);
 
 #[frb(mirror(MusicAggregatorJsonVec))]
 pub struct _MusicAggregatorJsonVec(pub Vec<MusicAggregator>);
+
+#[frb(mirror(MusicDataType))]
+pub enum _MusicDataType {
+    Database,
+    Playlists,
+    MusicAggregators,
+}

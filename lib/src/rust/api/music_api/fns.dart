@@ -4,7 +4,6 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
-import 'mirror.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<void> setDb({required String databaseUrl}) =>
@@ -15,8 +14,3 @@ Future<void> closeDb() => RustLib.instance.api.crateApiMusicApiFnsCloseDb();
 Future<void> clearDb() => RustLib.instance.api.crateApiMusicApiFnsClearDb();
 
 Future<void> reinitDb() => RustLib.instance.api.crateApiMusicApiFnsReinitDb();
-
-Future<List<MusicAggregator>> cloneMusicAggs(
-        {required List<MusicAggregator> musicAggs}) =>
-    RustLib.instance.api
-        .crateApiMusicApiFnsCloneMusicAggs(musicAggs: musicAggs);

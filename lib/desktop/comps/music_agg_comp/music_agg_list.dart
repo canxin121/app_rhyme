@@ -1,17 +1,18 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
-import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MusicAggregatorList extends StatelessWidget {
   final Playlist playlist;
   final List<MusicAggregator> musicAggs;
+  final bool cacheCover;
 
   const MusicAggregatorList({
     super.key,
     required this.musicAggs,
     required this.playlist,
+    this.cacheCover = false,
   });
 
   @override
@@ -37,7 +38,7 @@ class MusicAggregatorList extends StatelessWidget {
               isDarkMode: isDarkMode,
               hasBackgroundColor: index % 2 == 1,
               playlist: playlist,
-              cacheImageNow: globalConfig.storageConfig.savePic,
+              cacheCover: cacheCover,
             ),
           );
         },

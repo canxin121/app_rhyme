@@ -1,6 +1,6 @@
 import 'package:app_rhyme/desktop/comps/control_bar.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/pages/local_playlist_gridview_page.dart';
+import 'package:app_rhyme/desktop/pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';

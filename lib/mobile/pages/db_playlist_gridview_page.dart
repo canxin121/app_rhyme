@@ -1,19 +1,13 @@
 import 'dart:io';
-import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
-import 'package:app_rhyme/common_pages/reorder_page/playlist.dart';
+import 'package:app_rhyme/pulldown_menus/playlist_gridview_page_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
-import 'package:app_rhyme/dialogs/playlist_dialog.dart';
-import 'package:app_rhyme/mobile/pages/local_music_aggregator_listview_page.dart';
-import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
+import 'package:app_rhyme/mobile/pages/db_music_aggregator_listview_page.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 
 void Function() globalMobileMusicListGridPageRefreshFunction = () {};
 
@@ -120,11 +114,12 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               var playlisy = playlists[index];
-                              return MobileMusicListImageCard(
+                              return MobilePlaylistImageCard(
                                 key: ValueKey(playlisy.identity),
                                 playlist: playlisy,
-                                online: false,
                                 showDesc: false,
+                                cacheCover:
+                                    globalConfig.storageConfig.saveCover,
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -136,7 +131,6 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                                     ),
                                   );
                                 },
-                                cachePic: globalConfig.storageConfig.savePic,
                               );
                             },
                             childCount: playlists.length,
@@ -146,105 +140,6 @@ class LocalMusicListGridPageState extends State<LocalMusicListGridPage>
                     ],
                   ))
       ]),
-    );
-  }
-}
-
-@immutable
-class MusicListGridPageMenu extends StatelessWidget {
-  const MusicListGridPageMenu({
-    super.key,
-    required this.builder,
-    required this.playlists,
-  });
-  final PullDownMenuButtonBuilder builder;
-  final List<Playlist> playlists;
-
-  @override
-  Widget build(BuildContext context) {
-    return PullDownButton(
-      itemBuilder: (context) => [
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            if (context.mounted) {
-              var playlist = await showPlaylistInfoDialog(context);
-              if (playlist != null) {
-                try {
-                  await playlist.insertToDb();
-                  refreshPlaylistGridViewPage();
-                  LogToast.success("创建歌单", "创建歌单成功",
-                      "[MusicListGridPageMenu] Successfully created music list");
-                } catch (e) {
-                  LogToast.error("创建歌单", "创建歌单失败: $e",
-                      "[MusicListGridPageMenu] Failed to create music list: $e");
-                }
-              }
-            }
-          },
-          title: '创建歌单',
-          icon: CupertinoIcons.add,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            var share = await showInputPlaylistShareLinkDialog(context);
-            if (share != null) {
-              var playlist = await Playlist.getFromShare(share: share);
-              if (context.mounted) {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                      builder: (context) => MobileOnlineMusicListPage(
-                            playlist: playlist,
-                          )),
-                );
-              }
-            }
-          },
-          title: '打开歌单链接',
-          icon: CupertinoIcons.link,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            if (context.mounted) {
-              Navigator.of(context).push(
-                CupertinoPageRoute(
-                  builder: (context) => PlaylistReorderPage(
-                    playlists: playlists,
-                    isDesktop: false,
-                  ),
-                ),
-              );
-            }
-          },
-          title: '手动排序',
-          icon: CupertinoIcons.list_number,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            if (context.mounted) {
-              Navigator.of(context).push(
-                CupertinoPageRoute(
-                    builder: (context) => PlaylistMultiSelectionPage(
-                          playlists: playlists,
-                          isDesktop: false,
-                        )),
-              );
-            }
-          },
-          title: '多选操作',
-          icon: CupertinoIcons.selection_pin_in_out,
-        )
-      ],
-      animationBuilder: null,
-      position: PullDownMenuPosition.automatic,
-      buttonBuilder: builder,
     );
   }
 }

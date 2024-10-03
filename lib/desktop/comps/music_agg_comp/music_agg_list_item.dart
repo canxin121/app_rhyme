@@ -56,7 +56,7 @@ class DesktopMusicAggregatorListItem extends StatefulWidget {
   final bool isDarkMode;
   final bool hasBackgroundColor;
   final void Function()? onTap;
-  final bool cacheImageNow;
+  final bool cacheCover;
 
   const DesktopMusicAggregatorListItem({
     super.key,
@@ -65,7 +65,7 @@ class DesktopMusicAggregatorListItem extends StatefulWidget {
     required this.hasBackgroundColor,
     this.onTap,
     this.playlist,
-    this.cacheImageNow = false,
+    this.cacheCover = false,
   });
 
   @override
@@ -138,7 +138,10 @@ class DesktopMusicAggregatorListItemState
               child: TableRowWidget(
                 children: [
                   MusicCell(
-                      music: defaultMusic!, isDarkMode: widget.isDarkMode),
+                    music: defaultMusic!,
+                    isDarkMode: widget.isDarkMode,
+                    cacheCover: widget.cacheCover,
+                  ),
                   ArtistCell(
                       artists:
                           defaultMusic!.artists.map((e) => e.name).join(", "),
@@ -204,11 +207,13 @@ class TableRowWidget extends StatelessWidget {
 class MusicCell extends StatelessWidget {
   final Music music;
   final bool isDarkMode;
+  final bool cacheCover;
 
   const MusicCell({
     super.key,
     required this.music,
     required this.isDarkMode,
+    required this.cacheCover,
   });
 
   @override
@@ -217,12 +222,11 @@ class MusicCell extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(2.0),
-          child: imageWithCache(
-            music.getCover(size: 250),
-            width: 40,
-            height: 40,
-            fit: BoxFit.cover,
-          ),
+          child: imageWithCache(music.getCover(size: 250),
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+              enableCache: cacheCover),
         ),
         const SizedBox(width: 8),
         Expanded(

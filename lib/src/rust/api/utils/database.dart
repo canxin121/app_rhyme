@@ -6,11 +6,6 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> moveDatabase(
-        {required String documentFolder,
-        String? customRoot,
-        required String newDbUrl}) =>
-    RustLib.instance.api.crateApiCacheDatabaseOpMoveDatabase(
-        documentFolder: documentFolder,
-        customRoot: customRoot,
-        newDbUrl: newDbUrl);
+Future<void> verifySqliteUrl({required String sqliteUrl}) =>
+    RustLib.instance.api
+        .crateApiUtilsDatabaseVerifySqliteUrl(sqliteUrl: sqliteUrl);

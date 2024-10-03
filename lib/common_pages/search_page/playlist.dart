@@ -1,7 +1,6 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
@@ -184,7 +183,7 @@ class SearchMusicListState extends State<PlaylistSearchPage>
                                 );
                               },
                             )
-                          : MobileMusicListImageCard(
+                          : MobilePlaylistImageCard(
                               showDesc: false,
                               playlist: musicListW,
                               onTap: () {
@@ -198,7 +197,6 @@ class SearchMusicListState extends State<PlaylistSearchPage>
                                   ),
                                 );
                               },
-                              online: true,
                             ),
                     );
                   },

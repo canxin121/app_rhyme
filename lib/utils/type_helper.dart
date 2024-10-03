@@ -20,3 +20,14 @@ PlayInfo? playInfoFromObject(dynamic obj) {
     return null;
   }
 }
+
+String musicDataTypeToString(MusicDataType type) {
+  switch (type) {
+    case MusicDataType.database:
+      return "数据库";
+    case MusicDataType.playlists:
+      return "歌单";
+    case MusicDataType.musicAggregators:
+      return "音乐";
+  }
+}

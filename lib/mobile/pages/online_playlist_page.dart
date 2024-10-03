@@ -123,8 +123,9 @@ class DesktopOnlineMusicListPageState extends State<MobileOnlineMusicListPage> {
                     constraints: BoxConstraints(
                       maxWidth: screenWidth * 0.7,
                     ),
-                    child: MobileMusicListImageCard(
-                        playlist: widget.playlist, online: true),
+                    child: MobilePlaylistImageCard(
+                      playlist: widget.playlist,
+                    ),
                   ),
                 )),
           ),

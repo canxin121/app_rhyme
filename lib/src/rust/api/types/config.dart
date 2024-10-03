@@ -117,12 +117,12 @@ enum QualityOption {
 }
 
 class StorageConfig {
-  bool savePic;
+  bool saveCover;
   String? customCacheRoot;
   String? customDb;
 
   StorageConfig({
-    required this.savePic,
+    required this.saveCover,
     this.customCacheRoot,
     this.customDb,
   });
@@ -132,14 +132,14 @@ class StorageConfig {
 
   @override
   int get hashCode =>
-      savePic.hashCode ^ customCacheRoot.hashCode ^ customDb.hashCode;
+      saveCover.hashCode ^ customCacheRoot.hashCode ^ customDb.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is StorageConfig &&
           runtimeType == other.runtimeType &&
-          savePic == other.savePic &&
+          saveCover == other.saveCover &&
           customCacheRoot == other.customCacheRoot &&
           customDb == other.customDb;
 }

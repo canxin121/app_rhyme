@@ -16,7 +16,7 @@ class MusicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      var musics = globalAudioHandler.musicList;
+      var musicContainerList = globalAudioHandler.musicContainerList;
       return Expanded(
         child: CustomScrollView(
           slivers: <Widget>[
@@ -31,7 +31,8 @@ class MusicList extends StatelessWidget {
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: MobileMusicAggregatorListItem(
-                  musicAgg: musics[index].musicAggregator,
+                  key: ValueKey(musicContainerList[index].musicAggregator.identity()),
+                  musicAgg: musicContainerList[index].musicAggregator,
                   isDark: isDarkMode,
                   onTap: () {
                     globalAudioHandler.seek(Duration.zero, index: index);
@@ -39,7 +40,7 @@ class MusicList extends StatelessWidget {
                   index: index,
                 ),
               ),
-              itemCount: musics.length,
+              itemCount: musicContainerList.length,
             ),
           ],
         ),

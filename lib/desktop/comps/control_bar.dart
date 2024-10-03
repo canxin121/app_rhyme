@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:app_rhyme/desktop/comps/popup_comp/lyric.dart';
 import 'package:app_rhyme/desktop/comps/popup_comp/playlist.dart';
 import 'package:app_rhyme/desktop/comps/popup_comp/volume_slider.dart';
-import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/chore.dart';
+import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/time_parser.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -248,8 +248,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                       child: imageWithCache(
                           globalAudioHandler.playingMusic.value?.currentMusic
                               .getCover(size: 250),
-                          width: 46,
-                          height: 46),
+                          width: 47,
+                          height: 47),
                     )),
               ),
               SizedBox(
@@ -341,7 +341,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                         padding: const EdgeInsets.all(0),
                         isDragging: _isDragging,
                         onProgressUpdated: (value) {
-                          var toSeek = globalAudioUiController.getToSeek(value);
+                          var toSeek = globalAudioUiController
+                              .seekDurationFromPercent(value);
                           globalTalker.info(
                               "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
                           globalAudioHandler.seek(toSeek);

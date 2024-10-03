@@ -1,7 +1,6 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';

@@ -2,10 +2,10 @@ import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dar
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
+import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -116,6 +116,7 @@ class DesktopOnlineMusicListPageState
                 screenWidth: screenWidth,
                 pagingController: _pagingController,
                 fetchAllMusicAggregators: _fetchAllMusics,
+                cacheCover: false,
               ),
               const SliverToBoxAdapter(
                 child: SizedBox(height: 20),

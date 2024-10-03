@@ -5,7 +5,6 @@ import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
-import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -118,15 +117,10 @@ class PlaylistMultiSelectionPageState extends State<PlaylistMultiSelectionPage>
                                 ? DesktopPlaylistImageCard(
                                     playlist: playlist,
                                     showDesc: false,
-                                    cachePic:
-                                        globalConfig.storageConfig.savePic,
                                   )
-                                : MobileMusicListImageCard(
+                                : MobilePlaylistImageCard(
                                     playlist: playlist,
-                                    online: false,
                                     showDesc: false,
-                                    cachePic:
-                                        globalConfig.storageConfig.savePic,
                                   );
 
                             return Stack(

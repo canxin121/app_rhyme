@@ -22,7 +22,7 @@ List<T> shuffleList<T>(List<T> items) {
   return shuffledItems;
 }
 
-void openProjectLink() async {
+void openProjectRepoLink() async {
   Uri uri = Uri.parse("https://github.com/canxin121/app_rhyme");
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri);

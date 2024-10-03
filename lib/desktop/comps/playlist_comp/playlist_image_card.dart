@@ -12,14 +12,14 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 class DesktopPlaylistImageCard extends StatefulWidget {
   final Playlist playlist;
   final GestureTapCallback? onTap;
-  final bool cachePic;
+  final bool cacheCover;
   final bool showDesc;
 
   const DesktopPlaylistImageCard(
       {super.key,
       required this.playlist,
       this.onTap,
-      this.cachePic = false,
+      this.cacheCover = false,
       this.showDesc = true});
 
   @override
@@ -62,7 +62,9 @@ class DesktopPlaylistImageCardState extends State<DesktopPlaylistImageCard> {
                   child: AspectRatio(
                     aspectRatio: 1.0,
                     child: imageWithCache(widget.playlist.getCover(size: 250),
-                        cacheNow: widget.cachePic, width: 250, height: 250),
+                        enableCache: widget.cacheCover,
+                        width: 250,
+                        height: 250),
                   ), // 100x100
                 ),
                 if (_hovering)
@@ -96,7 +98,7 @@ class DesktopPlaylistImageCardState extends State<DesktopPlaylistImageCard> {
                     bottom: 8,
                     left: 8,
                     child: GestureDetector(
-                      onTap: () async { 
+                      onTap: () async {
                         try {
                           List<MusicAggregator> aggs;
                           if (widget.playlist.fromDb) {

@@ -6,22 +6,15 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
-// import 'package:app_rhyme/utils/source_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
-
-// 有三种使用场景: 1. 本地歌单的歌曲 2. 在线的歌曲 3. 播放列表
-// 区分:
-// 1. 本地歌单的歌曲: musicListW != null && index == -1
-// 2. 在线的歌曲: musicListW == null && index == -1
-// 3. 播放列表的歌曲: musicListW == null && index != -1
 
 class MobileMusicAggregatorListItem extends StatefulWidget {
   final MusicAggregator musicAgg;
   final Playlist? playlist;
   final bool? isDark;
   final GestureTapCallback? onTap;
-  final bool cachePic;
+  final bool cacheCover;
   final bool showMenu;
   final int index;
 
@@ -31,7 +24,7 @@ class MobileMusicAggregatorListItem extends StatefulWidget {
     this.playlist,
     this.isDark,
     this.onTap,
-    this.cachePic = false,
+    this.cacheCover = false,
     this.showMenu = true,
     this.index = -1,
   });
@@ -91,7 +84,7 @@ class MobileMusicAggregatorListItemState
                 width: 40,
                 height: 40,
                 fit: BoxFit.cover,
-                cacheNow: widget.cachePic),
+                enableCache: widget.cacheCover),
           ),
           // 歌曲的信息(歌名, 歌手)
           Expanded(
@@ -134,12 +127,6 @@ class MobileMusicAggregatorListItemState
                     child: Icon(CupertinoIcons.arrow_down_circle_fill,
                         color: CupertinoColors.systemGrey2))
                 : const SizedBox.shrink(),
-          // 具有误导性，暂时不显示
-          // // 标志音乐信息来源的Badge
-          // Badge(
-          //   label: sourceToShort(widget.musicContainer.info.source),
-          // ),
-          // 歌曲的操作按钮
           if (widget.showMenu)
             GestureDetector(
               onTapDown: (details) {

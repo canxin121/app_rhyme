@@ -51,7 +51,7 @@ Future<void> deleteFileCacheWithUriWrapper(String uri, String cacheFolder,
 
 ExtendedImage imageWithCache(
   String? url, {
-  bool cacheNow = false,
+  bool enableCache = false,
   double? width,
   double? height,
   double? cacheWidth,
@@ -76,7 +76,7 @@ ExtendedImage imageWithCache(
   }
 
   String? uri =
-      _getFileCacheWithUriWrapper(url, picCacheFolder, cacheNow: cacheNow);
+      _getFileCacheWithUriWrapper(url, picCacheFolder, cacheNow: enableCache);
 
   if (uri.startsWith("http")) {
     return ExtendedImage.network(

@@ -15,7 +15,7 @@ class MusicListComp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      var musics = globalAudioHandler.musicList;
+      var musics = globalAudioHandler.musicContainerList;
 
       return Container(
           constraints: BoxConstraints(maxHeight: maxHeight),

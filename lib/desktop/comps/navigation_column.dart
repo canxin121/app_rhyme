@@ -1,8 +1,8 @@
 import 'package:app_rhyme/common_pages/search_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/search_page/playlist.dart';
 import 'package:app_rhyme/desktop/home.dart';
-import 'package:app_rhyme/desktop/pages/local_music_agg_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/local_playlist_gridview_page.dart';
+import 'package:app_rhyme/desktop/pages/db_music_agg_listview_page.dart';
+import 'package:app_rhyme/desktop/pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/common_pages/setting_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
@@ -127,7 +127,9 @@ class MyNavListViewState extends State<MyNavListView> {
           onTap: () {
             globalSetNavItemSelected("###Setting###");
             navigatorToPage(
-              const SettingPage(),
+              const SettingPage(
+                isDesktop: true,
+              ),
             );
           },
           identity: '###Setting###',

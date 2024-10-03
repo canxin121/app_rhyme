@@ -8,14 +8,12 @@ import 'package:flutter/cupertino.dart';
 
 class MusicListListItem extends StatelessWidget {
   final Playlist playlist;
-  final bool online;
   final bool? isDark; // Make it nullable to support theme adaptation
   final GestureTapCallback? onTap;
 
   const MusicListListItem({
     super.key,
     required this.playlist,
-    required this.online,
     this.isDark,
     this.onTap,
   });

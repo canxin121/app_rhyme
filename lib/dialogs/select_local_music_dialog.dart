@@ -26,7 +26,6 @@ Future<Playlist?> showMusicListSelectionDialog(BuildContext context) async {
               },
               child: MusicListListItem(
                 playlist: musicLists[index],
-                online: false,
                 onTap: () {
                   Navigator.of(context).pop(musicLists[index]);
                 },

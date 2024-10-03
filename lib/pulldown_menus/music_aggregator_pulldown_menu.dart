@@ -182,7 +182,7 @@ List<dynamic> _musicAggregetorPullDownItems(
                     "[MusicContainer] Failed to edit music info: Cannot find music info");
                 return;
               }
-              await editMusicInfo(context, music);
+              music = await editMusicInfoToDb(context, music);
             },
             title: '编辑信息',
             icon: CupertinoIcons.pencil,

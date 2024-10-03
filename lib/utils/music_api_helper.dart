@@ -1,12 +1,14 @@
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/pages/local_playlist_gridview_page.dart';
+import 'package:app_rhyme/desktop/pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/dialogs/file_name_dialog.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
+import 'package:app_rhyme/dialogs/wait_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart'
     as rust_api_music_cache;
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -18,6 +20,7 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
 import 'package:app_rhyme/utils/refresh.dart';
+import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:flutter/cupertino.dart';
 
 Music? getMusicAggregatorDefaultMusic(MusicAggregator musicAggregator) {
@@ -68,13 +71,14 @@ Future<void> cacheMusicContainer(MusicContainer musicContainer) async {
   }
 }
 
-Future<Music?> editMusicInfo(BuildContext context, Music music) async {
+Future<Music?> editMusicInfoToDb(BuildContext context, Music music) async {
   try {
-    var musicInfo = await showMusicInfoDialog(context, defaultMusicInfo: music);
-    if (musicInfo == null) {
+    var editedMusic =
+        await showMusicInfoDialog(context, defaultMusicInfo: music);
+    if (editedMusic == null) {
       return null;
     }
-    var newMusic = await music.updateToDb();
+    var newMusic = await editedMusic.updateToDb();
     LogToast.success(
         "编辑成功", "编辑音乐信息成功", "[editMusicInfo] Successfully edited music info");
     refreshMusicAggregatorListViewPage();
@@ -133,18 +137,6 @@ Future<void> addMusicsToPlayList(
 
   if (targetMusicList != null) {
     try {
-      if (globalConfig.storageConfig.savePic) {
-        for (var musicAgg in musicAggs) {
-          var pic =
-              getMusicAggregatorDefaultMusic(musicAgg)?.getCover(size: 250);
-          if (pic != null && pic.isNotEmpty) {
-            try {
-              cacheFileFromUriWrapper(pic, picCacheFolder);
-            } catch (_) {}
-          }
-        }
-      }
-
       await targetMusicList.addAggsToDb(musicAggs: musicAggs);
       refreshMusicAggregatorListViewPage();
 
@@ -233,10 +225,6 @@ Future<void> saveMusicList(Playlist playlist, bool toastWhenSuccess) async {
   LogToast.success("保存歌单", "正在获取歌单'${playlist.name}'数据，请稍等",
       "[OnlineMusicListItemsPullDown] Start to save music list");
   try {
-    if (playlist.cover != null && globalConfig.storageConfig.savePic) {
-      cacheFileFromUriWrapper(playlist.cover!, picCacheFolder);
-    }
-
     var musicAggs = await playlist.fetchMusicsOnline(page: 1, limit: 2333);
     var playlistId = await playlist.insertToDb();
     var newPlaylist = await Playlist.findInDb(id: playlistId);
@@ -312,22 +300,13 @@ Future<void> exportPlaylistsJson(
   String filePath = "$dir/$fileName";
 
   try {
-    List<PlaylistJson> playlistJsons = [];
     LogToast.info("导出Json文件", "正在导出歌单'数据，请稍等",
         "[MutliSelectLocalMusicListGridPage] Start to export json file");
-    for (var playlist in playlists) {
-      List<MusicAggregator> aggs;
-      if (playlist.fromDb) {
-        aggs = await playlist.getMusicsFromDb();
-      } else {
-        aggs = await playlist.fetchMusicsOnline(page: 1, limit: 2333);
-      }
 
-      playlistJsons
-          .add(PlaylistJson(playlist: playlist, musicAggregators: aggs));
-    }
-    PlaylistJsonVec playlistJsonVec = PlaylistJsonVec(field0: playlistJsons);
-    await playlistJsonVec.saveTo(path: filePath);
+    MusicDataJsonWrapper musicDataJson =
+        await MusicDataJsonWrapper.fromPlaylists(playlists: playlists);
+
+    await musicDataJson.saveTo(path: filePath);
     LogToast.success(
       "导出Json文件成功",
       "导出Json文件成功",
@@ -493,5 +472,102 @@ Future<void> openSharePlaylist(BuildContext context, bool isDesktop) async {
         );
       }
     }
+  }
+}
+
+Future<void> importDatabaseJson(BuildContext context, bool isDesktop,
+    {MusicDataJsonWrapper? musicDataJson}) async {
+  var confirm = await showConfirmationDialog(
+      context,
+      "注意!\n"
+      "该功能可以将数据库Json文件导入数据库, 包含所有歌单和其中的歌曲\n"
+      "这将会导致当前使用的数据库下的歌单数据完全丢失!!!\n"
+      "请选择要导入的数据库Json文件, 请确保Json文件是从相同版本的AppRhyme中导出的\n"
+      "是否继续?");
+  if (confirm == null || !confirm) return;
+
+  if (!context.mounted) return;
+  await showWaitDialog(context, isDesktop, "正在应用数据库Json文件, 请稍等");
+
+  try {
+    if (musicDataJson == null) {
+      String? filePath = await pickFile();
+      if (filePath == null) {
+        return;
+      }
+      musicDataJson = await MusicDataJsonWrapper.loadFrom(path: filePath);
+    }
+
+    var type = await musicDataJson.getType();
+
+    if (type != MusicDataType.musicAggregators) {
+      throw "错误的Json数据类型, 应导入'数据库'数据Json, 而非${musicDataTypeToString(type)}";
+    }
+
+    await musicDataJson.applyToDb();
+
+    refreshMusicAggregatorListViewPage();
+    refreshPlaylistGridViewPage();
+    LogToast.success("导入数据库", "从Json文件导入数据库成功",
+        "[importDatabaseJson] succeed to imprt json file to database");
+  } catch (e) {
+    LogToast.error("导入数据库", "Json导入失败: $e", "[importDatabaseJson] failed: $e");
+  } finally {
+    if (context.mounted) Navigator.of(context).pop();
+  }
+}
+
+Future<void> importPlaylistJson(BuildContext context, bool isDesktop,
+    {MusicDataJsonWrapper? musicDataJson}) async {
+  try {
+    if (musicDataJson == null) {
+      String? filePath = await pickFile();
+      if (filePath == null) {
+        return;
+      }
+      musicDataJson = await MusicDataJsonWrapper.loadFrom(path: filePath);
+    }
+
+    var type = await musicDataJson.getType();
+    if (type != MusicDataType.musicAggregators) {
+      throw "错误的Json数据类型, 应导入'歌单'数据Json, 而非${musicDataTypeToString(type)}";
+    }
+    await musicDataJson.applyToDb();
+
+    refreshPlaylistGridViewPage();
+    LogToast.success("导入歌单", "从Json文件导入歌单成功",
+        "[importPlaylistJson] succeed to imprt json file to database");
+  } catch (e) {
+    LogToast.error("导入歌单", "Json导入失败: $e", "[importPlaylistJson] failed: $e");
+  }
+}
+
+Future<void> importMusicAggrgegatorJson(BuildContext context, bool isDesktop,
+    {MusicDataJsonWrapper? musicDataJson, Playlist? targetPlaylist}) async {
+  targetPlaylist ??= await showMusicListSelectionDialog(context);
+  if (targetPlaylist == null) return;
+
+  try {
+    if (musicDataJson == null) {
+      String? filePath = await pickFile();
+      if (filePath == null) {
+        return;
+      }
+      musicDataJson = await MusicDataJsonWrapper.loadFrom(path: filePath);
+    }
+    var type = await musicDataJson.getType();
+    if (type != MusicDataType.musicAggregators) {
+      throw "错误的Json数据类型, 应导入'音乐'数据Json, 而非${musicDataTypeToString(type)}";
+    }
+
+    await musicDataJson.applyToDb(
+        playlistId: int.parse(targetPlaylist.identity));
+
+    refreshMusicAggregatorListViewPage();
+    LogToast.success("导入歌曲", "从Json文件导入歌曲成功",
+        "[importMusicAggrgegatorJson] succeed to imprt json file to database");
+  } catch (e) {
+    LogToast.error(
+        "导入歌曲", "Json导入失败: $e", "[importMusicAggrgegatorJson] failed: $e");
   }
 }

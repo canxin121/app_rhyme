@@ -49,7 +49,7 @@ class QualityTimeState extends State<QualityTime> {
                     items: qualitySelectPullDown(context, qualityOptions,
                         (selectQuality) async {
                       await globalAudioHandler
-                          .replacePlayingMusic(selectQuality);
+                          .changePlayingMusicQuality(selectQuality);
                     }),
                     position: details.globalPosition & Size.zero);
               }

@@ -4,7 +4,6 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/cache/cache_op.dart';
-import 'api/cache/database_op.dart';
 import 'api/cache/file_cache.dart';
 import 'api/cache/music_cache.dart';
 import 'api/init.dart';
@@ -17,6 +16,7 @@ import 'api/types/external_api.dart';
 import 'api/types/playinfo.dart';
 import 'api/types/version.dart';
 import 'api/utils/crypto.dart';
+import 'api/utils/database.dart';
 import 'api/utils/http_helper.dart';
 import 'api/utils/path_util.dart';
 import 'dart:async';
@@ -83,7 +83,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.4.0';
 
   @override
-  int get rustContentHash => 1068175996;
+  int get rustContentHash => 2094486458;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -101,11 +101,6 @@ abstract class RustLibApi extends BaseApi {
       {required String documentPath,
       String? oldCustomCacheRoot,
       String? newCustomCacheRoot});
-
-  Future<void> crateApiCacheDatabaseOpMoveDatabase(
-      {required String documentFolder,
-      String? customRoot,
-      required String newDbUrl});
 
   Future<String> crateApiCacheFileCacheCacheFileFromContent(
       {required String documentFolder,
@@ -165,9 +160,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiMusicApiFnsClearDb();
 
-  Future<List<MusicAggregator>> crateApiMusicApiFnsCloneMusicAggs(
-      {required List<MusicAggregator> musicAggs});
-
   Future<void> crateApiMusicApiFnsCloseDb();
 
   Future<void> crateApiMusicApiFnsReinitDb();
@@ -189,20 +181,6 @@ abstract class RustLibApi extends BaseApi {
 
   String crateApiMusicApiMirrorMusicAggregatorIdentity(
       {required MusicAggregator that});
-
-  Future<MusicAggregatorJsonVec>
-      crateApiMusicApiMirrorMusicAggregatorJsonVecFromJson(
-          {required String json});
-
-  Future<MusicAggregatorJsonVec>
-      crateApiMusicApiMirrorMusicAggregatorJsonVecLoadFrom(
-          {required String path});
-
-  Future<void> crateApiMusicApiMirrorMusicAggregatorJsonVecSaveTo(
-      {required MusicAggregatorJsonVec that, required String path});
-
-  Future<String> crateApiMusicApiMirrorMusicAggregatorJsonVecToJson(
-      {required MusicAggregatorJsonVec that});
 
   Future<void> crateApiMusicApiMirrorMusicAggregatorSaveToDb(
       {required MusicAggregator that});
@@ -272,21 +250,6 @@ abstract class RustLibApi extends BaseApi {
   Future<PlatformInt64> crateApiMusicApiMirrorPlaylistInsertToDb(
       {required Playlist that});
 
-  Future<PlaylistJsonVec> crateApiMusicApiMirrorPlaylistJsonVecFromJson(
-      {required String json});
-
-  Future<void> crateApiMusicApiMirrorPlaylistJsonVecInsertToDb(
-      {required PlaylistJsonVec that});
-
-  Future<PlaylistJsonVec> crateApiMusicApiMirrorPlaylistJsonVecLoadFrom(
-      {required String path});
-
-  Future<void> crateApiMusicApiMirrorPlaylistJsonVecSaveTo(
-      {required PlaylistJsonVec that, required String path});
-
-  Future<String> crateApiMusicApiMirrorPlaylistJsonVecToJson(
-      {required PlaylistJsonVec that});
-
   Future<Playlist> crateApiMusicApiMirrorPlaylistNew(
       {required String name,
       String? summary,
@@ -309,25 +272,36 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiMusicApiPluginFnMusicToJson(
       {required Music music, required Quality quality});
 
-  Future<void> crateApiMusicApiWrapperDatabaseJsonWrapperApplyToDb(
-      {required DatabaseJsonWrapper that});
+  Future<void> crateApiMusicApiWrapperMusicDataJsonWrapperApplyToDb(
+      {required MusicDataJsonWrapper that, PlatformInt64? playlistId});
 
-  Future<DatabaseJsonWrapper>
-      crateApiMusicApiWrapperDatabaseJsonWrapperFromJson(
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromDatabase();
+
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromJson(
           {required String json});
 
-  Future<DatabaseJsonWrapper>
-      crateApiMusicApiWrapperDatabaseJsonWrapperGetFromDb();
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromMusicAggregators(
+          {required List<MusicAggregator> musicAggregators});
 
-  Future<DatabaseJsonWrapper>
-      crateApiMusicApiWrapperDatabaseJsonWrapperLoadFrom(
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromPlaylists(
+          {required List<Playlist> playlists});
+
+  Future<MusicDataType> crateApiMusicApiWrapperMusicDataJsonWrapperGetType(
+      {required MusicDataJsonWrapper that});
+
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperLoadFrom(
           {required String path});
 
-  Future<void> crateApiMusicApiWrapperDatabaseJsonWrapperSaveTo(
-      {required DatabaseJsonWrapper that, required String path});
+  Future<void> crateApiMusicApiWrapperMusicDataJsonWrapperSaveTo(
+      {required MusicDataJsonWrapper that, required String path});
 
-  Future<String> crateApiMusicApiWrapperDatabaseJsonWrapperToJson(
-      {required DatabaseJsonWrapper that});
+  Future<String> crateApiMusicApiWrapperMusicDataJsonWrapperToJson(
+      {required MusicDataJsonWrapper that});
 
   Future<Config> crateApiTypesConfigConfigDefault();
 
@@ -378,6 +352,9 @@ abstract class RustLibApi extends BaseApi {
   Future<String> crateApiUtilsCryptoRc4EncryptToBase64(
       {required String key, required String input});
 
+  Future<void> crateApiUtilsDatabaseVerifySqliteUrl(
+      {required String sqliteUrl});
+
   Future<String> crateApiUtilsHttpHelperSendRequest(
       {required String method,
       required Map<String, String> headers,
@@ -388,13 +365,13 @@ abstract class RustLibApi extends BaseApi {
       {required String input});
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_DatabaseJsonWrapper;
+      get rust_arc_increment_strong_count_MusicDataJsonWrapper;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_DatabaseJsonWrapper;
+      get rust_arc_decrement_strong_count_MusicDataJsonWrapper;
 
   CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_DatabaseJsonWrapperPtr;
+      get rust_arc_decrement_strong_count_MusicDataJsonWrapperPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -463,36 +440,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiCacheDatabaseOpMoveDatabase(
-      {required String documentFolder,
-      String? customRoot,
-      required String newDbUrl}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(documentFolder, serializer);
-        sse_encode_opt_String(customRoot, serializer);
-        sse_encode_String(newDbUrl, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 3, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiCacheDatabaseOpMoveDatabaseConstMeta,
-      argValues: [documentFolder, customRoot, newDbUrl],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiCacheDatabaseOpMoveDatabaseConstMeta =>
-      const TaskConstMeta(
-        debugName: "move_database",
-        argNames: ["documentFolder", "customRoot", "newDbUrl"],
-      );
-
-  @override
   Future<String> crateApiCacheFileCacheCacheFileFromContent(
       {required String documentFolder,
       required String content,
@@ -508,7 +455,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(filename, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
+            funcId: 3, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -554,7 +501,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(filename, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
+            funcId: 4, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -594,7 +541,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(filename, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 5, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -625,7 +572,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(str, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 6, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -658,7 +605,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(cacheFolder, serializer);
         sse_encode_opt_String(filename, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -698,7 +645,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_play_info(playinfo, serializer);
         sse_encode_opt_String(lyric, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -734,7 +681,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(customCacheRoot, serializer);
         sse_encode_box_autoadd_music(musicInfo, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -764,7 +711,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(customCacheRoot, serializer);
         sse_encode_box_autoadd_music(music, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
+            funcId: 10, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_record_play_info_string,
@@ -794,7 +741,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(customCacheRoot, serializer);
         sse_encode_box_autoadd_music(music, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 12, port: port_);
+            funcId: 11, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -818,7 +765,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 13, port: port_);
+            funcId: 12, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -842,7 +789,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(documentFolder, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 14, port: port_);
+            funcId: 13, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_config,
@@ -865,7 +812,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 15, port: port_);
+            funcId: 14, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -883,38 +830,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<MusicAggregator>> crateApiMusicApiFnsCloneMusicAggs(
-      {required List<MusicAggregator> musicAggs}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_list_music_aggregator(musicAggs, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 16, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_list_music_aggregator,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiFnsCloneMusicAggsConstMeta,
-      argValues: [musicAggs],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicApiFnsCloneMusicAggsConstMeta =>
-      const TaskConstMeta(
-        debugName: "clone_music_aggs",
-        argNames: ["musicAggs"],
-      );
-
-  @override
   Future<void> crateApiMusicApiFnsCloseDb() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 17, port: port_);
+            funcId: 15, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -937,7 +858,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 18, port: port_);
+            funcId: 16, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -962,7 +883,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(databaseUrl, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 19, port: port_);
+            funcId: 17, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -988,7 +909,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_music_aggregator(that, serializer);
         sse_encode_music_server(server, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 20, port: port_);
+            funcId: 18, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1016,7 +937,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music_aggregator(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 21, port: port_);
+            funcId: 19, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1044,11 +965,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_music_aggregator(that, serializer);
         sse_encode_list_music_server(servers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 22, port: port_);
+            funcId: 20, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_music_aggregator,
-        decodeErrorData: sse_decode_record_music_aggregator_string,
+        decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta:
           kCrateApiMusicApiMirrorMusicAggregatorFetchServerOnlineConstMeta,
@@ -1072,7 +993,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music(music, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 23, port: port_);
+            funcId: 21, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_music_aggregator,
@@ -1097,7 +1018,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music_aggregator(that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1116,117 +1037,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<MusicAggregatorJsonVec>
-      crateApiMusicApiMirrorMusicAggregatorJsonVecFromJson(
-          {required String json}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(json, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 25, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_music_aggregator_json_vec,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorMusicAggregatorJsonVecFromJsonConstMeta,
-      argValues: [json],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicApiMirrorMusicAggregatorJsonVecFromJsonConstMeta =>
-          const TaskConstMeta(
-            debugName: "music_aggregator_json_vec_from_json",
-            argNames: ["json"],
-          );
-
-  @override
-  Future<MusicAggregatorJsonVec>
-      crateApiMusicApiMirrorMusicAggregatorJsonVecLoadFrom(
-          {required String path}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(path, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 26, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_music_aggregator_json_vec,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorMusicAggregatorJsonVecLoadFromConstMeta,
-      argValues: [path],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicApiMirrorMusicAggregatorJsonVecLoadFromConstMeta =>
-          const TaskConstMeta(
-            debugName: "music_aggregator_json_vec_load_from",
-            argNames: ["path"],
-          );
-
-  @override
-  Future<void> crateApiMusicApiMirrorMusicAggregatorJsonVecSaveTo(
-      {required MusicAggregatorJsonVec that, required String path}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_music_aggregator_json_vec(that, serializer);
-        sse_encode_String(path, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 27, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorMusicAggregatorJsonVecSaveToConstMeta,
-      argValues: [that, path],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicApiMirrorMusicAggregatorJsonVecSaveToConstMeta =>
-          const TaskConstMeta(
-            debugName: "music_aggregator_json_vec_save_to",
-            argNames: ["that", "path"],
-          );
-
-  @override
-  Future<String> crateApiMusicApiMirrorMusicAggregatorJsonVecToJson(
-      {required MusicAggregatorJsonVec that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_music_aggregator_json_vec(that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 28, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorMusicAggregatorJsonVecToJsonConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicApiMirrorMusicAggregatorJsonVecToJsonConstMeta =>
-          const TaskConstMeta(
-            debugName: "music_aggregator_json_vec_to_json",
-            argNames: ["that"],
-          );
-
-  @override
   Future<void> crateApiMusicApiMirrorMusicAggregatorSaveToDb(
       {required MusicAggregator that}) {
     return handler.executeNormal(NormalTask(
@@ -1234,7 +1044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music_aggregator(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 29, port: port_);
+            funcId: 23, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1269,11 +1079,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_64(page, serializer);
         sse_encode_i_64(size, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 30, port: port_);
+            funcId: 24, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_music_aggregator,
-        decodeErrorData: sse_decode_record_list_music_aggregator_string,
+        decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiMusicApiMirrorMusicAggregatorSearchOnlineConstMeta,
       argValues: [aggs, servers, content, page, size],
@@ -1297,7 +1107,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_music_aggregator(that, serializer);
         sse_encode_i_64(playlistId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 31, port: port_);
+            funcId: 25, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1327,7 +1137,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_16(page, serializer);
         sse_encode_u_16(limit, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 32, port: port_);
+            funcId: 26, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -1354,7 +1164,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music(that, serializer);
         sse_encode_u_16(size, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -1379,7 +1189,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 34, port: port_);
+            funcId: 28, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1404,7 +1214,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 35, port: port_);
+            funcId: 29, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1436,7 +1246,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_64(page, serializer);
         sse_encode_i_64(size, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 36, port: port_);
+            funcId: 30, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_music,
@@ -1459,7 +1269,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 37)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_music_server,
@@ -1482,7 +1292,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_usize,
@@ -1507,7 +1317,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_music_server(that, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1532,7 +1342,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_music(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 40, port: port_);
+            funcId: 34, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_music,
@@ -1559,7 +1369,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_playlist(that, serializer);
         sse_encode_list_music_aggregator(musicAggs, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 41, port: port_);
+            funcId: 35, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1585,7 +1395,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_playlist(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 42, port: port_);
+            funcId: 36, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1612,7 +1422,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_playlist(that, serializer);
         sse_encode_String(musicAggIdentity, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 43, port: port_);
+            funcId: 37, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1640,7 +1450,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_u_16(page, serializer);
         sse_encode_u_16(limit, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 44, port: port_);
+            funcId: 38, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_music_aggregator,
@@ -1666,7 +1476,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_64(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 45, port: port_);
+            funcId: 39, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_playlist,
@@ -1692,7 +1502,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_playlist(that, serializer);
         sse_encode_u_16(size, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_String,
@@ -1716,7 +1526,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 47, port: port_);
+            funcId: 41, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_playlist,
@@ -1742,7 +1552,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(share, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 48, port: port_);
+            funcId: 42, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_playlist,
@@ -1768,7 +1578,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_playlist(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 49, port: port_);
+            funcId: 43, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_music_aggregator,
@@ -1794,7 +1604,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_playlist(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 50, port: port_);
+            funcId: 44, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -1813,137 +1623,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<PlaylistJsonVec> crateApiMusicApiMirrorPlaylistJsonVecFromJson(
-      {required String json}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(json, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 51, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_playlist_json_vec,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorPlaylistJsonVecFromJsonConstMeta,
-      argValues: [json],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicApiMirrorPlaylistJsonVecFromJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "playlist_json_vec_from_json",
-        argNames: ["json"],
-      );
-
-  @override
-  Future<void> crateApiMusicApiMirrorPlaylistJsonVecInsertToDb(
-      {required PlaylistJsonVec that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_playlist_json_vec(that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 52, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorPlaylistJsonVecInsertToDbConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicApiMirrorPlaylistJsonVecInsertToDbConstMeta =>
-      const TaskConstMeta(
-        debugName: "playlist_json_vec_insert_to_db",
-        argNames: ["that"],
-      );
-
-  @override
-  Future<PlaylistJsonVec> crateApiMusicApiMirrorPlaylistJsonVecLoadFrom(
-      {required String path}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(path, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 53, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_playlist_json_vec,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorPlaylistJsonVecLoadFromConstMeta,
-      argValues: [path],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicApiMirrorPlaylistJsonVecLoadFromConstMeta =>
-      const TaskConstMeta(
-        debugName: "playlist_json_vec_load_from",
-        argNames: ["path"],
-      );
-
-  @override
-  Future<void> crateApiMusicApiMirrorPlaylistJsonVecSaveTo(
-      {required PlaylistJsonVec that, required String path}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_playlist_json_vec(that, serializer);
-        sse_encode_String(path, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 54, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorPlaylistJsonVecSaveToConstMeta,
-      argValues: [that, path],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicApiMirrorPlaylistJsonVecSaveToConstMeta =>
-      const TaskConstMeta(
-        debugName: "playlist_json_vec_save_to",
-        argNames: ["that", "path"],
-      );
-
-  @override
-  Future<String> crateApiMusicApiMirrorPlaylistJsonVecToJson(
-      {required PlaylistJsonVec that}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_box_autoadd_playlist_json_vec(that, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 55, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiMirrorPlaylistJsonVecToJsonConstMeta,
-      argValues: [that],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiMusicApiMirrorPlaylistJsonVecToJsonConstMeta =>
-      const TaskConstMeta(
-        debugName: "playlist_json_vec_to_json",
-        argNames: ["that"],
-      );
-
-  @override
   Future<Playlist> crateApiMusicApiMirrorPlaylistNew(
       {required String name,
       String? summary,
@@ -1957,7 +1636,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_opt_String(cover, serializer);
         sse_encode_list_play_list_subscription(subscriptions, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 56, port: port_);
+            funcId: 45, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_playlist,
@@ -1989,7 +1668,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_64(page, serializer);
         sse_encode_i_64(size, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 57, port: port_);
+            funcId: 46, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_playlist,
@@ -2016,7 +1695,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_playlist(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 58, port: port_);
+            funcId: 47, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_playlist_update_subscription_result,
@@ -2043,7 +1722,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_playlist(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 59, port: port_);
+            funcId: 48, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_playlist,
@@ -2070,7 +1749,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_music(music, serializer);
         sse_encode_box_autoadd_quality(quality, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 60, port: port_);
+            funcId: 49, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2089,172 +1768,262 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiMusicApiWrapperDatabaseJsonWrapperApplyToDb(
-      {required DatabaseJsonWrapper that}) {
+  Future<void> crateApiMusicApiWrapperMusicDataJsonWrapperApplyToDb(
+      {required MusicDataJsonWrapper that, PlatformInt64? playlistId}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
             that, serializer);
+        sse_encode_opt_box_autoadd_i_64(playlistId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 61, port: port_);
+            funcId: 50, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiMusicApiWrapperDatabaseJsonWrapperApplyToDbConstMeta,
-      argValues: [that],
+      constMeta: kCrateApiMusicApiWrapperMusicDataJsonWrapperApplyToDbConstMeta,
+      argValues: [that, playlistId],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiMusicApiWrapperDatabaseJsonWrapperApplyToDbConstMeta =>
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperApplyToDbConstMeta =>
           const TaskConstMeta(
-            debugName: "DatabaseJsonWrapper_apply_to_db",
-            argNames: ["that"],
+            debugName: "MusicDataJsonWrapper_apply_to_db",
+            argNames: ["that", "playlistId"],
           );
 
   @override
-  Future<DatabaseJsonWrapper>
-      crateApiMusicApiWrapperDatabaseJsonWrapperFromJson(
-          {required String json}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(json, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 62, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiMusicApiWrapperDatabaseJsonWrapperFromJsonConstMeta,
-      argValues: [json],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta
-      get kCrateApiMusicApiWrapperDatabaseJsonWrapperFromJsonConstMeta =>
-          const TaskConstMeta(
-            debugName: "DatabaseJsonWrapper_from_json",
-            argNames: ["json"],
-          );
-
-  @override
-  Future<DatabaseJsonWrapper>
-      crateApiMusicApiWrapperDatabaseJsonWrapperGetFromDb() {
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromDatabase() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 63, port: port_);
+            funcId: 51, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper,
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiMusicApiWrapperDatabaseJsonWrapperGetFromDbConstMeta,
+      constMeta:
+          kCrateApiMusicApiWrapperMusicDataJsonWrapperFromDatabaseConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiMusicApiWrapperDatabaseJsonWrapperGetFromDbConstMeta =>
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperFromDatabaseConstMeta =>
           const TaskConstMeta(
-            debugName: "DatabaseJsonWrapper_get_from_db",
+            debugName: "MusicDataJsonWrapper_from_database",
             argNames: [],
           );
 
   @override
-  Future<DatabaseJsonWrapper>
-      crateApiMusicApiWrapperDatabaseJsonWrapperLoadFrom(
-          {required String path}) {
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromJson(
+          {required String json}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(path, serializer);
+        sse_encode_String(json, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 64, port: port_);
+            funcId: 52, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper,
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiMusicApiWrapperDatabaseJsonWrapperLoadFromConstMeta,
-      argValues: [path],
+      constMeta: kCrateApiMusicApiWrapperMusicDataJsonWrapperFromJsonConstMeta,
+      argValues: [json],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiMusicApiWrapperDatabaseJsonWrapperLoadFromConstMeta =>
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperFromJsonConstMeta =>
           const TaskConstMeta(
-            debugName: "DatabaseJsonWrapper_load_from",
-            argNames: ["path"],
+            debugName: "MusicDataJsonWrapper_from_json",
+            argNames: ["json"],
           );
 
   @override
-  Future<void> crateApiMusicApiWrapperDatabaseJsonWrapperSaveTo(
-      {required DatabaseJsonWrapper that, required String path}) {
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromMusicAggregators(
+          {required List<MusicAggregator> musicAggregators}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
-            that, serializer);
-        sse_encode_String(path, serializer);
+        sse_encode_list_music_aggregator(musicAggregators, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 65, port: port_);
+            funcId: 53, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiMusicApiWrapperDatabaseJsonWrapperSaveToConstMeta,
-      argValues: [that, path],
+      constMeta:
+          kCrateApiMusicApiWrapperMusicDataJsonWrapperFromMusicAggregatorsConstMeta,
+      argValues: [musicAggregators],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiMusicApiWrapperDatabaseJsonWrapperSaveToConstMeta =>
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperFromMusicAggregatorsConstMeta =>
           const TaskConstMeta(
-            debugName: "DatabaseJsonWrapper_save_to",
-            argNames: ["that", "path"],
+            debugName: "MusicDataJsonWrapper_from_music_aggregators",
+            argNames: ["musicAggregators"],
           );
 
   @override
-  Future<String> crateApiMusicApiWrapperDatabaseJsonWrapperToJson(
-      {required DatabaseJsonWrapper that}) {
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperFromPlaylists(
+          {required List<Playlist> playlists}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
-            that, serializer);
+        sse_encode_list_playlist(playlists, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 66, port: port_);
+            funcId: 54, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiMusicApiWrapperDatabaseJsonWrapperToJsonConstMeta,
+      constMeta:
+          kCrateApiMusicApiWrapperMusicDataJsonWrapperFromPlaylistsConstMeta,
+      argValues: [playlists],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperFromPlaylistsConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicDataJsonWrapper_from_playlists",
+            argNames: ["playlists"],
+          );
+
+  @override
+  Future<MusicDataType> crateApiMusicApiWrapperMusicDataJsonWrapperGetType(
+      {required MusicDataJsonWrapper that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 55, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_music_data_type,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiMusicApiWrapperMusicDataJsonWrapperGetTypeConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiMusicApiWrapperDatabaseJsonWrapperToJsonConstMeta =>
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperGetTypeConstMeta =>
           const TaskConstMeta(
-            debugName: "DatabaseJsonWrapper_to_json",
+            debugName: "MusicDataJsonWrapper_get_type",
+            argNames: ["that"],
+          );
+
+  @override
+  Future<MusicDataJsonWrapper>
+      crateApiMusicApiWrapperMusicDataJsonWrapperLoadFrom(
+          {required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 56, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiMusicApiWrapperMusicDataJsonWrapperLoadFromConstMeta,
+      argValues: [path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperLoadFromConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicDataJsonWrapper_load_from",
+            argNames: ["path"],
+          );
+
+  @override
+  Future<void> crateApiMusicApiWrapperMusicDataJsonWrapperSaveTo(
+      {required MusicDataJsonWrapper that, required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
+            that, serializer);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 57, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiMusicApiWrapperMusicDataJsonWrapperSaveToConstMeta,
+      argValues: [that, path],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperSaveToConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicDataJsonWrapper_save_to",
+            argNames: ["that", "path"],
+          );
+
+  @override
+  Future<String> crateApiMusicApiWrapperMusicDataJsonWrapperToJson(
+      {required MusicDataJsonWrapper that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 58, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiMusicApiWrapperMusicDataJsonWrapperToJsonConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiMusicApiWrapperMusicDataJsonWrapperToJsonConstMeta =>
+          const TaskConstMeta(
+            debugName: "MusicDataJsonWrapper_to_json",
             argNames: ["that"],
           );
 
@@ -2264,7 +2033,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 67, port: port_);
+            funcId: 59, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_config,
@@ -2290,7 +2059,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_config(that, serializer);
         sse_encode_String(documentFolder, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2316,7 +2085,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_config(that, serializer);
         sse_encode_String(documentFolder, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 69)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2342,7 +2111,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(documentFolder, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 70, port: port_);
+            funcId: 62, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_config,
@@ -2369,7 +2138,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_config(that, serializer);
         sse_encode_String(documentFolder, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 71, port: port_);
+            funcId: 63, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2394,7 +2163,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_config(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 72, port: port_);
+            funcId: 64, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_config,
@@ -2418,7 +2187,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 73, port: port_);
+            funcId: 65, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_quality_config,
@@ -2442,7 +2211,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 74, port: port_);
+            funcId: 66, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_storage_config,
@@ -2466,7 +2235,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 75, port: port_);
+            funcId: 67, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_update_config,
@@ -2489,7 +2258,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 76)!;
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 68)!;
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_window_config,
@@ -2516,7 +2285,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_external_api_config(that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 77, port: port_);
+            funcId: 69, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_external_api_config,
@@ -2547,7 +2316,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(documentFolder, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 78, port: port_);
+            funcId: 70, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_external_api_config,
@@ -2578,7 +2347,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(documentFolder, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 79, port: port_);
+            funcId: 71, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_external_api_config,
@@ -2605,7 +2374,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(currentVersion, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 80, port: port_);
+            funcId: 72, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_release,
@@ -2629,7 +2398,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 81, port: port_);
+            funcId: 73, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_release,
@@ -2656,7 +2425,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(key, serializer);
         sse_encode_String(input, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 82, port: port_);
+            funcId: 74, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2683,7 +2452,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(key, serializer);
         sse_encode_String(input, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 83, port: port_);
+            funcId: 75, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2702,6 +2471,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiUtilsDatabaseVerifySqliteUrl(
+      {required String sqliteUrl}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(sqliteUrl, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 76, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiUtilsDatabaseVerifySqliteUrlConstMeta,
+      argValues: [sqliteUrl],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUtilsDatabaseVerifySqliteUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "verify_sqlite_url",
+        argNames: ["sqliteUrl"],
+      );
+
+  @override
   Future<String> crateApiUtilsHttpHelperSendRequest(
       {required String method,
       required Map<String, String> headers,
@@ -2715,7 +2510,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(url, serializer);
         sse_encode_String(payload, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 84, port: port_);
+            funcId: 77, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2741,7 +2536,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(input, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 85, port: port_);
+            funcId: 78, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2760,12 +2555,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_DatabaseJsonWrapper => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper;
+      get rust_arc_increment_strong_count_MusicDataJsonWrapper => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_DatabaseJsonWrapper => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper;
+      get rust_arc_decrement_strong_count_MusicDataJsonWrapper => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper;
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
@@ -2774,19 +2569,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  DatabaseJsonWrapper
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+  MusicDataJsonWrapper
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return DatabaseJsonWrapperImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return MusicDataJsonWrapperImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
-  DatabaseJsonWrapper
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+  MusicDataJsonWrapper
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return DatabaseJsonWrapperImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return MusicDataJsonWrapperImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2797,11 +2592,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  DatabaseJsonWrapper
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+  MusicDataJsonWrapper
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return DatabaseJsonWrapperImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return MusicDataJsonWrapperImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2910,13 +2705,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicAggregatorJsonVec dco_decode_box_autoadd_music_aggregator_json_vec(
-      dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_music_aggregator_json_vec(raw);
-  }
-
-  @protected
   MusicServer dco_decode_box_autoadd_music_server(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_music_server(raw);
@@ -2932,12 +2720,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Playlist dco_decode_box_autoadd_playlist(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_playlist(raw);
-  }
-
-  @protected
-  PlaylistJsonVec dco_decode_box_autoadd_playlist_json_vec(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_playlist_json_vec(raw);
   }
 
   @protected
@@ -3052,12 +2834,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<PlaylistJson> dco_decode_list_playlist_json(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_playlist_json).toList();
-  }
-
-  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -3112,14 +2888,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicAggregatorJsonVec dco_decode_music_aggregator_json_vec(dynamic raw) {
+  MusicDataType dco_decode_music_data_type(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return MusicAggregatorJsonVec(
-      field0: dco_decode_list_music_aggregator(arr[0]),
-    );
+    return MusicDataType.values[raw as int];
   }
 
   @protected
@@ -3235,29 +3006,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PlaylistJson dco_decode_playlist_json(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
-    return PlaylistJson(
-      playlist: dco_decode_playlist(arr[0]),
-      musicAggregators: dco_decode_list_music_aggregator(arr[1]),
-    );
-  }
-
-  @protected
-  PlaylistJsonVec dco_decode_playlist_json_vec(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return PlaylistJsonVec(
-      field0: dco_decode_list_playlist_json(arr[0]),
-    );
-  }
-
-  @protected
   PlaylistType dco_decode_playlist_type(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return PlaylistType.values[raw as int];
@@ -3305,34 +3053,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   QualityOption dco_decode_quality_option(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return QualityOption.values[raw as int];
-  }
-
-  @protected
-  (List<MusicAggregator>, String)
-      dco_decode_record_list_music_aggregator_string(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2) {
-      throw Exception('Expected 2 elements, got ${arr.length}');
-    }
-    return (
-      dco_decode_list_music_aggregator(arr[0]),
-      dco_decode_String(arr[1]),
-    );
-  }
-
-  @protected
-  (MusicAggregator, String) dco_decode_record_music_aggregator_string(
-      dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2) {
-      throw Exception('Expected 2 elements, got ${arr.length}');
-    }
-    return (
-      dco_decode_music_aggregator(arr[0]),
-      dco_decode_String(arr[1]),
-    );
   }
 
   @protected
@@ -3411,7 +3131,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 3)
       throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return StorageConfig(
-      savePic: dco_decode_bool(arr[0]),
+      saveCover: dco_decode_bool(arr[0]),
       customCacheRoot: dco_decode_opt_String(arr[1]),
       customDb: dco_decode_opt_String(arr[2]),
     );
@@ -3482,20 +3202,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  DatabaseJsonWrapper
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+  MusicDataJsonWrapper
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return DatabaseJsonWrapperImpl.frbInternalSseDecode(
+    return MusicDataJsonWrapperImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
-  DatabaseJsonWrapper
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+  MusicDataJsonWrapper
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return DatabaseJsonWrapperImpl.frbInternalSseDecode(
+    return MusicDataJsonWrapperImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -3508,11 +3228,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  DatabaseJsonWrapper
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
+  MusicDataJsonWrapper
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return DatabaseJsonWrapperImpl.frbInternalSseDecode(
+    return MusicDataJsonWrapperImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -3644,13 +3364,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicAggregatorJsonVec sse_decode_box_autoadd_music_aggregator_json_vec(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_music_aggregator_json_vec(deserializer));
-  }
-
-  @protected
   MusicServer sse_decode_box_autoadd_music_server(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3667,13 +3380,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Playlist sse_decode_box_autoadd_playlist(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_playlist(deserializer));
-  }
-
-  @protected
-  PlaylistJsonVec sse_decode_box_autoadd_playlist_json_vec(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_playlist_json_vec(deserializer));
   }
 
   @protected
@@ -3832,19 +3538,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<PlaylistJson> sse_decode_list_playlist_json(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <PlaylistJson>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_playlist_json(deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -3921,11 +3614,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  MusicAggregatorJsonVec sse_decode_music_aggregator_json_vec(
-      SseDeserializer deserializer) {
+  MusicDataType sse_decode_music_data_type(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_list_music_aggregator(deserializer);
-    return MusicAggregatorJsonVec(field0: var_field0);
+    var inner = sse_decode_i_32(deserializer);
+    return MusicDataType.values[inner];
   }
 
   @protected
@@ -4090,22 +3782,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  PlaylistJson sse_decode_playlist_json(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_playlist = sse_decode_playlist(deserializer);
-    var var_musicAggregators = sse_decode_list_music_aggregator(deserializer);
-    return PlaylistJson(
-        playlist: var_playlist, musicAggregators: var_musicAggregators);
-  }
-
-  @protected
-  PlaylistJsonVec sse_decode_playlist_json_vec(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_list_playlist_json(deserializer);
-    return PlaylistJsonVec(field0: var_field0);
-  }
-
-  @protected
   PlaylistType sse_decode_playlist_type(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
@@ -4150,25 +3826,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return QualityOption.values[inner];
-  }
-
-  @protected
-  (List<MusicAggregator>, String)
-      sse_decode_record_list_music_aggregator_string(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_list_music_aggregator(deserializer);
-    var var_field1 = sse_decode_String(deserializer);
-    return (var_field0, var_field1);
-  }
-
-  @protected
-  (MusicAggregator, String) sse_decode_record_music_aggregator_string(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_music_aggregator(deserializer);
-    var var_field1 = sse_decode_String(deserializer);
-    return (var_field0, var_field1);
   }
 
   @protected
@@ -4244,11 +3901,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   StorageConfig sse_decode_storage_config(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_savePic = sse_decode_bool(deserializer);
+    var var_saveCover = sse_decode_bool(deserializer);
     var var_customCacheRoot = sse_decode_opt_String(deserializer);
     var var_customDb = sse_decode_opt_String(deserializer);
     return StorageConfig(
-        savePic: var_savePic,
+        saveCover: var_saveCover,
         customCacheRoot: var_customCacheRoot,
         customDb: var_customDb);
   }
@@ -4317,21 +3974,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
-          DatabaseJsonWrapper self, SseSerializer serializer) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
+          MusicDataJsonWrapper self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as DatabaseJsonWrapperImpl).frbInternalSseEncode(move: true),
+        (self as MusicDataJsonWrapperImpl).frbInternalSseEncode(move: true),
         serializer);
   }
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
-          DatabaseJsonWrapper self, SseSerializer serializer) {
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
+          MusicDataJsonWrapper self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as DatabaseJsonWrapperImpl).frbInternalSseEncode(move: false),
+        (self as MusicDataJsonWrapperImpl).frbInternalSseEncode(move: false),
         serializer);
   }
 
@@ -4345,11 +4002,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDatabaseJsonWrapper(
-          DatabaseJsonWrapper self, SseSerializer serializer) {
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerMusicDataJsonWrapper(
+          MusicDataJsonWrapper self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as DatabaseJsonWrapperImpl).frbInternalSseEncode(move: null),
+        (self as MusicDataJsonWrapperImpl).frbInternalSseEncode(move: null),
         serializer);
   }
 
@@ -4447,13 +4104,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_music_aggregator_json_vec(
-      MusicAggregatorJsonVec self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_music_aggregator_json_vec(self, serializer);
-  }
-
-  @protected
   void sse_encode_box_autoadd_music_server(
       MusicServer self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -4472,13 +4122,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       Playlist self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_playlist(self, serializer);
-  }
-
-  @protected
-  void sse_encode_box_autoadd_playlist_json_vec(
-      PlaylistJsonVec self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_playlist_json_vec(self, serializer);
   }
 
   @protected
@@ -4607,16 +4250,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_list_playlist_json(
-      List<PlaylistJson> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_playlist_json(item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -4671,10 +4304,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_music_aggregator_json_vec(
-      MusicAggregatorJsonVec self, SseSerializer serializer) {
+  void sse_encode_music_data_type(
+      MusicDataType self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_music_aggregator(self.field0, serializer);
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -4815,20 +4448,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_playlist_json(PlaylistJson self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_playlist(self.playlist, serializer);
-    sse_encode_list_music_aggregator(self.musicAggregators, serializer);
-  }
-
-  @protected
-  void sse_encode_playlist_json_vec(
-      PlaylistJsonVec self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_playlist_json(self.field0, serializer);
-  }
-
-  @protected
   void sse_encode_playlist_type(PlaylistType self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
@@ -4861,22 +4480,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_quality_option(QualityOption self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
-  }
-
-  @protected
-  void sse_encode_record_list_music_aggregator_string(
-      (List<MusicAggregator>, String) self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_music_aggregator(self.$1, serializer);
-    sse_encode_String(self.$2, serializer);
-  }
-
-  @protected
-  void sse_encode_record_music_aggregator_string(
-      (MusicAggregator, String) self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_music_aggregator(self.$1, serializer);
-    sse_encode_String(self.$2, serializer);
   }
 
   @protected
@@ -4929,7 +4532,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_storage_config(StorageConfig self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_bool(self.savePic, serializer);
+    sse_encode_bool(self.saveCover, serializer);
     sse_encode_opt_String(self.customCacheRoot, serializer);
     sse_encode_opt_String(self.customDb, serializer);
   }
@@ -4982,37 +4585,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 }
 
 @sealed
-class DatabaseJsonWrapperImpl extends RustOpaque
-    implements DatabaseJsonWrapper {
+class MusicDataJsonWrapperImpl extends RustOpaque
+    implements MusicDataJsonWrapper {
   // Not to be used by end users
-  DatabaseJsonWrapperImpl.frbInternalDcoDecode(List<dynamic> wire)
+  MusicDataJsonWrapperImpl.frbInternalDcoDecode(List<dynamic> wire)
       : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
-  DatabaseJsonWrapperImpl.frbInternalSseDecode(
+  MusicDataJsonWrapperImpl.frbInternalSseDecode(
       BigInt ptr, int externalSizeOnNative)
       : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount: RustLib
-        .instance.api.rust_arc_increment_strong_count_DatabaseJsonWrapper,
+        .instance.api.rust_arc_increment_strong_count_MusicDataJsonWrapper,
     rustArcDecrementStrongCount: RustLib
-        .instance.api.rust_arc_decrement_strong_count_DatabaseJsonWrapper,
+        .instance.api.rust_arc_decrement_strong_count_MusicDataJsonWrapper,
     rustArcDecrementStrongCountPtr: RustLib
-        .instance.api.rust_arc_decrement_strong_count_DatabaseJsonWrapperPtr,
+        .instance.api.rust_arc_decrement_strong_count_MusicDataJsonWrapperPtr,
   );
 
   /// takes ownership
-  Future<void> applyToDb() =>
-      RustLib.instance.api.crateApiMusicApiWrapperDatabaseJsonWrapperApplyToDb(
+  Future<void> applyToDb({PlatformInt64? playlistId}) =>
+      RustLib.instance.api.crateApiMusicApiWrapperMusicDataJsonWrapperApplyToDb(
+          that: this, playlistId: playlistId);
+
+  Future<MusicDataType> getType() =>
+      RustLib.instance.api.crateApiMusicApiWrapperMusicDataJsonWrapperGetType(
         that: this,
       );
 
-  Future<void> saveTo({required String path}) => RustLib.instance.api
-      .crateApiMusicApiWrapperDatabaseJsonWrapperSaveTo(that: this, path: path);
+  Future<void> saveTo({required String path}) =>
+      RustLib.instance.api.crateApiMusicApiWrapperMusicDataJsonWrapperSaveTo(
+          that: this, path: path);
 
   Future<String> toJson() =>
-      RustLib.instance.api.crateApiMusicApiWrapperDatabaseJsonWrapperToJson(
+      RustLib.instance.api.crateApiMusicApiWrapperMusicDataJsonWrapperToJson(
         that: this,
       );
 }

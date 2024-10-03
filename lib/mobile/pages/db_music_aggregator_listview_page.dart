@@ -17,8 +17,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
-// 用于执行更改本地歌单内的操作后直接刷新整个歌单页面，由于使用了 ValueKey，过渡自然
-Future<void> Function() globalMobileMusicContainerListPageRefreshFunction =
+Future<void> Function() globalMobileMusicAggregatorListPageRefreshFunction =
     () async {};
 void Function() globalMusicContainerListPagePopFunction = () {};
 
@@ -45,7 +44,7 @@ class LocalMusicContainerListPageState
     WidgetsBinding.instance.addObserver(this);
     playist = widget.playlist;
     // 设置全局的更新函数
-    globalMobileMusicContainerListPageRefreshFunction = () async {
+    globalMobileMusicAggregatorListPageRefreshFunction = () async {
       musicAggs = await playist.getMusicsFromDb();
 
       var newPlaylist =
@@ -69,7 +68,7 @@ class LocalMusicContainerListPageState
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     // 清空全局的更新函数
-    globalMobileMusicContainerListPageRefreshFunction = () async {};
+    globalMobileMusicAggregatorListPageRefreshFunction = () async {};
     globalMusicContainerListPagePopFunction = () {};
     super.dispose();
   }
@@ -142,9 +141,9 @@ class LocalMusicContainerListPageState
                 constraints: BoxConstraints(
                   maxWidth: screenWidth * 0.7,
                 ),
-                child: MobileMusicListImageCard(
+                child: MobilePlaylistImageCard(
                   playlist: playist,
-                  online: false,
+                  cacheCover: globalConfig.storageConfig.saveCover,
                 ),
               ),
             ),
@@ -213,7 +212,7 @@ class LocalMusicContainerListPageState
                         key: ValueKey(musicAgg.identity()),
                         musicAgg: musicAgg,
                         playlist: widget.playlist,
-                        cachePic: globalConfig.storageConfig.savePic,
+                        cacheCover: globalConfig.storageConfig.saveCover,
                       ),
                     ),
                     if (!isLastItem)
@@ -309,7 +308,7 @@ class LocalMusicListChoicMenu extends StatelessWidget {
               ),
             );
           },
-          title: "手动排序",
+          title: "歌曲排序",
           icon: CupertinoIcons.sort_up_circle,
         ),
         PullDownMenuItem(

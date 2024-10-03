@@ -123,9 +123,20 @@ List<PullDownMenuEntry> playlistMenuItems(
           await addAggsOfPlayListToTargetMusicList(playlist, targetMusicList);
         }
       },
-      title: '添加到已有歌单',
+      title: '添加歌曲到已有歌单',
       icon: CupertinoIcons.add_circled_solid,
     ),
+    if (playlist.fromDb)
+      PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
+        onTap: () async {
+          await importMusicAggrgegatorJson(context, isDesktop,
+              targetPlaylist: playlist);
+        },
+        title: '导入歌曲Json',
+        icon: CupertinoIcons.arrow_uturn_up_circle_fill,
+      ),
     PullDownMenuItem(
       itemTheme: PullDownMenuItemTheme(
           textStyle: const TextStyle().useSystemChineseFont()),

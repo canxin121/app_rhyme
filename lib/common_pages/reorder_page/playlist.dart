@@ -7,7 +7,6 @@ import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:reorderables/reorderables.dart';
-import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/colors.dart';
 
 class PlaylistReorderPage extends StatefulWidget {
@@ -131,17 +130,12 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
                                         key: ValueKey(musicList.identity),
                                         playlist: musicList,
                                         onTap: () {},
-                                        cachePic:
-                                            globalConfig.storageConfig.savePic,
                                       )
-                                    : MobileMusicListImageCard(
+                                    : MobilePlaylistImageCard(
                                         showDesc: false,
                                         key: ValueKey(musicList.identity),
                                         playlist: musicList,
-                                        online: false,
                                         onTap: () {},
-                                        cachePic:
-                                            globalConfig.storageConfig.savePic,
                                       ),
                               );
                             }).toList(),

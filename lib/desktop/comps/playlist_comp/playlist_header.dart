@@ -26,12 +26,14 @@ class MusicListHeader extends StatelessWidget {
     this.pagingController,
     this.musicAggs,
     this.fetchAllMusicAggregators,
+    this.cacheCover = false,
   });
   final Playlist playlist;
   final PagingController<int, MusicAggregator>? pagingController;
   final List<MusicAggregator>? musicAggs;
   final Future<void> Function()? fetchAllMusicAggregators;
   final bool isDarkMode;
+  final bool cacheCover;
   final double screenWidth;
 
   @override
@@ -50,9 +52,7 @@ class MusicListHeader extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5.0),
               child: imageWithCache(playlist.getCover(size: 250),
-                  cacheNow: globalConfig.storageConfig.savePic,
-                  width: 250,
-                  height: 250),
+                  enableCache: cacheCover, width: 250, height: 250),
             ),
           ),
           // 歌单信息
@@ -283,7 +283,7 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
                 ),
                 replace: false);
           },
-          title: "手动排序",
+          title: "歌曲排序",
           icon: CupertinoIcons.sort_up_circle,
         ),
         PullDownMenuItem(

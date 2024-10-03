@@ -5,18 +5,16 @@ import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 
-class MobileMusicListImageCard extends StatelessWidget {
+class MobilePlaylistImageCard extends StatelessWidget {
   final Playlist playlist;
-  final bool online;
   final GestureTapCallback? onTap;
-  final bool cachePic;
+  final bool cacheCover;
   final bool showDesc;
-  const MobileMusicListImageCard(
+  const MobilePlaylistImageCard(
       {super.key,
       required this.playlist,
-      required this.online,
       this.onTap,
-      this.cachePic = false,
+      this.cacheCover = false,
       this.showDesc = true});
 
   @override
@@ -34,7 +32,7 @@ class MobileMusicListImageCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
               child: imageWithCache(playlist.getCover(size: 250),
-                  cacheHeight: 100, cacheWidth: 100, cacheNow: cachePic),
+                  cacheHeight: 100, cacheWidth: 100, enableCache: cacheCover),
             ),
             Positioned(
               bottom: 8,

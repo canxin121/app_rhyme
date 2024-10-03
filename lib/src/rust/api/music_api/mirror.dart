@@ -6,7 +6,7 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These types are ignored because they are not used by any `pub` functions: `ArtistVec`, `PlayListSubscriptionVec`, `QualityVec`
+// These types are ignored because they are not used by any `pub` functions: `ArtistVec`, `MusicAggregatorJsonVec`, `PlayListSubscriptionVec`, `PlaylistJsonVec`, `PlaylistJson`, `QualityVec`
 
 class Artist {
   String name;
@@ -147,7 +147,6 @@ class MusicAggregator {
         that: this,
       );
 
-  /// take ownership
   Future<MusicAggregator> fetchServerOnline(
           {required List<MusicServer> servers}) =>
       RustLib.instance.api
@@ -168,7 +167,6 @@ class MusicAggregator {
         that: this,
       );
 
-  /// take ownership
   static Future<List<MusicAggregator>> searchOnline(
           {required List<MusicAggregator> aggs,
           required List<MusicServer> servers,
@@ -208,39 +206,11 @@ class MusicAggregator {
           defaultServer == other.defaultServer;
 }
 
-class MusicAggregatorJsonVec {
-  final List<MusicAggregator> field0;
-
-  const MusicAggregatorJsonVec({
-    required this.field0,
-  });
-
-  static Future<MusicAggregatorJsonVec> fromJson({required String json}) =>
-      RustLib.instance.api
-          .crateApiMusicApiMirrorMusicAggregatorJsonVecFromJson(json: json);
-
-  static Future<MusicAggregatorJsonVec> loadFrom({required String path}) =>
-      RustLib.instance.api
-          .crateApiMusicApiMirrorMusicAggregatorJsonVecLoadFrom(path: path);
-
-  Future<void> saveTo({required String path}) =>
-      RustLib.instance.api.crateApiMusicApiMirrorMusicAggregatorJsonVecSaveTo(
-          that: this, path: path);
-
-  Future<String> toJson() =>
-      RustLib.instance.api.crateApiMusicApiMirrorMusicAggregatorJsonVecToJson(
-        that: this,
-      );
-
-  @override
-  int get hashCode => field0.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MusicAggregatorJsonVec &&
-          runtimeType == other.runtimeType &&
-          field0 == other.field0;
+enum MusicDataType {
+  database,
+  playlists,
+  musicAggregators,
+  ;
 }
 
 enum MusicServer {
@@ -431,67 +401,6 @@ class Playlist {
           playTime == other.playTime &&
           musicNum == other.musicNum &&
           subscription == other.subscription;
-}
-
-class PlaylistJson {
-  final Playlist playlist;
-  final List<MusicAggregator> musicAggregators;
-
-  const PlaylistJson({
-    required this.playlist,
-    required this.musicAggregators,
-  });
-
-  @override
-  int get hashCode => playlist.hashCode ^ musicAggregators.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PlaylistJson &&
-          runtimeType == other.runtimeType &&
-          playlist == other.playlist &&
-          musicAggregators == other.musicAggregators;
-}
-
-class PlaylistJsonVec {
-  final List<PlaylistJson> field0;
-
-  const PlaylistJsonVec({
-    required this.field0,
-  });
-
-  static Future<PlaylistJsonVec> fromJson({required String json}) =>
-      RustLib.instance.api
-          .crateApiMusicApiMirrorPlaylistJsonVecFromJson(json: json);
-
-  /// takes ownership
-  Future<void> insertToDb() =>
-      RustLib.instance.api.crateApiMusicApiMirrorPlaylistJsonVecInsertToDb(
-        that: this,
-      );
-
-  static Future<PlaylistJsonVec> loadFrom({required String path}) =>
-      RustLib.instance.api
-          .crateApiMusicApiMirrorPlaylistJsonVecLoadFrom(path: path);
-
-  Future<void> saveTo({required String path}) => RustLib.instance.api
-      .crateApiMusicApiMirrorPlaylistJsonVecSaveTo(that: this, path: path);
-
-  Future<String> toJson() =>
-      RustLib.instance.api.crateApiMusicApiMirrorPlaylistJsonVecToJson(
-        that: this,
-      );
-
-  @override
-  int get hashCode => field0.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PlaylistJsonVec &&
-          runtimeType == other.runtimeType &&
-          field0 == other.field0;
 }
 
 enum PlaylistType {
