@@ -631,7 +631,14 @@ class StorageConfigPageState extends State<StorageConfigPage>
                         "是否继续?");
                     if (confirm == null || !confirm) return;
                     if (!context.mounted) return;
-                    var newDbUrl = await showNewDatabaseUrlDialog(context);
+                    String? newDbUrl;
+
+                    if (Platform.isIOS) {
+                      newDbUrl = await showIosDatabaseUrlDialog(context);
+                    } else {
+                      newDbUrl = await showNewDatabaseUrlDialog(context);
+                    }
+
                     if (newDbUrl == null) return;
                     if (!context.mounted) return;
                     try {
@@ -687,7 +694,16 @@ class StorageConfigPageState extends State<StorageConfigPage>
                         "是否继续?");
                     if (confirm == null || !confirm) return;
                     if (!context.mounted) return;
-                    var dbUrl = await showExistDatabaseUrlDialog(context);
+                    String? dbUrl;
+
+                    if (Platform.isAndroid) {
+                      dbUrl = await showNewDatabaseUrlDialog(context);
+                    } else if (Platform.isIOS) {
+                      dbUrl = await showIosDatabaseUrlDialog(context);
+                    } else {
+                      dbUrl = await showExistDatabaseUrlDialog(context);
+                    }
+
                     if (dbUrl == null) return;
                     if (!context.mounted) return;
                     await showWaitDialog(context, widget.isDesktop, "正在清除数据中");
