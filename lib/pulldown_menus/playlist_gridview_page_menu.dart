@@ -13,8 +13,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
 @immutable
-class MusicListGridPageMenu extends StatelessWidget {
-  const MusicListGridPageMenu({
+class PlaylistGridPageMenu extends StatelessWidget {
+  const PlaylistGridPageMenu({
     super.key,
     required this.builder,
     required this.playlists,

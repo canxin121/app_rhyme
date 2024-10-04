@@ -73,6 +73,8 @@ impl MusicAggregator {
     }
 
     pub async fn update_order_to_db(&self, playlist_id: i64) -> Result<(), anyhow::Error> {}
+
+    pub async fn clear_unused() -> anyhow::Result<()> {}
 }
 
 #[frb(external)]

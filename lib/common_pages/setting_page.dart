@@ -824,6 +824,54 @@ class StorageConfigPageState extends State<StorageConfigPage>
                     child: const Icon(CupertinoIcons.arrow_down_doc_fill),
                   ),
                 ),
+              ]),
+          CupertinoFormSection.insetGrouped(
+              header: Text('清理空间', style: TextStyle(color: textColor)),
+              children: [
+                CupertinoFormRow(
+                  prefix: Text(
+                    '清理未使用Db数据',
+                    style: TextStyle(color: textColor).useSystemChineseFont(),
+                  ),
+                  child: CupertinoButton(
+                    onPressed: () async {
+                      try {
+                        await MusicAggregator.clearUnused();
+                        LogToast.success("清理空间", "清理未使用Db数据成功",
+                            "[storageConfig.clearDb] success");
+                      } catch (e) {
+                        LogToast.error("清理空间", "清理未使用Db数据失败: $e",
+                            "[storageConfig.clearDb] $e");
+                      }
+                    },
+                    child: const Icon(CupertinoIcons.clear_circled_solid),
+                  ),
+                ),
+                CupertinoFormRow(
+                  prefix: Text(
+                    '清理缓存',
+                    style: TextStyle(color: textColor).useSystemChineseFont(),
+                  ),
+                  child: CupertinoButton(
+                    onPressed: () async {
+                      var confirm = await showConfirmationDialog(
+                          context,
+                          "注意!\n"
+                          "该功能将会清理所有缓存数据, 请确保你不再需要这些数据\n"
+                          "是否继续?");
+                      if (confirm == null || !confirm) return;
+                      try {
+                        await delOldCacheData(documentPath: globalDocumentPath);
+                        LogToast.success("清理空间", "清理缓存成功",
+                            "[storageConfig.clearCache] success");
+                      } catch (e) {
+                        LogToast.error("清理空间", "清理缓存失败: $e",
+                            "[storageConfig.clearCache] $e");
+                      }
+                    },
+                    child: const Icon(CupertinoIcons.clear_circled_solid),
+                  ),
+                ),
               ])
         ],
       ),

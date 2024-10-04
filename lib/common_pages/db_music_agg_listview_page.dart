@@ -4,17 +4,15 @@ import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dar
 import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/comps/play_button.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/desktop/home.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
-import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
-import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -136,7 +134,7 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
             slivers: <Widget>[
               MusicListHeader(
                 playlist: playlist,
-                musicAggs: musicAggs,
+                musicAggregators: musicAggs,
                 isDarkMode: isDarkMode,
                 screenWidth: screenWidth,
                 cacheCover: globalConfig.storageConfig.saveCover,
@@ -186,70 +184,10 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
             )),
         child: CustomScrollView(
           slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                    top: 10,
-                    left: screenWidth * 0.15,
-                    right: screenWidth * 0.15),
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: screenWidth * 0.7,
-                  ),
-                  child: MobilePlaylistImageCard(
-                    playlist: playlist,
-                    cacheCover: globalConfig.storageConfig.saveCover,
-                  ),
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    buildButton(
-                      context,
-                      icon: CupertinoIcons.play_fill,
-                      label: '播放',
-                      onPressed: () {
-                        globalAudioHandler.clearReplaceMusicAll(musicAggs
-                            .map(
-                              (e) => MusicContainer(e),
-                            )
-                            .toList());
-                      },
-                    ),
-                    buildButton(
-                      context,
-                      icon: Icons.shuffle,
-                      label: '随机播放',
-                      onPressed: () {
-                        globalAudioHandler.clearReplaceMusicAll(shuffleList(
-                          musicAggs
-                              .map(
-                                (e) => MusicContainer(e),
-                              )
-                              .toList(),
-                        ));
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Center(
-                child: SizedBox(
-                  width: screenWidth * 0.85,
-                  child: Divider(
-                    color: dividerColor,
-                    height: 0.5,
-                  ),
-                ),
-              ),
-            ),
+            MobilePlaylistHeader(
+                playlist: playlist,
+                musicAggregators: musicAggs,
+                isDarkMode: isDarkMode),
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {

@@ -142,6 +142,9 @@ class MusicAggregator {
           .crateApiMusicApiMirrorMusicAggregatorChangeDefaultServerInDb(
               that: this, server: server);
 
+  static Future<void> clearUnused() =>
+      RustLib.instance.api.crateApiMusicApiMirrorMusicAggregatorClearUnused();
+
   Future<void> delFromDb() =>
       RustLib.instance.api.crateApiMusicApiMirrorMusicAggregatorDelFromDb(
         that: this,

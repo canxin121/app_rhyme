@@ -104,7 +104,7 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
                 ),
               ),
             ),
-            trailing: MusicListGridPageMenu(
+            trailing: PlaylistGridPageMenu(
               playlists: playlists,
               builder: (context, showMenu) => CupertinoButton(
                   padding: const EdgeInsets.all(0),

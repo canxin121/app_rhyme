@@ -6,12 +6,12 @@ import 'package:app_rhyme/utils/colors.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-class MusicListListItem extends StatelessWidget {
+class PlaylistListItem extends StatelessWidget {
   final Playlist playlist;
   final bool? isDark; // Make it nullable to support theme adaptation
   final GestureTapCallback? onTap;
 
-  const MusicListListItem({
+  const PlaylistListItem({
     super.key,
     required this.playlist,
     this.isDark,

@@ -84,7 +84,6 @@ class AudioHandler {
       }
 
       playingMusic.value = targetMusicContainer;
-      playingMusic.refresh();
       await _lazyLoadMusic(index!);
 
       if (targetMusicContainer!.shouldUpdate()) {
@@ -96,7 +95,6 @@ class AudioHandler {
               "[tryLazyLoadMusic] Failed to lazy load music '${targetMusicContainer!.musicAggregator.name}' to many times, stop playing.");
           return;
         } else {
-          allowFailedTimes = 3;
           if (isPlaying) await pause();
           await seekToNext();
           return;
