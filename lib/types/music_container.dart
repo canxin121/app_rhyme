@@ -53,8 +53,8 @@ class MusicContainer {
 
   /// safe
   Future<bool> updateAll([Quality? quality]) async {
-    await getUpdatePlayAndLyricInfoAutoChangeSource();
-    await _updateAudioSource(quality);
+    await getUpdatePlayAndLyricInfoAutoChangeSource(quality);
+    await _updateAudioSource();
     return playInfo != null;
   }
 
@@ -145,7 +145,7 @@ class MusicContainer {
   }
 
   /// safe
-  Future<bool> _updateAudioSource([Quality? quality]) async {
+  Future<bool> _updateAudioSource() async {
     if (playInfo != null) {
       if (playInfo!.uri.contains("http")) {
         if ((Platform.isIOS || Platform.isMacOS) &&
