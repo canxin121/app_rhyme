@@ -68,7 +68,7 @@ class PlaylistMultiSelectionPageState extends State<PlaylistMultiSelectionPage>
               child: Icon(CupertinoIcons.back, color: activeIconRed),
               onPressed: () {
                 if (widget.isDesktop) {
-                  globalPopPage();
+                  globalDesktopPopPage();
                 } else {
                   Navigator.pop(context);
                 }

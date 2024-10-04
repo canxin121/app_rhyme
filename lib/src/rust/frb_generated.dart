@@ -135,24 +135,28 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiCacheMusicCacheCacheMusic(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music music,
+      required String name,
+      required String artists,
       required PlayInfo playinfo,
       String? lyric});
 
   Future<void> crateApiCacheMusicCacheDeleteMusicCache(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music musicInfo});
+      required String name,
+      required String artists});
 
   Future<(PlayInfo, String)?> crateApiCacheMusicCacheGetCacheMusic(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music music});
+      required String name,
+      required String artists});
 
   Future<bool> crateApiCacheMusicCacheHasCacheMusic(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music music});
+      required String name,
+      required String artists});
 
   Future<void> crateApiInitInit();
 
@@ -633,7 +637,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiCacheMusicCacheCacheMusic(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music music,
+      required String name,
+      required String artists,
       required PlayInfo playinfo,
       String? lyric}) {
     return handler.executeNormal(NormalTask(
@@ -641,7 +646,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(documentFolder, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
-        sse_encode_box_autoadd_music(music, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_String(artists, serializer);
         sse_encode_box_autoadd_play_info(playinfo, serializer);
         sse_encode_opt_String(lyric, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
@@ -652,7 +658,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiCacheMusicCacheCacheMusicConstMeta,
-      argValues: [documentFolder, customCacheRoot, music, playinfo, lyric],
+      argValues: [
+        documentFolder,
+        customCacheRoot,
+        name,
+        artists,
+        playinfo,
+        lyric
+      ],
       apiImpl: this,
     ));
   }
@@ -663,7 +676,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [
           "documentFolder",
           "customCacheRoot",
-          "music",
+          "name",
+          "artists",
           "playinfo",
           "lyric"
         ],
@@ -673,13 +687,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiCacheMusicCacheDeleteMusicCache(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music musicInfo}) {
+      required String name,
+      required String artists}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(documentFolder, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
-        sse_encode_box_autoadd_music(musicInfo, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_String(artists, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 9, port: port_);
       },
@@ -688,7 +704,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiCacheMusicCacheDeleteMusicCacheConstMeta,
-      argValues: [documentFolder, customCacheRoot, musicInfo],
+      argValues: [documentFolder, customCacheRoot, name, artists],
       apiImpl: this,
     ));
   }
@@ -696,20 +712,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiCacheMusicCacheDeleteMusicCacheConstMeta =>
       const TaskConstMeta(
         debugName: "delete_music_cache",
-        argNames: ["documentFolder", "customCacheRoot", "musicInfo"],
+        argNames: ["documentFolder", "customCacheRoot", "name", "artists"],
       );
 
   @override
   Future<(PlayInfo, String)?> crateApiCacheMusicCacheGetCacheMusic(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music music}) {
+      required String name,
+      required String artists}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(documentFolder, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
-        sse_encode_box_autoadd_music(music, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_String(artists, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 10, port: port_);
       },
@@ -718,7 +736,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: null,
       ),
       constMeta: kCrateApiCacheMusicCacheGetCacheMusicConstMeta,
-      argValues: [documentFolder, customCacheRoot, music],
+      argValues: [documentFolder, customCacheRoot, name, artists],
       apiImpl: this,
     ));
   }
@@ -726,20 +744,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiCacheMusicCacheGetCacheMusicConstMeta =>
       const TaskConstMeta(
         debugName: "get_cache_music",
-        argNames: ["documentFolder", "customCacheRoot", "music"],
+        argNames: ["documentFolder", "customCacheRoot", "name", "artists"],
       );
 
   @override
   Future<bool> crateApiCacheMusicCacheHasCacheMusic(
       {required String documentFolder,
       String? customCacheRoot,
-      required Music music}) {
+      required String name,
+      required String artists}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(documentFolder, serializer);
         sse_encode_opt_String(customCacheRoot, serializer);
-        sse_encode_box_autoadd_music(music, serializer);
+        sse_encode_String(name, serializer);
+        sse_encode_String(artists, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 11, port: port_);
       },
@@ -748,7 +768,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: null,
       ),
       constMeta: kCrateApiCacheMusicCacheHasCacheMusicConstMeta,
-      argValues: [documentFolder, customCacheRoot, music],
+      argValues: [documentFolder, customCacheRoot, name, artists],
       apiImpl: this,
     ));
   }
@@ -756,7 +776,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiCacheMusicCacheHasCacheMusicConstMeta =>
       const TaskConstMeta(
         debugName: "has_cache_music",
-        argNames: ["documentFolder", "customCacheRoot", "music"],
+        argNames: ["documentFolder", "customCacheRoot", "name", "artists"],
       );
 
   @override

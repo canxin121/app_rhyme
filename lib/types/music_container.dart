@@ -87,7 +87,9 @@ class MusicContainer {
     // try to use local cache
     try {
       var musicCache = await getCacheMusic(
-          music: currentMusic, documentFolder: globalDocumentPath);
+          name: musicAggregator.name,
+          artists: musicAggregator.artist,
+          documentFolder: globalDocumentPath);
       playInfo = musicCache?.$1;
       lyric = musicCache?.$2;
       try {

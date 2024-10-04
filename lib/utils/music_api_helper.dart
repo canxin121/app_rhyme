@@ -1,6 +1,5 @@
+import 'package:app_rhyme/common_pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/pages/db_playlist_gridview_page.dart';
-import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/dialogs/file_name_dialog.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
@@ -9,17 +8,16 @@ import 'package:app_rhyme/src/rust/api/cache/music_cache.dart'
     as rust_api_music_cache;
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/music_dialog.dart';
 import 'package:app_rhyme/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
-import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/const_vars.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -34,12 +32,12 @@ Future<void> delMusicAggregatorCache(MusicAggregator musicAggregator,
   // 这个函数运行耗时短，连续使用时应showToast = false
   try {
     await rust_api_music_cache.deleteMusicCache(
-        musicInfo: musicAggregator.musics
-            .where((e) => e.server == musicAggregator.defaultServer)
-            .first,
+        name: musicAggregator.name,
+        artists: musicAggregator.artist,
         documentFolder: globalDocumentPath);
 
-    refreshMusicAggregatorListViewPage();
+    musicAggregatorCacheController.add((false, musicAggregator.identity()));
+
     if (showToast) {
       LogToast.success("删除缓存成功", "成功删除缓存: ${musicAggregator.name}",
           "[deleteMusicCache] Successfully deleted cache: ${musicAggregator.name}");
@@ -58,11 +56,15 @@ Future<void> cacheMusicContainer(MusicContainer musicContainer) async {
       return;
     }
     await rust_api_music_cache.cacheMusic(
-        music: musicContainer.currentMusic,
+        name: musicContainer.musicAggregator.name,
+        artists: musicContainer.musicAggregator.artist,
         playinfo: musicContainer.playInfo!,
         lyric: musicContainer.lyric,
         documentFolder: globalDocumentPath);
-    refreshMusicAggregatorListViewPage();
+
+    musicAggregatorCacheController
+        .add((true, musicContainer.musicAggregator.identity()));
+
     LogToast.success("缓存成功", "成功缓存: ${musicContainer.musicAggregator.name}",
         "[cacheMusic] Successfully cached: ${musicContainer.musicAggregator.name}");
   } catch (e) {
@@ -81,7 +83,7 @@ Future<Music?> editMusicInfoToDb(BuildContext context, Music music) async {
     var newMusic = await editedMusic.updateToDb();
     LogToast.success(
         "编辑成功", "编辑音乐信息成功", "[editMusicInfo] Successfully edited music info");
-    refreshMusicAggregatorListViewPage();
+    musicAggregatorInfoUpdateStreamController.add(newMusic);
     return newMusic;
   } catch (e) {
     LogToast.error("编辑失败", "编辑音乐信息失败: $e",
@@ -102,8 +104,9 @@ Future<void> viewMusicAlbum(
     if (context.mounted) {
       if (isDesktop) {
         globalSetNavItemSelected("");
-        globalNavigatorToPage(
-            DesktopOnlineMusicListPage(
+        globalDesktopNavigatorToPage(
+            OnlineMusicListPage(
+              isDesktop: true,
               playlist: album,
               firstPageMusicAggregators: musicAggs,
             ),
@@ -111,9 +114,10 @@ Future<void> viewMusicAlbum(
       } else {
         Navigator.of(context).push(
           CupertinoPageRoute(
-              builder: (context) => MobileOnlineMusicListPage(
+              builder: (context) => OnlineMusicListPage(
                     playlist: album,
                     firstPageMusicAggregators: musicAggs,
+                    isDesktop: false,
                   )),
         );
       }
@@ -138,8 +142,8 @@ Future<void> addMusicsToPlayList(
   if (targetMusicList != null) {
     try {
       await targetMusicList.addAggsToDb(musicAggs: musicAggs);
-      refreshMusicAggregatorListViewPage();
-
+      musicAggregatorListUpdateStreamController
+          .add(await targetMusicList.getMusicsFromDb());
       LogToast.success("添加成功", "成功添加音乐到: ${targetMusicList.name}",
           "[addToMusicList] Successfully added musics to: ${targetMusicList.name}");
     } catch (e) {
@@ -182,14 +186,18 @@ Future<void> createNewMusicListFromMusics(
     if (createdPlaylist == null) {
       throw "未找到新建的歌单";
     }
-    refreshPlaylistGridViewPage();
+    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
     if (context.mounted) {
       LogToast.success("创建成功", "成功创建新歌单: ${createdPlaylist.name}, 正在添加音乐",
           "[createNewMusicList] Successfully created new music list: ${createdPlaylist.name}, adding musics");
       await addMusicsToPlayList(context, musicAggs, playlist: createdPlaylist);
+      createdPlaylist
+          .getMusicsFromDb()
+          .then((e) => musicAggregatorListUpdateStreamController.add(e));
     } else {
       await createdPlaylist.delFromDb();
-      refreshPlaylistGridViewPage();
+      Playlist.getFromDb()
+          .then((e) => playlistGridUpdateStreamController.add(e));
       LogToast.error("创建失败", "创建歌单失败: context is not mounted",
           "[createNewMusicList] Failed to create music list: context is not mounted");
     }
@@ -211,8 +219,12 @@ Future<void> setMusicCoverAsPlaylistCover(
   try {
     playlist.cover = picLink;
     playlist = await playlist.updateToDb();
-    refreshMusicAggregatorListViewPage();
-    refreshPlaylistGridViewPage();
+
+    playlistUpdateStreamController.add(playlist);
+    playlist
+        .getMusicsFromDb()
+        .then((e) => musicAggregatorListUpdateStreamController.add(e));
+
     LogToast.success(
         "设置封面成功", "成功设置为封面", "[setAsMusicListCover] Successfully set as cover");
   } catch (e) {
@@ -233,7 +245,8 @@ Future<void> saveMusicList(Playlist playlist, bool toastWhenSuccess) async {
     }
 
     await newPlaylist.addAggsToDb(musicAggs: musicAggs);
-    refreshPlaylistGridViewPage();
+    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
+
     if (!toastWhenSuccess) {
       LogToast.success("保存歌单", "保存'${playlist.name}'成功",
           "[OnlineMusicListItemsPullDown] Succeed to save music list '${playlist.name}'");
@@ -259,7 +272,11 @@ Future<void> addAggsOfPlayListToTargetMusicList(
     }
 
     to.addAggsToDb(musicAggs: musicAggs);
-    refreshMusicAggregatorListViewPage();
+
+    to
+        .getMusicsFromDb()
+        .then((e) => musicAggregatorListUpdateStreamController.add(e));
+
     LogToast.success("添加歌曲", "添加歌单'${from.name}'中的歌曲到'${to.name}'成功",
         "[OnlineMusicListItemsPullDown] Succeed to add music from '${from.name}' to '${to.name}'");
   } catch (e) {
@@ -275,49 +292,15 @@ Future<void> editPlaylistListInfo(
   if (newPlaylist != null) {
     try {
       playlist = await newPlaylist.updateToDb();
-      refreshPlaylistGridViewPage();
-      refreshMusicAggregatorListViewPage();
+      playlistUpdateStreamController.add(playlist);
+      Playlist.getFromDb()
+          .then((e) => playlistGridUpdateStreamController.add(e));
       LogToast.success("编辑歌单", "编辑歌单成功",
           "[LocalMusicListItemsPullDown] Succeed to edit music list");
     } catch (e) {
       LogToast.error("编辑歌单", "编辑歌单失败: $e",
           "[LocalMusicListItemsPullDown] Failed to edit music list: $e");
     }
-  }
-}
-
-Future<void> exportPlaylistsJson(
-    BuildContext context, List<Playlist> playlists) async {
-  bool? confirm = await showConfirmationDialog(
-      context, "本功能可以导出歌单为Json文件, 包括其中的所有歌曲\n请选择要保存的目录");
-  if (confirm == null || !confirm) return;
-  String? dir = await pickDirectory();
-  if (dir == null) return;
-  if (!context.mounted) return;
-  String? fileName = await showFileNameDialog(context, "json",
-      defaultFileName: "app_rhyme_playlists");
-  if (fileName == null) return;
-  String filePath = "$dir/$fileName";
-
-  try {
-    LogToast.info("导出Json文件", "正在导出歌单'数据，请稍等",
-        "[MutliSelectLocalMusicListGridPage] Start to export json file");
-
-    MusicDataJsonWrapper musicDataJson =
-        await MusicDataJsonWrapper.fromPlaylists(playlists: playlists);
-
-    await musicDataJson.saveTo(path: filePath);
-    LogToast.success(
-      "导出Json文件成功",
-      "导出Json文件成功",
-      "[MutliSelectLocalMusicListGridPage] Successfully exported json file",
-    );
-  } catch (e) {
-    LogToast.error(
-      "导出Json文件失败",
-      "导出Json文件失败: $e",
-      "[MutliSelectLocalMusicListGridPage] Failed to export json file: $e",
-    );
   }
 }
 
@@ -358,8 +341,7 @@ Future<void> savePlaylistsAsOneNewPlaylist(
           "[MutiSelectOnlineMusicListGridPage] Failed to save as new music list");
       return;
     }
-
-    refreshPlaylistGridViewPage();
+    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
 
     for (var musicList in playlists) {
       await addAggsOfPlayListToTargetMusicList(musicList, newPlaylist);
@@ -378,7 +360,6 @@ Future<void> savePlaylists(
 ) async {
   await Future.wait(playlists.map((musicList) async {
     await saveMusicList(musicList, false);
-    refreshPlaylistGridViewPage();
   }));
   LogToast.success("保存歌单", "保存所选歌单成功",
       "[MutliSelectLocalMusicListGridPage] Successfully saved music list");
@@ -400,7 +381,6 @@ Future<void> deleteMusicAggsCache(
     await delMusicAggregatorCache(musicContainer, showToast: false);
   }
   refresh();
-  refreshMusicAggregatorListViewPage();
   LogToast.success("删除选中音乐缓存", "删除选中音乐缓存成功",
       "[handleDeleteCacheSelected] succeed to delete cache of selected music aggregators");
 }
@@ -417,13 +397,15 @@ Future<void> deleteMusicAggsFromDbPlaylist(
         LogToast.error("删除失败", "删除音乐失败: $e",
             "[deleteMusicAggsFromDbPlaylist] Failed to delete music: $e");
       } finally {
-        refreshMusicAggregatorListViewPage();
+        playlist
+            .getMusicsFromDb()
+            .then((e) => musicAggregatorListUpdateStreamController.add(e));
       }
     }
   }
 }
 
-Future<void> deletePlaylist(
+Future<void> delDbPlaylist(
   Playlist playlist,
   bool inPlaylist,
   bool isDesktop,
@@ -433,19 +415,12 @@ Future<void> deletePlaylist(
     await playlist.delFromDb();
 
     if (inPlaylist) {
-      if (isDesktop) {
-        globalNavigatorToPage(const DesktopLocalMusicListGridPage());
-        globalSetNavItemSelected("###AllPlaylist###");
-      } else {
-        if (context.mounted) {
-          Navigator.of(context).pop();
-        }
-      }
+      dbPlaylistPagePopStreamController.add(null);
     }
 
     LogToast.success("删除歌单", "删除歌单成功",
         "[LocalMusicListItemsPullDown] Succeed to delete music list");
-    refreshPlaylistGridViewPage();
+    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
   } catch (e) {
     LogToast.error("删除歌单", "删除歌单失败: $e",
         "[LocalMusicListItemsPullDown] Failed to delete music list: $e");
@@ -458,15 +433,19 @@ Future<void> openSharePlaylist(BuildContext context, bool isDesktop) async {
     var musicListW = await Playlist.getFromShare(share: url);
     if (context.mounted) {
       if (isDesktop) {
-        globalNavigatorToPage(
-          DesktopOnlineMusicListPage(playlist: musicListW),
+        globalDesktopNavigatorToPage(
+          OnlineMusicListPage(
+            playlist: musicListW,
+            isDesktop: isDesktop,
+          ),
           replace: false,
         );
       } else {
         Navigator.of(context).push(
           CupertinoPageRoute(
-            builder: (context) => MobileOnlineMusicListPage(
+            builder: (context) => OnlineMusicListPage(
               playlist: musicListW,
+              isDesktop: isDesktop,
             ),
           ),
         );
@@ -506,8 +485,7 @@ Future<void> importDatabaseJson(BuildContext context, bool isDesktop,
 
     await musicDataJson.applyToDb();
 
-    refreshMusicAggregatorListViewPage();
-    refreshPlaylistGridViewPage();
+    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
     LogToast.success("导入数据库", "从Json文件导入数据库成功",
         "[importDatabaseJson] succeed to imprt json file to database");
   } catch (e) {
@@ -534,7 +512,7 @@ Future<void> importPlaylistJson(BuildContext context, bool isDesktop,
     }
     await musicDataJson.applyToDb();
 
-    refreshPlaylistGridViewPage();
+    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
     LogToast.success("导入歌单", "从Json文件导入歌单成功",
         "[importPlaylistJson] succeed to imprt json file to database");
   } catch (e) {
@@ -562,12 +540,83 @@ Future<void> importMusicAggrgegatorJson(BuildContext context, bool isDesktop,
 
     await musicDataJson.applyToDb(
         playlistId: int.parse(targetPlaylist.identity));
-
-    refreshMusicAggregatorListViewPage();
+    targetPlaylist
+        .getMusicsFromDb()
+        .then((e) => musicAggregatorListUpdateStreamController.add(e));
     LogToast.success("导入歌曲", "从Json文件导入歌曲成功",
         "[importMusicAggrgegatorJson] succeed to imprt json file to database");
   } catch (e) {
     LogToast.error(
         "导入歌曲", "Json导入失败: $e", "[importMusicAggrgegatorJson] failed: $e");
+  }
+}
+
+Future<void> exportMusicAggregatorsJson(
+  BuildContext context,
+  List<MusicAggregator> musicAggs,
+) async {
+  String? dir = await pickDirectory();
+  if (dir == null) return;
+  if (!context.mounted) return;
+  String? fileName = await showFileNameDialog(context, "json",
+      defaultFileName: "app_rhyme_musics");
+  if (fileName == null) return;
+  String filePath = "$dir/$fileName";
+
+  try {
+    LogToast.info("导出Json文件", "正在导出歌单'数据，请稍等",
+        "[exportMusicAggregatorsJson] Start to export json file");
+
+    MusicDataJsonWrapper musicDataJson =
+        await MusicDataJsonWrapper.fromMusicAggregators(
+            musicAggregators: musicAggs);
+
+    await musicDataJson.saveTo(path: filePath);
+    LogToast.success(
+      "导出Json文件成功",
+      "导出Json文件成功",
+      "[exportMusicAggregatorsJson] Successfully exported json file",
+    );
+  } catch (e) {
+    LogToast.error(
+      "导出Json文件失败",
+      "导出Json文件失败: $e",
+      "[exportMusicAggregatorsJson] Failed to export json file: $e",
+    );
+  }
+}
+
+Future<void> exportPlaylistsJson(
+    BuildContext context, List<Playlist> playlists) async {
+  bool? confirm = await showConfirmationDialog(
+      context, "本功能可以导出歌单为Json文件, 包括其中的所有歌曲\n请选择要保存的目录");
+  if (confirm == null || !confirm) return;
+  String? dir = await pickDirectory();
+  if (dir == null) return;
+  if (!context.mounted) return;
+  String? fileName = await showFileNameDialog(context, "json",
+      defaultFileName: "app_rhyme_playlists");
+  if (fileName == null) return;
+  String filePath = "$dir/$fileName";
+
+  try {
+    LogToast.info("导出Json文件", "正在导出歌单'数据，请稍等",
+        "[exportPlaylistsJson] Start to export json file");
+
+    MusicDataJsonWrapper musicDataJson =
+        await MusicDataJsonWrapper.fromPlaylists(playlists: playlists);
+
+    await musicDataJson.saveTo(path: filePath);
+    LogToast.success(
+      "导出Json文件成功",
+      "导出Json文件成功",
+      "[exportPlaylistsJson] Successfully exported json file",
+    );
+  } catch (e) {
+    LogToast.error(
+      "导出Json文件失败",
+      "导出Json文件失败: $e",
+      "[exportPlaylistsJson] Failed to export json file: $e",
+    );
   }
 }

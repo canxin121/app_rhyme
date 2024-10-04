@@ -14,6 +14,7 @@ import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
 import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/src/rust/api/types/external_api.dart';
 import 'package:app_rhyme/src/rust/api/utils/database.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/chore.dart';
@@ -25,7 +26,6 @@ import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -220,7 +220,7 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
               child: CupertinoButton(
                 onPressed: () {
                   if (isDesktop()) {
-                    globalNavigatorToPage(TalkerScreen(
+                    globalDesktopNavigatorToPage(TalkerScreen(
                       talker: globalTalker,
                     ));
                   } else {
@@ -482,7 +482,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
       }
     } finally {
       if (widget.isDesktop) {
-        globalPopPage();
+        globalDesktopPopPage();
       } else {
         if (mounted) Navigator.pop(context);
       }
@@ -652,8 +652,8 @@ class StorageConfigPageState extends State<StorageConfigPage>
                       await clearDb();
                       await musicDataJson.applyToDb();
 
-                      refreshMusicAggregatorListViewPage();
-                      refreshPlaylistGridViewPage();
+                      Playlist.getFromDb().then(
+                          (e) => playlistGridUpdateStreamController.add(e));
                       LogToast.success("数据库设置", "数据库移动成功",
                           "[storageConfig.moveDatabase] success");
                     } catch (e) {
@@ -661,7 +661,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
                           "[storageConfig.moveDatabase] failed: $e");
                     } finally {
                       if (widget.isDesktop) {
-                        globalPopPage();
+                        globalDesktopPopPage();
                       } else {
                         if (context.mounted) Navigator.pop(context);
                       }
@@ -705,8 +705,8 @@ class StorageConfigPageState extends State<StorageConfigPage>
 
                       await clearDb();
                       await setDb(databaseUrl: dbUrl);
-                      refreshMusicAggregatorListViewPage();
-                      refreshPlaylistGridViewPage();
+                      Playlist.getFromDb().then(
+                          (e) => playlistGridUpdateStreamController.add(e));
 
                       LogToast.success("数据库设置", "数据库设置成功",
                           "[storageConfig.moveDatabase] success");
@@ -715,7 +715,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
                           "[storageConfig.moveDatabase] failed: $e");
                     } finally {
                       if (widget.isDesktop) {
-                        globalPopPage();
+                        globalDesktopPopPage();
                       } else {
                         if (context.mounted) Navigator.pop(context);
                       }

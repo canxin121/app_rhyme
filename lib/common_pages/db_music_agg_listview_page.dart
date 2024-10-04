@@ -1,0 +1,394 @@
+import 'dart:async';
+import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
+import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
+import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
+import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list.dart';
+import 'package:app_rhyme/desktop/comps/navigation_column.dart';
+import 'package:app_rhyme/desktop/comps/play_button.dart';
+import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
+import 'package:app_rhyme/desktop/home.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
+import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/music_container.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
+import 'package:app_rhyme/utils/cache_helper.dart';
+import 'package:app_rhyme/utils/chore.dart';
+import 'package:app_rhyme/utils/colors.dart';
+import 'package:app_rhyme/utils/global_vars.dart';
+import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/music_api_helper.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:pull_down_button/pull_down_button.dart';
+
+class DbMusicContainerListPage extends StatefulWidget {
+  final Playlist playlist;
+  final bool isDesktop;
+
+  const DbMusicContainerListPage({
+    super.key,
+    required this.playlist,
+    required this.isDesktop,
+  });
+
+  @override
+  DbMusicContainerListPageState createState() =>
+      DbMusicContainerListPageState();
+}
+
+class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
+    with WidgetsBindingObserver {
+  late Playlist playlist;
+  List<MusicAggregator> musicAggs = [];
+  late StreamSubscription<Playlist> playlistInfoUpdateSubscription;
+  late StreamSubscription<List<MusicAggregator>>
+      musicAggregatorListUpdateSubscription;
+  late StreamSubscription<void> popSubscription;
+
+  @override
+  void initState() {
+    playlist = widget.playlist;
+    WidgetsBinding.instance.addObserver(this);
+
+    playlistInfoUpdateSubscription =
+        playlistUpdateStreamController.stream.listen((e) {
+      setState(() {
+        playlist = e;
+      });
+    });
+    musicAggregatorListUpdateSubscription =
+        musicAggregatorListUpdateStreamController.stream.listen((e) {
+      setState(() {
+        musicAggs = e;
+      });
+    });
+
+    popSubscription = dbPlaylistPagePopStreamController.stream.listen((_) {
+      if (widget.isDesktop) {
+        if (globalDesktopNavigatorKey.currentContext != null) {
+          globalSetNavItemSelected("###AllPlaylist###");
+          globalDesktopNavigatorToPage(DbMusicListGridPage(
+            isDesktop: true,
+          ));
+        }
+      } else {
+        if (!mounted) return;
+        var navigator = Navigator.of(context);
+        if (navigator.canPop()) {
+          navigator.pop();
+        }
+      }
+    });
+
+    loadMusicContainers();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    playlistInfoUpdateSubscription.cancel();
+    musicAggregatorListUpdateSubscription.cancel();
+    popSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() {});
+  }
+
+  Future<void> loadMusicContainers() async {
+    try {
+      var newMuiscAggs = await playlist.getMusicsFromDb();
+
+      setState(() {
+        musicAggs = newMuiscAggs;
+      });
+    } catch (e) {
+      LogToast.error("加载歌曲列表", "加载歌曲列表失败!:$e",
+          "[loadMusicContainers] Failed to load music list: $e");
+      setState(() {
+        musicAggs = [];
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Brightness brightness = MediaQuery.of(context).platformBrightness;
+    final bool isDarkMode = brightness == Brightness.dark;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    if (widget.isDesktop) {
+      final ScrollController controller = ScrollController();
+      return CupertinoPageScaffold(
+        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        child: CupertinoScrollbar(
+          controller: controller,
+          thickness: 10,
+          radius: const Radius.circular(10),
+          child: CustomScrollView(
+            controller: controller,
+            slivers: <Widget>[
+              MusicListHeader(
+                playlist: playlist,
+                musicAggs: musicAggs,
+                isDarkMode: isDarkMode,
+                screenWidth: screenWidth,
+                cacheCover: globalConfig.storageConfig.saveCover,
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 20),
+              ),
+              MusicAggregatorList(
+                musicAggs: musicAggs,
+                playlist: playlist,
+                cacheCover: globalConfig.storageConfig.saveCover,
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      final Color backgroundColor =
+          isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+      final Color dividerColor = isDarkMode
+          ? const Color.fromARGB(255, 41, 41, 43)
+          : const Color.fromARGB(255, 245, 245, 246);
+
+      return CupertinoPageScaffold(
+        backgroundColor: backgroundColor,
+        navigationBar: CupertinoNavigationBar(
+            padding: const EdgeInsetsDirectional.only(end: 16),
+            backgroundColor: backgroundColor,
+            leading: CupertinoButton(
+              padding: const EdgeInsets.all(0),
+              child: Icon(CupertinoIcons.back, color: activeIconRed),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            trailing: DbMusicListChoicMenu(
+              builder: (context, showMenu) => CupertinoButton(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: showMenu,
+                  child: Text(
+                    '选项',
+                    style:
+                        TextStyle(color: activeIconRed).useSystemChineseFont(),
+                  )),
+              playlist: playlist,
+              musicAggs: musicAggs,
+            )),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: 10,
+                    left: screenWidth * 0.15,
+                    right: screenWidth * 0.15),
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: screenWidth * 0.7,
+                  ),
+                  child: MobilePlaylistImageCard(
+                    playlist: playlist,
+                    cacheCover: globalConfig.storageConfig.saveCover,
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    buildButton(
+                      context,
+                      icon: CupertinoIcons.play_fill,
+                      label: '播放',
+                      onPressed: () {
+                        globalAudioHandler.clearReplaceMusicAll(musicAggs
+                            .map(
+                              (e) => MusicContainer(e),
+                            )
+                            .toList());
+                      },
+                    ),
+                    buildButton(
+                      context,
+                      icon: Icons.shuffle,
+                      label: '随机播放',
+                      onPressed: () {
+                        globalAudioHandler.clearReplaceMusicAll(shuffleList(
+                          musicAggs
+                              .map(
+                                (e) => MusicContainer(e),
+                              )
+                              .toList(),
+                        ));
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Center(
+                child: SizedBox(
+                  width: screenWidth * 0.85,
+                  child: Divider(
+                    color: dividerColor,
+                    height: 0.5,
+                  ),
+                ),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  bool isFirst = index == 0;
+                  bool isLastItem = index == musicAggs.length - 1;
+
+                  final musicAgg = musicAggs[index];
+                  return Column(
+                    children: [
+                      if (isFirst)
+                        const Padding(padding: EdgeInsets.only(top: 5)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: MobileMusicAggregatorListItem(
+                          key: ValueKey(musicAgg.identity()),
+                          musicAgg: musicAgg,
+                          playlist: widget.playlist,
+                          cacheCover: globalConfig.storageConfig.saveCover,
+                        ),
+                      ),
+                      if (!isLastItem)
+                        Center(
+                          child: SizedBox(
+                            width: screenWidth * 0.85,
+                            child: Divider(
+                              color: dividerColor,
+                              height: 0.5,
+                            ),
+                          ),
+                        )
+                    ],
+                  );
+                },
+                childCount: musicAggs.length,
+              ),
+            ),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(top: 200),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+}
+
+@immutable
+class DbMusicListChoicMenu extends StatelessWidget {
+  const DbMusicListChoicMenu({
+    super.key,
+    required this.builder,
+    required this.playlist,
+    required this.musicAggs,
+  });
+
+  final PullDownMenuButtonBuilder builder;
+  final Playlist playlist;
+  final List<MusicAggregator> musicAggs;
+
+  @override
+  Widget build(BuildContext context) {
+    return PullDownButton(
+      itemBuilder: (context) => [
+        PullDownMenuHeader(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
+          leading: imageWithCache(playlist.getCover(size: 250),
+              height: 100, width: 100),
+          title: playlist.name,
+          subtitle: playlist.summary,
+        ),
+        const PullDownMenuDivider.large(),
+        ...playlistMenuItems(context, playlist, false, true),
+        PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
+          onTap: () async {
+            for (var musicAgg in musicAggs) {
+              await cacheMusicContainer(MusicContainer(musicAgg));
+            }
+          },
+          title: '缓存歌单所有音乐',
+          icon: CupertinoIcons.cloud_download,
+        ),
+        PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
+          onTap: () async {
+            for (var musicAgg in musicAggs) {
+              await delMusicAggregatorCache(musicAgg, showToast: false);
+            }
+            LogToast.success("删除所有音乐缓存", "删除所有音乐缓存成功",
+                "[LocalMusicListChoicMenu] Successfully deleted all music caches");
+          },
+          title: '删除所有音乐缓存',
+          icon: CupertinoIcons.delete,
+        ),
+        PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => MuiscAggregatorReorderPage(
+                  musicAggregators: musicAggs,
+                  playlist: playlist,
+                  isDesktop: false,
+                ),
+              ),
+            );
+          },
+          title: "歌曲排序",
+          icon: CupertinoIcons.sort_up_circle,
+        ),
+        PullDownMenuItem(
+          itemTheme: PullDownMenuItemTheme(
+              textStyle: const TextStyle().useSystemChineseFont()),
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => MusicAggregatorMultiSelectionPage(
+                  playlist: playlist,
+                  musicAggs: musicAggs,
+                  isDesktop: false,
+                ),
+              ),
+            );
+          },
+          title: "多选操作",
+          icon: CupertinoIcons.selection_pin_in_out,
+        )
+      ],
+      animationBuilder: null,
+      position: PullDownMenuPosition.automatic,
+      buttonBuilder: builder,
+    );
+  }
+}

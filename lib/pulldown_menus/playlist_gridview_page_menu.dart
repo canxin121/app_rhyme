@@ -1,13 +1,13 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
+import 'package:app_rhyme/common_pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/common_pages/reorder_page/playlist.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
 import 'package:app_rhyme/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -18,9 +18,11 @@ class MusicListGridPageMenu extends StatelessWidget {
     super.key,
     required this.builder,
     required this.playlists,
+    required this.isDesktop,
   });
   final List<Playlist> playlists;
   final PullDownMenuButtonBuilder builder;
+  final bool isDesktop;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,8 @@ class MusicListGridPageMenu extends StatelessWidget {
               if (playlist != null) {
                 try {
                   await playlist.insertToDb();
-                  refreshPlaylistGridViewPage();
+                  Playlist.getFromDb()
+                      .then((e) => playlistGridUpdateStreamController.add(e));
                   LogToast.success("创建歌单", "创建歌单成功",
                       "[MusicListGridPageMenu] Successfully created music list");
                 } catch (e) {
@@ -57,9 +60,10 @@ class MusicListGridPageMenu extends StatelessWidget {
               try {
                 var playlist = await Playlist.getFromShare(share: url);
                 if (context.mounted) {
-                  globalNavigatorToPage(
-                      DesktopOnlineMusicListPage(
+                  globalDesktopNavigatorToPage(
+                      OnlineMusicListPage(
                         playlist: playlist,
+                        isDesktop: isDesktop,
                       ),
                       replace: false);
                 }
@@ -86,7 +90,7 @@ class MusicListGridPageMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             if (context.mounted) {
-              globalNavigatorToPage(
+              globalDesktopNavigatorToPage(
                   PlaylistReorderPage(playlists: playlists, isDesktop: true),
                   replace: false);
             }
@@ -100,7 +104,7 @@ class MusicListGridPageMenu extends StatelessWidget {
           onTap: () async {
             if (context.mounted) {
               var playlists = await Playlist.getFromDb();
-              globalNavigatorToPage(
+              globalDesktopNavigatorToPage(
                   PlaylistMultiSelectionPage(
                       playlists: playlists, isDesktop: true),
                   replace: false);

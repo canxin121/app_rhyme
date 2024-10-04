@@ -370,7 +370,8 @@ fn wire__crate__api__cache__music_cache__cache_music_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_document_folder = <String>::sse_decode(&mut deserializer);
             let api_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
-            let api_music = <crate::api::music_api::mirror::Music>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_artists = <String>::sse_decode(&mut deserializer);
             let api_playinfo =
                 <crate::api::types::playinfo::PlayInfo>::sse_decode(&mut deserializer);
             let api_lyric = <Option<String>>::sse_decode(&mut deserializer);
@@ -381,7 +382,8 @@ fn wire__crate__api__cache__music_cache__cache_music_impl(
                         let output_ok = crate::api::cache::music_cache::cache_music(
                             &api_document_folder,
                             api_custom_cache_root,
-                            &api_music,
+                            api_name,
+                            api_artists,
                             &api_playinfo,
                             api_lyric,
                         )
@@ -418,8 +420,8 @@ fn wire__crate__api__cache__music_cache__delete_music_cache_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_document_folder = <String>::sse_decode(&mut deserializer);
             let api_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
-            let api_music_info =
-                <crate::api::music_api::mirror::Music>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_artists = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
@@ -427,7 +429,8 @@ fn wire__crate__api__cache__music_cache__delete_music_cache_impl(
                         let output_ok = crate::api::cache::music_cache::delete_music_cache(
                             &api_document_folder,
                             api_custom_cache_root,
-                            &api_music_info,
+                            &api_name,
+                            &api_artists,
                         )
                         .await?;
                         Ok(output_ok)
@@ -462,7 +465,8 @@ fn wire__crate__api__cache__music_cache__get_cache_music_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_document_folder = <String>::sse_decode(&mut deserializer);
             let api_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
-            let api_music = <crate::api::music_api::mirror::Music>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_artists = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, ()>(
@@ -471,7 +475,8 @@ fn wire__crate__api__cache__music_cache__get_cache_music_impl(
                             crate::api::cache::music_cache::get_cache_music(
                                 &api_document_folder,
                                 api_custom_cache_root,
-                                &api_music,
+                                api_name,
+                                api_artists,
                             )
                             .await,
                         )?;
@@ -507,7 +512,8 @@ fn wire__crate__api__cache__music_cache__has_cache_music_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_document_folder = <String>::sse_decode(&mut deserializer);
             let api_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
-            let api_music = <crate::api::music_api::mirror::Music>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_artists = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, ()>(
@@ -516,7 +522,8 @@ fn wire__crate__api__cache__music_cache__has_cache_music_impl(
                             crate::api::cache::music_cache::has_cache_music(
                                 &api_document_folder,
                                 api_custom_cache_root,
-                                &api_music,
+                                api_name,
+                                api_artists,
                             )
                             .await,
                         )?;

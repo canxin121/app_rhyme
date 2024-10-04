@@ -1,9 +1,8 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
+import 'package:app_rhyme/common_pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/desktop/pages/online_music_agg_listview_page.dart';
-import 'package:app_rhyme/mobile/pages/online_playlist_page.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -13,6 +12,10 @@ import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pull_down_button/pull_down_button.dart';
+
+final PagingController<int, Playlist> _pagingController =
+    PagingController(firstPageKey: 1);
+final TextEditingController _inputContentController = TextEditingController();
 
 class PlaylistSearchPage extends StatefulWidget {
   const PlaylistSearchPage({super.key, required this.isDesktop});
@@ -25,10 +28,6 @@ class PlaylistSearchPage extends StatefulWidget {
 
 class SearchMusicListState extends State<PlaylistSearchPage>
     with WidgetsBindingObserver {
-  final PagingController<int, Playlist> _pagingController =
-      PagingController(firstPageKey: 1);
-  final TextEditingController _inputContentController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -175,9 +174,10 @@ class SearchMusicListState extends State<PlaylistSearchPage>
                               showDesc: false,
                               playlist: musicListW,
                               onTap: () {
-                                globalNavigatorToPage(
-                                  DesktopOnlineMusicListPage(
+                                globalDesktopNavigatorToPage(
+                                  OnlineMusicListPage(
                                     playlist: musicListW,
+                                    isDesktop: true,
                                   ),
                                   replace: false,
                                 );
@@ -190,9 +190,9 @@ class SearchMusicListState extends State<PlaylistSearchPage>
                                 Navigator.push(
                                   context,
                                   CupertinoPageRoute(
-                                    builder: (context) =>
-                                        MobileOnlineMusicListPage(
+                                    builder: (context) => OnlineMusicListPage(
                                       playlist: musicListW,
+                                      isDesktop: false,
                                     ),
                                   ),
                                 );
@@ -294,7 +294,7 @@ class SearchPlaylistChoiceMenu extends StatelessWidget {
               "[SearchMusicListPage] Succeed to fetch all music lists",
             );
             if (isDesktop) {
-              globalNavigatorToPage(
+              globalDesktopNavigatorToPage(
                 PlaylistMultiSelectionPage(
                   playlists: pagingController.itemList!,
                   isDesktop: isDesktop,

@@ -1,11 +1,11 @@
 import 'package:app_rhyme/dialogs/subscriptions_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -67,7 +67,7 @@ List<PullDownMenuEntry> playlistMenuItems(
             itemTheme: PullDownMenuItemTheme(
                 textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () async {
-              await deletePlaylist(playlist, inPlaylist, isDesktop, context);
+              await delDbPlaylist(playlist, inPlaylist, isDesktop, context);
             },
             title: '删除歌单',
             icon: CupertinoIcons.delete,
@@ -107,7 +107,9 @@ List<PullDownMenuEntry> playlistMenuItems(
             LogToast.error("更新订阅'${error.$1}'", "更新失败: ${error.$2}",
                 "[LocalMusicListItemsPullDown] Failed to update subscription '${error.$1}': ${error.$2}");
           }
-          refreshMusicAggregatorListViewPage();
+          playlist
+              .getMusicsFromDb()
+              .then((e) => musicAggregatorListUpdateStreamController.add(e));
           LogToast.success("更新订阅", "更新成功",
               "[LocalMusicListItemsPullDown] Succeed to update subscription");
         },

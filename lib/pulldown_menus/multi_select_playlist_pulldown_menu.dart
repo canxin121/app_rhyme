@@ -1,8 +1,8 @@
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/multi_select.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -68,7 +68,8 @@ class PlaylistMutiSelectGridPageMenu extends StatelessWidget {
               }
               controller.clear();
               setState();
-              refreshPlaylistGridViewPage();
+              Playlist.getFromDb()
+                  .then((e) => playlistGridUpdateStreamController.add(e));
 
               LogToast.success(
                 "删除歌单成功",

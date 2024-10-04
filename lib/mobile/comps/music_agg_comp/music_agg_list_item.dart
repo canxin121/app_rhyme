@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:app_rhyme/pulldown_menus/music_aggregator_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -38,11 +40,25 @@ class MobileMusicAggregatorListItemState
     extends State<MobileMusicAggregatorListItem> {
   Music? defaultMusic;
   bool _hasCache = false;
+  late StreamSubscription<Music> subscription;
 
   @override
   void initState() {
     super.initState();
     defaultMusic = getMusicAggregatorDefaultMusic(widget.musicAgg);
+    subscription = musicAggregatorInfoUpdateStreamController.stream.listen((e) {
+      if (defaultMusic?.identity == e.identity) {
+        setState(() {
+          defaultMusic = e;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscription.cancel();
   }
 
   void _checkCache() async {
@@ -50,7 +66,9 @@ class MobileMusicAggregatorListItemState
       return;
     }
     bool cacheStatus = await hasCacheMusic(
-        music: defaultMusic!, documentFolder: globalDocumentPath);
+        name: widget.musicAgg.name,
+        artists: widget.musicAgg.artist,
+        documentFolder: globalDocumentPath);
     if (mounted) {
       setState(() {
         _hasCache = cacheStatus;

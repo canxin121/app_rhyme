@@ -1,17 +1,19 @@
+import 'dart:async';
+
+import 'package:app_rhyme/common_pages/db_music_agg_listview_page.dart';
+import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/common_pages/search_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/search_page/playlist.dart';
 import 'package:app_rhyme/desktop/home.dart';
-import 'package:app_rhyme/desktop/pages/db_music_agg_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/common_pages/setting_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-void Function() globalDesktopMusicListNavColumnRefreshFunction = () {};
-void Function() globalPopPage = () {};
-void Function(Widget page, {bool replace}) globalNavigatorToPage =
+void Function() globalDesktopPopPage = () {};
+void Function(Widget page, {bool replace}) globalDesktopNavigatorToPage =
     (Widget page, {bool replace = true}) {
   return;
 };
@@ -28,7 +30,7 @@ class MyNavListContainer extends StatelessWidget {
         ? const Color.fromARGB(255, 32, 32, 32)
         : const Color.fromARGB(255, 243, 243, 243);
     Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;   
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,12 +72,8 @@ class MyNavListView extends StatefulWidget {
 }
 
 class MyNavListViewState extends State<MyNavListView> {
-  List<Playlist> musicLists = [];
-
-  Future<void> refresh() async {
-    musicLists = await Playlist.getFromDb();
-    setState(() {});
-  }
+  List<Playlist> playlists = [];
+  late StreamSubscription<List<Playlist>> playlistUpdateSubscription;
 
   void navigatorToPage(Widget page, {bool replace = true}) {
     if (globalDesktopNavigatorKey.currentContext == null) return;
@@ -103,16 +101,30 @@ class MyNavListViewState extends State<MyNavListView> {
 
   @override
   void initState() {
-    refresh();
-    globalDesktopMusicListNavColumnRefreshFunction = refresh;
-    globalNavigatorToPage = navigatorToPage;
-    globalPopPage = popPage;
+    playlistUpdateSubscription =
+        playlistGridUpdateStreamController.stream.listen((e) {
+      setState(() {
+        playlists = e;
+      });
+    });
+
+    globalDesktopNavigatorToPage = navigatorToPage;
+    globalDesktopPopPage = popPage;
+
+    Playlist.getFromDb().then((e) {
+      setState(() {
+        playlists = e;
+      });
+    });
     super.initState();
   }
 
   @override
   void dispose() {
-    globalDesktopMusicListNavColumnRefreshFunction = () {};
+    playlistUpdateSubscription.cancel();
+
+    globalDesktopNavigatorToPage = (Widget page, {bool replace = true}) {};
+    globalDesktopPopPage = () {};
     super.dispose();
   }
 
@@ -168,12 +180,14 @@ class MyNavListViewState extends State<MyNavListView> {
               onTap: () {
                 globalSetNavItemSelected("###AllPlaylist###");
                 navigatorToPage(
-                  const DesktopLocalMusicListGridPage(),
+                  const DbMusicListGridPage(
+                    isDesktop: true,
+                  ),
                 );
               },
               identity: '###AllPlaylist###',
             ),
-            ...musicLists.map(
+            ...playlists.map(
               (e) {
                 var title = e.name;
                 return NavItem(
@@ -182,8 +196,9 @@ class MyNavListViewState extends State<MyNavListView> {
                   onTap: () {
                     globalSetNavItemSelected("###Playlist_${e.identity}###");
                     navigatorToPage(
-                      LocalMusicContainerListPage(
+                      DbMusicContainerListPage(
                         playlist: e,
+                        isDesktop: true,
                       ),
                     );
                   },

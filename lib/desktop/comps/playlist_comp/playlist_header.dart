@@ -275,7 +275,7 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
-            globalNavigatorToPage(
+            globalDesktopNavigatorToPage(
                 MuiscAggregatorReorderPage(
                   musicAggregators: musicAggs,
                   playlist: playlist,
@@ -290,7 +290,7 @@ class DesktopLocalMusicListChoicMenu extends StatelessWidget {
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
-            globalNavigatorToPage(
+            globalDesktopNavigatorToPage(
                 MusicAggregatorMultiSelectionPage(
                   playlist: playlist,
                   musicAggs: musicAggs,

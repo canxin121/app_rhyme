@@ -1,6 +1,6 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/pulldown_menus/multi_select_music_agg_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -76,7 +76,7 @@ class MusicAggregatorMultiSelectionPageState
             child: Icon(CupertinoIcons.back, color: activeIconRed),
             onPressed: () {
               if (widget.isDesktop) {
-                globalPopPage();
+                globalDesktopPopPage();
               } else {
                 Navigator.of(context).pop();
               }
@@ -113,7 +113,6 @@ class MusicAggregatorMultiSelectionPageState
                     key: ValueKey(controller.hashCode),
                     alignment: Alignment.topCenter,
                     child: CupertinoScrollbar(
-                        
                         thickness: 10,
                         radius: const Radius.circular(10),
                         controller: scrollController,

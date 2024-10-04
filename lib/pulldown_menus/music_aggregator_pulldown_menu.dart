@@ -29,7 +29,9 @@ Future<void> showMusicAggregatorMenu(
   if (index == -1) {
     bool hasCache = false;
     hasCache = await hasCacheMusic(
-        music: defaultMusic, documentFolder: globalDocumentPath);
+        name: musicAgg.name,
+        artists: musicAgg.artist,
+        documentFolder: globalDocumentPath);
     if (!context.mounted) return;
     menuItems = _musicAggregetorPullDownItems(
         context, playlist, musicAgg, defaultMusic, hasCache, isDesktop);
@@ -118,7 +120,6 @@ List<dynamic> _musicAggregetorPullDownItems(
   return [
     PullDownMenuActionsRow.medium(
       items: [
-        /// 在线歌曲
         if (!musicAgg.fromDb)
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
@@ -127,8 +128,6 @@ List<dynamic> _musicAggregetorPullDownItems(
             title: '创建新歌单',
             icon: CupertinoIcons.add_circled,
           ),
-
-        /// 在线歌曲
         if (!musicAgg.fromDb)
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
@@ -137,8 +136,6 @@ List<dynamic> _musicAggregetorPullDownItems(
             title: '添加到歌单',
             icon: CupertinoIcons.add,
           ),
-
-        /// 数据库内歌曲
         if (musicAgg.fromDb && playlist != null)
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
@@ -150,8 +147,6 @@ List<dynamic> _musicAggregetorPullDownItems(
             title: '从歌单删除',
             icon: CupertinoIcons.delete,
           ),
-
-        /// 通用
         if (hasCache)
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
@@ -169,8 +164,6 @@ List<dynamic> _musicAggregetorPullDownItems(
             title: '缓存音乐',
             icon: CupertinoIcons.cloud_download,
           ),
-
-        /// 数据库内歌曲
         if (musicAgg.fromDb)
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
@@ -215,6 +208,13 @@ List<dynamic> _musicAggregetorPullDownItems(
           textStyle: const TextStyle().useSystemChineseFont()),
       onTap: () => createNewMusicListFromMusics(context, [musicAgg]),
       title: '创建新歌单',
+      icon: CupertinoIcons.add_circled,
+    ),
+    PullDownMenuItem(
+      itemTheme: PullDownMenuItemTheme(
+          textStyle: const TextStyle().useSystemChineseFont()),
+      onTap: () => exportMusicAggregatorsJson(context, [musicAgg]),
+      title: '导出歌曲Json',
       icon: CupertinoIcons.add_circled,
     ),
     if (playlist != null && playlist.fromDb)

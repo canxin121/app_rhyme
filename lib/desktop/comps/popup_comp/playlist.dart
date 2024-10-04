@@ -1,4 +1,4 @@
-import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';

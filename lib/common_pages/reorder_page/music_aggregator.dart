@@ -1,9 +1,9 @@
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:reorderables/reorderables.dart';
@@ -67,7 +67,7 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
               child: Icon(CupertinoIcons.back, color: activeIconRed),
               onPressed: () {
                 if (widget.isDesktop) {
-                  globalPopPage();
+                  globalDesktopPopPage();
                 } else {
                   Navigator.pop(context);
                 }
@@ -85,7 +85,8 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
                         playlistId: int.parse(widget.playlist.identity));
                   }
 
-                  refreshMusicAggregatorListViewPage();
+                  widget.playlist.getMusicsFromDb().then(
+                      (e) => musicAggregatorListUpdateStreamController.add(e));
                   LogToast.success("歌曲排序成功", "歌曲排序成功",
                       "[ReorderLocalMusicListPageState] Music list reordered successfully");
                 } catch (e) {
@@ -94,7 +95,7 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
                 }
                 if (context.mounted) {
                   if (widget.isDesktop) {
-                    globalPopPage();
+                    globalDesktopPopPage();
                   } else {
                     Navigator.pop(context);
                   }

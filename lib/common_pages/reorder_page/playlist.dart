@@ -2,8 +2,8 @@ import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/utils/refresh.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:reorderables/reorderables.dart';
@@ -48,7 +48,8 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
       }
       LogToast.success("歌单排序成功", "歌单排序成功",
           "[ReorderLocalMusicListGridPageState] Music list reordered successfully");
-      refreshPlaylistGridViewPage();
+      Playlist.getFromDb()
+          .then((e) => playlistGridUpdateStreamController.add(e));
     } catch (e) {
       LogToast.error("歌单排序失败", "歌单排序错误: $e",
           "[ReorderLocalMusicListGridPageState] Failed to reorder music list: $e");
@@ -77,7 +78,7 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
                 child: Icon(CupertinoIcons.back, color: activeIconRed),
                 onPressed: () {
                   if (widget.isDesktop) {
-                    globalPopPage();
+                    globalDesktopPopPage();
                   } else {
                     Navigator.pop(context);
                   }
@@ -90,12 +91,13 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
                   await _updatePlaylistsOrder();
                   if (context.mounted) {
                     if (widget.isDesktop) {
-                      globalPopPage();
+                      globalDesktopPopPage();
                     } else {
                       Navigator.pop(context);
                     }
                   }
-                  refreshPlaylistGridViewPage();
+                  Playlist.getFromDb()
+                      .then((e) => playlistGridUpdateStreamController.add(e));
                 },
               ),
             ),

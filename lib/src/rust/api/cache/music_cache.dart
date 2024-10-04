@@ -13,40 +13,48 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<bool> hasCacheMusic(
         {required String documentFolder,
         String? customCacheRoot,
-        required Music music}) =>
+        required String name,
+        required String artists}) =>
     RustLib.instance.api.crateApiCacheMusicCacheHasCacheMusic(
         documentFolder: documentFolder,
         customCacheRoot: customCacheRoot,
-        music: music);
+        name: name,
+        artists: artists);
 
 /// get cached music playinfo and lyric
 Future<(PlayInfo, String)?> getCacheMusic(
         {required String documentFolder,
         String? customCacheRoot,
-        required Music music}) =>
+        required String name,
+        required String artists}) =>
     RustLib.instance.api.crateApiCacheMusicCacheGetCacheMusic(
         documentFolder: documentFolder,
         customCacheRoot: customCacheRoot,
-        music: music);
+        name: name,
+        artists: artists);
 
 Future<void> cacheMusic(
         {required String documentFolder,
         String? customCacheRoot,
-        required Music music,
+        required String name,
+        required String artists,
         required PlayInfo playinfo,
         String? lyric}) =>
     RustLib.instance.api.crateApiCacheMusicCacheCacheMusic(
         documentFolder: documentFolder,
         customCacheRoot: customCacheRoot,
-        music: music,
+        name: name,
+        artists: artists,
         playinfo: playinfo,
         lyric: lyric);
 
 Future<void> deleteMusicCache(
         {required String documentFolder,
         String? customCacheRoot,
-        required Music musicInfo}) =>
+        required String name,
+        required String artists}) =>
     RustLib.instance.api.crateApiCacheMusicCacheDeleteMusicCache(
         documentFolder: documentFolder,
         customCacheRoot: customCacheRoot,
-        musicInfo: musicInfo);
+        name: name,
+        artists: artists);

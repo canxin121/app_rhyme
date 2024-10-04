@@ -4,6 +4,7 @@ import 'package:app_rhyme/pulldown_menus/music_aggregator_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -77,10 +78,32 @@ class DesktopMusicAggregatorListItemState
     extends State<DesktopMusicAggregatorListItem> {
   bool isHovered = false;
   Music? defaultMusic;
+
+  late StreamSubscription<Music> musicInfoUpdateSubscription;
+
   @override
   void initState() {
     super.initState();
     defaultMusic = getMusicAggregatorDefaultMusic(widget.musicAgg);
+    musicInfoUpdateSubscription =
+        musicAggregatorInfoUpdateStreamController.stream.listen((e) {
+      if (defaultMusic?.identity == e.identity) {
+        setState(() {
+          defaultMusic = e;
+        });
+        var musicIndex =
+            widget.musicAgg.musics.indexWhere((m) => m.server == e.server);
+        if (musicIndex != -1) {
+          widget.musicAgg.musics[musicIndex] = e;
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    musicInfoUpdateSubscription.cancel();
   }
 
   @override
@@ -153,7 +176,7 @@ class DesktopMusicAggregatorListItemState
                       duration: defaultMusic!.duration,
                       isDarkMode: widget.isDarkMode),
                   OptionsCell(
-                    music: defaultMusic!,
+                    musicAgg: widget.musicAgg,
                     isDarkMode: widget.isDarkMode,
                     onTapDown: (details) {
                       final Offset tapPosition = details.globalPosition;
@@ -315,23 +338,14 @@ class DurationCell extends StatelessWidget {
   }
 }
 
-final StreamController<void> _cacheUpdateController =
-    StreamController<void>.broadcast();
-
-Stream<void> get cacheUpdateStream => _cacheUpdateController.stream;
-
-void globalNotifyMusicContainerCacheUpdated() {
-  _cacheUpdateController.add(null);
-}
-
 class OptionsCell extends StatefulWidget {
   final bool isDarkMode;
-  final Music music;
+  final MusicAggregator musicAgg;
   final void Function(TapDownDetails)? onTapDown;
   const OptionsCell({
     super.key,
     required this.isDarkMode,
-    required this.music,
+    required this.musicAgg,
     this.onTapDown,
   });
 
@@ -341,12 +355,15 @@ class OptionsCell extends StatefulWidget {
 
 class OptionsCellState extends State<OptionsCell> {
   bool hasCache = false;
-  StreamSubscription<void>? _cacheUpdateSubscription;
+  late StreamSubscription<(bool, String)> cacheUpdateSubscription;
 
   @override
   void initState() {
     super.initState();
-    hasCacheMusic(music: widget.music, documentFolder: globalDocumentPath)
+    hasCacheMusic(
+            name: widget.musicAgg.name,
+            artists: widget.musicAgg.artist,
+            documentFolder: globalDocumentPath)
         .then((value) {
       if (mounted) {
         setState(() {
@@ -355,21 +372,19 @@ class OptionsCellState extends State<OptionsCell> {
       }
     });
 
-    _cacheUpdateSubscription = cacheUpdateStream.listen((_) {
-      hasCacheMusic(music: widget.music, documentFolder: globalDocumentPath)
-          .then((value) {
-        if (mounted) {
-          setState(() {
-            hasCache = value;
-          });
-        }
-      });
+    cacheUpdateSubscription = musicAggregatorCacheController.stream.listen((e) {
+      var (newHasCache, identity) = e;
+      if (identity == widget.musicAgg.identity()) {
+        setState(() {
+          hasCache = newHasCache;
+        });
+      }
     });
   }
 
   @override
   void dispose() {
-    _cacheUpdateSubscription?.cancel();
+    cacheUpdateSubscription.cancel();
     super.dispose();
   }
 

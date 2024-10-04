@@ -1,7 +1,7 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/mobile/comps/music_agg_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -253,7 +253,8 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
 
 @immutable
 class SearchMusicAggregatorChoiceMenu extends StatelessWidget {
-  const SearchMusicAggregatorChoiceMenu({super.key, 
+  const SearchMusicAggregatorChoiceMenu({
+    super.key,
     required this.builder,
     required this.fetchAllMusicAggregators,
     required this.pagingController,
@@ -306,7 +307,7 @@ class SearchMusicAggregatorChoiceMenu extends StatelessWidget {
             if (pagingController.itemList!.isEmpty) return;
             if (context.mounted) {
               globalSetNavItemSelected("");
-              globalNavigatorToPage(
+              globalDesktopNavigatorToPage(
                   MusicAggregatorMultiSelectionPage(
                     musicAggs: pagingController.itemList!,
                     isDesktop: true,
