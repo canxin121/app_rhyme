@@ -234,7 +234,7 @@ Future<void> setMusicCoverAsPlaylistCover(
 }
 
 Future<void> saveMusicList(Playlist playlist, bool toastWhenSuccess) async {
-  LogToast.success("保存歌单", "正在获取歌单'${playlist.name}'数据，请稍等",
+  LogToast.info("保存歌单", "正在获取歌单'${playlist.name}'数据，请稍等",
       "[OnlineMusicListItemsPullDown] Start to save music list");
   try {
     var musicAggs = await playlist.fetchMusicsOnline(page: 1, limit: 2333);

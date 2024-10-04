@@ -119,120 +119,127 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
-    double screenWidth = MediaQuery.of(context).size.width;
 
-    if (widget.isDesktop) {
-      final ScrollController controller = ScrollController();
-      return CupertinoPageScaffold(
-        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-        child: CupertinoScrollbar(
-          controller: controller,
-          thickness: 10,
-          radius: const Radius.circular(10),
-          child: CustomScrollView(
-            controller: controller,
-            slivers: <Widget>[
-              MusicListHeader(
-                playlist: playlist,
-                musicAggregators: musicAggs,
-                isDarkMode: isDarkMode,
-                screenWidth: screenWidth,
-                cacheCover: globalConfig.storageConfig.saveCover,
-              ),
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 20),
-              ),
-              MusicAggregatorList(
-                musicAggs: musicAggs,
-                playlist: playlist,
-                cacheCover: globalConfig.storageConfig.saveCover,
-              ),
-            ],
+    return widget.isDesktop
+        ? _buildDesktopLayout(isDarkMode, widget.isDesktop)
+        : _buildMobileLayout(isDarkMode, widget.isDesktop);
+  }
+
+  Widget _buildMobileLayout(bool isDarkMode, bool isDesktop) {
+    final Color backgroundColor =
+        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+    final Color dividerColor = isDarkMode
+        ? const Color.fromARGB(255, 41, 41, 43)
+        : const Color.fromARGB(255, 245, 245, 246);
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    return CupertinoPageScaffold(
+      backgroundColor: backgroundColor,
+      navigationBar: CupertinoNavigationBar(
+          padding: const EdgeInsetsDirectional.only(end: 16),
+          backgroundColor: backgroundColor,
+          leading: CupertinoButton(
+            padding: const EdgeInsets.all(0),
+            child: Icon(CupertinoIcons.back, color: activeIconRed),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-        ),
-      );
-    } else {
-      final Color backgroundColor =
-          isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-      final Color dividerColor = isDarkMode
-          ? const Color.fromARGB(255, 41, 41, 43)
-          : const Color.fromARGB(255, 245, 245, 246);
-
-      return CupertinoPageScaffold(
-        backgroundColor: backgroundColor,
-        navigationBar: CupertinoNavigationBar(
-            padding: const EdgeInsetsDirectional.only(end: 16),
-            backgroundColor: backgroundColor,
-            leading: CupertinoButton(
-              padding: const EdgeInsets.all(0),
-              child: Icon(CupertinoIcons.back, color: activeIconRed),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            trailing: DbMusicListChoicMenu(
-              builder: (context, showMenu) => CupertinoButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: showMenu,
-                  child: Text(
-                    '选项',
-                    style:
-                        TextStyle(color: activeIconRed).useSystemChineseFont(),
-                  )),
+          trailing: DbMusicListChoicMenu(
+            builder: (context, showMenu) => CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+                )),
+            playlist: playlist,
+            musicAggs: musicAggs,
+          )),
+      child: CustomScrollView(
+        slivers: <Widget>[
+          MobilePlaylistHeader(
               playlist: playlist,
-              musicAggs: musicAggs,
-            )),
-        child: CustomScrollView(
-          slivers: <Widget>[
-            MobilePlaylistHeader(
-                playlist: playlist,
-                musicAggregators: musicAggs,
-                isDarkMode: isDarkMode),
-            SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  bool isFirst = index == 0;
-                  bool isLastItem = index == musicAggs.length - 1;
+              musicAggregators: musicAggs,
+              isDarkMode: isDarkMode),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                bool isFirst = index == 0;
+                bool isLastItem = index == musicAggs.length - 1;
 
-                  final musicAgg = musicAggs[index];
-                  return Column(
-                    children: [
-                      if (isFirst)
-                        const Padding(padding: EdgeInsets.only(top: 5)),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: MobileMusicAggregatorListItem(
-                          key: ValueKey(musicAgg.identity()),
-                          musicAgg: musicAgg,
-                          playlist: widget.playlist,
-                          cacheCover: globalConfig.storageConfig.saveCover,
-                        ),
+                final musicAgg = musicAggs[index];
+                return Column(
+                  children: [
+                    if (isFirst)
+                      const Padding(padding: EdgeInsets.only(top: 5)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
+                      child: MobileMusicAggregatorListItem(
+                        key: ValueKey(musicAgg.identity()),
+                        musicAgg: musicAgg,
+                        playlist: widget.playlist,
+                        cacheCover: globalConfig.storageConfig.saveCover,
                       ),
-                      if (!isLastItem)
-                        Center(
-                          child: SizedBox(
-                            width: screenWidth * 0.85,
-                            child: Divider(
-                              color: dividerColor,
-                              height: 0.5,
-                            ),
+                    ),
+                    if (!isLastItem)
+                      Center(
+                        child: SizedBox(
+                          width: screenWidth * 0.85,
+                          child: Divider(
+                            color: dividerColor,
+                            height: 0.5,
                           ),
-                        )
-                    ],
-                  );
-                },
-                childCount: musicAggs.length,
-              ),
+                        ),
+                      )
+                  ],
+                );
+              },
+              childCount: musicAggs.length,
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.only(top: 200),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout(bool isDarkMode, bool isDesktop) {
+    final ScrollController controller = ScrollController();
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    return CupertinoPageScaffold(
+      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+      child: CupertinoScrollbar(
+        controller: controller,
+        thickness: 10,
+        radius: const Radius.circular(10),
+        child: CustomScrollView(
+          controller: controller,
+          slivers: <Widget>[
+            MusicListHeader(
+              playlist: playlist,
+              musicAggregators: musicAggs,
+              isDarkMode: isDarkMode,
+              screenWidth: screenWidth,
+              cacheCover: globalConfig.storageConfig.saveCover,
             ),
             const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(top: 200),
-              ),
+              child: SizedBox(height: 20),
+            ),
+            MusicAggregatorList(
+              musicAggs: musicAggs,
+              playlist: playlist,
+              cacheCover: globalConfig.storageConfig.saveCover,
             ),
           ],
         ),
-      );
-    }
+      ),
+    );
   }
 }
 

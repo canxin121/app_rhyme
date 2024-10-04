@@ -75,6 +75,14 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
+
+    return widget.isDesktop
+        ? buildDesktopUI(isDarkMode)
+        : buildMobileUI(isDarkMode);
+  }
+
+  /// 桌面端 UI 构建
+  Widget buildDesktopUI(bool isDarkMode) {
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color backgroundColor = isDarkMode
@@ -92,13 +100,12 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
             leading: Padding(
               padding: const EdgeInsets.only(left: 0.0),
               child: Align(
-                alignment:
-                    widget.isDesktop ? Alignment.center : Alignment.centerLeft,
+                alignment: Alignment.center,
                 child: Text(
-                  widget.isDesktop ? '所有播放列表' : '资料库',
+                  '资料库',
                   style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: widget.isDesktop ? 16 : 24,
+                          fontSize: 16,
                           color: textColor)
                       .useSystemChineseFont(),
                 ),
@@ -114,7 +121,7 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
                     style:
                         TextStyle(color: activeIconRed).useSystemChineseFont(),
                   )),
-              isDesktop: widget.isDesktop,
+              isDesktop: true,
             ),
           ),
           Expanded(
@@ -124,9 +131,61 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
                         style:
                             TextStyle(color: textColor).useSystemChineseFont()),
                   )
-                : widget.isDesktop
-                    ? buildDesktopGrid(controller, textColor)
-                    : buildMobileGrid(textColor),
+                : buildDesktopGrid(controller, textColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 移动端 UI 构建
+  Widget buildMobileUI(bool isDarkMode) {
+    final Color textColor =
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    final Color backgroundColor =
+        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+
+    return CupertinoPageScaffold(
+      backgroundColor: backgroundColor,
+      child: Column(
+        children: [
+          CupertinoNavigationBar(
+            backgroundColor: backgroundColor,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 0.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '资料库',
+                  style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                          color: textColor)
+                      .useSystemChineseFont(),
+                ),
+              ),
+            ),
+            trailing: PlaylistGridPageMenu(
+              playlists: playlists,
+              builder: (context, showMenu) => CupertinoButton(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: showMenu,
+                  child: Text(
+                    '选项',
+                    style:
+                        TextStyle(color: activeIconRed).useSystemChineseFont(),
+                  )),
+              isDesktop: false,
+            ),
+          ),
+          Expanded(
+            child: playlists.isEmpty
+                ? Center(
+                    child: Text("没有歌单",
+                        style:
+                            TextStyle(color: textColor).useSystemChineseFont()),
+                  )
+                : buildMobileGrid(textColor),
           ),
         ],
       ),

@@ -82,13 +82,19 @@ class SearchMusicListState extends State<PlaylistSearchPage>
     final ScrollController scrollController = ScrollController();
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
+    final Color primaryColor =
+        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+      backgroundColor: widget.isDesktop
+          ? getPrimaryBackgroundColor(isDarkMode)
+          : primaryColor,
       child: Column(
         children: [
           CupertinoNavigationBar(
-            backgroundColor: getNavigatorBarColor(isDarkMode),
+            backgroundColor: widget.isDesktop
+                ? getNavigatorBarColor(isDarkMode)
+                : primaryColor,
             leading: Padding(
               padding: const EdgeInsets.only(left: 0.0),
               child: Align(
