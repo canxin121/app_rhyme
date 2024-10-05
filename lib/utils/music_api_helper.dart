@@ -52,13 +52,13 @@ Future<void> delMusicAggregatorCache(MusicAggregator musicAggregator,
 Future<void> cacheMusicContainer(MusicContainer musicContainer) async {
   try {
     var success = await musicContainer.updateAll();
-    if (!success || musicContainer.playInfo == null) {
+    if (!success || musicContainer.playinfo == null) {
       return;
     }
     await rust_api_music_cache.cacheMusic(
         name: musicContainer.musicAggregator.name,
         artists: musicContainer.musicAggregator.artist,
-        playinfo: musicContainer.playInfo!,
+        playinfo: musicContainer.playinfo!,
         lyric: musicContainer.lyric,
         documentFolder: globalDocumentPath);
 

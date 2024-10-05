@@ -58,7 +58,7 @@ class QualityTimeState extends State<QualityTime> {
               return Badge(
                 isDarkMode: true,
                 label: globalAudioHandler
-                        .playingMusic.value?.playInfo?.quality.summary ??
+                        .playingMusic.value?.playinfo?.quality.summary ??
                     "Quality",
               );
             }),

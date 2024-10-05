@@ -50,11 +50,13 @@ class SongDisplayPageState extends State<SongDisplayPage> {
 
   @override
   Widget build(BuildContext context) {
-    const bool isDarkMode = true;
-    const animateBackgroundColor = CupertinoColors.white;
+    final isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
+
+    final Color backgroundColor =
+        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
     const backgroundColor1 = Color.fromARGB(255, 56, 56, 56);
     const backgroundColor2 = Color.fromARGB(255, 31, 31, 31);
-
     const textColor = CupertinoColors.white;
 
     double screenWidth = MediaQuery.of(context).size.width;
@@ -76,12 +78,10 @@ class SongDisplayPageState extends State<SongDisplayPage> {
         break;
       case PageState.list:
         topWidgets = <Widget>[
-          // 占据70高度
           const PlayingMusicCard(
             height: 70,
             picPadding: EdgeInsets.only(left: 20),
           ),
-          // 占据20高度
           Container(
             padding:
                 const EdgeInsets.only(left: 20, top: 20, bottom: 10, right: 20),
@@ -111,7 +111,6 @@ class SongDisplayPageState extends State<SongDisplayPage> {
               ],
             ),
           ),
-          // 应当占据剩下的所有高度
           MusicListComp(
             maxHeight: screenHeight * 0.87 - 300,
           ),
@@ -123,10 +122,9 @@ class SongDisplayPageState extends State<SongDisplayPage> {
             height: 70,
             picPadding: EdgeInsets.only(left: 20),
           ),
-          // 应当占据剩下的空间
           LyricDisplay(
             maxHeight: screenHeight * 0.87 - 240,
-            isDarkMode: isDarkMode,
+            isDarkMode: true,
           )
         ];
         break;
@@ -135,7 +133,7 @@ class SongDisplayPageState extends State<SongDisplayPage> {
     return DismissiblePage(
       isFullScreen: true,
       direction: DismissiblePageDismissDirection.down,
-      backgroundColor: animateBackgroundColor,
+      backgroundColor: backgroundColor,
       onDismissed: () => Navigator.of(context).pop(),
       child: Container(
           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -154,28 +152,24 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                 ...topWidgets
               ],
             ),
-            // 固定在页面底部的内容,共占据约 140 + screenHeight * 0.2 的高度
             Positioned(
-              bottom: 0, // 确保它固定在底部
+              bottom: 0,
               left: 0,
               right: 0,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // main界面时占据36的高度
                   if (pageState == PageState.main)
                     const MusicInfo(
                       titleHeight: 20,
                       artistHeight: 16,
                       padding: EdgeInsets.only(left: 40, right: 40),
                     ),
-                  // 占据约35的高度
                   const ProgressSlider(
                     padding: EdgeInsets.only(
                         top: 10, bottom: 10, left: 20, right: 20),
                     isDarkMode: true,
                   ),
-                  // 占据 12 高度
                   const QualityTime(
                     fontHeight: 12,
                     padding: 35,
@@ -192,8 +186,6 @@ class SongDisplayPageState extends State<SongDisplayPage> {
                     padding: EdgeInsets.only(left: 20, right: 20),
                     isDarkMode: true,
                   ),
-                  // if (!Platform.isIOS) const VolumeSlider(),
-                  // 占据 55 的高度
                   BottomButton(
                     onList: onListBotton,
                     onLyric: onLyricBotton,

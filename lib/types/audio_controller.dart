@@ -126,7 +126,7 @@ class AudioHandler {
     if (targetMusicContainer == null) return;
 
     playingMusic.value = targetMusicContainer;
-
+    playingMusic.refresh();
     try {
       if (!await targetMusicContainer!.updateAll(quality)) {
         globalTalker.info(
@@ -149,6 +149,7 @@ class AudioHandler {
           "[AudioHanlder.lazyLoadMusic] LazyLoad Music Succeed: ${targetMusicContainer!.musicAggregator.name}");
     } catch (e) {
       playingMusic.value = null;
+      playingMusic.refresh();
       globalTalker.error("[AudioHandler.tryLazyLoadMusic] Unknown Error: $e");
     }
   }
@@ -206,7 +207,7 @@ class AudioHandler {
 
         await _lazyLoadMusic(player.currentIndex!,
             quality: quality, force: true);
-
+        playingMusic.refresh();
         await seek(position);
       }
     } catch (e) {

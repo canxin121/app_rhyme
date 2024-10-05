@@ -15,7 +15,7 @@ class MusicContainer {
   late int currentMusicIndex;
   late AudioSource audioSource;
 
-  PlayInfo? playInfo;
+  PlayInfo? playinfo;
   String? lyric;
   List<MusicServer> usedServers = [];
   DateTime lastUpdateDateTime = DateTime(1999);
@@ -55,17 +55,18 @@ class MusicContainer {
   Future<bool> updateAll([Quality? quality]) async {
     await getUpdatePlayAndLyricInfoAutoChangeSource(quality);
     await _updateAudioSource();
-    return playInfo != null;
+    return playinfo != null;
   }
 
   /// safe
   Future<PlayInfo?> getUpdatePlayAndLyricInfoAutoChangeSource(
       [Quality? quality]) async {
     while (true) {
-      playInfo ??= await getUpdatePlayInfoAndLyric(quality);
-
-      if (playInfo != null) {
-        return playInfo;
+      var newPlayinfo = await getUpdatePlayInfoAndLyric(quality);
+      // playInfo ??= await getUpdatePlayInfoAndLyric(quality);
+      playinfo = newPlayinfo;
+      if (playinfo != null) {
+        return playinfo;
       } else {
         bool changed = await changeMusicServer();
         if (!changed) {
@@ -90,7 +91,7 @@ class MusicContainer {
           name: musicAggregator.name,
           artists: musicAggregator.artist,
           documentFolder: globalDocumentPath);
-      playInfo = musicCache?.$1;
+      playinfo = musicCache?.$1;
       lyric = musicCache?.$2;
       try {
         lyric ??= await currentMusic.getLyric();
@@ -98,11 +99,11 @@ class MusicContainer {
         LogToast.error("在线获取歌词失败", "在线获取歌词失败: ${currentMusic.name} $e",
             "[getUpdateMusicPlayInfo] Failed to get lyric: $e");
       }
-      if (playInfo != null) {
+      if (playinfo != null) {
         globalTalker
             .info("[getUpdateMusicPlayInfo] 使用缓存歌曲: ${currentMusic.name}");
         setUpdated();
-        return playInfo!;
+        return playinfo!;
       }
       // ignore: empty_catches
     } catch (e) {}
@@ -113,10 +114,10 @@ class MusicContainer {
       return null;
     }
 
-    playInfo = await globalExternalApiEvaler!.getMusicPlayInfo(currentMusic,
+    playinfo = await globalExternalApiEvaler!.getMusicPlayInfo(currentMusic,
         selectedQuality ?? autoPickQuality(currentMusic.qualities));
 
-    if (playInfo == null) {
+    if (playinfo == null) {
       globalTalker.error(
           "[getUpdateMusicPlayInfo] 第三方音乐源无法获取到playinfo: [${currentMusic.server}]${currentMusic.name}");
       return null;
@@ -125,7 +126,7 @@ class MusicContainer {
     globalTalker.info(
         "[getUpdateMusicPlayInfo] 使用第三方Api请求获取playinfo: [${currentMusic.server}]${currentMusic.name}");
     setUpdated();
-    return playInfo;
+    return playinfo;
   }
 
   /// safe
@@ -146,33 +147,33 @@ class MusicContainer {
 
   /// safe
   Future<bool> _updateAudioSource() async {
-    if (playInfo != null) {
-      if (playInfo!.uri.contains("http")) {
+    if (playinfo != null) {
+      if (playinfo!.uri.contains("http")) {
         if ((Platform.isIOS || Platform.isMacOS) &&
-            ((playInfo!.quality.format != null &&
-                    playInfo!.quality.format!.contains("flac")) ||
-                (playInfo!.quality.summary.contains("flac")))) {
-          audioSource = ProgressiveAudioSource(Uri.parse(playInfo!.uri),
+            ((playinfo!.quality.format != null &&
+                    playinfo!.quality.format!.contains("flac")) ||
+                (playinfo!.quality.summary.contains("flac")))) {
+          audioSource = ProgressiveAudioSource(Uri.parse(playinfo!.uri),
               tag: _toMediaItem(),
               options: const ProgressiveAudioSourceOptions(
                   darwinAssetOptions: DarwinAssetOptions(
                       preferPreciseDurationAndTiming: true)));
         } else {
           audioSource =
-              AudioSource.uri(Uri.parse(playInfo!.uri), tag: _toMediaItem());
+              AudioSource.uri(Uri.parse(playinfo!.uri), tag: _toMediaItem());
         }
       } else {
         if ((Platform.isIOS || Platform.isMacOS) &&
-            ((playInfo!.quality.format != null &&
-                    playInfo!.quality.format!.contains("flac")) ||
-                (playInfo!.quality.summary.contains("flac")))) {
-          audioSource = ProgressiveAudioSource(Uri.file(playInfo!.uri),
+            ((playinfo!.quality.format != null &&
+                    playinfo!.quality.format!.contains("flac")) ||
+                (playinfo!.quality.summary.contains("flac")))) {
+          audioSource = ProgressiveAudioSource(Uri.file(playinfo!.uri),
               tag: _toMediaItem(),
               options: const ProgressiveAudioSourceOptions(
                   darwinAssetOptions: DarwinAssetOptions(
                       preferPreciseDurationAndTiming: true)));
         } else {
-          audioSource = AudioSource.file(playInfo!.uri, tag: _toMediaItem());
+          audioSource = AudioSource.file(playinfo!.uri, tag: _toMediaItem());
         }
       }
 
