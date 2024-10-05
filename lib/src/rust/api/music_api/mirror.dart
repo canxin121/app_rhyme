@@ -10,7 +10,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class Artist {
   String name;
-  PlatformInt64? id;
+  String? id;
 
   Artist({
     required this.name,
@@ -79,8 +79,8 @@ class Music {
   static Future<List<Music>> searchOnline(
           {required List<MusicServer> servers,
           required String content,
-          required PlatformInt64 page,
-          required PlatformInt64 size}) =>
+          required int page,
+          required int size}) =>
       RustLib.instance.api.crateApiMusicApiMirrorMusicSearchOnline(
           servers: servers, content: content, page: page, size: size);
 
@@ -150,6 +150,15 @@ class MusicAggregator {
         that: this,
       );
 
+  static Future<List<MusicAggregator>> fetchArtistMusicAggregators(
+          {required MusicServer server,
+          required String artistId,
+          required int page,
+          required int limit}) =>
+      RustLib.instance.api
+          .crateApiMusicApiMirrorMusicAggregatorFetchArtistMusicAggregators(
+              server: server, artistId: artistId, page: page, limit: limit);
+
   Future<MusicAggregator> fetchServerOnline(
           {required List<MusicServer> servers}) =>
       RustLib.instance.api
@@ -174,8 +183,8 @@ class MusicAggregator {
           {required List<MusicAggregator> aggs,
           required List<MusicServer> servers,
           required String content,
-          required PlatformInt64 page,
-          required PlatformInt64 size}) =>
+          required int page,
+          required int size}) =>
       RustLib.instance.api.crateApiMusicApiMirrorMusicAggregatorSearchOnline(
           aggs: aggs,
           servers: servers,
@@ -303,6 +312,14 @@ class Playlist {
       RustLib.instance.api.crateApiMusicApiMirrorPlaylistDelMusicAgg(
           that: this, musicAggIdentity: musicAggIdentity);
 
+  static Future<List<Playlist>> fetchArtistAlbums(
+          {required MusicServer server,
+          required String artistId,
+          required int page,
+          required int limit}) =>
+      RustLib.instance.api.crateApiMusicApiMirrorPlaylistFetchArtistAlbums(
+          server: server, artistId: artistId, page: page, limit: limit);
+
   /// Fetch musics from playlist
   Future<List<MusicAggregator>> fetchMusicsOnline(
           {required int page, required int limit}) =>
@@ -353,8 +370,8 @@ class Playlist {
   static Future<List<Playlist>> searchOnline(
           {required List<MusicServer> servers,
           required String content,
-          required PlatformInt64 page,
-          required PlatformInt64 size}) =>
+          required int page,
+          required int size}) =>
       RustLib.instance.api.crateApiMusicApiMirrorPlaylistSearchOnline(
           servers: servers, content: content, page: page, size: size);
 

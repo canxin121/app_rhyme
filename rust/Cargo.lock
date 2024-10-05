@@ -1263,7 +1263,7 @@ dependencies = [
 [[package]]
 name = "music_api"
 version = "0.1.0"
-source = "git+https://github.com/canxin121/music_api#9b43946a3330381c9b286dccb64fb97bd76f925d"
+source = "git+https://github.com/canxin121/music_api#3422416787d1891980a3775744910648cee871be"
 dependencies = [
  "aes",
  "anyhow",

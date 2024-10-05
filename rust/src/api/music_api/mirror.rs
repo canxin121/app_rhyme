@@ -42,7 +42,7 @@ pub struct _Artist {
     #[frb(non_final)]
     pub name: String,
     #[frb(non_final)]
-    pub id: Option<i64>,
+    pub id: Option<String>,
 }
 
 #[frb(mirror(ArtistVec))]

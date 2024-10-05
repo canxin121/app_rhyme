@@ -23,8 +23,8 @@ impl Music {
     pub async fn search_online(
         servers: Vec<MusicServer>,
         content: String,
-        page: i64,
-        size: i64,
+        page: u16,
+        size: u16,
     ) -> Result<Vec<Music>> {
     }
 
@@ -59,8 +59,8 @@ impl MusicAggregator {
         aggs: Vec<MusicAggregator>,
         servers: Vec<MusicServer>,
         content: String,
-        page: i64,
-        size: i64,
+        page: u16,
+        size: u16,
     ) -> anyhow::Result<Vec<Self>> {
     }
 
@@ -75,6 +75,14 @@ impl MusicAggregator {
     pub async fn update_order_to_db(&self, playlist_id: i64) -> Result<(), anyhow::Error> {}
 
     pub async fn clear_unused() -> anyhow::Result<()> {}
+
+    pub async fn fetch_artist_music_aggregators(
+        server: MusicServer,
+        artist_id: &str,
+        page: u16,
+        limit: u16,
+    ) -> anyhow::Result<Vec<Self>> {
+    }
 }
 
 #[frb(external)]
@@ -87,8 +95,8 @@ impl Playlist {
     pub async fn search_online(
         servers: Vec<MusicServer>,
         content: String,
-        page: i64,
-        size: i64,
+        page: u16,
+        size: u16,
     ) -> Result<Vec<Playlist>> {
     }
 
@@ -133,6 +141,14 @@ impl Playlist {
     pub async fn update_subscription(&self) -> Result<PlaylistUpdateSubscriptionResult> {}
 
     pub async fn del_music_agg(&self, music_agg_identity: String) -> anyhow::Result<()> {}
+
+    pub async fn fetch_artist_albums(
+        server: MusicServer,
+        artist_id: &str,
+        page: u16,
+        limit: u16,
+    ) -> Result<Vec<Playlist>> {
+    }
 }
 
 #[frb(external)]
