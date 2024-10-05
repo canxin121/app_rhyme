@@ -66,16 +66,11 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
     final isDarkMode = brightness == Brightness.dark;
     final textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final primaryColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      backgroundColor: widget.isDesktop
-          ? getSettingPageBackgroundColor(isDarkMode)
-          : primaryColor,
+      backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
-        backgroundColor:
-            widget.isDesktop ? getNavigatorBarColor(isDarkMode) : primaryColor,
+        backgroundColor: getNavigatorBarColor(isDarkMode),
         leading: Align(
           alignment: Alignment.centerLeft,
           child: Text(
