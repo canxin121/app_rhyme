@@ -626,7 +626,7 @@ Future<void> exportPlaylistsJson(
 //       server: server, artistId: artistId, page: page, limit: limit);
 // }
 
-Future<void> example() async {
-  List<ServerPlaylistTagCollection> serverTagCollections =
-      await ServerPlaylistTagCollection.getPlaylistTags();
-}
+// Future<void> example() async {
+//   List<ServerPlaylistTagCollection> serverTagCollections =
+//       await ServerPlaylistTagCollection.getPlaylistTags();
+// }
