@@ -2,11 +2,13 @@
 use anyhow::Result;
 use flutter_rust_bridge::frb;
 use music_api::{
-    data::interface::{
+    interface::{
         json::{MusicAggregatorJsonVec, PlaylistJsonVec},
         music_aggregator::{Music, MusicAggregator},
+        music_chart::ServerMusicChartCollection,
         playlist::Playlist,
         playlist_subscription::PlayListSubscription,
+        playlist_tag::{ServerPlaylistTagCollection, TagPlaylistOrder},
         results::PlaylistUpdateSubscriptionResult,
         server::MusicServer,
     },
@@ -163,20 +165,47 @@ impl MusicServer {
 
 #[frb]
 pub async fn set_db(database_url: &str) -> Result<(), anyhow::Error> {
-    music_api::data::interface::database::set_db(database_url).await
+    music_api::interface::database::set_db(database_url).await
 }
 
 #[frb]
 pub async fn close_db() -> Result<(), anyhow::Error> {
-    music_api::data::interface::database::close_db().await
+    music_api::interface::database::close_db().await
 }
 
 #[frb]
 pub async fn clear_db() -> Result<(), anyhow::Error> {
-    music_api::data::interface::database::clear_db().await
+    music_api::interface::database::clear_db().await
 }
 
 #[frb]
 pub async fn reinit_db() -> Result<(), anyhow::Error> {
-    music_api::data::interface::database::reinit_db().await
+    music_api::interface::database::reinit_db().await
+}
+
+#[frb(external)]
+impl ServerMusicChartCollection {
+    pub async fn get_music_chart_collection() -> Result<Vec<ServerMusicChartCollection>> {}
+
+    pub async fn get_musics_from_chart(
+        server: MusicServer,
+        id: &str,
+        page: u16,
+        limit: u16,
+    ) -> Result<Vec<MusicAggregator>> {
+    }
+}
+
+#[frb(external)]
+impl ServerPlaylistTagCollection {
+    pub async fn get_playlist_tags() -> Result<Vec<ServerPlaylistTagCollection>> {}
+
+    pub async fn get_playlists_from_tag(
+        server: MusicServer,
+        tag_id: &str,
+        order: TagPlaylistOrder,
+        page: u16,
+        limit: u16,
+    ) -> Result<Vec<Playlist>> {
+    }
 }

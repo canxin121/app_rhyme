@@ -1,5 +1,5 @@
 use flutter_rust_bridge::frb;
-use music_api::data::interface::{music_aggregator::Music, quality::Quality, server::MusicServer};
+use music_api::interface::{music_aggregator::Music, quality::Quality, server::MusicServer};
 use serde::Serialize;
 
 #[frb]

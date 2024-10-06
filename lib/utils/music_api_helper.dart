@@ -620,3 +620,13 @@ Future<void> exportPlaylistsJson(
     );
   }
 }
+
+// Future<void> example() async {
+//   var musicAggs = await MusicAggregator.fetchArtistMusicAggregators(
+//       server: server, artistId: artistId, page: page, limit: limit);
+// }
+
+Future<void> example() async {
+  List<ServerPlaylistTagCollection> serverTagCollections =
+      await ServerPlaylistTagCollection.getPlaylistTags();
+}

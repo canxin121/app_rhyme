@@ -218,6 +218,58 @@ class MusicAggregator {
           defaultServer == other.defaultServer;
 }
 
+class MusicChart {
+  final String name;
+  final String? summary;
+  final String? cover;
+  final String id;
+
+  const MusicChart({
+    required this.name,
+    this.summary,
+    this.cover,
+    required this.id,
+  });
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ summary.hashCode ^ cover.hashCode ^ id.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MusicChart &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          summary == other.summary &&
+          cover == other.cover &&
+          id == other.id;
+}
+
+class MusicChartCollection {
+  final String name;
+  final String? summary;
+  final List<MusicChart> charts;
+
+  const MusicChartCollection({
+    required this.name,
+    this.summary,
+    required this.charts,
+  });
+
+  @override
+  int get hashCode => name.hashCode ^ summary.hashCode ^ charts.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MusicChartCollection &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          summary == other.summary &&
+          charts == other.charts;
+}
+
 enum MusicDataType {
   database,
   playlists,
@@ -423,6 +475,48 @@ class Playlist {
           subscription == other.subscription;
 }
 
+class PlaylistTag {
+  final String name;
+  final String id;
+
+  const PlaylistTag({
+    required this.name,
+    required this.id,
+  });
+
+  @override
+  int get hashCode => name.hashCode ^ id.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlaylistTag &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          id == other.id;
+}
+
+class PlaylistTagCollection {
+  final String name;
+  final List<PlaylistTag> tags;
+
+  const PlaylistTagCollection({
+    required this.name,
+    required this.tags,
+  });
+
+  @override
+  int get hashCode => name.hashCode ^ tags.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlaylistTagCollection &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          tags == other.tags;
+}
+
 enum PlaylistType {
   userPlaylist,
   album,
@@ -473,4 +567,85 @@ class Quality {
           bitrate == other.bitrate &&
           format == other.format &&
           size == other.size;
+}
+
+class ServerMusicChartCollection {
+  final MusicServer server;
+  final List<MusicChartCollection> collections;
+
+  const ServerMusicChartCollection({
+    required this.server,
+    required this.collections,
+  });
+
+  static Future<
+      List<
+          ServerMusicChartCollection>> getMusicChartCollection() => RustLib
+      .instance.api
+      .crateApiMusicApiMirrorServerMusicChartCollectionGetMusicChartCollection();
+
+  static Future<List<MusicAggregator>> getMusicsFromChart(
+          {required MusicServer server,
+          required String id,
+          required int page,
+          required int limit}) =>
+      RustLib.instance.api
+          .crateApiMusicApiMirrorServerMusicChartCollectionGetMusicsFromChart(
+              server: server, id: id, page: page, limit: limit);
+
+  @override
+  int get hashCode => server.hashCode ^ collections.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ServerMusicChartCollection &&
+          runtimeType == other.runtimeType &&
+          server == other.server &&
+          collections == other.collections;
+}
+
+class ServerPlaylistTagCollection {
+  final MusicServer server;
+  final List<PlaylistTagCollection> collections;
+
+  const ServerPlaylistTagCollection({
+    required this.server,
+    required this.collections,
+  });
+
+  static Future<List<ServerPlaylistTagCollection>> getPlaylistTags() =>
+      RustLib.instance.api
+          .crateApiMusicApiMirrorServerPlaylistTagCollectionGetPlaylistTags();
+
+  static Future<List<Playlist>> getPlaylistsFromTag(
+          {required MusicServer server,
+          required String tagId,
+          required TagPlaylistOrder order,
+          required int page,
+          required int limit}) =>
+      RustLib.instance.api
+          .crateApiMusicApiMirrorServerPlaylistTagCollectionGetPlaylistsFromTag(
+              server: server,
+              tagId: tagId,
+              order: order,
+              page: page,
+              limit: limit);
+
+  @override
+  int get hashCode => server.hashCode ^ collections.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ServerPlaylistTagCollection &&
+          runtimeType == other.runtimeType &&
+          server == other.server &&
+          collections == other.collections;
+}
+
+enum TagPlaylistOrder {
+  hot,
+  new_,
+  ;
 }

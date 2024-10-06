@@ -1,10 +1,14 @@
 use flutter_rust_bridge::frb;
-pub use music_api::data::interface::{
+pub use music_api::interface::{
     artist::{Artist, ArtistVec},
     json::{DatabaseJson, MusicAggregatorJsonVec, MusicDataType, PlaylistJson, PlaylistJsonVec},
     music_aggregator::{Music, MusicAggregator},
+    music_chart::{MusicChart, MusicChartCollection, ServerMusicChartCollection},
     playlist::{Playlist, PlaylistType},
     playlist_subscription::PlayListSubscription,
+    playlist_tag::{
+        PlaylistTag, PlaylistTagCollection, ServerPlaylistTagCollection, TagPlaylistOrder,
+    },
     quality::{Quality, QualityVec},
     results::PlaylistUpdateSubscriptionResult,
     server::MusicServer,
@@ -133,4 +137,49 @@ pub enum _MusicDataType {
     Database,
     Playlists,
     MusicAggregators,
+}
+
+#[frb(mirror(PlaylistTag))]
+pub struct _PlaylistTag {
+    pub name: String,
+    pub id: String,
+}
+
+#[frb(mirror(PlaylistTagCollection))]
+pub struct _PlaylistTagCollection {
+    pub name: String,
+    pub tags: Vec<PlaylistTag>,
+}
+
+#[frb(mirror(ServerPlaylistTagCollection))]
+pub struct _ServerPlaylistTagCollection {
+    pub server: MusicServer,
+    pub collections: Vec<PlaylistTagCollection>,
+}
+
+#[frb(mirror(TagPlaylistOrder))]
+pub enum _TagPlaylistOrder {
+    Hot,
+    New,
+}
+
+#[frb(mirror(MusicChart))]
+pub struct _MusicChart {
+    pub name: String,
+    pub summary: Option<String>,
+    pub cover: Option<String>,
+    pub id: String,
+}
+
+#[frb(mirror(MusicChartCollection))]
+pub struct _MusicChartCollection {
+    pub name: String,
+    pub summary: Option<String>,
+    pub charts: Vec<MusicChart>,
+}
+
+#[frb(mirror(ServerMusicChartCollection))]
+pub struct _ServerMusicChartCollection {
+    pub server: MusicServer,
+    pub collections: Vec<MusicChartCollection>,
 }

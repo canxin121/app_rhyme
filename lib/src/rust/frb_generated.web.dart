@@ -137,6 +137,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<MusicAggregator> dco_decode_list_music_aggregator(dynamic raw);
 
   @protected
+  List<MusicChart> dco_decode_list_music_chart(dynamic raw);
+
+  @protected
+  List<MusicChartCollection> dco_decode_list_music_chart_collection(
+      dynamic raw);
+
+  @protected
   List<MusicServer> dco_decode_list_music_server(dynamic raw);
 
   @protected
@@ -145,6 +152,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<Playlist> dco_decode_list_playlist(dynamic raw);
+
+  @protected
+  List<PlaylistTag> dco_decode_list_playlist_tag(dynamic raw);
+
+  @protected
+  List<PlaylistTagCollection> dco_decode_list_playlist_tag_collection(
+      dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -156,10 +170,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
+  List<ServerMusicChartCollection>
+      dco_decode_list_server_music_chart_collection(dynamic raw);
+
+  @protected
+  List<ServerPlaylistTagCollection>
+      dco_decode_list_server_playlist_tag_collection(dynamic raw);
+
+  @protected
   Music dco_decode_music(dynamic raw);
 
   @protected
   MusicAggregator dco_decode_music_aggregator(dynamic raw);
+
+  @protected
+  MusicChart dco_decode_music_chart(dynamic raw);
+
+  @protected
+  MusicChartCollection dco_decode_music_chart_collection(dynamic raw);
 
   @protected
   MusicDataType dco_decode_music_data_type(dynamic raw);
@@ -207,6 +235,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Playlist dco_decode_playlist(dynamic raw);
 
   @protected
+  PlaylistTag dco_decode_playlist_tag(dynamic raw);
+
+  @protected
+  PlaylistTagCollection dco_decode_playlist_tag_collection(dynamic raw);
+
+  @protected
   PlaylistType dco_decode_playlist_type(dynamic raw);
 
   @protected
@@ -237,7 +271,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Release dco_decode_release(dynamic raw);
 
   @protected
+  ServerMusicChartCollection dco_decode_server_music_chart_collection(
+      dynamic raw);
+
+  @protected
+  ServerPlaylistTagCollection dco_decode_server_playlist_tag_collection(
+      dynamic raw);
+
+  @protected
   StorageConfig dco_decode_storage_config(dynamic raw);
+
+  @protected
+  TagPlaylistOrder dco_decode_tag_playlist_order(dynamic raw);
 
   @protected
   int dco_decode_u_16(dynamic raw);
@@ -364,6 +409,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<MusicChart> sse_decode_list_music_chart(SseDeserializer deserializer);
+
+  @protected
+  List<MusicChartCollection> sse_decode_list_music_chart_collection(
+      SseDeserializer deserializer);
+
+  @protected
   List<MusicServer> sse_decode_list_music_server(SseDeserializer deserializer);
 
   @protected
@@ -372,6 +424,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<Playlist> sse_decode_list_playlist(SseDeserializer deserializer);
+
+  @protected
+  List<PlaylistTag> sse_decode_list_playlist_tag(SseDeserializer deserializer);
+
+  @protected
+  List<PlaylistTagCollection> sse_decode_list_playlist_tag_collection(
+      SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -384,10 +443,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<ServerMusicChartCollection>
+      sse_decode_list_server_music_chart_collection(
+          SseDeserializer deserializer);
+
+  @protected
+  List<ServerPlaylistTagCollection>
+      sse_decode_list_server_playlist_tag_collection(
+          SseDeserializer deserializer);
+
+  @protected
   Music sse_decode_music(SseDeserializer deserializer);
 
   @protected
   MusicAggregator sse_decode_music_aggregator(SseDeserializer deserializer);
+
+  @protected
+  MusicChart sse_decode_music_chart(SseDeserializer deserializer);
+
+  @protected
+  MusicChartCollection sse_decode_music_chart_collection(
+      SseDeserializer deserializer);
 
   @protected
   MusicDataType sse_decode_music_data_type(SseDeserializer deserializer);
@@ -438,6 +514,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Playlist sse_decode_playlist(SseDeserializer deserializer);
 
   @protected
+  PlaylistTag sse_decode_playlist_tag(SseDeserializer deserializer);
+
+  @protected
+  PlaylistTagCollection sse_decode_playlist_tag_collection(
+      SseDeserializer deserializer);
+
+  @protected
   PlaylistType sse_decode_playlist_type(SseDeserializer deserializer);
 
   @protected
@@ -471,7 +554,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Release sse_decode_release(SseDeserializer deserializer);
 
   @protected
+  ServerMusicChartCollection sse_decode_server_music_chart_collection(
+      SseDeserializer deserializer);
+
+  @protected
+  ServerPlaylistTagCollection sse_decode_server_playlist_tag_collection(
+      SseDeserializer deserializer);
+
+  @protected
   StorageConfig sse_decode_storage_config(SseDeserializer deserializer);
+
+  @protected
+  TagPlaylistOrder sse_decode_tag_playlist_order(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_16(SseDeserializer deserializer);
@@ -602,6 +696,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<MusicAggregator> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_music_chart(
+      List<MusicChart> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_music_chart_collection(
+      List<MusicChartCollection> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_music_server(
       List<MusicServer> self, SseSerializer serializer);
 
@@ -611,6 +713,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_playlist(List<Playlist> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_playlist_tag(
+      List<PlaylistTag> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_playlist_tag_collection(
+      List<PlaylistTagCollection> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(
@@ -624,11 +734,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<(String, String)> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_server_music_chart_collection(
+      List<ServerMusicChartCollection> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_server_playlist_tag_collection(
+      List<ServerPlaylistTagCollection> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_music(Music self, SseSerializer serializer);
 
   @protected
   void sse_encode_music_aggregator(
       MusicAggregator self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_music_chart(MusicChart self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_music_chart_collection(
+      MusicChartCollection self, SseSerializer serializer);
 
   @protected
   void sse_encode_music_data_type(MusicDataType self, SseSerializer serializer);
@@ -682,6 +807,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_playlist(Playlist self, SseSerializer serializer);
 
   @protected
+  void sse_encode_playlist_tag(PlaylistTag self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_playlist_tag_collection(
+      PlaylistTagCollection self, SseSerializer serializer);
+
+  @protected
   void sse_encode_playlist_type(PlaylistType self, SseSerializer serializer);
 
   @protected
@@ -713,7 +845,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_release(Release self, SseSerializer serializer);
 
   @protected
+  void sse_encode_server_music_chart_collection(
+      ServerMusicChartCollection self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_server_playlist_tag_collection(
+      ServerPlaylistTagCollection self, SseSerializer serializer);
+
+  @protected
   void sse_encode_storage_config(StorageConfig self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_tag_playlist_order(
+      TagPlaylistOrder self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_16(int self, SseSerializer serializer);

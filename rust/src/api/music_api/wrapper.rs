@@ -1,4 +1,4 @@
-use music_api::data::interface::{
+use music_api::interface::{
     json::{MusicDataJson, MusicDataType},
     music_aggregator::MusicAggregator,
     playlist::Playlist,
