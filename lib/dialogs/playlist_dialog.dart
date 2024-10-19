@@ -8,7 +8,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<Playlist?> showPlaylistInfoDialog(BuildContext context,
+Future<Playlist?> showPlaylistDialog(BuildContext context,
     {Playlist? defaultPlaylist, bool readonly = false}) async {
   return showCupertinoDialog<Playlist>(
     context: context,
@@ -191,10 +191,22 @@ class PlaylistDialogState extends State<PlaylistDialog> {
             onPressed: () async {
               if (nameController.text.isNotEmpty) {
                 if (widget.defaultMusicList != null) {
-                  widget.defaultMusicList!.name = nameController.text;
-                  widget.defaultMusicList!.summary = descController.text;
-                  widget.defaultMusicList!.cover = artPicPath;
-                  Navigator.of(context).pop(widget.defaultMusicList);
+                  Navigator.of(context).pop(Playlist(
+                    fromDb: widget.defaultMusicList!.fromDb,
+                    typeField: widget.defaultMusicList!.typeField,
+                    identity: widget.defaultMusicList!.identity,
+                    name: nameController.text,
+                    summary: descController.text,
+                    cover: artPicPath,
+                    subscription: widget.defaultMusicList!.subscription,
+                    collectionId: widget.defaultMusicList!.collectionId,
+                    order: widget.defaultMusicList!.order,
+                    server: widget.defaultMusicList!.server,
+                    creator: widget.defaultMusicList!.creator,
+                    creatorId: widget.defaultMusicList!.creatorId,
+                    musicNum: widget.defaultMusicList!.musicNum,
+                    playTime: widget.defaultMusicList!.playTime,
+                  ));
                 } else {
                   Navigator.of(context).pop(await Playlist.newInstance(
                     name: nameController.text,

@@ -86,7 +86,7 @@ class DesktopMusicAggregatorListItemState
     super.initState();
     defaultMusic = getMusicAggregatorDefaultMusic(widget.musicAgg);
     musicInfoUpdateSubscription =
-        musicAggregatorInfoUpdateStreamController.stream.listen((e) {
+        musicAggregatorUpdateStreamController.stream.listen((e) {
       if (defaultMusic?.identity == e.identity) {
         setState(() {
           defaultMusic = e;

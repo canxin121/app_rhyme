@@ -1,4 +1,4 @@
-import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
+import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/desktop/comps/control_bar.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
@@ -66,7 +66,7 @@ class DesktopHomeState extends State<DesktopHome> {
                       return CupertinoPageRoute(
                         builder: (context) {
                           globalDesktopPageContext = context;
-                          return const DbMusicListGridPage(
+                          return const DbPlaylistCollectionPage(
                             isDesktop: true,
                           );
                         },

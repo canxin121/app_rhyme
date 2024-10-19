@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:app_rhyme/common_pages/db_music_agg_listview_page.dart';
+import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/common_pages/search_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/search_page/playlist.dart';
@@ -30,7 +30,7 @@ class MyNavListContainer extends StatelessWidget {
         ? const Color.fromARGB(255, 32, 32, 32)
         : const Color.fromARGB(255, 243, 243, 243);
     Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;   
+        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,8 +72,75 @@ class MyNavListView extends StatefulWidget {
 }
 
 class MyNavListViewState extends State<MyNavListView> {
-  List<Playlist> playlists = [];
-  late StreamSubscription<List<Playlist>> playlistUpdateSubscription;
+  List<PlaylistCollection> playlistCollections = [];
+  late StreamSubscription<void>
+      playlistCollectionsPageRefreshStreamSubscription;
+  late StreamSubscription<int> playlistCollectionDeleteStreamSubscription;
+  late StreamSubscription<PlaylistCollection>
+      playlistCollectionUpdateStreamSubscription;
+  late StreamSubscription<PlaylistCollection>
+      playlistCollectionCreateStreamSubscription;
+
+  @override
+  void initState() {
+    playlistCollectionsPageRefreshStreamSubscription =
+        playlistCollectionsPageRefreshStreamController.stream.listen((e) {
+      PlaylistCollection.getFormDb().then((e) {
+        setState(() {
+          playlistCollections = e;
+        });
+      });
+    });
+
+    playlistCollectionDeleteStreamSubscription =
+        playlistCollectionDeleteStreamController.stream.listen((p) {
+      setState(() {
+        playlistCollections.removeWhere((element) => element.id == p);
+      });
+    });
+
+    playlistCollectionUpdateStreamSubscription =
+        playlistCollectionUpdateStreamController.stream.listen((e) {
+      setState(() {
+        var index =
+            playlistCollections.indexWhere((element) => element.id == e.id);
+        if (index != -1) {
+          playlistCollections[index] = e;
+        } else {
+          playlistCollections.add(e);
+        }
+      });
+    });
+
+    playlistCollectionCreateStreamSubscription =
+        playlistCollectionCreateStreamController.stream.listen((e) {
+      setState(() {
+        playlistCollections.add(e);
+      });
+    });
+
+    globalDesktopNavigatorToPage = navigatorToPage;
+    globalDesktopPopPage = popPage;
+
+    PlaylistCollection.getFormDb().then((e) {
+      setState(() {
+        playlistCollections = e;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    playlistCollectionsPageRefreshStreamSubscription.cancel();
+    playlistCollectionDeleteStreamSubscription.cancel();
+    playlistCollectionUpdateStreamSubscription.cancel();
+    playlistCollectionCreateStreamSubscription.cancel();
+
+    globalDesktopNavigatorToPage = (Widget page, {bool replace = true}) {};
+    globalDesktopPopPage = () {};
+    super.dispose();
+  }
 
   void navigatorToPage(Widget page, {bool replace = true}) {
     if (globalDesktopNavigatorKey.currentContext == null) return;
@@ -97,35 +164,6 @@ class MyNavListViewState extends State<MyNavListView> {
     if (navigator.canPop()) {
       navigator.pop();
     }
-  }
-
-  @override
-  void initState() {
-    playlistUpdateSubscription =
-        playlistGridUpdateStreamController.stream.listen((e) {
-      setState(() {
-        playlists = e;
-      });
-    });
-
-    globalDesktopNavigatorToPage = navigatorToPage;
-    globalDesktopPopPage = popPage;
-
-    Playlist.getFromDb().then((e) {
-      setState(() {
-        playlists = e;
-      });
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    playlistUpdateSubscription.cancel();
-
-    globalDesktopNavigatorToPage = (Widget page, {bool replace = true}) {};
-    globalDesktopPopPage = () {};
-    super.dispose();
   }
 
   @override
@@ -175,34 +213,36 @@ class MyNavListViewState extends State<MyNavListView> {
           icon: CupertinoIcons.music_note,
           items: [
             NavItem(
-              title: '所有播放列表',
+              title: '所有歌单列表',
               icon: CupertinoIcons.music_albums,
               onTap: () {
-                globalSetNavItemSelected("###AllPlaylist###");
+                globalSetNavItemSelected("###AllPlaylistCollection###");
                 navigatorToPage(
-                  const DbMusicListGridPage(
+                  const DbPlaylistCollectionPage(
                     isDesktop: true,
                   ),
                 );
               },
-              identity: '###AllPlaylist###',
+              identity: '###AllPlaylistCollection###',
             ),
-            ...playlists.map(
-              (e) {
-                var title = e.name;
+            ...playlistCollections.map(
+              (pc) {
+                var title = pc.name;
                 return NavItem(
                   title: title,
                   icon: CupertinoIcons.music_albums,
                   onTap: () {
-                    globalSetNavItemSelected("###Playlist_${e.identity}###");
-                    navigatorToPage(
-                      DbMusicContainerListPage(
-                        playlist: e,
-                        isDesktop: true,
-                      ),
-                    );
+                    globalSetNavItemSelected(
+                        "###PlaylistCollection_${pc.id}###");
+                    pc
+                        .getPlaylistsFromDb()
+                        .then((pls) => navigatorToPage(DbPlaylistGridPage(
+                              isDesktop: true,
+                              playlists: pls,
+                              playlistCollection: pc,
+                            )));
                   },
-                  identity: "###Playlist_${e.identity}###",
+                  identity: "###PlaylistCollection_${pc.id}###",
                 );
               },
             )

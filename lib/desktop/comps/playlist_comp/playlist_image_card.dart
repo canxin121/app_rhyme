@@ -63,9 +63,9 @@ class DesktopPlaylistImageCardState extends State<DesktopPlaylistImageCard> {
                     aspectRatio: 1.0,
                     child: imageWithCache(widget.playlist.getCover(size: 250),
                         enableCache: widget.cacheCover,
-                        width: 250,
-                        height: 250),
-                  ), // 100x100
+                        cacheHeight: 250,
+                        cacheWidth: 250),
+                  ),
                 ),
                 if (_hovering)
                   Positioned.fill(

@@ -54,6 +54,7 @@ class PlaylistMutiSelectGridPageMenu extends StatelessWidget {
               for (var playlist in selectedPlaylists) {
                 try {
                   await playlist.delFromDb();
+                  playlistDeleteStreamController.add(playlist.identity);
                 } catch (e) {
                   LogToast.error(
                     "删除歌单失败",
@@ -68,8 +69,6 @@ class PlaylistMutiSelectGridPageMenu extends StatelessWidget {
               }
               controller.clear();
               setState();
-              Playlist.getFromDb()
-                  .then((e) => playlistGridUpdateStreamController.add(e));
 
               LogToast.success(
                 "删除歌单成功",
@@ -87,40 +86,20 @@ class PlaylistMutiSelectGridPageMenu extends StatelessWidget {
               if (selectedPlaylists == null) {
                 return;
               }
-              savePlaylists(selectedPlaylists);
+              saveOnlinePlaylists(context, selectedPlaylists);
             },
-            title: '保存歌单为新增歌单',
+            title: '保存歌单',
             icon: CupertinoIcons.music_house_fill,
           ),
-        PullDownMenuItem(
-          onTap: () async {
-            var selectedPlaylists = getSelectedPlaylists();
-            if (selectedPlaylists == null) {
-              return;
-            }
-            controller.clear();
-            await savePlaylistsAsOneNewPlaylist(selectedPlaylists, context);
-
-            /// 只有来自数据库的歌单才需要改变，在线歌单不需要
-            if (playlists.first.fromDb) {
-              var result = await Playlist.getFromDb();
-              playlists.clear();
-              playlists.addAll(result);
-            }
-            setState();
-          },
-          title: '添加歌曲到新建歌单',
-          icon: CupertinoIcons.music_albums_fill,
-        ),
         PullDownMenuItem(
           onTap: () {
             var selectedPlaylists = getSelectedPlaylists();
             if (selectedPlaylists == null) {
               return;
             }
-            addAggsOfPlaylistsToTargetPlayList(selectedPlaylists, context);
+            saveAggsOfPlaylists(selectedPlaylists, context);
           },
-          title: '添加歌曲到已有歌单',
+          title: '保存歌曲',
           icon: CupertinoIcons.add_circled_solid,
         ),
         PullDownMenuItem(

@@ -46,7 +46,7 @@ class MobileMusicAggregatorListItemState
   void initState() {
     super.initState();
     defaultMusic = getMusicAggregatorDefaultMusic(widget.musicAgg);
-    subscription = musicAggregatorInfoUpdateStreamController.stream.listen((e) {
+    subscription = musicAggregatorUpdateStreamController.stream.listen((e) {
       if (defaultMusic?.identity == e.identity) {
         setState(() {
           defaultMusic = e;

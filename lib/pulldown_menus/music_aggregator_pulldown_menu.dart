@@ -79,7 +79,7 @@ List<dynamic> _playinglistItems(BuildContext context, int index,
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => createNewMusicListFromMusics(context, [musicAgg]),
+          onTap: () => createPlaylistFromMusics(context, [musicAgg]),
           title: '创建新歌单',
           icon: CupertinoIcons.add_circled,
         ),
@@ -124,7 +124,7 @@ List<dynamic> _musicAggregetorPullDownItems(
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
                 textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => createNewMusicListFromMusics(context, [musicAgg]),
+            onTap: () => createPlaylistFromMusics(context, [musicAgg]),
             title: '创建新歌单',
             icon: CupertinoIcons.add_circled,
           ),
@@ -151,8 +151,9 @@ List<dynamic> _musicAggregetorPullDownItems(
           PullDownMenuItem(
             itemTheme: PullDownMenuItemTheme(
                 textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => delMusicAggregatorCache(musicAgg,
-                showToastWhenNoMsuicCache: true),
+            onTap: () => delMusicCache(
+              musicAgg,
+            ),
             title: '删除缓存',
             icon: CupertinoIcons.delete_solid,
           )
@@ -175,7 +176,7 @@ List<dynamic> _musicAggregetorPullDownItems(
                     "[MusicContainer] Failed to edit music info: Cannot find music info");
                 return;
               }
-              music = await editMusicInfoToDb(context, music);
+              music = await editMusicToDb(context, music);
             },
             title: '编辑信息',
             icon: CupertinoIcons.pencil,
@@ -199,6 +200,20 @@ List<dynamic> _musicAggregetorPullDownItems(
     PullDownMenuItem(
       itemTheme: PullDownMenuItemTheme(
           textStyle: const TextStyle().useSystemChineseFont()),
+      onTap: () => viewArtistMusicAggregators(context, defaultMusic, isDesktop),
+      title: '查看歌手歌曲',
+      icon: CupertinoIcons.music_albums,
+    ),
+    PullDownMenuItem(
+      itemTheme: PullDownMenuItemTheme(
+          textStyle: const TextStyle().useSystemChineseFont()),
+      onTap: () => viewArtistAlbums(context, defaultMusic, isDesktop),
+      title: '查看歌手专辑',
+      icon: CupertinoIcons.music_albums,
+    ),
+    PullDownMenuItem(
+      itemTheme: PullDownMenuItemTheme(
+          textStyle: const TextStyle().useSystemChineseFont()),
       onTap: () => addMusicsToPlayList(context, [musicAgg]),
       title: '添加到歌单',
       icon: CupertinoIcons.add,
@@ -206,7 +221,7 @@ List<dynamic> _musicAggregetorPullDownItems(
     PullDownMenuItem(
       itemTheme: PullDownMenuItemTheme(
           textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => createNewMusicListFromMusics(context, [musicAgg]),
+      onTap: () => createPlaylistFromMusics(context, [musicAgg]),
       title: '创建新歌单',
       icon: CupertinoIcons.add_circled,
     ),

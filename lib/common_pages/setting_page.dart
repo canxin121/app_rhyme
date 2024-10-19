@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/dialogs/database_url_dialog.dart';
 import 'package:app_rhyme/dialogs/file_name_dialog.dart';
@@ -24,6 +23,7 @@ import 'package:app_rhyme/types/extern_api.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -198,7 +198,7 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                 child: const Icon(CupertinoIcons.right_chevron),
               ),
             ),
-            if (isDesktop())
+            if (widget.isDesktop)
               CupertinoFormRow(
                 prefix: Text('窗口设置',
                     style: TextStyle(color: textColor).useSystemChineseFont()),
@@ -218,18 +218,8 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                   style: TextStyle(color: textColor).useSystemChineseFont()),
               child: CupertinoButton(
                 onPressed: () {
-                  if (isDesktop()) {
-                    globalDesktopNavigatorToPage(TalkerScreen(
-                      talker: globalTalker,
-                    ));
-                  } else {
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                          builder: (context) => TalkerScreen(
-                                talker: globalTalker,
-                              )),
-                    );
-                  }
+                  navigate(context, TalkerScreen(talker: globalTalker),
+                      widget.isDesktop, "");
                 },
                 child: const Icon(CupertinoIcons.right_chevron),
               ),
@@ -480,12 +470,9 @@ class StorageConfigPageState extends State<StorageConfigPage>
         context.findAncestorStateOfType<SettingPageState>()?.refresh();
       }
     } finally {
-      if (widget.isDesktop) {
-        globalDesktopPopPage();
-      } else {
-        if (mounted) Navigator.pop(context);
+      if (mounted) {
+        popPage(context, isDesktop);
       }
-      setState(() {});
     }
   }
 
@@ -658,20 +645,16 @@ class StorageConfigPageState extends State<StorageConfigPage>
                       await clearDb();
                       await musicDataJson.applyToDb();
 
-                      Playlist.getFromDb().then(
-                          (e) => playlistGridUpdateStreamController.add(e));
+                      playlistCollectionsPageRefreshStreamController.add(null);
                       LogToast.success("数据库设置", "数据库移动成功",
                           "[storageConfig.moveDatabase] success");
                     } catch (e) {
                       LogToast.error("数据库设置", "数据库移动失败: $e",
                           "[storageConfig.moveDatabase] failed: $e");
                     } finally {
-                      if (widget.isDesktop) {
-                        globalDesktopPopPage();
-                      } else {
-                        if (context.mounted) Navigator.pop(context);
+                      if (context.mounted) {
+                        popPage(context, widget.isDesktop);
                       }
-                      setState(() {});
                     }
                   },
                   child: const Icon(CupertinoIcons.tray_2_fill),
@@ -720,8 +703,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
 
                       await clearDb();
                       await setDb(databaseUrl: dbUrl);
-                      Playlist.getFromDb().then(
-                          (e) => playlistGridUpdateStreamController.add(e));
+                      playlistCollectionsPageRefreshStreamController.add(null);
 
                       LogToast.success("数据库设置", "数据库设置成功",
                           "[storageConfig.moveDatabase] success");
@@ -729,12 +711,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
                       LogToast.error("数据库设置", "数据库设置失败: $e",
                           "[storageConfig.moveDatabase] failed: $e");
                     } finally {
-                      if (widget.isDesktop) {
-                        globalDesktopPopPage();
-                      } else {
-                        if (context.mounted) Navigator.pop(context);
-                      }
-                      setState(() {});
+                      if (context.mounted) popPage(context, widget.isDesktop);
                     }
                   },
                   child: const Icon(CupertinoIcons.tray_2_fill),
@@ -820,14 +797,12 @@ class StorageConfigPageState extends State<StorageConfigPage>
                             }
                           case MusicDataType.playlists:
                             if (context.mounted) {
-                              await importPlaylistJson(
-                                  context, widget.isDesktop,
+                              await importPlaylistJson(context,
                                   musicDataJson: musicDataJson);
                             }
                           case MusicDataType.musicAggregators:
                             if (context.mounted) {
-                              await importMusicAggrgegatorJson(
-                                  context, widget.isDesktop,
+                              await importMusicAggrgegatorJson(context,
                                   musicDataJson: musicDataJson);
                             }
                         }

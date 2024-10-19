@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 Color activeIconRed = const Color.fromARGB(255, 250, 35, 59);
+Color tagRedColor = const Color.fromARGB(255, 241, 80, 71);
 
 Color getDividerColor(bool isDarkMode) {
   return isDarkMode
@@ -24,4 +25,8 @@ Color getSettingPageBackgroundColor(bool isDarkMode) {
   return isDarkMode
       ? CupertinoColors.black
       : CupertinoColors.systemGroupedBackground;
+}
+
+Color getTextColor(bool isDarkMode) {
+  return isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 }

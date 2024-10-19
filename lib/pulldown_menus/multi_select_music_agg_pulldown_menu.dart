@@ -1,5 +1,4 @@
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
-import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/multi_select.dart';
@@ -42,15 +41,14 @@ class MusicAggMultiSelectMenu extends StatelessWidget {
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () {
+          onTap: () async {
             var selectedMusicAggs = controller.value.selectedIndexes
                 .map((index) => musicAggs[index])
                 .toList();
-            cacheMusicAggs(selectedMusicAggs, () {
-              setState();
-              playlist?.getMusicsFromDb().then(
-                  (e) => musicAggregatorListUpdateStreamController.add(e));
-            });
+            await cacheMusicAggs(
+              selectedMusicAggs,
+            );
+            setState();
           },
           title: '缓存选中音乐',
           icon: CupertinoIcons.cloud_download,
@@ -62,7 +60,7 @@ class MusicAggMultiSelectMenu extends StatelessWidget {
             var selectedMusicAggs = controller.value.selectedIndexes
                 .map((index) => musicAggs[index])
                 .toList();
-            deleteMusicAggsCache(selectedMusicAggs, () {
+            deleteMusicsCache(selectedMusicAggs, () {
               setState();
             });
           },
@@ -78,6 +76,7 @@ class MusicAggMultiSelectMenu extends StatelessWidget {
                 try {
                   await playlist!.delMusicAgg(
                       musicAggIdentity: musicAggs[index].identity());
+                  
                 } catch (e) {
                   LogToast.error("删除失败", "删除音乐失败: $e",
                       "[deleteMusicAggsFromDbPlaylist] Failed to delete music: $e");
@@ -91,8 +90,6 @@ class MusicAggMultiSelectMenu extends StatelessWidget {
               }
               controller.clear();
               setState();
-              playlist?.getMusicsFromDb().then(
-                  (e) => musicAggregatorListUpdateStreamController.add(e));
             }
           },
           title: '从歌单删除',
@@ -118,7 +115,7 @@ class MusicAggMultiSelectMenu extends StatelessWidget {
           var selectedMusicAggs = controller.value.selectedIndexes
               .map((index) => musicAggs[index])
               .toList();
-          await createNewMusicListFromMusics(context, selectedMusicAggs);
+          await createPlaylistFromMusics(context, selectedMusicAggs);
         },
         title: '创建新歌单',
         icon: CupertinoIcons.add_circled,

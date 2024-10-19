@@ -1,34 +1,83 @@
 import 'package:app_rhyme/common_pages/online_music_agg_listview_page.dart';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
+import 'package:app_rhyme/common_pages/online_playlist_gridview_page.dart';
+import 'package:app_rhyme/dialogs/artist_select_dialog.dart';
 import 'package:app_rhyme/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/dialogs/file_name_dialog.dart';
 import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
+import 'package:app_rhyme/dialogs/playlist_collection_dialog.dart';
+import 'package:app_rhyme/dialogs/select_create_playlist_collection_dialog.dart';
 import 'package:app_rhyme/dialogs/wait_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart'
     as rust_api_music_cache;
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
-import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/music_dialog.dart';
 import 'package:app_rhyme/dialogs/playlist_dialog.dart';
-import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
+import 'package:app_rhyme/dialogs/select_create_playlist_dialog.dart';
 import 'package:app_rhyme/types/music_container.dart';
-import 'package:app_rhyme/utils/const_vars.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
 import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:flutter/cupertino.dart';
 
+/// safe
 Music? getMusicAggregatorDefaultMusic(MusicAggregator musicAggregator) {
-  return musicAggregator.musics
-      .where((e) => e.server == musicAggregator.defaultServer)
-      .first;
+  try {
+    return musicAggregator.musics
+        .where((e) => e.server == musicAggregator.defaultServer)
+        .first;
+  } catch (e) {
+    LogToast.error("获取默认音乐失败", "获取默认音乐失败: $e",
+        "[getMusicAggregatorDefaultMusic] Failed to get default music: $e");
+  }
+  return null;
 }
 
-Future<void> delMusicAggregatorCache(MusicAggregator musicAggregator,
-    {bool showToast = true, bool showToastWhenNoMsuicCache = false}) async {
+/// safe
+Future<List<MusicAggregator>?> getOrFetchAllMusicAgrgegatorsFromPlaylist(
+    Playlist playlist) async {
+  if (playlist.fromDb) {
+    return playlist.getMusicsFromDb();
+  }
+
+  return await getOrFetchAllMusicAgrgegators((int page, int limit) async {
+    return await playlist.fetchMusicsOnline(page: page, limit: limit);
+  });
+}
+
+Future<List<MusicAggregator>?> getOrFetchAllMusicAgrgegators(
+    Future<List<MusicAggregator>> Function(int page, int limit)
+        fetchMusicAggregators) async {
+  try {
+    const int limit = 500;
+    List<MusicAggregator> musicAggs = [];
+    int page = 1;
+
+    while (true) {
+      var fetchedMusicAggs = await fetchMusicAggregators(page, limit);
+      if (fetchedMusicAggs.isEmpty) {
+        break;
+      }
+      musicAggs.addAll(fetchedMusicAggs);
+      page++;
+    }
+
+    return musicAggs;
+  } catch (e) {
+    LogToast.error("获取歌单音乐失败", "获取歌单音乐失败: $e",
+        "[fetchAllMusicAgrgegatorsFromPlaylist] Failed to fetch music from playlist: $e");
+  }
+  return null;
+}
+
+/// safe
+Future<void> delMusicCache(
+  MusicAggregator musicAggregator, {
+  bool showToast = true,
+}) async {
   // 这个函数运行耗时短，连续使用时应showToast = false
   try {
     await rust_api_music_cache.deleteMusicCache(
@@ -37,11 +86,6 @@ Future<void> delMusicAggregatorCache(MusicAggregator musicAggregator,
         documentFolder: globalDocumentPath);
 
     musicAggregatorCacheController.add((false, musicAggregator.identity()));
-
-    if (showToast) {
-      LogToast.success("删除缓存成功", "成功删除缓存: ${musicAggregator.name}",
-          "[deleteMusicCache] Successfully deleted cache: ${musicAggregator.name}");
-    }
   } catch (e) {
     // 失败时总是要显示toast
     LogToast.error("删除缓存失败", "删除缓存'${musicAggregator.name}'失败: $e",
@@ -49,11 +93,22 @@ Future<void> delMusicAggregatorCache(MusicAggregator musicAggregator,
   }
 }
 
+/// safe
+Future<void> deleteMusicsCache(
+    List<MusicAggregator> musicAggs, VoidCallback refresh) async {
+  await Future.wait(musicAggs.map((musicContainer) async {
+    await delMusicCache(musicContainer, showToast: false);
+  }));
+}
+
+/// safe
 Future<void> cacheMusicContainer(MusicContainer musicContainer) async {
   try {
-    var success = await musicContainer.updateAll();
-    if (!success || musicContainer.playinfo == null) {
-      return;
+    if (musicContainer.shouldUpdate()) {
+      var success = await musicContainer.updateAll();
+      if (!success || musicContainer.playinfo == null) {
+        return;
+      }
     }
     await rust_api_music_cache.cacheMusic(
         name: musicContainer.musicAggregator.name,
@@ -64,16 +119,21 @@ Future<void> cacheMusicContainer(MusicContainer musicContainer) async {
 
     musicAggregatorCacheController
         .add((true, musicContainer.musicAggregator.identity()));
-
-    LogToast.success("缓存成功", "成功缓存: ${musicContainer.musicAggregator.name}",
-        "[cacheMusic] Successfully cached: ${musicContainer.musicAggregator.name}");
   } catch (e) {
     LogToast.error("缓存失败", "缓存'${musicContainer.musicAggregator.name}'失败: $e",
         "[cacheMusic] Failed to cache: $e");
   }
 }
 
-Future<Music?> editMusicInfoToDb(BuildContext context, Music music) async {
+/// safe
+Future<void> cacheMusicAggs(List<MusicAggregator> musicAggs) async {
+  await Future.wait(musicAggs.map((musicContainer) async {
+    await cacheMusicContainer(MusicContainer(musicContainer));
+  }));
+}
+
+/// safe
+Future<Music?> editMusicToDb(BuildContext context, Music music) async {
   try {
     var editedMusic =
         await showMusicInfoDialog(context, defaultMusicInfo: music);
@@ -83,7 +143,7 @@ Future<Music?> editMusicInfoToDb(BuildContext context, Music music) async {
     var newMusic = await editedMusic.updateToDb();
     LogToast.success(
         "编辑成功", "编辑音乐信息成功", "[editMusicInfo] Successfully edited music info");
-    musicAggregatorInfoUpdateStreamController.add(newMusic);
+    musicAggregatorUpdateStreamController.add(newMusic);
     return newMusic;
   } catch (e) {
     LogToast.error("编辑失败", "编辑音乐信息失败: $e",
@@ -92,6 +152,26 @@ Future<Music?> editMusicInfoToDb(BuildContext context, Music music) async {
   return null;
 }
 
+/// safe
+Future<void> editPlaylistListInfo(
+    BuildContext context, Playlist playlist) async {
+  var newPlaylist = await showPlaylistDialog(
+    context,
+    defaultPlaylist: playlist,
+  );
+
+  if (newPlaylist == null) return;
+
+  try {
+    playlist = await newPlaylist.updateToDb();
+    playlistUpdateStreamController.add(playlist);
+  } catch (e) {
+    LogToast.error("编辑歌单", "编辑歌单失败: $e",
+        "[LocalMusicListItemsPullDown] Failed to edit music list: $e");
+  }
+}
+
+/// safe
 Future<void> viewMusicAlbum(
     BuildContext context, Music music, bool isDesktop) async {
   try {
@@ -101,117 +181,165 @@ Future<void> viewMusicAlbum(
           "查看专辑失败", "专辑为空", "[viewAlbum] Failed to view album: album is null");
       return;
     }
-    if (context.mounted) {
-      if (isDesktop) {
-        globalSetNavItemSelected("");
-        globalDesktopNavigatorToPage(
-            OnlineMusicListPage(
-              isDesktop: true,
-              playlist: album,
-              firstPageMusicAggregators: musicAggs,
-            ),
-            replace: false);
-      } else {
-        Navigator.of(context).push(
-          CupertinoPageRoute(
-              builder: (context) => OnlineMusicListPage(
-                    playlist: album,
-                    firstPageMusicAggregators: musicAggs,
-                    isDesktop: false,
-                  )),
-        );
-      }
-    }
+    if (!context.mounted) return;
+    navigate(
+        context,
+        OnlineMusicAggregatorListViewPage(
+          isDesktop: isDesktop,
+          playlist: album,
+          firstPageMusicAggregators: musicAggs,
+        ),
+        isDesktop,
+        "");
   } catch (e) {
     LogToast.error(
         "查看专辑失败", "查看专辑失败: $e", "[viewAlbum] Failed to view album: $e");
   }
 }
 
-Future<void> addMusicsToPlayList(
-    BuildContext context, List<MusicAggregator> musicAggs,
-    {Playlist? playlist}) async {
-  Playlist? targetMusicList;
+/// safe
+Future<void> viewSharePlaylist(BuildContext context, bool isDesktop) async {
+  var url = await showInputPlaylistShareLinkDialog(context);
+  if (url == null) return;
+  var musicListW = await Playlist.getFromShare(share: url);
 
-  if (playlist != null) {
-    targetMusicList = playlist;
-  } else {
-    targetMusicList = (await showMusicListSelectionDialog(context));
-  }
-
-  if (targetMusicList != null) {
-    try {
-      await targetMusicList.addAggsToDb(musicAggs: musicAggs);
-      musicAggregatorListUpdateStreamController
-          .add(await targetMusicList.getMusicsFromDb());
-      LogToast.success("添加成功", "成功添加音乐到: ${targetMusicList.name}",
-          "[addToMusicList] Successfully added musics to: ${targetMusicList.name}");
-    } catch (e) {
-      LogToast.error(
-          "添加失败", "添加音乐失败: $e", "[addToMusicList] Failed to add music: $e");
-    }
+  if (context.mounted) {
+    navigate(
+        context,
+        OnlineMusicAggregatorListViewPage(
+          playlist: musicListW,
+          isDesktop: isDesktop,
+        ),
+        isDesktop,
+        "");
   }
 }
 
-// 从一些音乐中创建一个新的歌单
-Future<void> createNewMusicListFromMusics(
+/// safe
+Future<void> addMusicsToPlayList(
+    BuildContext context, List<MusicAggregator> musicAggs,
+    {PlaylistCollection? playlistCollection, Playlist? playlist}) async {
+  playlistCollection ??=
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (playlistCollection == null || !context.mounted) return;
+  playlist ??= await showSelectCratePlaylistDialog(context, playlistCollection);
+  if (playlist == null) return;
+
+  try {
+    await playlist.addAggsToDb(musicAggs: musicAggs);
+    musicAggrgatorsPageRefreshStreamController.add(playlist.identity);
+  } catch (e) {
+    LogToast.error(
+        "添加失败", "添加音乐失败: $e", "[addToMusicList] Failed to add music: $e");
+  }
+}
+
+/// safe
+Future<Playlist?> insertPlaylistToDb(
+    Playlist newPlaylist, int playlistCollectionId) async {
+  try {
+    int identity =
+        await newPlaylist.insertToDb(collectionId: playlistCollectionId);
+    Playlist? createdPlaylist = await Playlist.findInDb(id: identity);
+
+    if (createdPlaylist != null) {
+      playlistCreateStreamController.add(createdPlaylist);
+    }
+
+    return createdPlaylist;
+  } catch (e) {
+    LogToast.error("创建歌单失败", "创建歌单失败: $e",
+        "[insertPlaylistToDb] Failed to create music list: $e");
+  }
+  return null;
+}
+
+/// safe
+Future<void> saveOnlinePlaylist(
+  BuildContext context,
+  Playlist playlist, {
+  int? playlistCollectionId,
+}) async {
+  if (playlistCollectionId == null) {
+    var playlistCollection =
+        await showSelectCreatePlaylistCollectionDialog(context);
+    if (playlistCollection == null) return;
+    playlistCollectionId = playlistCollection.id;
+  }
+  var musics = await getOrFetchAllMusicAgrgegatorsFromPlaylist(playlist);
+  if (!context.mounted || musics == null) return;
+  var newPlaylist = await insertPlaylistToDb(playlist, playlistCollectionId);
+  if (newPlaylist == null || !context.mounted) return;
+  await addMusicsToPlayList(context, musics, playlist: newPlaylist);
+}
+
+/// safe
+Future<void> saveOnlinePlaylists(
+  BuildContext context,
+  List<Playlist> playlists,
+) async {
+  var playlistCollection =
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (playlistCollection == null) return;
+
+  await Future.wait(playlists.map((playlist) async {
+    await saveOnlinePlaylist(
+      context,
+      playlist,
+      playlistCollectionId: playlistCollection.id,
+    );
+  }));
+}
+
+/// safe
+Future<Playlist?> createPlaylist(
+  BuildContext context, {
+  Playlist? playlist,
+  PlaylistCollection? playlistCollection,
+}) async {
+  playlist ??= await showPlaylistDialog(context, defaultPlaylist: playlist);
+  if (playlist == null || !context.mounted) return null;
+  playlistCollection ??=
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (playlistCollection == null) return null;
+  return insertPlaylistToDb(playlist, playlistCollection.id);
+}
+
+/// safe
+Future<void> createPlaylistFromMusics(
     BuildContext context, List<MusicAggregator> musicAggs) async {
   if (musicAggs.isEmpty) {
     return;
   }
   var defaultMusicOfFirstAgg = getMusicAggregatorDefaultMusic(musicAggs.first);
   if (!context.mounted) return;
-  // ignore: use_build_context_synchronously
-  var newPlaylist = await showPlaylistInfoDialog(context,
-      defaultPlaylist: await Playlist.newInstance(
-        name: defaultMusicOfFirstAgg?.artists.first.name ?? "",
-        cover: defaultMusicOfFirstAgg?.cover ?? "",
-        subscriptions: [],
-      ));
-
-  // 用户取消
-  if (newPlaylist == null) {
-    return;
-  }
-
-  // 保存新歌单的图片
-  if (newPlaylist.cover != null || newPlaylist.cover!.isNotEmpty) {
-    cacheFileFromUriWrapper(newPlaylist.cover!, picCacheFolder);
-  }
-
-  // 创建新歌单，插入音乐
-  try {
-    int identity = await newPlaylist.insertToDb();
-    Playlist? createdPlaylist = await Playlist.findInDb(id: identity);
-    if (createdPlaylist == null) {
-      throw "未找到新建的歌单";
-    }
-    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
-    if (context.mounted) {
-      LogToast.success("创建成功", "成功创建新歌单: ${createdPlaylist.name}, 正在添加音乐",
-          "[createNewMusicList] Successfully created new music list: ${createdPlaylist.name}, adding musics");
-      await addMusicsToPlayList(context, musicAggs, playlist: createdPlaylist);
-      createdPlaylist
-          .getMusicsFromDb()
-          .then((e) => musicAggregatorListUpdateStreamController.add(e));
-    } else {
-      await createdPlaylist.delFromDb();
-      Playlist.getFromDb()
-          .then((e) => playlistGridUpdateStreamController.add(e));
-      LogToast.error("创建失败", "创建歌单失败: context is not mounted",
-          "[createNewMusicList] Failed to create music list: context is not mounted");
-    }
-  } catch (e) {
-    LogToast.error("创建失败", "创建歌单失败: $e",
-        "[createNewMusicList] Failed to create music list: $e");
-  }
+  // use the first music's artist name as default playlist name
+  var defaultPlaylist = await Playlist.newInstance(
+    name: defaultMusicOfFirstAgg?.artists.first.name ?? "",
+    cover: defaultMusicOfFirstAgg?.cover ?? "",
+    subscriptions: [],
+  );
+  if (!context.mounted) return;
+  // let user edit playlist name
+  var newPlaylist =
+      await showPlaylistDialog(context, defaultPlaylist: defaultPlaylist);
+  if (newPlaylist == null) return;
+  if (!context.mounted) return;
+  var playlistCollection =
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (playlistCollection == null) return;
+  var createdPlaylist =
+      await insertPlaylistToDb(newPlaylist, playlistCollection.id);
+  if (!context.mounted || createdPlaylist == null) return;
+  await addMusicsToPlayList(context, musicAggs, playlist: createdPlaylist);
 }
 
+/// safe
 Future<void> setMusicCoverAsPlaylistCover(
     Music music, Playlist playlist) async {
   var picLink = music.cover;
   if (picLink == null || picLink.isEmpty) {
-    LogToast.error("设置封面失败", "歌曲没有封面",
+    LogToast.error("设置封面失败", "该歌曲没有封面",
         "[setAsMusicListCover] Failed to set cover: music has no cover");
     return;
   }
@@ -221,9 +349,6 @@ Future<void> setMusicCoverAsPlaylistCover(
     playlist = await playlist.updateToDb();
 
     playlistUpdateStreamController.add(playlist);
-    playlist
-        .getMusicsFromDb()
-        .then((e) => musicAggregatorListUpdateStreamController.add(e));
 
     LogToast.success(
         "设置封面成功", "成功设置为封面", "[setAsMusicListCover] Successfully set as cover");
@@ -233,227 +358,106 @@ Future<void> setMusicCoverAsPlaylistCover(
   }
 }
 
-Future<void> saveMusicList(Playlist playlist, bool toastWhenSuccess) async {
-  LogToast.info("保存歌单", "正在获取歌单'${playlist.name}'数据，请稍等",
-      "[OnlineMusicListItemsPullDown] Start to save music list");
-  try {
-    var musicAggs = await playlist.fetchMusicsOnline(page: 1, limit: 2333);
-    var playlistId = await playlist.insertToDb();
-    var newPlaylist = await Playlist.findInDb(id: playlistId);
-    if (newPlaylist == null) {
-      throw "Failed to find playlist inserted in db";
-    }
+/// safe
+Future<void> saveAggsOfPlayList(
+  BuildContext context,
+  Playlist from, {
+  PlaylistCollection? toPlaylistCollection,
+  Playlist? toPlaylist,
+}) async {
+  toPlaylistCollection ??=
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (toPlaylistCollection == null || !context.mounted) return;
+  toPlaylist ??=
+      await showSelectCratePlaylistDialog(context, toPlaylistCollection);
+  if (toPlaylist == null) return;
 
-    await newPlaylist.addAggsToDb(musicAggs: musicAggs);
-    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
-
-    if (!toastWhenSuccess) {
-      LogToast.success("保存歌单", "保存'${playlist.name}'成功",
-          "[OnlineMusicListItemsPullDown] Succeed to save music list '${playlist.name}'");
-    }
-  } catch (e) {
-    LogToast.error("保存歌单", "保存'${playlist.name}'失败: $e",
-        "[OnlineMusicListItemsPullDown] Failed to save music list '${playlist.name}': $e");
-  }
+  var musicAggs = await getOrFetchAllMusicAgrgegatorsFromPlaylist(from);
+  if (musicAggs == null || !context.mounted) return;
+  await addMusicsToPlayList(context, musicAggs,
+      playlistCollection: toPlaylistCollection, playlist: toPlaylist);
 }
 
-Future<void> addAggsOfPlayListToTargetMusicList(
-  Playlist from,
-  Playlist to,
-) async {
-  LogToast.info("添加歌曲", "正在获取歌单'${from.name}'数据，请稍等",
-      "[OnlineMusicListItemsPullDown] Start to add music");
-  try {
-    List<MusicAggregator> musicAggs;
-    if (from.fromDb) {
-      musicAggs = await from.getMusicsFromDb();
-    } else {
-      musicAggs = await from.fetchMusicsOnline(page: 1, limit: 2333);
-    }
+/// safe
+Future<void> saveAggsOfPlaylists(List<Playlist> playlists, BuildContext context,
+    {PlaylistCollection? playlistCollection, Playlist? targetPlaylist}) async {
+  playlistCollection ??=
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (playlistCollection == null || !context.mounted) return;
+  targetPlaylist ??=
+      await showSelectCratePlaylistDialog(context, playlistCollection);
 
-    to.addAggsToDb(musicAggs: musicAggs);
+  if (targetPlaylist == null || !context.mounted) return;
 
-    to
-        .getMusicsFromDb()
-        .then((e) => musicAggregatorListUpdateStreamController.add(e));
-
-    LogToast.success("添加歌曲", "添加歌单'${from.name}'中的歌曲到'${to.name}'成功",
-        "[OnlineMusicListItemsPullDown] Succeed to add music from '${from.name}' to '${to.name}'");
-  } catch (e) {
-    LogToast.error("添加歌曲", "添加歌单'${from.name}'中的歌曲到'${to.name}'失败: $e",
-        "[OnlineMusicListItemsPullDown] Failed to add music from '${from.name}' to '${to.name}': $e");
-  }
-}
-
-Future<void> editPlaylistListInfo(
-    BuildContext context, Playlist playlist) async {
-  var newPlaylist = await showPlaylistInfoDialog(context,
-      defaultPlaylist: playlist, readonly: false);
-  if (newPlaylist != null) {
-    try {
-      playlist = await newPlaylist.updateToDb();
-      playlistUpdateStreamController.add(playlist);
-      Playlist.getFromDb()
-          .then((e) => playlistGridUpdateStreamController.add(e));
-      LogToast.success("编辑歌单", "编辑歌单成功",
-          "[LocalMusicListItemsPullDown] Succeed to edit music list");
-    } catch (e) {
-      LogToast.error("编辑歌单", "编辑歌单失败: $e",
-          "[LocalMusicListItemsPullDown] Failed to edit music list: $e");
-    }
-  }
-}
-
-Future<void> addAggsOfPlaylistsToTargetPlayList(
-    List<Playlist> playlists, BuildContext context,
-    {Playlist? targetPlaylist}) async {
-  try {
-    Playlist? finalTargetPlaylist =
-        targetPlaylist ?? await showMusicListSelectionDialog(context);
-
-    if (finalTargetPlaylist == null) return;
-
-    for (var fromPlaylist in playlists) {
-      await addAggsOfPlayListToTargetMusicList(
-          fromPlaylist, finalTargetPlaylist);
-    }
-
-    LogToast.success("添加到目标歌单成功", "添加到目标歌单成功",
-        "[MutiSelectOnlineMusicListGridPage] Successfully added to target music list");
-  } catch (e) {
-    LogToast.error("添加到目标歌单失败", "添加到目标歌单失败: $e",
-        "[MutiSelectOnlineMusicListGridPage] Failed to add to target music list: $e");
-  }
-}
-
-Future<void> savePlaylistsAsOneNewPlaylist(
-    List<Playlist> playlists, BuildContext context) async {
-  try {
-    Playlist? targetPlayListInfo =
-        await showPlaylistInfoDialog(context, defaultPlaylist: playlists.first);
-
-    if (targetPlayListInfo == null) return;
-    int newPlayListId = await targetPlayListInfo.insertToDb();
-    Playlist? newPlaylist = await Playlist.findInDb(id: newPlayListId);
-
-    if (newPlaylist == null) {
-      LogToast.error("保存为新歌单失败", "创建新歌单失败： 未找到新歌单",
-          "[MutiSelectOnlineMusicListGridPage] Failed to save as new music list");
-      return;
-    }
-    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
-
-    for (var musicList in playlists) {
-      await addAggsOfPlayListToTargetMusicList(musicList, newPlaylist);
-    }
-
-    LogToast.success("保存为新歌单", "保存为新建歌单成功",
-        "[MutiSelectOnlineMusicListGridPage] Successfully saved as new music list");
-  } catch (e) {
-    LogToast.error("保存为新歌单失败", "保存为新建歌单失败: $e",
-        "[MutiSelectOnlineMusicListGridPage] Failed to save as new music list: $e");
-  }
-}
-
-Future<void> savePlaylists(
-  List<Playlist> playlists,
-) async {
-  await Future.wait(playlists.map((musicList) async {
-    await saveMusicList(musicList, false);
+  await Future.wait(playlists.map((fromPlaylist) async {
+    await saveAggsOfPlayList(context, fromPlaylist,
+        toPlaylistCollection: playlistCollection, toPlaylist: targetPlaylist);
   }));
-  LogToast.success("保存歌单", "保存所选歌单成功",
-      "[MutliSelectLocalMusicListGridPage] Successfully saved music list");
 }
 
-Future<void> cacheMusicAggs(
-    List<MusicAggregator> musicAggs, VoidCallback refresh) async {
-  for (var musicContainer in musicAggs) {
-    await cacheMusicContainer(MusicContainer(musicContainer));
+/// safe
+Future<void> deleMusicFromPlaylist(
+  MusicAggregator musicAgg,
+  Playlist playlist,
+) async {
+  try {
+    await playlist.delMusicAgg(musicAggIdentity: musicAgg.identity());
+    playlistDeleteStreamController.add(playlist.identity);
+  } catch (e) {
+    LogToast.error("删除音乐", "删除音乐失败: $e",
+        "[deleteMusicFromPlaylist] Failed to delete music: $e");
   }
-  refresh();
-  LogToast.success("缓存选中音乐", "缓存选中音乐成功",
-      "[cacheMusicAggs] succeed to cache music aggregators");
 }
 
-Future<void> deleteMusicAggsCache(
-    List<MusicAggregator> musicAggs, VoidCallback refresh) async {
-  for (var musicContainer in musicAggs) {
-    await delMusicAggregatorCache(musicContainer, showToast: false);
-  }
-  refresh();
-  LogToast.success("删除选中音乐缓存", "删除选中音乐缓存成功",
-      "[handleDeleteCacheSelected] succeed to delete cache of selected music aggregators");
-}
-
+/// safe
 Future<void> deleteMusicAggsFromDbPlaylist(
   List<MusicAggregator> musicAggs,
   Playlist playlist,
 ) async {
-  if (playlist.fromDb) {
-    for (var musicAgg in musicAggs) {
-      try {
-        await playlist.delMusicAgg(musicAggIdentity: musicAgg.identity());
-      } catch (e) {
-        LogToast.error("删除失败", "删除音乐失败: $e",
-            "[deleteMusicAggsFromDbPlaylist] Failed to delete music: $e");
-      } finally {
-        playlist
-            .getMusicsFromDb()
-            .then((e) => musicAggregatorListUpdateStreamController.add(e));
-      }
-    }
+  if (!playlist.fromDb) return;
+  for (var musicAgg in musicAggs) {
+    await deleMusicFromPlaylist(
+      musicAgg,
+      playlist,
+    );
   }
 }
 
+/// safe
 Future<void> delDbPlaylist(
   Playlist playlist,
-  bool inPlaylist,
   bool isDesktop,
   BuildContext context,
 ) async {
+  if (!playlist.fromDb) return;
   try {
     await playlist.delFromDb();
-
-    if (inPlaylist) {
-      dbPlaylistPagePopStreamController.add(null);
-    }
-
-    LogToast.success("删除歌单", "删除歌单成功",
-        "[LocalMusicListItemsPullDown] Succeed to delete music list");
-    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
+    dbPlaylistPagePopStreamController.add(int.parse(playlist.identity));
+    playlistDeleteStreamController.add(playlist.identity);
   } catch (e) {
     LogToast.error("删除歌单", "删除歌单失败: $e",
         "[LocalMusicListItemsPullDown] Failed to delete music list: $e");
   }
 }
 
-Future<void> openSharePlaylist(BuildContext context, bool isDesktop) async {
-  var url = await showInputPlaylistShareLinkDialog(context);
-  if (url != null) {
-    var musicListW = await Playlist.getFromShare(share: url);
-    if (context.mounted) {
-      if (isDesktop) {
-        globalDesktopNavigatorToPage(
-          OnlineMusicListPage(
-            playlist: musicListW,
-            isDesktop: isDesktop,
-          ),
-          replace: false,
-        );
-      } else {
-        Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => OnlineMusicListPage(
-              playlist: musicListW,
-              isDesktop: isDesktop,
-            ),
-          ),
-        );
-      }
-    }
+/// safe
+Future<PlaylistCollection?> createPlaylistCollection(BuildContext context,
+    {PlaylistCollection? playlistCollection}) async {
+  playlistCollection ??= await showPlaylistCollectionDialog(context);
+  if (playlistCollection == null) return null;
+  try {
+    int id = await playlistCollection.insertToDb();
+    var createdPlaylistCollection = await PlaylistCollection.findInDb(id: id);
+    playlistCollectionCreateStreamController.add(createdPlaylistCollection);
+    return createdPlaylistCollection;
+  } catch (e) {
+    LogToast.error("创建歌单列表", "创建歌单列表失败: $e",
+        "[createPlaylistCollection] Failed to create music list: $e");
   }
+  return null;
 }
 
+/// safe
 Future<void> importDatabaseJson(BuildContext context, bool isDesktop,
     {MusicDataJsonWrapper? musicDataJson}) async {
   var confirm = await showConfirmationDialog(
@@ -463,46 +467,36 @@ Future<void> importDatabaseJson(BuildContext context, bool isDesktop,
       "这将会导致当前使用的数据库下的歌单数据完全丢失!!!\n"
       "请选择要导入的数据库Json文件, 请确保Json文件是从相同版本的AppRhyme中导出的\n"
       "是否继续?");
-  if (confirm == null || !confirm) return;
+  if (!context.mounted || confirm == null || !confirm) return;
 
-  if (!context.mounted) return;
   await showWaitDialog(context, isDesktop, "正在应用数据库Json文件, 请稍等");
 
   try {
     if (musicDataJson == null) {
       String? filePath = await pickFile();
-      if (filePath == null) {
-        return;
-      }
+      if (filePath == null) return;
       musicDataJson = await MusicDataJsonWrapper.loadFrom(path: filePath);
     }
-
     var type = await musicDataJson.getType();
-
     if (type != MusicDataType.musicAggregators) {
       throw "错误的Json数据类型, 应导入'数据库'数据Json, 而非${musicDataTypeToString(type)}";
     }
-
     await musicDataJson.applyToDb();
-
-    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
-    LogToast.success("导入数据库", "从Json文件导入数据库成功",
-        "[importDatabaseJson] succeed to imprt json file to database");
+    playlistCollectionsPageRefreshStreamController.add(null);
   } catch (e) {
     LogToast.error("导入数据库", "Json导入失败: $e", "[importDatabaseJson] failed: $e");
-  } finally {
-    if (context.mounted) Navigator.of(context).pop();
   }
+
+  if (context.mounted) Navigator.of(context).pop();
 }
 
-Future<void> importPlaylistJson(BuildContext context, bool isDesktop,
+/// safe
+Future<void> importPlaylistJson(BuildContext context,
     {MusicDataJsonWrapper? musicDataJson}) async {
   try {
     if (musicDataJson == null) {
       String? filePath = await pickFile();
-      if (filePath == null) {
-        return;
-      }
+      if (filePath == null) return;
       musicDataJson = await MusicDataJsonWrapper.loadFrom(path: filePath);
     }
 
@@ -510,19 +504,28 @@ Future<void> importPlaylistJson(BuildContext context, bool isDesktop,
     if (type != MusicDataType.musicAggregators) {
       throw "错误的Json数据类型, 应导入'歌单'数据Json, 而非${musicDataTypeToString(type)}";
     }
-    await musicDataJson.applyToDb();
-
-    Playlist.getFromDb().then((e) => playlistGridUpdateStreamController.add(e));
-    LogToast.success("导入歌单", "从Json文件导入歌单成功",
-        "[importPlaylistJson] succeed to imprt json file to database");
+    if (!context.mounted) return;
+    var playlistCollection =
+        await showSelectCreatePlaylistCollectionDialog(context);
+    if (playlistCollection == null) return;
+    await musicDataJson.applyToDb(playlistCollectionId: playlistCollection.id);
+    playlistsPageRefreshStreamController.add(playlistCollection.id);
+    playlistCollectionsPageRefreshStreamController.add(null);
   } catch (e) {
     LogToast.error("导入歌单", "Json导入失败: $e", "[importPlaylistJson] failed: $e");
   }
 }
 
-Future<void> importMusicAggrgegatorJson(BuildContext context, bool isDesktop,
-    {MusicDataJsonWrapper? musicDataJson, Playlist? targetPlaylist}) async {
-  targetPlaylist ??= await showMusicListSelectionDialog(context);
+/// safe
+Future<void> importMusicAggrgegatorJson(BuildContext context,
+    {MusicDataJsonWrapper? musicDataJson,
+    PlaylistCollection? playlistCollection,
+    Playlist? targetPlaylist}) async {
+  playlistCollection ??=
+      await showSelectCreatePlaylistCollectionDialog(context);
+  if (playlistCollection == null || !context.mounted) return;
+  targetPlaylist ??=
+      await showSelectCratePlaylistDialog(context, playlistCollection);
   if (targetPlaylist == null) return;
 
   try {
@@ -540,17 +543,14 @@ Future<void> importMusicAggrgegatorJson(BuildContext context, bool isDesktop,
 
     await musicDataJson.applyToDb(
         playlistId: int.parse(targetPlaylist.identity));
-    targetPlaylist
-        .getMusicsFromDb()
-        .then((e) => musicAggregatorListUpdateStreamController.add(e));
-    LogToast.success("导入歌曲", "从Json文件导入歌曲成功",
-        "[importMusicAggrgegatorJson] succeed to imprt json file to database");
+    musicAggrgatorsPageRefreshStreamController.add(targetPlaylist.identity);
   } catch (e) {
     LogToast.error(
         "导入歌曲", "Json导入失败: $e", "[importMusicAggrgegatorJson] failed: $e");
   }
 }
 
+/// safe
 Future<void> exportMusicAggregatorsJson(
   BuildContext context,
   List<MusicAggregator> musicAggs,
@@ -572,11 +572,6 @@ Future<void> exportMusicAggregatorsJson(
             musicAggregators: musicAggs);
 
     await musicDataJson.saveTo(path: filePath);
-    LogToast.success(
-      "导出Json文件成功",
-      "导出Json文件成功",
-      "[exportMusicAggregatorsJson] Successfully exported json file",
-    );
   } catch (e) {
     LogToast.error(
       "导出Json文件失败",
@@ -586,6 +581,7 @@ Future<void> exportMusicAggregatorsJson(
   }
 }
 
+/// safe
 Future<void> exportPlaylistsJson(
     BuildContext context, List<Playlist> playlists) async {
   bool? confirm = await showConfirmationDialog(
@@ -621,12 +617,53 @@ Future<void> exportPlaylistsJson(
   }
 }
 
-// Future<void> example() async {
-//   var musicAggs = await MusicAggregator.fetchArtistMusicAggregators(
-//       server: server, artistId: artistId, page: page, limit: limit);
-// }
+Future<void> viewArtistMusicAggregators(
+    BuildContext context, Music music, bool isDesktop) async {
+  Artist? artist;
+  if (music.artists.length == 1) {
+    artist = music.artists.first;
+  } else {
+    artist = await showArtistSelectDialog(context, music.artists);
+  }
+  if (artist == null || artist.id == null || !context.mounted) return;
 
-// Future<void> example() async {
-//   List<ServerPlaylistTagCollection> serverTagCollections =
-//       await ServerPlaylistTagCollection.getPlaylistTags();
-// }
+  navigate(
+      context,
+      OnlineMusicAggregatorListViewPage(
+          isDesktop: isDesktop,
+          fetchMusicAggregators: (int page, int limit) async {
+            return await MusicAggregator.fetchArtistMusicAggregators(
+                server: music.server,
+                artistId: artist!.id!,
+                page: page,
+                limit: limit);
+          }),
+      isDesktop,
+      "");
+}
+
+Future<void> viewArtistAlbums(
+    BuildContext context, Music music, bool isDesktop) async {
+  Artist? artist;
+  if (music.artists.length == 1) {
+    artist = music.artists.first;
+  } else {
+    artist = await showArtistSelectDialog(context, music.artists);
+  }
+  if (artist == null || artist.id == null || !context.mounted) return;
+
+  navigate(
+      context,
+      OnlinePlaylistGridViewPage(
+        isDesktop: isDesktop,
+        fetchPlaylists: (int page, int limit) async {
+          return await Playlist.fetchArtistAlbums(
+              server: music.server,
+              artistId: artist!.id!,
+              page: page,
+              limit: limit);
+        },
+      ),
+      isDesktop,
+      "");
+}

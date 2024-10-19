@@ -7,6 +7,7 @@ use music_api::{
         music_aggregator::{Music, MusicAggregator},
         music_chart::ServerMusicChartCollection,
         playlist::Playlist,
+        playlist_collection::PlaylistCollection,
         playlist_subscription::PlayListSubscription,
         playlist_tag::{ServerPlaylistTagCollection, TagPlaylistOrder},
         results::PlaylistUpdateSubscriptionResult,
@@ -123,7 +124,7 @@ impl Playlist {
     pub async fn update_to_db(&self) -> Result<Self> {}
 
     // insert a playlist to db
-    pub async fn insert_to_db(&self) -> Result<i64> {}
+    pub async fn insert_to_db(&self, collection_id: i64) -> Result<i64> {}
 
     /// delete a playlist from db
     /// this will also delete all junctions between the playlist and music
@@ -151,6 +152,24 @@ impl Playlist {
         limit: u16,
     ) -> Result<Vec<Playlist>> {
     }
+}
+
+#[frb(external)]
+impl PlaylistCollection {
+    pub fn new(name: String) -> Self {}
+
+    pub async fn get_form_db() -> anyhow::Result<Vec<Self>> {
+    }
+    
+    pub async fn get_playlists_from_db(&self) -> anyhow::Result<Vec<Playlist>> {}
+
+    pub async fn insert_to_db(&self) -> anyhow::Result<i64> {}
+
+    pub async fn find_in_db(id: i64) -> anyhow::Result<Self> {}
+
+    pub async fn update_to_db(&self) -> anyhow::Result<Self> {}
+
+    pub async fn delete_from_db(&self) -> anyhow::Result<()> {}
 }
 
 #[frb(external)]

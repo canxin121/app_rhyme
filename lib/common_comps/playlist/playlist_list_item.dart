@@ -1,4 +1,3 @@
-import 'package:app_rhyme/mobile/comps/chores/badge.dart';
 import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
@@ -8,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 class PlaylistListItem extends StatelessWidget {
   final Playlist playlist;
-  final bool? isDark; // Make it nullable to support theme adaptation
+  final bool? isDark;
   final GestureTapCallback? onTap;
 
   const PlaylistListItem({
@@ -20,7 +19,6 @@ class PlaylistListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 获取当前主题的亮度
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = isDark ?? (brightness == Brightness.dark);
 
@@ -29,7 +27,6 @@ class PlaylistListItem extends StatelessWidget {
       onPressed: onTap,
       child: Row(
         children: <Widget>[
-          // 歌单的封面
           CupertinoButton(
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
             onPressed: () {},
@@ -43,7 +40,6 @@ class PlaylistListItem extends StatelessWidget {
               ),
             ),
           ),
-          // 歌单的名称和介绍
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -76,12 +72,6 @@ class PlaylistListItem extends StatelessWidget {
               ),
             ),
           ),
-          // 标志音乐信息来源的Badge
-          Badge(
-            label: playlist.server?.toString() ?? "",
-            isDarkMode: isDarkMode,
-          ),
-          // 歌曲的操作按钮
           GestureDetector(
             onTapDown: (details) {
               Rect position = Rect.fromPoints(

@@ -1,37 +1,46 @@
 import 'package:app_rhyme/common_comps/paged/paged_playlist_gridview.dart';
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
-import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
-final PagingController<int, Playlist> _pagingController =
-    PagingController(firstPageKey: 1);
-final TextEditingController _inputContentController = TextEditingController();
-
-class PlaylistSearchPage extends StatefulWidget {
-  const PlaylistSearchPage({super.key, required this.isDesktop});
-
+class OnlinePlaylistGridViewPage extends StatefulWidget {
+  const OnlinePlaylistGridViewPage(
+      {super.key,
+      required this.isDesktop,
+      required this.fetchPlaylists,
+      this.title = "在线歌单"});
+  final String title;
+  final Future<List<Playlist>> Function(int page, int limit) fetchPlaylists;
   final bool isDesktop;
 
   @override
   SearchMusicListState createState() => SearchMusicListState();
 }
 
-class SearchMusicListState extends State<PlaylistSearchPage>
+class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
     with WidgetsBindingObserver {
+  final PagingController<int, Playlist> _pagingController =
+      PagingController(firstPageKey: 1);
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchMusicLists(pageKey);
+    _pagingController.addPageRequestListener((pageKey) async {
+      if (_pagingController.nextPageKey == null) return;
+      try {
+        var fetchedPlaylists = await widget.fetchPlaylists(pageKey, 30);
+        _pagingController.appendPage(
+            fetchedPlaylists, _pagingController.nextPageKey! + 1);
+      } catch (e) {
+        _pagingController.error = e;
+      }
     });
   }
 
@@ -46,30 +55,39 @@ class SearchMusicListState extends State<PlaylistSearchPage>
     setState(() {});
   }
 
-  Future<void> _fetchAllMusicLists() async {
-    while (_pagingController.nextPageKey != null) {
-      await _fetchMusicLists(_pagingController.nextPageKey!);
-    }
-  }
+  Future<void> _fetchAllPlaylists() async {
+    LogToast.info("加载所有歌单", "正在加载所有歌单,请稍等",
+        "[OnlineMusicListPage] MultiSelect wait to fetch all music aggregators");
+    const int pageSize = 500;
 
-  Future<void> _fetchMusicLists(int pageKey) async {
     try {
-      if (_inputContentController.value.text.isEmpty) {
-        _pagingController.appendLastPage([]);
-      }
-      var musiclists = await Playlist.searchOnline(
-          servers: [MusicServer.kuwo, MusicServer.netease],
-          content: _inputContentController.value.text,
-          page: pageKey,
-          size: 30);
-      if (musiclists.isEmpty) {
-        _pagingController.appendLastPage([]);
-      } else {
-        _pagingController.appendPage(musiclists, pageKey + 1);
-      }
-    } catch (error) {
-      _pagingController.error = error;
+      var fetchedPlaylists = await widget.fetchPlaylists(1, pageSize);
+      _pagingController.value =
+          PagingState(itemList: fetchedPlaylists, nextPageKey: 2);
+    } catch (e) {
+      _pagingController.error = e;
+      return;
     }
+
+    try {
+      while (_pagingController.nextPageKey != null) {
+        var fetchedPlaylists = await widget.fetchPlaylists(
+            _pagingController.nextPageKey!, pageSize);
+
+        if (fetchedPlaylists.isEmpty) {
+          _pagingController.appendLastPage([]);
+        } else {
+          _pagingController.appendPage(
+              fetchedPlaylists, _pagingController.nextPageKey! + 1);
+        }
+      }
+    } catch (e) {
+      LogToast.error("获取歌单失败", "获取歌单失败: $e",
+          "[fetchAllMusicAgrgegatorsFromPlaylist] Failed to fetch music from playlist: $e");
+    }
+
+    LogToast.success("加载所有歌单", '已加载所有歌单',
+        "[OnlineMusicListPage] Succeed to fetch all music aggregators");
   }
 
   @override
@@ -83,57 +101,46 @@ class SearchMusicListState extends State<PlaylistSearchPage>
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor:
+            widget.isDesktop ? getNavigatorBarColor(isDarkMode) : primaryColor,
+        leading: CupertinoButton(
+            padding: EdgeInsets.zero,
+            child: Icon(
+              CupertinoIcons.back,
+              color: activeIconRed,
+            ),
+            onPressed: () {
+              popPage(context, widget.isDesktop);
+            }),
+        middle: Text(
+          widget.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: textColor,
+          ).useSystemChineseFont(),
+        ),
+        trailing: SearchPlaylistChoiceMenu(
+          builder: (BuildContext context, Future<void> Function() showMenu) =>
+              CupertinoButton(
+            padding: const EdgeInsets.all(0),
+            onPressed: showMenu,
+            child: Text(
+              '选项',
+              style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+            ),
+          ),
+          fetchAllMusicAggregators: _fetchAllPlaylists,
+          pagingController: _pagingController,
+          isDesktop: widget.isDesktop,
+        ),
+      ),
       backgroundColor: widget.isDesktop
           ? getPrimaryBackgroundColor(isDarkMode)
           : primaryColor,
       child: Column(
         children: [
-          CupertinoNavigationBar(
-            backgroundColor: widget.isDesktop
-                ? getNavigatorBarColor(isDarkMode)
-                : primaryColor,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '搜索歌单',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: textColor,
-                  ).useSystemChineseFont(),
-                ),
-              ),
-            ),
-            trailing: SearchPlaylistChoiceMenu(
-              builder:
-                  (BuildContext context, Future<void> Function() showMenu) =>
-                      CupertinoButton(
-                padding: const EdgeInsets.all(0),
-                onPressed: showMenu,
-                child: Text(
-                  '选项',
-                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-                ),
-              ),
-              fetchAllMusicAggregators: _fetchAllMusicLists,
-              pagingController: _pagingController,
-              isDesktop: widget.isDesktop,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
-            child: CupertinoSearchTextField(
-              style: TextStyle(color: textColor).useSystemChineseFont(),
-              controller: _inputContentController,
-              onSubmitted: (String value) {
-                if (value.isNotEmpty) {
-                  _pagingController.refresh();
-                }
-              },
-            ),
-          ),
           Expanded(
             child: CupertinoScrollbar(
               thickness: 10,
@@ -169,24 +176,6 @@ class SearchPlaylistChoiceMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PullDownButton(
       itemBuilder: (context) => [
-        if (!isDesktop)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () {
-              globalMobileToggleSearchPage();
-            },
-            title: "搜索歌曲",
-            icon: CupertinoIcons.double_music_note,
-          ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-            textStyle: const TextStyle().useSystemChineseFont(),
-          ),
-          onTap: () => viewSharePlaylist(context, isDesktop),
-          title: '打开歌单链接',
-          icon: CupertinoIcons.link,
-        ),
         PullDownMenuItem(
           itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont(),

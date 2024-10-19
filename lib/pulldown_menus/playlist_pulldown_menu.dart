@@ -1,15 +1,14 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/dialogs/subscriptions_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/dialogs/playlist_dialog.dart';
-import 'package:app_rhyme/dialogs/select_local_music_dialog.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -48,7 +47,7 @@ List<PullDownMenuEntry> playlistMenuItems(
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () {
-            showPlaylistInfoDialog(context,
+            showPlaylistDialog(context,
                 defaultPlaylist: playlist, readonly: true);
           },
           title: '查看详情',
@@ -59,13 +58,15 @@ List<PullDownMenuEntry> playlistMenuItems(
             itemTheme: PullDownMenuItemTheme(
                 textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () async {
-              var newPlaylist = await showPlaylistInfoDialog(context,
-                  defaultPlaylist: playlist);
-              if (newPlaylist != null) {
-                await saveMusicList(newPlaylist, true);
-              }
+              var newPlaylist =
+                  await showPlaylistDialog(context, defaultPlaylist: playlist);
+              if (newPlaylist == null || !context.mounted) return;
+              await saveOnlinePlaylist(
+                context,
+                newPlaylist,
+              );
             },
-            title: '保存为新增歌单',
+            title: '保存歌单',
             icon: CupertinoIcons.add_circled,
           ),
         if (playlist.fromDb)
@@ -73,7 +74,7 @@ List<PullDownMenuEntry> playlistMenuItems(
             itemTheme: PullDownMenuItemTheme(
                 textStyle: const TextStyle().useSystemChineseFont()),
             onTap: () async {
-              await delDbPlaylist(playlist, inPlaylist, isDesktop, context);
+              await delDbPlaylist(playlist, inPlaylist, context);
             },
             title: '删除歌单',
             icon: CupertinoIcons.delete,
@@ -113,37 +114,32 @@ List<PullDownMenuEntry> playlistMenuItems(
             LogToast.error("更新订阅'${error.$1}'", "更新失败: ${error.$2}",
                 "[LocalMusicListItemsPullDown] Failed to update subscription '${error.$1}': ${error.$2}");
           }
-          playlist
-              .getMusicsFromDb()
-              .then((e) => musicAggregatorListUpdateStreamController.add(e));
+          musicAggrgatorsPageRefreshStreamController.add(playlist.identity);
           LogToast.success("更新订阅", "更新成功",
               "[LocalMusicListItemsPullDown] Succeed to update subscription");
         },
         title: '更新订阅',
         icon: CupertinoIcons.pencil,
       ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () async {
-        var targetMusicList = await showMusicListSelectionDialog(context);
-        if (targetMusicList != null) {
-          await addAggsOfPlayListToTargetMusicList(playlist, targetMusicList);
-        }
-      },
-      title: '添加歌曲到已有歌单',
-      icon: CupertinoIcons.add_circled_solid,
-    ),
     if (playlist.fromDb)
       PullDownMenuItem(
         itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
-          await importMusicAggrgegatorJson(context, isDesktop,
-              targetPlaylist: playlist);
+          await importMusicAggrgegatorJson(context, targetPlaylist: playlist);
         },
         title: '导入歌曲Json',
         icon: CupertinoIcons.arrow_uturn_up_circle_fill,
+      ),
+    if (!playlist.fromDb)
+      PullDownMenuItem(
+        itemTheme: PullDownMenuItemTheme(
+            textStyle: const TextStyle().useSystemChineseFont()),
+        onTap: () {
+          saveAggsOfPlayList(context, playlist);
+        },
+        title: '保存歌曲',
+        icon: CupertinoIcons.download_circle_fill,
       ),
     PullDownMenuItem(
       itemTheme: PullDownMenuItemTheme(
@@ -170,7 +166,7 @@ List<PullDownMenuEntry> playlistMenuItems(
             textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () async {
           for (var musicContainer in musicAggs) {
-            await delMusicAggregatorCache(musicContainer, showToast: false);
+            await delMusicCache(musicContainer, showToast: false);
           }
           LogToast.success("删除所有音乐缓存", "删除所有音乐缓存成功",
               "[LocalMusicListChoicMenu] Successfully deleted all music caches");
@@ -183,25 +179,15 @@ List<PullDownMenuEntry> playlistMenuItems(
         itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () {
-          if (isDesktop) {
-            globalDesktopNavigatorToPage(
-                MuiscAggregatorReorderPage(
-                  musicAggregators: musicAggs,
-                  playlist: playlist,
-                  isDesktop: true,
-                ),
-                replace: false);
-          } else {
-            Navigator.of(context).push(
-              CupertinoPageRoute(
-                builder: (context) => MuiscAggregatorReorderPage(
-                  musicAggregators: musicAggs,
-                  playlist: playlist,
-                  isDesktop: false,
-                ),
+          navigate(
+              context,
+              MuiscAggregatorReorderPage(
+                musicAggregators: musicAggs,
+                playlist: playlist,
+                isDesktop: isDesktop,
               ),
-            );
-          }
+              isDesktop,
+              "");
         },
         title: "歌曲排序",
         icon: CupertinoIcons.sort_up_circle,
@@ -211,25 +197,15 @@ List<PullDownMenuEntry> playlistMenuItems(
         itemTheme: PullDownMenuItemTheme(
             textStyle: const TextStyle().useSystemChineseFont()),
         onTap: () {
-          if (isDesktop) {
-            globalDesktopNavigatorToPage(
-                MusicAggregatorMultiSelectionPage(
-                  playlist: playlist,
-                  musicAggs: musicAggs,
-                  isDesktop: true,
-                ),
-                replace: false);
-          } else {
-            Navigator.of(context).push(
-              CupertinoPageRoute(
-                builder: (context) => MusicAggregatorMultiSelectionPage(
-                  playlist: playlist,
-                  musicAggs: musicAggs,
-                  isDesktop: false,
-                ),
+          navigate(
+              context,
+              MusicAggregatorMultiSelectionPage(
+                playlist: playlist,
+                musicAggs: musicAggs,
+                isDesktop: isDesktop,
               ),
-            );
-          }
+              isDesktop,
+              "");
         },
         title: "多选操作",
         icon: CupertinoIcons.selection_pin_in_out,

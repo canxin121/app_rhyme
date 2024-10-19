@@ -3,72 +3,105 @@ import 'dart:io';
 import 'package:app_rhyme/common_pages/db_music_agg_listview_page.dart';
 import 'package:app_rhyme/desktop/comps/delegate.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/pulldown_menus/playlist_gridview_page_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-class DbMusicListGridPage extends StatefulWidget {
+class DbPlaylistGridPage extends StatefulWidget {
   final bool isDesktop;
+  final PlaylistCollection playlistCollection;
+  final List<Playlist> playlists;
 
-  const DbMusicListGridPage({
+  const DbPlaylistGridPage({
     super.key,
     required this.isDesktop,
+    required this.playlists,
+    required this.playlistCollection,
   });
 
   @override
-  DbMusicListGridPageState createState() => DbMusicListGridPageState();
+  DbPlaylistGridPageState createState() => DbPlaylistGridPageState();
 }
 
-class DbMusicListGridPageState extends State<DbMusicListGridPage>
+class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
     with WidgetsBindingObserver {
-  List<Playlist> playlists = [];
-  late StreamSubscription<List<Playlist>> playlistGridUpdateSubscription;
+  late List<Playlist> playlists;
+  late PlaylistCollection playlistCollection;
+
+  late StreamSubscription<int> playlistsPageRefreshStreamSubscription;
+  late StreamSubscription<Playlist> playlistUpdateStreamSubscription;
+  late StreamSubscription<PlaylistCollection>
+      playlistCollectionUpdateStreamSubscription;
+  late StreamSubscription<String> playlistDeleteStreamSubscription;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    playlistCollection = widget.playlistCollection;
+    playlists = widget.playlists;
 
-    playlistGridUpdateSubscription =
-        playlistGridUpdateStreamController.stream.listen((e) {
-      setState(() {
-        playlists = e;
-      });
+    playlistsPageRefreshStreamSubscription =
+        playlistsPageRefreshStreamController.stream.listen((id) {
+      if (id == widget.playlistCollection.id) {
+        widget.playlistCollection.getPlaylistsFromDb().then((ps) {
+          setState(() {
+            playlists = ps;
+          });
+        });
+      }
     });
-    Playlist.getFromDb().then((e) => setState(() {
-          playlists = e;
-        }));
+
+    playlistUpdateStreamSubscription =
+        playlistUpdateStreamController.stream.listen((p) {
+      var index =
+          playlists.indexWhere((element) => element.identity == p.identity);
+      if (index != -1) {
+        setState(() {
+          playlists[index] = p;
+        });
+      }
+    });
+
+    playlistCollectionUpdateStreamSubscription =
+        playlistCollectionUpdateStreamController.stream.listen((pc) {
+      if (pc.id == playlistCollection.id) {
+        setState(() {
+          playlistCollection = pc;
+        });
+      }
+    });
+
+    playlistDeleteStreamSubscription =
+        playlistDeleteStreamController.stream.listen((id) {
+      var index = playlists.indexWhere((element) => element.identity == id);
+      if (index != -1) {
+        setState(() {
+          playlists.removeAt(index);
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    playlistGridUpdateSubscription.cancel();
+    playlistsPageRefreshStreamSubscription.cancel();
+    playlistUpdateStreamSubscription.cancel();
+    playlistCollectionUpdateStreamSubscription.cancel();
+
     super.dispose();
   }
 
   @override
   void didChangePlatformBrightness() {
     setState(() {});
-  }
-
-  void loadMusicLists() async {
-    try {
-      List<Playlist> loadedLists = await Playlist.getFromDb();
-      setState(() {
-        playlists = loadedLists;
-      });
-    } catch (e) {
-      LogToast.error("加载歌单列表", "加载歌单列表失败: $e",
-          "[loadMusicLists] Failed to load music lists: $e");
-    }
   }
 
   @override
@@ -85,14 +118,11 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
   Widget buildDesktopUI(bool isDarkMode) {
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color backgroundColor = isDarkMode
-        ? getPrimaryBackgroundColor(isDarkMode)
-        : CupertinoColors.white;
     final Color navigatorBarColor = getNavigatorBarColor(isDarkMode);
     final ScrollController controller = ScrollController();
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
       child: Column(
         children: [
           CupertinoNavigationBar(
@@ -102,7 +132,7 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
               child: Align(
                 alignment: Alignment.center,
                 child: Text(
-                  '资料库',
+                  playlistCollection.name,
                   style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -122,6 +152,7 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
                         TextStyle(color: activeIconRed).useSystemChineseFont(),
                   )),
               isDesktop: true,
+              playlistCollection: playlistCollection,
             ),
           ),
           Expanded(
@@ -156,7 +187,7 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  '资料库',
+                  playlistCollection.name,
                   style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -176,6 +207,7 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
                         TextStyle(color: activeIconRed).useSystemChineseFont(),
                   )),
               isDesktop: false,
+              playlistCollection: playlistCollection,
             ),
           ),
           Expanded(
@@ -220,14 +252,14 @@ class DbMusicListGridPageState extends State<DbMusicListGridPage>
                       playlist: musicList,
                       showDesc: false,
                       onTap: () {
-                        globalSetNavItemSelected(
+                        navigate(
+                            context,
+                            DbMusicContainerListPage(
+                              playlist: musicList,
+                              isDesktop: widget.isDesktop,
+                            ),
+                            widget.isDesktop,
                             "###Playlist_${musicList.identity}###");
-                        globalDesktopNavigatorToPage(
-                          DbMusicContainerListPage(
-                            playlist: musicList,
-                            isDesktop: true,
-                          ),
-                        );
                       },
                       cacheCover: globalConfig.storageConfig.saveCover,
                     );

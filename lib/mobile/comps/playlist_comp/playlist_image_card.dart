@@ -10,6 +10,7 @@ class MobilePlaylistImageCard extends StatelessWidget {
   final GestureTapCallback? onTap;
   final bool cacheCover;
   final bool showDesc;
+
   const MobilePlaylistImageCard(
       {super.key,
       required this.playlist,
@@ -32,7 +33,7 @@ class MobilePlaylistImageCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
               child: imageWithCache(playlist.getCover(size: 250),
-                  cacheHeight: 100, cacheWidth: 100, enableCache: cacheCover),
+                  cacheHeight: 250, cacheWidth: 250, enableCache: cacheCover),
             ),
             Positioned(
               bottom: 8,

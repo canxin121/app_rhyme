@@ -5,6 +5,7 @@ pub use music_api::interface::{
     music_aggregator::{Music, MusicAggregator},
     music_chart::{MusicChart, MusicChartCollection, ServerMusicChartCollection},
     playlist::{Playlist, PlaylistType},
+    playlist_collection::PlaylistCollection,
     playlist_subscription::PlayListSubscription,
     playlist_tag::{
         PlaylistTag, PlaylistTagCollection, ServerPlaylistTagCollection, TagPlaylistOrder,
@@ -88,6 +89,7 @@ pub struct _Playlist {
     pub server: Option<MusicServer>,
     pub type_field: PlaylistType,
     pub identity: String,
+    pub collection_id: Option<i64>,
     #[frb(non_final)]
     pub name: String,
     #[frb(non_final)]
@@ -182,4 +184,11 @@ pub struct _MusicChartCollection {
 pub struct _ServerMusicChartCollection {
     pub server: MusicServer,
     pub collections: Vec<MusicChartCollection>,
+}
+
+#[frb(mirror(PlaylistCollection))]
+pub struct _PlaylistCollection {
+    pub id: i64,
+    pub order: i64,
+    pub name: String,
 }

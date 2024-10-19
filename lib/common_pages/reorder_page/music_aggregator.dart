@@ -1,9 +1,9 @@
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:reorderables/reorderables.dart';
@@ -66,11 +66,7 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
               padding: const EdgeInsets.all(0),
               child: Icon(CupertinoIcons.back, color: activeIconRed),
               onPressed: () {
-                if (widget.isDesktop) {
-                  globalDesktopPopPage();
-                } else {
-                  Navigator.pop(context);
-                }
+                if (context.mounted) popPage(context, widget.isDesktop);
               },
             ),
             trailing: CupertinoButton(
@@ -84,22 +80,13 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
                     await widget.musicAggregators[i].updateOrderToDb(
                         playlistId: int.parse(widget.playlist.identity));
                   }
-
-                  widget.playlist.getMusicsFromDb().then(
-                      (e) => musicAggregatorListUpdateStreamController.add(e));
-                  LogToast.success("歌曲排序成功", "歌曲排序成功",
-                      "[ReorderLocalMusicListPageState] Music list reordered successfully");
+                  musicAggrgatorsPageRefreshStreamController
+                      .add(widget.playlist.identity);
                 } catch (e) {
                   LogToast.error("歌曲排序失败", "歌曲排序错误:$e",
                       "[ReorderLocalMusicListPageState] Failed to reorder music list: $e");
                 }
-                if (context.mounted) {
-                  if (widget.isDesktop) {
-                    globalDesktopPopPage();
-                  } else {
-                    Navigator.pop(context);
-                  }
-                }
+                if (context.mounted) popPage(context, widget.isDesktop);
               },
             ),
           ),

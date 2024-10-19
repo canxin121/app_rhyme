@@ -28,8 +28,14 @@ impl MusicDataJsonWrapper {
     }
 
     /// takes ownership
-    pub async fn apply_to_db(self, playlist_id: Option<i64>) -> anyhow::Result<()> {
-        self.0.apply_to_db(playlist_id).await
+    pub async fn apply_to_db(
+        self,
+        playlist_id: Option<i64>,
+        playlist_collection_id: Option<i64>,
+    ) -> anyhow::Result<()> {
+        self.0
+            .apply_to_db(playlist_id, playlist_collection_id)
+            .await
     }
 
     pub async fn from_database() -> anyhow::Result<Self> {

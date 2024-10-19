@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
 import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list.dart';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
-import 'package:app_rhyme/desktop/home.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
@@ -17,6 +14,7 @@ import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,44 +39,42 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
     with WidgetsBindingObserver {
   late Playlist playlist;
   List<MusicAggregator> musicAggs = [];
-  late StreamSubscription<Playlist> playlistInfoUpdateSubscription;
-  late StreamSubscription<List<MusicAggregator>>
-      musicAggregatorListUpdateSubscription;
-  late StreamSubscription<void> popSubscription;
+  late StreamSubscription<String> musicAggrgatorsPageRefreshStreamSubscription;
+  late StreamSubscription<Playlist> playlistUpdateSubscription;
+  late StreamSubscription<String> musicAggregatorDeleteStreamSubscription;
+  late StreamSubscription<void> popPageSubscription;
 
   @override
   void initState() {
     playlist = widget.playlist;
     WidgetsBinding.instance.addObserver(this);
 
-    playlistInfoUpdateSubscription =
-        playlistUpdateStreamController.stream.listen((e) {
+    playlistUpdateSubscription =
+        playlistUpdateStreamController.stream.listen((newPlaylist) {
       setState(() {
-        playlist = e;
-      });
-    });
-    musicAggregatorListUpdateSubscription =
-        musicAggregatorListUpdateStreamController.stream.listen((e) {
-      setState(() {
-        musicAggs = e;
+        playlist = newPlaylist;
       });
     });
 
-    popSubscription = dbPlaylistPagePopStreamController.stream.listen((_) {
-      if (widget.isDesktop) {
-        if (globalDesktopNavigatorKey.currentContext != null) {
-          globalSetNavItemSelected("###AllPlaylist###");
-          globalDesktopNavigatorToPage(DbMusicListGridPage(
-            isDesktop: true,
-          ));
-        }
-      } else {
-        if (!mounted) return;
-        var navigator = Navigator.of(context);
-        if (navigator.canPop()) {
-          navigator.pop();
-        }
+    musicAggrgatorsPageRefreshStreamSubscription =
+        musicAggrgatorsPageRefreshStreamController.stream.listen((id) {
+      if (id == widget.playlist.identity) {
+        setState(() async {
+          musicAggs = await widget.playlist.getMusicsFromDb();
+        });
       }
+    });
+
+    musicAggregatorDeleteStreamSubscription =
+        musicAggregatorDeleteStreamController.stream.listen((mId) {
+      setState(() {
+        musicAggs.removeWhere((element) => element.identity() == mId);
+      });
+    });
+
+    popPageSubscription = dbPlaylistPagePopStreamController.stream.listen((_) {
+      if (!mounted) return;
+      popPage(context, widget.isDesktop);
     });
 
     loadMusicContainers();
@@ -88,9 +84,10 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    playlistInfoUpdateSubscription.cancel();
-    musicAggregatorListUpdateSubscription.cancel();
-    popSubscription.cancel();
+    musicAggrgatorsPageRefreshStreamSubscription.cancel();
+    playlistUpdateSubscription.cancel();
+    popPageSubscription.cancel();
+    musicAggregatorDeleteStreamSubscription.cancel();
     super.dispose();
   }
 
@@ -214,6 +211,27 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
 
     return CupertinoPageScaffold(
       backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+      navigationBar: CupertinoNavigationBar(
+          padding: const EdgeInsetsDirectional.only(end: 16),
+          backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+          leading: CupertinoButton(
+            padding: const EdgeInsets.all(0),
+            child: Icon(CupertinoIcons.back, color: activeIconRed),
+            onPressed: () {
+              popPage(context, isDesktop);
+            },
+          ),
+          trailing: DbMusicListChoicMenu(
+            builder: (context, showMenu) => CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+                )),
+            playlist: playlist,
+            musicAggs: musicAggs,
+          )),
       child: CupertinoScrollbar(
         controller: controller,
         thickness: 10,
@@ -286,7 +304,7 @@ class DbMusicListChoicMenu extends StatelessWidget {
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
             for (var musicAgg in musicAggs) {
-              await delMusicAggregatorCache(musicAgg, showToast: false);
+              await delMusicCache(musicAgg, showToast: false);
             }
             LogToast.success("删除所有音乐缓存", "删除所有音乐缓存成功",
                 "[LocalMusicListChoicMenu] Successfully deleted all music caches");

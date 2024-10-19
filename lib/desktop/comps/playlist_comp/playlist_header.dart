@@ -153,8 +153,7 @@ class MusicListHeader extends StatelessWidget {
                               false;
                           if (!confirm) return;
                           for (var musicAgg in musicAggregators) {
-                            await cacheMusicContainer(
-                                MusicContainer(musicAgg));
+                            await cacheMusicContainer(MusicContainer(musicAgg));
                           }
                         }),
                   ],

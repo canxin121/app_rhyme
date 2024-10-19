@@ -5,7 +5,7 @@ pub mod plugin;
 pub mod types;
 pub mod utils;
 
-pub const APP_RHYME_FOLDER: &str = "AppRhyme";
+pub const APP_RHYME_FOLDER: &str = "app_rhyme";
 pub const PIC_FOLDER: &str = "Pic";
 pub const MUSIC_FOLDER: &str = "Music";
 pub const PLAYINFO_FOLDER: &str = "PlayInfo";

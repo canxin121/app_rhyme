@@ -1,9 +1,9 @@
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:reorderables/reorderables.dart';
@@ -12,10 +12,11 @@ import 'package:app_rhyme/utils/colors.dart';
 class PlaylistReorderPage extends StatefulWidget {
   final bool isDesktop;
   final List<Playlist> playlists;
+  final PlaylistCollection playlistCollection;
   const PlaylistReorderPage({
     super.key,
     required this.isDesktop,
-    required this.playlists,
+    required this.playlists, required this.playlistCollection,
   });
 
   @override
@@ -46,10 +47,7 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
         widget.playlists[i].order = i;
         widget.playlists[i] = await widget.playlists[i].updateToDb();
       }
-      LogToast.success("歌单排序成功", "歌单排序成功",
-          "[ReorderLocalMusicListGridPageState] Music list reordered successfully");
-      Playlist.getFromDb()
-          .then((e) => playlistGridUpdateStreamController.add(e));
+      playlistsPageRefreshStreamController.add(widget.playlistCollection.id);
     } catch (e) {
       LogToast.error("歌单排序失败", "歌单排序错误: $e",
           "[ReorderLocalMusicListGridPageState] Failed to reorder music list: $e");
@@ -77,11 +75,7 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
                 padding: const EdgeInsets.all(0),
                 child: Icon(CupertinoIcons.back, color: activeIconRed),
                 onPressed: () {
-                  if (widget.isDesktop) {
-                    globalDesktopPopPage();
-                  } else {
-                    Navigator.pop(context);
-                  }
+                  if (context.mounted) popPage(context, widget.isDesktop);
                 },
               ),
               trailing: CupertinoButton(
@@ -89,15 +83,7 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
                 child: Icon(CupertinoIcons.checkmark, color: activeIconRed),
                 onPressed: () async {
                   await _updatePlaylistsOrder();
-                  if (context.mounted) {
-                    if (widget.isDesktop) {
-                      globalDesktopPopPage();
-                    } else {
-                      Navigator.pop(context);
-                    }
-                  }
-                  Playlist.getFromDb()
-                      .then((e) => playlistGridUpdateStreamController.add(e));
+                  if (context.mounted) popPage(context, widget.isDesktop);
                 },
               ),
             ),

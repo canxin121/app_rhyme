@@ -1,14 +1,12 @@
+import 'package:app_rhyme/common_comps/paged/paged_music_agg_listview.dart';
 import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
-import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
@@ -84,12 +82,10 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final ScrollController scrollController = ScrollController();
     final Color primaryColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
@@ -145,116 +141,13 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
               },
             ),
           ),
-          if (widget.isDesktop &&
-              _pagingController.itemList != null &&
-              _pagingController.itemList!.isNotEmpty)
-            const Padding(
-              padding: EdgeInsets.only(left: 16, right: 16),
-              child: MusicAggregatorListHeaderRow(),
-            ),
           Expanded(
-            child: widget.isDesktop
-                ? _buildDesktopList(context, scrollController, textColor,
-                    screenHeight, isDarkMode)
-                : _buildMobileList(context, scrollController, textColor,
-                    screenHeight, isDarkMode),
-          ),
+              child: PagedMusicAggregatorList(
+                  isDesktop: widget.isDesktop,
+                  pagingController: _pagingController)),
         ],
       ),
     );
-  }
-
-  Widget _buildDesktopList(
-      BuildContext context,
-      ScrollController scrollController,
-      Color textColor,
-      double screenHeight,
-      bool isDarkMode) {
-    return CupertinoScrollbar(
-      thickness: 10,
-      radius: const Radius.circular(10),
-      controller: scrollController,
-      child: PagedListView(
-        scrollController: scrollController,
-        pagingController: _pagingController,
-        padding: EdgeInsets.only(bottom: screenHeight * 0.2),
-        builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
-          noItemsFoundIndicatorBuilder: (context) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '输入关键词以搜索单曲',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: textColor,
-                  ).useSystemChineseFont(),
-                ),
-              ],
-            ),
-          ),
-          itemBuilder: (context, musicAggregator, index) {
-            return DesktopMusicAggregatorListItem(
-              musicAgg: musicAggregator,
-              isDarkMode: isDarkMode,
-              hasBackgroundColor: (index - 1) % 2 == 0,
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMobileList(
-      BuildContext context,
-      ScrollController scrollController,
-      Color textColor,
-      double screenHeight,
-      bool isDarkMode) {
-    return CupertinoScrollbar(
-        thickness: 10,
-        radius: const Radius.circular(10),
-        controller: scrollController,
-        child: PagedListView.separated(
-          scrollController: scrollController,
-          pagingController: _pagingController,
-          padding: EdgeInsets.only(bottom: screenHeight * 0.2),
-          separatorBuilder: (context, index) => Divider(
-            color: isDarkMode
-                ? CupertinoColors.systemGrey
-                : CupertinoColors.systemGrey4,
-            indent: 30,
-            endIndent: 30,
-          ),
-          builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
-            noItemsFoundIndicatorBuilder: (context) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '输入关键词以搜索单曲',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: textColor,
-                    ).useSystemChineseFont(),
-                  ),
-                  Text(
-                    '点击右上角图标切换搜索歌单',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: textColor,
-                    ).useSystemChineseFont(),
-                  ),
-                ],
-              ),
-            ),
-            itemBuilder: (context, musicAggregator, index) {
-              return MobileMusicAggregatorListItem(
-                musicAgg: musicAggregator,
-              );
-            },
-          ),
-        ));
   }
 }
 
@@ -304,22 +197,17 @@ class SearchMusicAggregatorChoiceMenu extends StatelessWidget {
           itemTheme: PullDownMenuItemTheme(
               textStyle: const TextStyle().useSystemChineseFont()),
           onTap: () async {
-            LogToast.info(
-              "多选操作",
-              "正在加载所有歌曲,请稍等",
-              "[SearchMusicAggregatorPage] Multi select operation, wait to fetch all music aggregators",
-            );
-            await fetchAllMusicAggregators();
             if (pagingController.itemList == null) return;
             if (pagingController.itemList!.isEmpty) return;
             if (context.mounted) {
-              globalSetNavItemSelected("");
-              globalDesktopNavigatorToPage(
+              navigate(
+                  context,
                   MusicAggregatorMultiSelectionPage(
                     musicAggs: pagingController.itemList!,
-                    isDesktop: true,
+                    isDesktop: isDesktop,
                   ),
-                  replace: false);
+                  isDesktop,
+                  "");
             }
           },
           title: "多选操作",

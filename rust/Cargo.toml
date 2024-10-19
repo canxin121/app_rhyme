@@ -7,10 +7,10 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-flutter_rust_bridge = { version = "=2.4.0", features = ["chrono"] }
+flutter_rust_bridge = { version = "=2.5.0", features = ["chrono"] }
 rayon = "1.10.0"
-futures = "0.3.30"
-futures-util = "0.3.30"
+futures = "0.3.31"
+futures-util = "0.3.31"
 chrono = { version = "0.4.38", features = ["serde"] }
 base64 = "0.22.1"
 rc4 = { git = "https://github.com/rsdump/rc4" }
@@ -23,7 +23,7 @@ generic-array = "1.1.0"
 hex = "0.4.3"
 log = "0.4.22"
 md-5 = "0.10.6"
-once_cell = "1.20.1"
+once_cell = "1.20.2"
 rand = "0.8.5"
 regex = "1.11.0"
 reqwest = { version = "0.12.8", features = [
@@ -35,20 +35,20 @@ reqwest = { version = "0.12.8", features = [
 reqwest-middleware = "0.3.3"
 reqwest-retry = "0.6.1"
 rsa = { version = "0.9.6", features = ["hazmat"] }
-sea-orm = { version = "1.0.1", default-features = false, features = [
+sea-orm = { version = "1.1.0", default-features = false, features = [
     "sqlx-sqlite",
     "runtime-tokio-rustls",
     "serde_json",
     "with-json",
 ] }
-sea-orm-migration = { version = "1.0.1", features = [
+sea-orm-migration = { version = "1.1.0", features = [
     "sqlx-sqlite",
     "runtime-tokio-rustls",
 ], default-features = false }
-sea-query = { version = "0.31.0" }
-sea-query-binder = { version = "0.6.0", features = ["sqlx-any", "sqlx-sqlite"] }
+sea-query = { version = "0.32.0" }
+sea-query-binder = { version = "0.7.0", features = ["sqlx-any", "sqlx-sqlite"] }
 serde = { version = "1.0.210", features = ["derive"] }
-serde_json = "1.0.128"
+serde_json = "1.0.129"
 sha2 = "0.10.8"
 tokio = { version = "1.40.0", features = ["full"] }
 tracing-subscriber = "0.3.18"

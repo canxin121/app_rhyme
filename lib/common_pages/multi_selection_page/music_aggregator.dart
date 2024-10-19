@@ -1,8 +1,8 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
-import 'package:app_rhyme/desktop/comps/navigation_column.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/pulldown_menus/multi_select_music_agg_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:drag_select_grid_view/drag_select_grid_view.dart';
@@ -75,11 +75,7 @@ class MusicAggregatorMultiSelectionPageState
             padding: const EdgeInsets.all(0),
             child: Icon(CupertinoIcons.back, color: activeIconRed),
             onPressed: () {
-              if (widget.isDesktop) {
-                globalDesktopPopPage();
-              } else {
-                Navigator.of(context).pop();
-              }
+              if (context.mounted) popPage(context, widget.isDesktop);
             },
           ),
           trailing: MusicAggMultiSelectMenu(

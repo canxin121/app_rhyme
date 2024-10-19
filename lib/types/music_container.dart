@@ -10,6 +10,7 @@ import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:app_rhyme/utils/source_helper.dart';
 import 'package:just_audio/just_audio.dart';
 
+// 问题： currentMusicIndex 可能是out of range的
 class MusicContainer {
   late MusicAggregator musicAggregator;
   late int currentMusicIndex;
