@@ -1,8 +1,9 @@
 import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
-import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/mobile/comps/play_display_comp/music_control_bar.dart';
 import 'package:app_rhyme/common_pages/setting_page.dart';
+import 'package:app_rhyme/mobile/pages/explore_page.dart';
+import 'package:app_rhyme/mobile/pages/search_page.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,18 +19,21 @@ class MobileHome extends StatefulWidget {
 }
 
 class MobileHomeState extends State<MobileHome> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
+
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
 
   final List<Widget> _pages = [
+    const MobileExplorePage(),
+    const SearchPageMobile(),
     const DbPlaylistCollectionPage(
       isDesktop: false,
     ),
-    const CombinedSearchPage(),
     const SettingPage(
       isDesktop: false,
     ),
@@ -69,6 +73,15 @@ class MobileHomeState extends State<MobileHome> {
     return false;
   }
 
+  BottomNavigationBarItem buildBottomNavigationBarItem(IconData iconData) {
+    return BottomNavigationBarItem(
+      icon: Padding(
+        padding: EdgeInsets.only(top: 10, bottom: 10),
+        child: Icon(iconData),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
@@ -96,7 +109,6 @@ class MobileHomeState extends State<MobileHome> {
               }).toList(),
             ),
           ),
-          // 页面底部的音乐控制栏和底部导航栏
           KeyboardVisibilityBuilder(
             builder: (p0, isKeyboardVisible) => isKeyboardVisible
                 ? const SizedBox(
@@ -120,27 +132,13 @@ class MobileHomeState extends State<MobileHome> {
                             _selectedIndex = index;
                           });
                         },
-                        items: const [
-                          BottomNavigationBarItem(
-                            icon: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: Icon(
-                                CupertinoIcons.music_albums_fill,
-                              ),
-                            ),
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: Icon(CupertinoIcons.search),
-                            ),
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: Icon(CupertinoIcons.settings),
-                            ),
-                          ),
+                        items: [
+                          buildBottomNavigationBarItem(
+                              CupertinoIcons.music_note),
+                          buildBottomNavigationBarItem(CupertinoIcons.search),
+                          buildBottomNavigationBarItem(
+                              CupertinoIcons.music_albums),
+                          buildBottomNavigationBarItem(CupertinoIcons.settings),
                         ],
                         activeColor: activeIconRed,
                       ),

@@ -1,4 +1,4 @@
-import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
+import 'package:app_rhyme/pulldown_menus/musics_playlist_smart_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
@@ -36,7 +36,6 @@ class PlaylistListItem extends StatelessWidget {
                 playlist.getCover(size: 250),
                 width: 50,
                 height: 50,
-                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -78,7 +77,8 @@ class PlaylistListItem extends StatelessWidget {
                 details.globalPosition,
                 details.globalPosition,
               );
-              showPlaylistMenu(context, playlist, position, false, true);
+              showMusicPlaylistSmartMenu(
+                  context, playlist, position, false, true);
             },
             child: Icon(
               CupertinoIcons.ellipsis,

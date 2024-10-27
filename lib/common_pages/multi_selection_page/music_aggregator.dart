@@ -1,6 +1,6 @@
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
-import 'package:app_rhyme/pulldown_menus/multi_select_music_agg_pulldown_menu.dart';
+import 'package:app_rhyme/pulldown_menus/multi_select/multi_select_music_agg_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -62,7 +62,6 @@ class MusicAggregatorMultiSelectionPageState
     final Color dividerColor = isDarkMode
         ? const Color.fromARGB(255, 41, 41, 43)
         : const Color.fromARGB(255, 245, 245, 246);
-    final ScrollController scrollController = ScrollController();
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
@@ -94,87 +93,79 @@ class MusicAggregatorMultiSelectionPageState
           ),
         ),
         Expanded(
-            child: widget.musicAggs.isEmpty
-                ? Center(
-                    child: Text(
-                      "没有音乐",
-                      style: TextStyle(
-                              color: isDarkMode
-                                  ? CupertinoColors.white
-                                  : CupertinoColors.black)
-                          .useSystemChineseFont(),
+          child: widget.musicAggs.isEmpty
+              ? Center(
+                  child: Text(
+                    "没有音乐",
+                    style: TextStyle(
+                            color: isDarkMode
+                                ? CupertinoColors.white
+                                : CupertinoColors.black)
+                        .useSystemChineseFont(),
+                  ),
+                )
+              : Align(
+                  key: ValueKey(controller.hashCode),
+                  alignment: Alignment.topCenter,
+                  child: DragSelectGridView(
+                    gridController: controller,
+                    padding: EdgeInsets.only(
+                      bottom: 100,
+                      top: 10,
+                      left: widget.isDesktop ? 0 : 10,
+                      right: widget.isDesktop ? 0 : 10,
                     ),
-                  )
-                : Align(
-                    key: ValueKey(controller.hashCode),
-                    alignment: Alignment.topCenter,
-                    child: CupertinoScrollbar(
-                        thickness: 10,
-                        radius: const Radius.circular(10),
-                        controller: scrollController,
-                        child: DragSelectGridView(
-                          scrollController: scrollController,
-                          gridController: controller,
-                          padding: EdgeInsets.only(
-                            bottom: 100,
-                            top: 10,
-                            left: widget.isDesktop ? 0 : 10,
-                            right: widget.isDesktop ? 0 : 10,
-                          ),
-                          itemCount: widget.musicAggs.length,
-                          triggerSelectionOnTap: true,
-                          itemBuilder: (context, index, selected) {
-                            final musicAgg = widget.musicAggs[index];
+                    itemCount: widget.musicAggs.length,
+                    triggerSelectionOnTap: true,
+                    itemBuilder: (context, index, selected) {
+                      final musicAgg = widget.musicAggs[index];
 
-                            Widget musicAggItem = widget.isDesktop
-                                ? DesktopMusicAggregatorListItem(
-                                    musicAgg: musicAgg,
-                                    playlist: widget.playlist,
-                                    isDarkMode: isDarkMode,
-                                    hasBackgroundColor: index % 2 == 0,
-                                  )
-                                : MobileMusicAggregatorListItem(
-                                    showMenu: false,
-                                    musicAgg: musicAgg,
-                                    playlist: widget.playlist,
-                                  );
-                            return Column(
-                              children: [
-                                Row(
-                                  key: ValueKey(
-                                      "${selected}_${musicAgg.identity()}"),
-                                  children: [
-                                    Expanded(
-                                      child: musicAggItem,
-                                    ),
-                                    Icon(
-                                      selected
-                                          ? CupertinoIcons.check_mark_circled
-                                          : CupertinoIcons.circle,
-                                      color: selected
-                                          ? CupertinoColors.systemGreen
-                                          : CupertinoColors.systemGrey4,
-                                    ),
-                                  ],
-                                ),
-                                const Padding(
-                                    padding: EdgeInsets.only(top: 10)),
-                                SizedBox(
-                                  width: screenWidth * 0.85,
-                                  child: Divider(
-                                    color: dividerColor,
-                                    height: 0.5,
-                                  ),
-                                )
-                              ],
+                      Widget musicAggItem = widget.isDesktop
+                          ? DesktopMusicAggregatorListItem(
+                              musicAgg: musicAgg,
+                              playlist: widget.playlist,
+                              isDarkMode: isDarkMode,
+                              hasBackgroundColor: index % 2 == 0,
+                            )
+                          : MobileMusicAggregatorListItem(
+                              showMenu: false,
+                              musicAgg: musicAgg,
+                              playlist: widget.playlist,
                             );
-                          },
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedRowHeight(
-                            rowHeight: 60,
+                      return Column(
+                        children: [
+                          Row(
+                            key: ValueKey("${selected}_${musicAgg.identity()}"),
+                            children: [
+                              Expanded(
+                                child: musicAggItem,
+                              ),
+                              Icon(
+                                selected
+                                    ? CupertinoIcons.check_mark_circled
+                                    : CupertinoIcons.circle,
+                                color: selected
+                                    ? CupertinoColors.systemGreen
+                                    : CupertinoColors.systemGrey4,
+                              ),
+                            ],
                           ),
-                        )),
-                  ))
+                          const Padding(padding: EdgeInsets.only(top: 10)),
+                          SizedBox(
+                            width: screenWidth * 0.85,
+                            child: Divider(
+                              color: dividerColor,
+                              height: 0.5,
+                            ),
+                          )
+                        ],
+                      );
+                    },
+                    gridDelegate: const SliverGridDelegateWithFixedRowHeight(
+                      rowHeight: 60,
+                    ),
+                  )),
+        )
       ]),
     );
   }

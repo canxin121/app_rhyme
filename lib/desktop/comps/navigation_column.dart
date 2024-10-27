@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
+import 'package:app_rhyme/desktop/pages/explore_page/music_chart_page.dart';
+import 'package:app_rhyme/desktop/pages/explore_page/playlist_tag_page.dart';
 import 'package:app_rhyme/common_pages/search_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/search_page/playlist.dart';
 import 'package:app_rhyme/desktop/home.dart';
@@ -184,6 +186,30 @@ class MyNavListViewState extends State<MyNavListView> {
           },
           identity: '###Setting###',
         ),
+        NavGroup(title: "浏览", icon: CupertinoIcons.compass, items: [
+          NavItem(
+            title: '歌曲排行榜',
+            icon: CupertinoIcons.search,
+            onTap: () {
+              globalSetNavItemSelected("###MusicChart###");
+              navigatorToPage(const MusicChartPage(
+                isDesktop: true,
+              ));
+            },
+            identity: '###MusicChart###',
+          ),
+          NavItem(
+            title: '浏览歌单',
+            icon: CupertinoIcons.search,
+            onTap: () {
+              globalSetNavItemSelected("###PlaylistTag###");
+              navigatorToPage(const PlaylistTagPage(
+                isDesktop: true,
+              ));
+            },
+            identity: "###PlaylistTag###",
+          ),
+        ]),
         NavGroup(title: "搜索", icon: CupertinoIcons.search, items: [
           NavItem(
             title: '搜索单曲',

@@ -1,5 +1,4 @@
-import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_image_card.dart';
-import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
+import 'package:app_rhyme/common_comps/card/playlist_card.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -16,7 +15,8 @@ class PlaylistReorderPage extends StatefulWidget {
   const PlaylistReorderPage({
     super.key,
     required this.isDesktop,
-    required this.playlists, required this.playlistCollection,
+    required this.playlists,
+    required this.playlistCollection,
   });
 
   @override
@@ -63,7 +63,6 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    final ScrollController scrollController = ScrollController();
 
     return CupertinoPageScaffold(
         backgroundColor: backgroundColor,
@@ -96,47 +95,28 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
                     )
                   : Align(
                       alignment: Alignment.topCenter,
-                      child: CupertinoScrollbar(
-                          controller: scrollController,
-                          thickness: 10,
-                          radius: const Radius.circular(10),
-                          child: ReorderableWrap(
-                            controller: scrollController,
-                            padding: const EdgeInsets.only(
-                                bottom: 100, left: 10, right: 10, top: 10),
-                            spacing: 8.0,
-                            runSpacing: 8.0,
-                            needsLongPressDraggable: true,
-                            children: widget.playlists.map((musicList) {
-                              return SizedBox(
-                                width: widget.isDesktop
-                                    ? 200
-                                    : screenWidth / 2 - 20,
-                                child: widget.isDesktop
-                                    ? DesktopPlaylistImageCard(
-                                        showDesc: false,
-                                        key: ValueKey(musicList.identity),
-                                        playlist: musicList,
-                                        onTap: () {},
-                                      )
-                                    : MobilePlaylistImageCard(
-                                        showDesc: false,
-                                        key: ValueKey(musicList.identity),
-                                        playlist: musicList,
-                                        onTap: () {},
-                                      ),
-                              );
-                            }).toList(),
-                            onReorder: (int oldIndex, int newIndex) {
-                              setState(() {
-                                final Playlist item =
-                                    widget.playlists.removeAt(oldIndex);
-                                widget.playlists.insert(newIndex, item);
-                              });
-                            },
-                          )),
-                    ),
-            )
+                      child: ReorderableWrap(
+                        padding: const EdgeInsets.only(
+                            bottom: 100, left: 10, right: 10, top: 10),
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        needsLongPressDraggable: true,
+                        children: widget.playlists.map((playlist) {
+                          return SizedBox(
+                            width:
+                                widget.isDesktop ? 200 : screenWidth / 2 - 20,
+                            child: PlaylistCard(playlist: playlist),
+                          );
+                        }).toList(),
+                        onReorder: (int oldIndex, int newIndex) {
+                          setState(() {
+                            final Playlist item =
+                                widget.playlists.removeAt(oldIndex);
+                            widget.playlists.insert(newIndex, item);
+                          });
+                        },
+                      )),
+            ),
           ],
         ));
   }

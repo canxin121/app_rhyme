@@ -92,7 +92,7 @@ class AudioHandler {
           allowFailedTimes = 3;
           if (isPlaying) await pause();
           LogToast.error("播放失败!", "播放失败次数过多，暂停播放!",
-              "[tryLazyLoadMusic] Failed to lazy load music '${targetMusicContainer!.musicAggregator.name}' to many times, stop playing.");
+              "[tryLazyLoadMusic] Failed to lazy load music to many times, stop playing.");
           return;
         } else {
           if (isPlaying) await pause();

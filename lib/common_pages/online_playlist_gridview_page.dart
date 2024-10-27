@@ -3,6 +3,7 @@ import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,7 +40,9 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
         _pagingController.appendPage(
             fetchedPlaylists, _pagingController.nextPageKey! + 1);
       } catch (e) {
-        _pagingController.error = e;
+        LogToast.error("获取歌单", "获取歌单失败: $e",
+            "[OnlinePlaylistGridViewPage] failed to get playlists: $e");
+        _pagingController.appendLastPage([]);
       }
     });
   }
@@ -56,45 +59,17 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
   }
 
   Future<void> _fetchAllPlaylists() async {
-    LogToast.info("加载所有歌单", "正在加载所有歌单,请稍等",
-        "[OnlineMusicListPage] MultiSelect wait to fetch all music aggregators");
-    const int pageSize = 500;
-
-    try {
-      var fetchedPlaylists = await widget.fetchPlaylists(1, pageSize);
-      _pagingController.value =
-          PagingState(itemList: fetchedPlaylists, nextPageKey: 2);
-    } catch (e) {
-      _pagingController.error = e;
-      return;
-    }
-
-    try {
-      while (_pagingController.nextPageKey != null) {
-        var fetchedPlaylists = await widget.fetchPlaylists(
-            _pagingController.nextPageKey!, pageSize);
-
-        if (fetchedPlaylists.isEmpty) {
-          _pagingController.appendLastPage([]);
-        } else {
-          _pagingController.appendPage(
-              fetchedPlaylists, _pagingController.nextPageKey! + 1);
-        }
-      }
-    } catch (e) {
-      LogToast.error("获取歌单失败", "获取歌单失败: $e",
-          "[fetchAllMusicAgrgegatorsFromPlaylist] Failed to fetch music from playlist: $e");
-    }
-
-    LogToast.success("加载所有歌单", '已加载所有歌单',
-        "[OnlineMusicListPage] Succeed to fetch all music aggregators");
+    await fetchAllItemsWithPagingController(
+      widget.fetchPlaylists,
+      _pagingController,
+      "歌单",
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
-    final ScrollController scrollController = ScrollController();
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color primaryColor =
@@ -121,7 +96,7 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
             color: textColor,
           ).useSystemChineseFont(),
         ),
-        trailing: SearchPlaylistChoiceMenu(
+        trailing: SearchPlaylistPullDownMenu(
           builder: (BuildContext context, Future<void> Function() showMenu) =>
               CupertinoButton(
             padding: const EdgeInsets.all(0),
@@ -142,14 +117,9 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
       child: Column(
         children: [
           Expanded(
-            child: CupertinoScrollbar(
-              thickness: 10,
-              radius: const Radius.circular(10),
-              controller: scrollController,
-              child: PagedPlaylistGridview(
-                  isDesktop: widget.isDesktop,
-                  pagingController: _pagingController),
-            ),
+            child: PagedPlaylistGridview(
+                isDesktop: widget.isDesktop,
+                pagingController: _pagingController),
           ),
         ],
       ),
@@ -158,8 +128,8 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
 }
 
 @immutable
-class SearchPlaylistChoiceMenu extends StatelessWidget {
-  const SearchPlaylistChoiceMenu({
+class SearchPlaylistPullDownMenu extends StatelessWidget {
+  const SearchPlaylistPullDownMenu({
     super.key,
     required this.builder,
     required this.fetchAllMusicAggregators,
@@ -196,26 +166,6 @@ class SearchPlaylistChoiceMenu extends StatelessWidget {
             textStyle: const TextStyle().useSystemChineseFont(),
           ),
           onTap: () async {
-            LogToast.info(
-              "多选操作",
-              "多选操作,正在加载所有歌单",
-              "[SearchMusicListPage] Multi select playlist, going to select playlists",
-            );
-            await fetchAllMusicAggregators();
-            if (pagingController.itemList!.isEmpty) {
-              LogToast.error(
-                "多选操作",
-                "没有查找到歌单",
-                "[SearchMusicListPage] No playlists to select",
-              );
-              return;
-            }
-
-            LogToast.success(
-              "加载所有歌单",
-              "已加载所有歌单",
-              "[SearchMusicListPage] Succeed to fetch all music lists",
-            );
             if (!context.mounted) return;
             navigate(
                 context,

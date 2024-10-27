@@ -1,8 +1,7 @@
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/common_comps/card/playlist_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:app_rhyme/mobile/comps/chores/button.dart';
-import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_image_card.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/chore.dart';
@@ -35,9 +34,10 @@ class MobilePlaylistHeader extends StatelessWidget {
             constraints: BoxConstraints(
               maxWidth: screenWidth * 0.7,
             ),
-            child: MobilePlaylistImageCard(
+            child: PlaylistCard(
               playlist: playlist,
               cacheCover: globalConfig.storageConfig.saveCover,
+              showButton: false,
             ),
           ),
         ),
@@ -53,8 +53,6 @@ class MobilePlaylistHeader extends StatelessWidget {
                 onPressed: () async {
                   var musicAggs = musicAggregators;
                   if (fetchAllMusicAggregators != null) {
-                    LogToast.info("加载音乐", "正在加载所有音乐,请稍等",
-                        "[MobilePlaylistHeader.fetchAllMuiscAggregators] loading");
                     musicAggs = await fetchAllMusicAggregators!();
                   }
                   await globalAudioHandler.clearReplaceMusicAll(musicAggs
@@ -71,8 +69,6 @@ class MobilePlaylistHeader extends StatelessWidget {
                 onPressed: () async {
                   var musicAggs = musicAggregators;
                   if (fetchAllMusicAggregators != null) {
-                    LogToast.info("加载音乐", "正在加载所有音乐,请稍等",
-                        "[MobilePlaylistHeader.fetchAllMuiscAggregators] loading");
                     musicAggs = await fetchAllMusicAggregators!();
                   }
                   await globalAudioHandler.clearReplaceMusicAll(shuffleList(

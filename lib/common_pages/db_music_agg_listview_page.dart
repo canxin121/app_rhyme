@@ -1,19 +1,16 @@
 import 'dart:async';
-import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
-import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
 import 'package:app_rhyme/desktop/comps/music_agg_comp/music_agg_list.dart';
 import 'package:app_rhyme/desktop/comps/playlist_comp/playlist_header.dart';
 import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/mobile/comps/playlist_comp/playlist_header.dart';
-import 'package:app_rhyme/pulldown_menus/playlist_pulldown_menu.dart';
+import 'package:app_rhyme/pulldown_menus/items/music_aggregators.dart';
+import 'package:app_rhyme/pulldown_menus/musics_playlist_smart_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
-import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -59,8 +56,10 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
     musicAggrgatorsPageRefreshStreamSubscription =
         musicAggrgatorsPageRefreshStreamController.stream.listen((id) {
       if (id == widget.playlist.identity) {
-        setState(() async {
-          musicAggs = await widget.playlist.getMusicsFromDb();
+        widget.playlist.getMusicsFromDb().then((newMusicAggs) {
+          setState(() {
+            musicAggs = newMusicAggs;
+          });
         });
       }
     });
@@ -139,10 +138,19 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
             padding: const EdgeInsets.all(0),
             child: Icon(CupertinoIcons.back, color: activeIconRed),
             onPressed: () {
-              Navigator.pop(context);
+              popPage(context, isDesktop);
             },
           ),
+          middle: Text(
+            playlist.name,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: getTextColor(isDarkMode),
+            ).useSystemChineseFont(),
+          ),
           trailing: DbMusicListChoicMenu(
+            isDesktop: widget.isDesktop,
             builder: (context, showMenu) => CupertinoButton(
                 padding: const EdgeInsets.all(0),
                 onPressed: showMenu,
@@ -206,7 +214,6 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
   }
 
   Widget _buildDesktopLayout(bool isDarkMode, bool isDesktop) {
-    final ScrollController controller = ScrollController();
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
@@ -222,6 +229,7 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
             },
           ),
           trailing: DbMusicListChoicMenu(
+            isDesktop: widget.isDesktop,
             builder: (context, showMenu) => CupertinoButton(
                 padding: const EdgeInsets.all(0),
                 onPressed: showMenu,
@@ -232,30 +240,24 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
             playlist: playlist,
             musicAggs: musicAggs,
           )),
-      child: CupertinoScrollbar(
-        controller: controller,
-        thickness: 10,
-        radius: const Radius.circular(10),
-        child: CustomScrollView(
-          controller: controller,
-          slivers: <Widget>[
-            MusicListHeader(
-              playlist: playlist,
-              musicAggregators: musicAggs,
-              isDarkMode: isDarkMode,
-              screenWidth: screenWidth,
-              cacheCover: globalConfig.storageConfig.saveCover,
-            ),
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 20),
-            ),
-            MusicAggregatorList(
-              musicAggs: musicAggs,
-              playlist: playlist,
-              cacheCover: globalConfig.storageConfig.saveCover,
-            ),
-          ],
-        ),
+      child: CustomScrollView(
+        slivers: <Widget>[
+          MusicListHeader(
+            playlist: playlist,
+            musicAggregators: musicAggs,
+            isDarkMode: isDarkMode,
+            screenWidth: screenWidth,
+            cacheCover: globalConfig.storageConfig.saveCover,
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 20),
+          ),
+          MusicAggregatorList(
+            musicAggs: musicAggs,
+            playlist: playlist,
+            cacheCover: globalConfig.storageConfig.saveCover,
+          ),
+        ],
       ),
     );
   }
@@ -268,11 +270,13 @@ class DbMusicListChoicMenu extends StatelessWidget {
     required this.builder,
     required this.playlist,
     required this.musicAggs,
+    required this.isDesktop,
   });
 
   final PullDownMenuButtonBuilder builder;
   final Playlist playlist;
   final List<MusicAggregator> musicAggs;
+  final bool isDesktop;
 
   @override
   Widget build(BuildContext context) {
@@ -287,69 +291,20 @@ class DbMusicListChoicMenu extends StatelessWidget {
           subtitle: playlist.summary,
         ),
         const PullDownMenuDivider.large(),
-        ...playlistMenuItems(context, playlist, false, true),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            for (var musicAgg in musicAggs) {
-              await cacheMusicContainer(MusicContainer(musicAgg));
-            }
-          },
-          title: '缓存歌单所有音乐',
-          icon: CupertinoIcons.cloud_download,
+        ...musicPlaylistMenuSmartItems(context, playlist, false, true),
+        // 缓存所有音乐
+        cacheAllMusicAggsPullDownItem(
+          context,
+          musicAggs,
         ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            for (var musicAgg in musicAggs) {
-              await delMusicCache(musicAgg, showToast: false);
-            }
-            LogToast.success("删除所有音乐缓存", "删除所有音乐缓存成功",
-                "[LocalMusicListChoicMenu] Successfully deleted all music caches");
-          },
-          title: '删除所有音乐缓存',
-          icon: CupertinoIcons.delete,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => MuiscAggregatorReorderPage(
-                  musicAggregators: musicAggs,
-                  playlist: playlist,
-                  isDesktop: false,
-                ),
-              ),
-            );
-          },
-          title: "歌曲排序",
-          icon: CupertinoIcons.sort_up_circle,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => MusicAggregatorMultiSelectionPage(
-                  playlist: playlist,
-                  musicAggs: musicAggs,
-                  isDesktop: false,
-                ),
-              ),
-            );
-          },
-          title: "多选操作",
-          icon: CupertinoIcons.selection_pin_in_out,
-        )
+        // 删除所有音乐缓存
+        deleteAllMusicAggsCachePullDownItem(musicAggs),
+        // 歌曲排序
+        orderMusicAggsPullDownItem(context, musicAggs, playlist, isDesktop),
+        // 歌曲多选
+        multiSelectMusicAggsPullDownItem(
+            context, musicAggs, playlist, isDesktop),
       ],
-      animationBuilder: null,
       position: PullDownMenuPosition.automatic,
       buttonBuilder: builder,
     );

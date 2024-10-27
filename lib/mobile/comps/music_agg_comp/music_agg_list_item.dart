@@ -101,7 +101,6 @@ class MobileMusicAggregatorListItemState
             child: imageWithCache(defaultMusic!.getCover(size: 250),
                 width: 40,
                 height: 40,
-                fit: BoxFit.cover,
                 enableCache: widget.cacheCover),
           ),
           // 歌曲的信息(歌名, 歌手)

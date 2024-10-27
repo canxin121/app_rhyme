@@ -6,7 +6,6 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -84,13 +83,11 @@ class MusicListHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    buildButton(context,
+                    buildMobileRedButton(context,
                         icon: CupertinoIcons.play_fill,
                         label: "播放", onPressed: () async {
                       var musicAggs = musicAggregators;
                       if (fetchAllMusicAggregators != null) {
-                        LogToast.info("加载音乐", "正在加载所有音乐,请稍等",
-                            "[MobilePlaylistHeader.fetchAllMuiscAggregators] loading");
                         musicAggs = await fetchAllMusicAggregators!();
                       }
                       await globalAudioHandler.clearReplaceMusicAll(musicAggs
@@ -100,13 +97,11 @@ class MusicListHeader extends StatelessWidget {
                           .toList());
                     }),
                     const SizedBox(width: 10),
-                    buildButton(context,
+                    buildMobileRedButton(context,
                         icon: CupertinoIcons.shuffle,
                         label: "随机播放", onPressed: () async {
                       var musicAggs = musicAggregators;
                       if (fetchAllMusicAggregators != null) {
-                        LogToast.info("加载音乐", "正在加载所有音乐,请稍等",
-                            "[MobilePlaylistHeader.fetchAllMuiscAggregators] loading");
                         musicAggs = await fetchAllMusicAggregators!();
                       }
                       await globalAudioHandler
@@ -138,7 +133,7 @@ class MusicListHeader extends StatelessWidget {
                           size: 20,
                         ),
                         onPressed: () async {
-                          editPlaylistListInfo(context, playlist);
+                          editPlaylistListToDb(context, playlist);
                         }),
                     CupertinoButton(
                         padding: EdgeInsets.zero,
@@ -152,9 +147,7 @@ class MusicListHeader extends StatelessWidget {
                                   context, "确定要缓存所有音乐吗?")) ??
                               false;
                           if (!confirm) return;
-                          for (var musicAgg in musicAggregators) {
-                            await cacheMusicContainer(MusicContainer(musicAgg));
-                          }
+                          cacheMusicAggs(musicAggregators);
                         }),
                   ],
                 )),

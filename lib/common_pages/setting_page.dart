@@ -71,16 +71,13 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
       backgroundColor: getSettingPageBackgroundColor(isDarkMode),
       navigationBar: CupertinoNavigationBar(
         backgroundColor: getNavigatorBarColor(isDarkMode),
-        leading: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            '设置',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              color: textColor,
-            ).useSystemChineseFont(),
-          ),
+        middle: Text(
+          '设置',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            color: textColor,
+          ).useSystemChineseFont(),
         ),
       ),
       child: ListView(

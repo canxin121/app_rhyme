@@ -1,7 +1,6 @@
-import 'package:app_rhyme/dialogs/music_dialog.dart';
+import 'package:app_rhyme/pulldown_menus/items/music_aggregator.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
-import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -60,53 +59,19 @@ List<dynamic> _playinglistItems(BuildContext context, int index,
   return [
     PullDownMenuActionsRow.medium(
       items: [
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            globalAudioHandler.removeAt(index);
-          },
-          title: '移除',
-          icon: CupertinoIcons.delete,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => addMusicsToPlayList(context, [musicAgg]),
-          title: '添加到歌单',
-          icon: CupertinoIcons.add,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () => createPlaylistFromMusics(context, [musicAgg]),
-          title: '创建新歌单',
-          icon: CupertinoIcons.add_circled,
-        ),
+        removeMusicAggFromPlaylistPullDownItem(index),
+        addMusicToPlaylistPullDownItem(context, musicAgg),
+        createNewPlaylistFromMusicAggPullDownItem(context, musicAgg),
       ],
     ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () {
-        var defaultMusic = getMusicAggregatorDefaultMusic(musicAgg);
-        if (defaultMusic == null) {
-          LogToast.error("查看详情失败", "无法查看详情: 未找到音乐信息",
-              "[MusicContainer] Failed to view music info: Cannot find music info");
-          return;
-        }
-        showMusicInfoDialog(context, defaultMusicInfo: defaultMusic);
-      },
-      title: '查看详情',
-      icon: CupertinoIcons.photo,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => viewMusicAlbum(context, defaultMusic, isDesktop),
-      title: '查看专辑',
-      icon: CupertinoIcons.music_albums,
-    ),
+    // 查看专辑
+    viewMusicAlbumPullDownItem(context, defaultMusic, isDesktop),
+    // 查看歌手专辑
+    viewArtistAlbumPullDownItem(context, defaultMusic, isDesktop),
+    // 查看歌手单曲
+    viewArtistMusicAggregators(context, defaultMusic, isDesktop),
+    // 导出歌曲Json
+    exportMusicAggregatorsJsonPullDownItem(context, musicAgg),
   ];
 }
 
@@ -120,125 +85,29 @@ List<dynamic> _musicAggregetorPullDownItems(
   return [
     PullDownMenuActionsRow.medium(
       items: [
-        if (!musicAgg.fromDb)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => createPlaylistFromMusics(context, [musicAgg]),
-            title: '创建新歌单',
-            icon: CupertinoIcons.add_circled,
-          ),
-        if (!musicAgg.fromDb)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => addMusicsToPlayList(context, [musicAgg]),
-            title: '添加到歌单',
-            icon: CupertinoIcons.add,
-          ),
-        if (musicAgg.fromDb && playlist != null)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => deleteMusicAggsFromDbPlaylist(
-              [musicAgg],
-              playlist,
-            ),
-            title: '从歌单删除',
-            icon: CupertinoIcons.delete,
-          ),
-        if (hasCache)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => delMusicCache(
-              musicAgg,
-            ),
-            title: '删除缓存',
-            icon: CupertinoIcons.delete_solid,
-          )
-        else
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () => cacheMusicContainer(MusicContainer(musicAgg)),
-            title: '缓存音乐',
-            icon: CupertinoIcons.cloud_download,
-          ),
-        if (musicAgg.fromDb)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () async {
-              var music = getMusicAggregatorDefaultMusic(musicAgg);
-              if (music == null) {
-                LogToast.error("编辑信息失败", "无法编辑信息: 未找到音乐信息",
-                    "[MusicContainer] Failed to edit music info: Cannot find music info");
-                return;
-              }
-              music = await editMusicToDb(context, music);
-            },
-            title: '编辑信息',
-            icon: CupertinoIcons.pencil,
-          ),
+        // 保存到歌单
+        addMusicToPlaylistPullDownItem(context, musicAgg),
+        // 创建新歌单
+        createNewPlaylistFromMusicAggPullDownItem(context, musicAgg),
+        // 查看详情 or 编辑信息
+        showOrEditMusicAggPullDownItem(context, defaultMusic)
       ],
     ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => showMusicInfoDialog(context, defaultMusicInfo: defaultMusic),
-      title: '查看详情',
-      icon: CupertinoIcons.photo,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => viewMusicAlbum(context, defaultMusic, isDesktop),
-      title: '查看专辑',
-      icon: CupertinoIcons.music_albums,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => viewArtistMusicAggregators(context, defaultMusic, isDesktop),
-      title: '查看歌手歌曲',
-      icon: CupertinoIcons.music_albums,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => viewArtistAlbums(context, defaultMusic, isDesktop),
-      title: '查看歌手专辑',
-      icon: CupertinoIcons.music_albums,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => addMusicsToPlayList(context, [musicAgg]),
-      title: '添加到歌单',
-      icon: CupertinoIcons.add,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => createPlaylistFromMusics(context, [musicAgg]),
-      title: '创建新歌单',
-      icon: CupertinoIcons.add_circled,
-    ),
-    PullDownMenuItem(
-      itemTheme: PullDownMenuItemTheme(
-          textStyle: const TextStyle().useSystemChineseFont()),
-      onTap: () => exportMusicAggregatorsJson(context, [musicAgg]),
-      title: '导出歌曲Json',
-      icon: CupertinoIcons.add_circled,
-    ),
+    // 缓存歌曲 or 删除缓存
+    musicCachePullDownItem(musicAgg, hasCache),
     if (playlist != null && playlist.fromDb)
-      PullDownMenuItem(
-        itemTheme: PullDownMenuItemTheme(
-            textStyle: const TextStyle().useSystemChineseFont()),
-        onTap: () => setMusicCoverAsPlaylistCover(defaultMusic, playlist),
-        title: '用作歌单的封面',
-        icon: CupertinoIcons.photo_fill_on_rectangle_fill,
-      ),
+      // 从歌单删除
+      deleteMusicAggFromDbPlaylistPullDownItem(context, musicAgg, playlist),
+    if (playlist != null && playlist.fromDb)
+      // 设为歌单封面
+      setMusicCoverAsPlaylistCoverPullDownItem(playlist, defaultMusic),
+    // 查看专辑
+    viewMusicAlbumPullDownItem(context, defaultMusic, isDesktop),
+    // 查看歌手专辑
+    viewArtistAlbumPullDownItem(context, defaultMusic, isDesktop),
+    // 查看歌手单曲
+    viewArtistMusicAggregatorsPullDownItem(context, defaultMusic, isDesktop),
+    // 导出歌曲Json
+    exportMusicAggregatorsJsonPullDownItem(context, musicAgg),
   ];
 }

@@ -189,6 +189,8 @@ pub struct _ServerMusicChartCollection {
 #[frb(mirror(PlaylistCollection))]
 pub struct _PlaylistCollection {
     pub id: i64,
+    #[frb(non_final)]
     pub order: i64,
+    #[frb(non_final)]
     pub name: String,
 }

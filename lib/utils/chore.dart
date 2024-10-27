@@ -42,20 +42,20 @@ Future<void> exitApp() async {
   }
 }
 
-bool? globalIsTablet;
-bool isTablet(BuildContext context) {
+bool? globalIsTouchScreenTablet;
+bool isTouchScreenDesktop(BuildContext context) {
   if (isDesktop()) {
     return false;
   }
 
-  if (globalIsTablet != null) {
-    return globalIsTablet!;
+  if (globalIsTouchScreenTablet != null) {
+    return globalIsTouchScreenTablet!;
   }
   final mediaQuery = MediaQuery.of(context);
   final size = mediaQuery.size;
   final diagonal = sqrt(size.width * size.width + size.height * size.height);
-  globalIsTablet = diagonal > 600;
-  return globalIsTablet!;
+  globalIsTouchScreenTablet = diagonal > 600;
+  return globalIsTouchScreenTablet!;
 }
 
 bool isDesktop() {

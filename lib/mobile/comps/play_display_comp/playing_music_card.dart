@@ -61,7 +61,6 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
                             .getCover(size: 250),
                         width: 50,
                         height: 50,
-                        fit: BoxFit.cover,
                         borderRadius: BorderRadius.circular(4.0))),
               ),
               Expanded(

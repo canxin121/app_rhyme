@@ -25,7 +25,7 @@ class MusicAggregatorListHeaderRow extends StatelessWidget {
         ? CupertinoColors.systemGrey
         : const Color.fromARGB(255, 160, 160, 160);
     return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 16, left: 20, right: 20),
+      padding: const EdgeInsets.only(top: 16, left: 20, right: 20),
       child: TableRowWidget(
         children: [
           Text(
@@ -246,10 +246,7 @@ class MusicCell extends StatelessWidget {
         ClipRRect(
           borderRadius: BorderRadius.circular(2.0),
           child: imageWithCache(music.getCover(size: 250),
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-              enableCache: cacheCover),
+              width: 40, height: 40, enableCache: cacheCover),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -395,7 +392,7 @@ class OptionsCellState extends State<OptionsCell> {
       children: [
         if (hasCache)
           Positioned(
-            right: 40,
+            right: 32,
             child: Icon(
               CupertinoIcons.arrow_down_circle_fill,
               color: widget.isDarkMode

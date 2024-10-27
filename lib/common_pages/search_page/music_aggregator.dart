@@ -1,18 +1,11 @@
 import 'package:app_rhyme/common_comps/paged/paged_music_agg_listview.dart';
-import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
-import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
+import 'package:app_rhyme/pulldown_menus/musics_playlist_smart_pulldown_menu.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/search_controllers.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/utils/navigate.dart';
+import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:pull_down_button/pull_down_button.dart';
-
-final PagingController<int, MusicAggregator> _pagingController =
-    PagingController(firstPageKey: 1);
-final TextEditingController _inputContentController = TextEditingController();
 
 class MusicAggregatorSearchPage extends StatefulWidget {
   final bool isDesktop;
@@ -29,8 +22,25 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchMusicAggregators(pageKey);
+    pagingControllerMusicAggregator.addPageRequestListener((pageKey) {
+      fetchItemWithInputPagingController(
+          inputController: inputContentController,
+          pagingController: pagingControllerMusicAggregator,
+          fetchFunction: (
+            int page,
+            int pageSize,
+            String content,
+          ) async {
+            return await MusicAggregator.searchOnline(
+              aggs: pagingControllerMusicAggregator.itemList ?? [],
+              servers: MusicServer.all(),
+              content: content,
+              page: pageKey,
+              size: pageSize,
+            );
+          },
+          pageKey: pageKey,
+          itemName: '歌曲');
     });
   }
 
@@ -45,39 +55,16 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
     setState(() {});
   }
 
-  Future<void> _fetchMusicAggregators(int pageKey) async {
-    try {
-      if (_inputContentController.value.text.isEmpty) {
-        _pagingController.appendLastPage([]);
-        return;
-      }
-
-      int originLength = _pagingController.itemList?.length ?? 0;
-
-      _pagingController.value = PagingState<int, MusicAggregator>(
-        nextPageKey: pageKey + 1,
-        itemList: await MusicAggregator.searchOnline(
-          aggs: _pagingController.itemList ?? [],
-          servers: MusicServer.all(),
-          content: _inputContentController.value.text,
-          page: pageKey,
-          size: 30,
-        ),
-      );
-
-      _pagingController.nextPageKey =
-          _pagingController.itemList!.length > originLength
-              ? pageKey + 1
-              : null;
-    } catch (error) {
-      _pagingController.error = error;
-    }
-  }
-
   Future<void> _fetchAllMusicAggregators() async {
-    while (_pagingController.nextPageKey != null) {
-      await _fetchMusicAggregators(_pagingController.nextPageKey!);
-    }
+    await fetchAllItemsWithPagingController((int page, int limit) async {
+      return await MusicAggregator.searchOnline(
+        aggs: pagingControllerMusicAggregator.itemList ?? [],
+        servers: MusicServer.all(),
+        content: inputContentController.value.text,
+        page: page,
+        size: limit,
+      );
+    }, pagingControllerMusicAggregator, "歌曲");
   }
 
   @override
@@ -90,53 +77,43 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor:
+            widget.isDesktop ? getNavigatorBarColor(isDarkMode) : primaryColor,
+        middle: Text(
+          '搜索歌曲',
+          style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 24, color: textColor)
+              .useSystemChineseFont(),
+        ),
+        trailing: MusicPlaylistSmartPullDownMenu(
+          musicAggPageController: pagingControllerMusicAggregator,
+          builder: (BuildContext context, Future<void> Function() showMenu) =>
+              CupertinoButton(
+            padding: const EdgeInsets.all(0),
+            onPressed: showMenu,
+            child: Text(
+              '选项',
+              style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+            ),
+          ),
+          fetchAllMusicAggregators: _fetchAllMusicAggregators,
+          isDesktop: widget.isDesktop,
+        ),
+      ),
       backgroundColor: widget.isDesktop
           ? getPrimaryBackgroundColor(isDarkMode)
           : primaryColor,
       child: Column(
         children: [
-          CupertinoNavigationBar(
-            backgroundColor: widget.isDesktop
-                ? getNavigatorBarColor(isDarkMode)
-                : primaryColor,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '搜索歌曲',
-                  style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                          color: textColor)
-                      .useSystemChineseFont(),
-                ),
-              ),
-            ),
-            trailing: SearchMusicAggregatorChoiceMenu(
-              pagingController: _pagingController,
-              builder:
-                  (BuildContext context, Future<void> Function() showMenu) =>
-                      CupertinoButton(
-                padding: const EdgeInsets.all(0),
-                onPressed: showMenu,
-                child: Text(
-                  '选项',
-                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-                ),
-              ),
-              fetchAllMusicAggregators: _fetchAllMusicAggregators,
-              isDesktop: widget.isDesktop,
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
             child: CupertinoSearchTextField(
               style: TextStyle(color: textColor).useSystemChineseFont(),
-              controller: _inputContentController,
+              controller: inputContentController,
               onSubmitted: (String value) {
                 if (value.isNotEmpty) {
-                  _pagingController.refresh();
+                  pagingControllerMusicAggregator.refresh();
                 }
               },
             ),
@@ -144,78 +121,9 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
           Expanded(
               child: PagedMusicAggregatorList(
                   isDesktop: widget.isDesktop,
-                  pagingController: _pagingController)),
+                  pagingController: pagingControllerMusicAggregator)),
         ],
       ),
-    );
-  }
-}
-
-@immutable
-class SearchMusicAggregatorChoiceMenu extends StatelessWidget {
-  const SearchMusicAggregatorChoiceMenu({
-    super.key,
-    required this.builder,
-    required this.fetchAllMusicAggregators,
-    required this.pagingController,
-    required this.isDesktop,
-  });
-  final PagingController<int, MusicAggregator> pagingController;
-  final Future<void> Function() fetchAllMusicAggregators;
-  final PullDownMenuButtonBuilder builder;
-  final bool isDesktop;
-
-  @override
-  Widget build(BuildContext context) {
-    return PullDownButton(
-      itemBuilder: (context) => [
-        if (!isDesktop)
-          PullDownMenuItem(
-            itemTheme: PullDownMenuItemTheme(
-                textStyle: const TextStyle().useSystemChineseFont()),
-            onTap: () {
-              globalMobileToggleSearchPage();
-            },
-            title: "搜索歌单",
-            icon: CupertinoIcons.music_albums,
-          ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            await fetchAllMusicAggregators();
-            LogToast.success(
-              "加载所有歌曲",
-              "已加载所有歌曲",
-              "[SearchMusicAggregatorPage] Succeed to fetch all music aggregators",
-            );
-          },
-          title: "加载所有歌曲",
-          icon: CupertinoIcons.music_note_2,
-        ),
-        PullDownMenuItem(
-          itemTheme: PullDownMenuItemTheme(
-              textStyle: const TextStyle().useSystemChineseFont()),
-          onTap: () async {
-            if (pagingController.itemList == null) return;
-            if (pagingController.itemList!.isEmpty) return;
-            if (context.mounted) {
-              navigate(
-                  context,
-                  MusicAggregatorMultiSelectionPage(
-                    musicAggs: pagingController.itemList!,
-                    isDesktop: isDesktop,
-                  ),
-                  isDesktop,
-                  "");
-            }
-          },
-          title: "多选操作",
-          icon: CupertinoIcons.selection_pin_in_out,
-        )
-      ],
-      position: PullDownMenuPosition.automatic,
-      buttonBuilder: builder,
     );
   }
 }

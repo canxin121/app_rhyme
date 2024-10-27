@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 Future<Playlist?> showSelectCratePlaylistDialog(
     BuildContext context, PlaylistCollection? playlistCollection) async {
-  var playlistCollection =
+  playlistCollection ??=
       await showSelectCreatePlaylistCollectionDialog(context);
   if (playlistCollection == null) return null;
 
@@ -19,7 +19,7 @@ Future<Playlist?> showSelectCratePlaylistDialog(
       builder: (BuildContext context) {
         return MusicListSelectionDialog(
           playlists: playlists,
-          playlistCollection: playlistCollection,
+          playlistCollection: playlistCollection!,
         );
       },
     );

@@ -49,7 +49,9 @@ pub async fn cache_file_from_uri(
     }
 
     let file_path = cache_folder_path.join(&filename);
-
+    if (file_path.exists()) {
+        tokio::fs::remove_file(&file_path).await?;
+    }
     if uri.starts_with("http") {
         let response = CLIENT.get(uri).send().await?;
         let mut stream = response.bytes_stream();

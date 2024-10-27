@@ -86,6 +86,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.21"
+  aura_box:
+    dependency: "direct main"
+    description:
+      name: aura_box
+      sha256: "944986570485c44b98e1e719895448eb3889e1cd5d6b8f7fd4a9b4349401f2d8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   back_button_interceptor:
     dependency: "direct main"
     description:
@@ -552,6 +560,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  glossy:
+    dependency: "direct main"
+    description:
+      name: glossy
+      sha256: e57a20a9883eecbb134a2495d602c75ed99f0bdf010ab09b6d56d680a6af8616
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   group_button:
     dependency: transitive
     description:

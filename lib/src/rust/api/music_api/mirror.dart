@@ -480,10 +480,10 @@ class Playlist {
 
 class PlaylistCollection {
   final PlatformInt64 id;
-  final PlatformInt64 order;
-  final String name;
+  PlatformInt64 order;
+  String name;
 
-  const PlaylistCollection({
+  PlaylistCollection({
     required this.id,
     required this.order,
     required this.name,

@@ -22,6 +22,7 @@ import 'package:app_rhyme/utils/navigate.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
 import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 /// safe
 Music? getMusicAggregatorDefaultMusic(MusicAggregator musicAggregator) {
@@ -36,6 +37,134 @@ Music? getMusicAggregatorDefaultMusic(MusicAggregator musicAggregator) {
   return null;
 }
 
+const int fetchAllPageSize = 500;
+const int fetchOnePageSize = 30;
+
+Future<void> fetchItemWithInputPagingController<T>({
+  required TextEditingController inputController,
+  required PagingController<int, T> pagingController,
+  required Future<List<T>> Function(int page, int pageSize, String content)
+      fetchFunction,
+  required int pageKey,
+  required String itemName,
+}) async {
+  try {
+    if (inputController.value.text.isEmpty) {
+      pagingController.appendLastPage([]);
+      return;
+    }
+
+    var results = await fetchFunction(
+      pageKey,
+      fetchOnePageSize,
+      inputController.value.text,
+    );
+
+    if (results.isEmpty) {
+      pagingController.appendLastPage([]);
+    } else {
+      pagingController.appendPage(results, pageKey + 1);
+    }
+  } catch (error) {
+    LogToast.error(
+      "获取$itemName失败",
+      "获取$itemName失败: $error",
+      "[fetchItemWithInputPagingController] Failed to fetch $itemName: $error",
+    );
+    pagingController.appendLastPage([]);
+  }
+}
+
+Future<void> fetchItemWithPagingController<T>({
+  required PagingController<int, T> pagingController,
+  required Future<List<T>> Function(int page, int pageSize) fetchFunction,
+  required int pageKey,
+  required String itemName,
+}) async {
+  try {
+    var results = await fetchFunction(pageKey, fetchOnePageSize);
+
+    if (results.isEmpty) {
+      pagingController.appendLastPage([]);
+    } else {
+      pagingController.appendPage(results, pageKey + 1);
+    }
+  } catch (error) {
+    LogToast.error(
+      "获取$itemName失败",
+      "获取$itemName失败: $error",
+      "[fetchItemWithPagingController] Failed to fetch $itemName: $error",
+    );
+    pagingController.appendLastPage([]);
+  }
+}
+
+/// safe
+Future<List<T>?> fetchAllItems<T>(
+    Future<List<T>> Function(int page, int limit) fetchItems,
+    String itemName) async {
+  LogToast.info("获取所有$itemName", "正在获取所有$itemName,请稍等",
+      "[fetchAllItems] fetching all $itemName, please wait.");
+  try {
+    List<T> items = [];
+    int page = 1;
+
+    while (true) {
+      var fetchedItems = await fetchItems(page, fetchAllPageSize);
+      if (fetchedItems.isEmpty) {
+        break;
+      }
+      items.addAll(fetchedItems);
+      page++;
+    }
+
+    LogToast.success("获取所有$itemName", "成功获取所有$itemName",
+        "[fetchAllItems] Successfully fetched all items");
+    return items;
+  } catch (e) {
+    LogToast.error(
+        "获取数据失败", "获取数据失败: $e", "[fetchAllItems] Failed to fetch items: $e");
+  }
+  return null;
+}
+
+// safe
+Future<List<T>?> fetchAllItemsWithPagingController<T>(
+    Future<List<T>> Function(int page, int limit) fetchItems,
+    PagingController<int, T> pagingController,
+    String itemName) async {
+  if (pagingController.nextPageKey == null) return null;
+  LogToast.info("获取所有$itemName", "正在获取所有$itemName,请稍等",
+      "[fetchAllItemsWithPagingController] fetching all $itemName, please wait.");
+  try {
+    var fetchedItems = await fetchItems(1, fetchAllPageSize);
+
+    pagingController.value = PagingState<int, T>(
+        nextPageKey: 2, itemList: fetchedItems, error: null);
+
+    while (pagingController.nextPageKey != null) {
+      var fetchedItems =
+          await fetchItems(pagingController.nextPageKey!, fetchAllPageSize);
+
+      if (fetchedItems.isEmpty) {
+        pagingController.appendLastPage([]);
+        break;
+      }
+
+      pagingController.appendPage(
+          fetchedItems, pagingController.nextPageKey! + 1);
+    }
+
+    LogToast.success("获取所有$itemName", "成功获取所有$itemName",
+        "[fetchAllItemsWithPagingController] Successfully fetched all items");
+    return pagingController.itemList;
+  } catch (e) {
+    LogToast.error("获取$itemName失败", "获取$itemName失败: $e",
+        "[fetchAllItemsWithPagingController] Failed to fetch items: $e");
+  }
+  return null;
+}
+
 /// safe
 Future<List<MusicAggregator>?> getOrFetchAllMusicAgrgegatorsFromPlaylist(
     Playlist playlist) async {
@@ -43,42 +172,24 @@ Future<List<MusicAggregator>?> getOrFetchAllMusicAgrgegatorsFromPlaylist(
     return playlist.getMusicsFromDb();
   }
 
-  return await getOrFetchAllMusicAgrgegators((int page, int limit) async {
+  return await fetchAllItems((int page, int limit) async {
     return await playlist.fetchMusicsOnline(page: page, limit: limit);
-  });
-}
-
-Future<List<MusicAggregator>?> getOrFetchAllMusicAgrgegators(
-    Future<List<MusicAggregator>> Function(int page, int limit)
-        fetchMusicAggregators) async {
-  try {
-    const int limit = 500;
-    List<MusicAggregator> musicAggs = [];
-    int page = 1;
-
-    while (true) {
-      var fetchedMusicAggs = await fetchMusicAggregators(page, limit);
-      if (fetchedMusicAggs.isEmpty) {
-        break;
-      }
-      musicAggs.addAll(fetchedMusicAggs);
-      page++;
-    }
-
-    return musicAggs;
-  } catch (e) {
-    LogToast.error("获取歌单音乐失败", "获取歌单音乐失败: $e",
-        "[fetchAllMusicAgrgegatorsFromPlaylist] Failed to fetch music from playlist: $e");
-  }
-  return null;
+  }, "歌曲");
 }
 
 /// safe
+/// 这个函数运行耗时短，连续使用时应showToast = false
 Future<void> delMusicCache(
   MusicAggregator musicAggregator, {
   bool showToast = true,
 }) async {
-  // 这个函数运行耗时短，连续使用时应showToast = false
+  if (!await rust_api_music_cache.hasCacheMusic(
+      documentFolder: globalDocumentPath,
+      name: musicAggregator.name,
+      artists: musicAggregator.artist)) {
+    return;
+  }
+
   try {
     await rust_api_music_cache.deleteMusicCache(
         name: musicAggregator.name,
@@ -95,14 +206,23 @@ Future<void> delMusicCache(
 
 /// safe
 Future<void> deleteMusicsCache(
-    List<MusicAggregator> musicAggs, VoidCallback refresh) async {
+  List<MusicAggregator> musicAggs,
+) async {
   await Future.wait(musicAggs.map((musicContainer) async {
     await delMusicCache(musicContainer, showToast: false);
   }));
 }
 
 /// safe
-Future<void> cacheMusicContainer(MusicContainer musicContainer) async {
+Future<void> cacheMusicContainer(MusicContainer musicContainer,
+    {bool hasCache = false}) async {
+  if (await rust_api_music_cache.hasCacheMusic(
+      documentFolder: globalDocumentPath,
+      name: musicContainer.musicAggregator.name,
+      artists: musicContainer.musicAggregator.artist)) {
+    return;
+  }
+
   try {
     if (musicContainer.shouldUpdate()) {
       var success = await musicContainer.updateAll();
@@ -153,7 +273,7 @@ Future<Music?> editMusicToDb(BuildContext context, Music music) async {
 }
 
 /// safe
-Future<void> editPlaylistListInfo(
+Future<void> editPlaylistListToDb(
     BuildContext context, Playlist playlist) async {
   var newPlaylist = await showPlaylistDialog(
     context,
@@ -219,10 +339,14 @@ Future<void> viewSharePlaylist(BuildContext context, bool isDesktop) async {
 Future<void> addMusicsToPlayList(
     BuildContext context, List<MusicAggregator> musicAggs,
     {PlaylistCollection? playlistCollection, Playlist? playlist}) async {
-  playlistCollection ??=
-      await showSelectCreatePlaylistCollectionDialog(context);
-  if (playlistCollection == null || !context.mounted) return;
-  playlist ??= await showSelectCratePlaylistDialog(context, playlistCollection);
+  if (playlist == null) {
+    playlistCollection ??=
+        await showSelectCreatePlaylistCollectionDialog(context);
+    if (playlistCollection == null || !context.mounted) return;
+    playlist ??=
+        await showSelectCratePlaylistDialog(context, playlistCollection);
+  }
+
   if (playlist == null) return;
 
   try {
@@ -243,7 +367,8 @@ Future<Playlist?> insertPlaylistToDb(
     Playlist? createdPlaylist = await Playlist.findInDb(id: identity);
 
     if (createdPlaylist != null) {
-      playlistCreateStreamController.add(createdPlaylist);
+      playlistCreateStreamController
+          .add((createdPlaylist, playlistCollectionId));
     }
 
     return createdPlaylist;
@@ -393,6 +518,9 @@ Future<void> saveAggsOfPlaylists(List<Playlist> playlists, BuildContext context,
     await saveAggsOfPlayList(context, fromPlaylist,
         toPlaylistCollection: playlistCollection, toPlaylist: targetPlaylist);
   }));
+
+  LogToast.success(
+      "保存成功", "成功保存歌曲", "[saveMusicList] Successfully saved music");
 }
 
 /// safe
@@ -402,7 +530,7 @@ Future<void> deleMusicFromPlaylist(
 ) async {
   try {
     await playlist.delMusicAgg(musicAggIdentity: musicAgg.identity());
-    playlistDeleteStreamController.add(playlist.identity);
+    musicAggregatorDeleteStreamController.add(musicAgg.identity());
   } catch (e) {
     LogToast.error("删除音乐", "删除音乐失败: $e",
         "[deleteMusicFromPlaylist] Failed to delete music: $e");
@@ -492,7 +620,8 @@ Future<void> importDatabaseJson(BuildContext context, bool isDesktop,
 
 /// safe
 Future<void> importPlaylistJson(BuildContext context,
-    {MusicDataJsonWrapper? musicDataJson}) async {
+    {MusicDataJsonWrapper? musicDataJson,
+    PlaylistCollection? playlistCollection}) async {
   try {
     if (musicDataJson == null) {
       String? filePath = await pickFile();
@@ -501,11 +630,11 @@ Future<void> importPlaylistJson(BuildContext context,
     }
 
     var type = await musicDataJson.getType();
-    if (type != MusicDataType.musicAggregators) {
+    if (type != MusicDataType.playlists) {
       throw "错误的Json数据类型, 应导入'歌单'数据Json, 而非${musicDataTypeToString(type)}";
     }
     if (!context.mounted) return;
-    var playlistCollection =
+    playlistCollection ??=
         await showSelectCreatePlaylistCollectionDialog(context);
     if (playlistCollection == null) return;
     await musicDataJson.applyToDb(playlistCollectionId: playlistCollection.id);
@@ -521,11 +650,14 @@ Future<void> importMusicAggrgegatorJson(BuildContext context,
     {MusicDataJsonWrapper? musicDataJson,
     PlaylistCollection? playlistCollection,
     Playlist? targetPlaylist}) async {
-  playlistCollection ??=
-      await showSelectCreatePlaylistCollectionDialog(context);
-  if (playlistCollection == null || !context.mounted) return;
-  targetPlaylist ??=
-      await showSelectCratePlaylistDialog(context, playlistCollection);
+  if (targetPlaylist == null) {
+    playlistCollection ??=
+        await showSelectCreatePlaylistCollectionDialog(context);
+    if (playlistCollection == null || !context.mounted) return;
+    targetPlaylist ??=
+        await showSelectCratePlaylistDialog(context, playlistCollection);
+  }
+
   if (targetPlaylist == null) return;
 
   try {
@@ -564,19 +696,19 @@ Future<void> exportMusicAggregatorsJson(
   String filePath = "$dir/$fileName";
 
   try {
-    LogToast.info("导出Json文件", "正在导出歌单'数据，请稍等",
-        "[exportMusicAggregatorsJson] Start to export json file");
-
     MusicDataJsonWrapper musicDataJson =
         await MusicDataJsonWrapper.fromMusicAggregators(
             musicAggregators: musicAggs);
 
     await musicDataJson.saveTo(path: filePath);
+
+    LogToast.success("导出Json文件", "导出歌曲成功",
+        "[exportMusicAggregatorsJson] Successfully exported musicAggregators json file");
   } catch (e) {
     LogToast.error(
-      "导出Json文件失败",
+      "导出Json文件",
       "导出Json文件失败: $e",
-      "[exportMusicAggregatorsJson] Failed to export json file: $e",
+      "[exportMusicAggregatorsJson] Failed to export musicAggregators json file: $e",
     );
   }
 }
@@ -630,6 +762,7 @@ Future<void> viewArtistMusicAggregators(
   navigate(
       context,
       OnlineMusicAggregatorListViewPage(
+          title: artist.name,
           isDesktop: isDesktop,
           fetchMusicAggregators: (int page, int limit) async {
             return await MusicAggregator.fetchArtistMusicAggregators(
@@ -655,6 +788,7 @@ Future<void> viewArtistAlbums(
   navigate(
       context,
       OnlinePlaylistGridViewPage(
+        title: artist.name,
         isDesktop: isDesktop,
         fetchPlaylists: (int page, int limit) async {
           return await Playlist.fetchArtistAlbums(

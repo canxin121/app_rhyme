@@ -40,7 +40,7 @@ Future<void> initMobileDevice(BuildContext context) async {
     systemNavigationBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  if (!isTablet(context)) {
+  if (!isTouchScreenDesktop(context)) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

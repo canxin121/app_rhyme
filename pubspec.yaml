@@ -53,6 +53,8 @@ dependencies:
   reorderables: ^0.6.0
   flutter_keyboard_visibility: ^6.0.0
   bitsdojo_window: ^0.1.6
+  glossy: ^0.0.4
+  aura_box: ^1.0.2
 
 dev_dependencies:
   flutter_test:

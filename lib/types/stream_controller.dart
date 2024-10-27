@@ -33,7 +33,7 @@ final StreamController<String> musicAggregatorDeleteStreamController =
 final StreamController<String> playlistDeleteStreamController =
     StreamController.broadcast();
 // Playlist: new crearted playlist
-final StreamController<Playlist> playlistCreateStreamController =
+final StreamController<(Playlist, int)> playlistCreateStreamController =
     StreamController.broadcast();
 // Playlist: updated playlist info
 final StreamController<Playlist> playlistUpdateStreamController =

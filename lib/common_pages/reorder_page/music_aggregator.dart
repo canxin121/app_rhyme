@@ -54,8 +54,6 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    final ScrollController scrollController = ScrollController();
-
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
       child: Column(
@@ -100,52 +98,44 @@ class MuiscAggregatorReorderPageState extends State<MuiscAggregatorReorderPage>
                   )
                 : Align(
                     alignment: Alignment.topCenter,
-                    child: CupertinoScrollbar(
-                        controller: scrollController,
-                        thickness: 10,
-                        radius: const Radius.circular(10),
-                        child: ReorderableWrap(
-                          controller: scrollController,
-                          padding: const EdgeInsets.only(
-                              bottom: 100, left: 10, right: 10, top: 10),
-                          spacing: 8.0,
-                          runSpacing: 8.0,
-                          needsLongPressDraggable: true,
-                          children: widget.musicAggregators
-                              .asMap()
-                              .entries
-                              .map((entry) {
-                            final int index = entry.key;
-                            final MusicAggregator musicAgg = entry.value;
+                    child: ReorderableWrap(
+                      padding: const EdgeInsets.only(
+                          bottom: 100, left: 10, right: 10, top: 10),
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      needsLongPressDraggable: true,
+                      children:
+                          widget.musicAggregators.asMap().entries.map((entry) {
+                        final int index = entry.key;
+                        final MusicAggregator musicAgg = entry.value;
 
-                            Widget musicAggItem = widget.isDesktop
-                                ? DesktopMusicAggregatorListItem(
-                                    playlist: widget.playlist,
-                                    musicAgg: musicAgg,
-                                    onTap: () {},
-                                    isDarkMode: isDarkMode,
-                                    hasBackgroundColor: index % 2 == 0,
-                                  )
-                                : MobileMusicAggregatorListItem(
-                                    playlist: widget.playlist,
-                                    musicAgg: musicAgg,
-                                    onTap: () {},
-                                  );
+                        Widget musicAggItem = widget.isDesktop
+                            ? DesktopMusicAggregatorListItem(
+                                playlist: widget.playlist,
+                                musicAgg: musicAgg,
+                                onTap: () {},
+                                isDarkMode: isDarkMode,
+                                hasBackgroundColor: index % 2 == 0,
+                              )
+                            : MobileMusicAggregatorListItem(
+                                playlist: widget.playlist,
+                                musicAgg: musicAgg,
+                                onTap: () {},
+                              );
 
-                            return SizedBox(
-                              width: screenWidth - 20,
-                              child: musicAggItem,
-                            );
-                          }).toList(),
-                          onReorder: (int oldIndex, int newIndex) {
-                            setState(() {
-                              final MusicAggregator item =
-                                  widget.musicAggregators.removeAt(oldIndex);
-                              widget.musicAggregators.insert(newIndex, item);
-                            });
-                          },
-                        )),
-                  ),
+                        return SizedBox(
+                          width: screenWidth - 20,
+                          child: musicAggItem,
+                        );
+                      }).toList(),
+                      onReorder: (int oldIndex, int newIndex) {
+                        setState(() {
+                          final MusicAggregator item =
+                              widget.musicAggregators.removeAt(oldIndex);
+                          widget.musicAggregators.insert(newIndex, item);
+                        });
+                      },
+                    )),
           )
         ],
       ),

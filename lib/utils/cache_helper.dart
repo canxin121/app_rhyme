@@ -56,7 +56,6 @@ ExtendedImage imageWithCache(
   double? height,
   double? cacheWidth,
   double? cacheHeight,
-  BoxFit? fit,
   double? scale = 0.1,
   BorderRadius? borderRadius,
 }) {
@@ -68,7 +67,7 @@ ExtendedImage imageWithCache(
       height: height,
       cacheWidth: cacheWidth?.toInt() ?? width?.toInt(),
       cacheHeight: cacheHeight?.toInt() ?? height?.toInt(),
-      fit: fit,
+      fit: BoxFit.cover,
       scale: scale,
       borderRadius: borderRadius,
       enableMemoryCache: true,
@@ -85,16 +84,16 @@ ExtendedImage imageWithCache(
       height: height,
       cacheWidth: width?.toInt(),
       cacheHeight: height?.toInt(),
-      fit: fit,
+      fit: BoxFit.cover,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
       enableMemoryCache: true,
       loadStateChanged: (state) {
         switch (state.extendedImageLoadState) {
           case LoadState.loading:
-            return const SizedBox(
-                height: 200,
-                width: 200,
+            return SizedBox(
+                height: width ?? 200,
+                width: width ?? 200,
                 child: Center(child: CupertinoActivityIndicator()));
           case LoadState.completed:
             return state.completedWidget;
@@ -105,7 +104,7 @@ ExtendedImage imageWithCache(
               height: height,
               cacheWidth: width?.toInt(),
               cacheHeight: height?.toInt(),
-              fit: fit,
+              fit: BoxFit.cover,
               scale: scale,
               borderRadius: borderRadius,
               clearMemoryCacheIfFailed: true,
@@ -122,7 +121,7 @@ ExtendedImage imageWithCache(
       height: height,
       cacheWidth: width?.toInt(),
       cacheHeight: height?.toInt(),
-      fit: fit,
+      fit: BoxFit.cover,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
       enableMemoryCache: true,
@@ -139,7 +138,7 @@ ExtendedImage imageWithCache(
               height: height,
               cacheWidth: width?.toInt(),
               cacheHeight: height?.toInt(),
-              fit: fit,
+              fit: BoxFit.cover,
               scale: scale,
               borderRadius: borderRadius,
               clearMemoryCacheIfFailed: true,
