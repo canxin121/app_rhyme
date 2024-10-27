@@ -2,7 +2,7 @@ name: app_rhyme
 description: "A Powerfull CrossPlatform Music App Made By Flutter and Rust"
 publish_to: "none"
 
-version: 1.0.9
+version: 2.0.1
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
