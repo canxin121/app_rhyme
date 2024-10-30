@@ -55,36 +55,39 @@ class PlaylistTagPageState extends State<PlaylistTagPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: getNavigatorBarColor(isDarkMode),
-        middle: Text(
-          '浏览歌单',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: getTextColor(isDarkMode),
-          ).useSystemChineseFont(),
-        ),
-      ),
-      child: SafeArea(
-        child: isLoading
-            ? Center(child: CupertinoActivityIndicator())
-            : serverPlaylistTagCollections.isEmpty
-                ? Center(
-                    child: Text(
-                      '暂无歌单标签',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: getTextColor(isDarkMode),
-                      ).useSystemChineseFont(),
-                    ),
-                  )
-                : PlaylistTagCollectionList(
-                    collections: serverPlaylistTagCollections,
-                    isDesktop: widget.isDesktop,
-                  ),
-      ),
-    );
+        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+              backgroundColor: getNavigatorBarColor(isDarkMode),
+              middle: Text(
+                '浏览歌单',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: getTextColor(isDarkMode),
+                ).useSystemChineseFont(),
+              ),
+            ),
+            Expanded(
+              child: isLoading
+                  ? Center(child: CupertinoActivityIndicator())
+                  : serverPlaylistTagCollections.isEmpty
+                      ? Center(
+                          child: Text(
+                            '暂无歌单标签',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: getTextColor(isDarkMode),
+                            ).useSystemChineseFont(),
+                          ),
+                        )
+                      : PlaylistTagCollectionList(
+                          collections: serverPlaylistTagCollections,
+                          isDesktop: widget.isDesktop,
+                        ),
+            )
+          ],
+        ));
   }
 }

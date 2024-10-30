@@ -55,36 +55,39 @@ class MusicChartPageState extends State<MusicChartPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: getNavigatorBarColor(isDarkMode),
-        middle: Text(
-          '音乐排行榜',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: getTextColor(isDarkMode),
-          ).useSystemChineseFont(),
-        ),
-      ),
-      child: SafeArea(
-        child: isLoading
-            ? Center(child: CupertinoActivityIndicator())
-            : serverMusicChartCollections.isEmpty
-                ? Center(
-                    child: Text(
-                      '暂无排行榜数据',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: getTextColor(isDarkMode),
-                      ).useSystemChineseFont(),
-                    ),
-                  )
-                : MusicChartCollectionList(
-                    collections: serverMusicChartCollections,
-                    isDesktop: widget.isDesktop,
-                  ),
-      ),
-    );
+        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+              backgroundColor: getNavigatorBarColor(isDarkMode),
+              middle: Text(
+                '音乐排行榜',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: getTextColor(isDarkMode),
+                ).useSystemChineseFont(),
+              ),
+            ),
+            Expanded(
+              child: isLoading
+                  ? Center(child: CupertinoActivityIndicator())
+                  : serverMusicChartCollections.isEmpty
+                      ? Center(
+                          child: Text(
+                            '暂无排行榜数据',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: getTextColor(isDarkMode),
+                            ).useSystemChineseFont(),
+                          ),
+                        )
+                      : MusicChartCollectionList(
+                          collections: serverMusicChartCollections,
+                          isDesktop: widget.isDesktop,
+                        ),
+            )
+          ],
+        ));
   }
 }

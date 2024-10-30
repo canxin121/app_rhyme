@@ -68,53 +68,56 @@ class MobileExplorePageState extends State<MobileExplorePage> {
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(
-          _selectedSegment.displayName,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: textColor,
-          ).useSystemChineseFont(),
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: CupertinoSlidingSegmentedControl<ExploreSegment>(
-                groupValue: _selectedSegment,
-                onValueChanged: (ExploreSegment? value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedSegment = value;
-                    });
-                  }
-                },
-                children: {
-                  ExploreSegment.musicChart:
-                      Text(ExploreSegment.musicChart.displayName),
-                  ExploreSegment.playlistTag:
-                      Text(ExploreSegment.playlistTag.displayName),
-                },
-              ),
+      child: Column(
+        children: [
+          CupertinoNavigationBar(
+            middle: Text(
+              _selectedSegment.displayName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: textColor,
+              ).useSystemChineseFont(),
             ),
-            Expanded(
-              child: isLoading
-                  ? Center(child: CupertinoActivityIndicator())
-                  : _selectedSegment == ExploreSegment.musicChart
-                      ? MusicChartCollectionList(
-                          collections: musicCharts,
-                          isDesktop: false,
-                        )
-                      : PlaylistTagCollectionList(
-                          collections: playlistTags,
-                          isDesktop: false,
-                        ),
+          ),
+          SizedBox(),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: CupertinoSlidingSegmentedControl<ExploreSegment>(
+              groupValue: _selectedSegment,
+              onValueChanged: (ExploreSegment? value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedSegment = value;
+                  });
+                }
+              },
+              children: {
+                ExploreSegment.musicChart: Text(
+                    ExploreSegment.musicChart.displayName,
+                    style: TextStyle(color: textColor).useSystemChineseFont()),
+                ExploreSegment.playlistTag: Text(
+                    ExploreSegment.playlistTag.displayName,
+                    style: TextStyle(color: textColor).useSystemChineseFont()),
+              },
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: isLoading
+                ? Center(child: CupertinoActivityIndicator())
+                : _selectedSegment == ExploreSegment.musicChart
+                    ? MusicChartCollectionList(
+                        collections: musicCharts,
+                        isDesktop: false,
+                      )
+                    : PlaylistTagCollectionList(
+                        collections: playlistTags,
+                        isDesktop: false,
+                      ),
+          ),
+        ],
       ),
     );
   }

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 
 Future<void> initDesktopWindowSetting() async {
   // 初始化桌面窗口设置，仅在桌面平台运行
-  if (isDesktop()) {
+  if (isDesktopDevice()) {
     doWhenWindowReady(() {
       if (globalConfig.windowConfig == null) {
         globalConfig.windowConfig == WindowConfig.default_();
@@ -31,7 +31,7 @@ Future<void> initDesktopWindowSetting() async {
 }
 
 Future<void> initMobileDevice(BuildContext context) async {
-  if (isDesktop()) {
+  if (isDesktopDevice()) {
     return;
   }
 

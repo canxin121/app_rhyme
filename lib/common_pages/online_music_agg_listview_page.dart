@@ -97,116 +97,121 @@ class OnlineMusicAggregatorListViewPageState
     double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-          backgroundColor: getNavigatorBarColor(isDarkMode),
-          middle: Text(
-            widget.playlist?.name ?? widget.title ?? "在线歌曲",
-            style: TextStyle(color: getTextColor(isDarkMode))
-                .useSystemChineseFont(),
-          ),
-          leading: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: Icon(
-                CupertinoIcons.back,
-                color: activeIconRed,
-              ),
-              onPressed: () {
-                popPage(context, widget.isDesktop);
-              }),
-          trailing: MusicPlaylistSmartPullDownMenu(
-            musicAggPageController: _pagingController,
-            builder: (context, showMenu) => CupertinoButton(
-                padding: const EdgeInsets.all(0),
-                onPressed: showMenu,
-                child: Text(
-                  '选项',
-                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-                )),
-            playlist: widget.playlist,
-            fetchAllMusicAggregators: _fetchAllMusicAggregators,
-            isDesktop: widget.isDesktop,
-          )),
-      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-      child: CustomScrollView(
-        slivers: <Widget>[
-          const SliverToBoxAdapter(
-            child: SafeArea(child: SizedBox()),
-          ),
-          if (widget.playlist != null)
-            MusicListHeader(
-              playlist: widget.playlist!,
-              isDarkMode: isDarkMode,
-              screenWidth: screenWidth,
-              fetchAllMusicAggregators: () async {
-                await _fetchAllMusicAggregators();
-                return _pagingController.itemList ?? [];
-              },
-              cacheCover: false,
-              musicAggregators: _pagingController.itemList ?? [],
-            ),
-          if (widget.playlist == null && widget.title != null)
-            DesktopMusicAggsHeader(
-              title: widget.title!,
-              summary: widget.summary,
-              cover: widget.cover,
-              isDarkMode: isDarkMode,
-              screenWidth: screenWidth,
-              fetchAllMusicAggregators: () async {
-                await _fetchAllMusicAggregators();
-                return _pagingController.itemList ?? [];
-              },
-              cacheCover: false,
-              musicAggregators: _pagingController.itemList ?? [],
-            ),
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 20),
-          ),
-          PagedSliverList(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
-                noItemsFoundIndicatorBuilder: (context) {
-              return Center(
-                child: Text(
-                  '没有找到任何音乐',
+        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+                backgroundColor: getNavigatorBarColor(isDarkMode),
+                middle: Text(
+                  widget.playlist?.name ?? widget.title ?? "在线歌曲",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: getTextColor(isDarkMode))
                       .useSystemChineseFont(),
                 ),
-              );
-            }, itemBuilder: (context, musicAggregator, index) {
-              if (index == 0) {
-                return Column(
-                  children: [
-                    const MusicAggregatorListHeaderRow(),
-                    DesktopMusicAggregatorListItem(
-                      musicAgg: musicAggregator,
+                leading: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Icon(
+                      CupertinoIcons.back,
+                      color: activeIconRed,
+                    ),
+                    onPressed: () {
+                      popPage(context, widget.isDesktop);
+                    }),
+                trailing: MusicPlaylistSmartPullDownMenu(
+                  musicAggPageController: _pagingController,
+                  builder: (context, showMenu) => CupertinoButton(
+                      padding: const EdgeInsets.all(0),
+                      onPressed: showMenu,
+                      child: Text(
+                        '选项',
+                        style: TextStyle(color: activeIconRed)
+                            .useSystemChineseFont(),
+                      )),
+                  playlist: widget.playlist,
+                  fetchAllMusicAggregators: _fetchAllMusicAggregators,
+                  isDesktop: widget.isDesktop,
+                )),
+            Expanded(
+              child: CustomScrollView(
+                slivers: <Widget>[
+                  if (widget.playlist != null)
+                    MusicListHeader(
+                      playlist: widget.playlist!,
                       isDarkMode: isDarkMode,
-                      hasBackgroundColor: index % 2 == 1,
-                    )
-                  ],
-                );
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.only(
-                    top: 2,
-                    bottom: 2,
+                      screenWidth: screenWidth,
+                      fetchAllMusicAggregators: () async {
+                        await _fetchAllMusicAggregators();
+                        return _pagingController.itemList ?? [];
+                      },
+                      cacheCover: false,
+                      musicAggregators: _pagingController.itemList ?? [],
+                    ),
+                  if (widget.playlist == null && widget.title != null)
+                    DesktopMusicAggsHeader(
+                      title: widget.title!,
+                      summary: widget.summary,
+                      cover: widget.cover,
+                      isDarkMode: isDarkMode,
+                      screenWidth: screenWidth,
+                      fetchAllMusicAggregators: () async {
+                        await _fetchAllMusicAggregators();
+                        return _pagingController.itemList ?? [];
+                      },
+                      cacheCover: false,
+                      musicAggregators: _pagingController.itemList ?? [],
+                    ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 20),
                   ),
-                  child: DesktopMusicAggregatorListItem(
-                    musicAgg: musicAggregator,
-                    isDarkMode: isDarkMode,
-                    hasBackgroundColor: index % 2 == 1,
+                  PagedSliverList(
+                    pagingController: _pagingController,
+                    builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
+                        noItemsFoundIndicatorBuilder: (context) {
+                      return Center(
+                        child: Text(
+                          '没有找到任何音乐',
+                          style: TextStyle(color: getTextColor(isDarkMode))
+                              .useSystemChineseFont(),
+                        ),
+                      );
+                    }, itemBuilder: (context, musicAggregator, index) {
+                      if (index == 0) {
+                        return Column(
+                          children: [
+                            const MusicAggregatorListHeaderRow(),
+                            DesktopMusicAggregatorListItem(
+                              musicAgg: musicAggregator,
+                              isDarkMode: isDarkMode,
+                              hasBackgroundColor: index % 2 == 1,
+                            )
+                          ],
+                        );
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            top: 2,
+                            bottom: 2,
+                          ),
+                          child: DesktopMusicAggregatorListItem(
+                            musicAgg: musicAggregator,
+                            isDarkMode: isDarkMode,
+                            hasBackgroundColor: index % 2 == 1,
+                          ),
+                        );
+                      }
+                    }),
                   ),
-                );
-              }
-            }),
-          ),
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.only(top: 200),
-            ),
-          ),
-        ],
-      ),
-    );
+                  const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 200),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ));
   }
 
   Widget _buildMobile(BuildContext context, bool isDarkMode) {
@@ -217,92 +222,100 @@ class OnlineMusicAggregatorListViewPageState
         : const Color.fromARGB(255, 245, 245, 246);
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
-      navigationBar: CupertinoNavigationBar(
-          backgroundColor: getNavigatorBarColor(isDarkMode),
-          middle: Text(
-            widget.playlist?.name ?? widget.title ?? "在线歌曲",
-            style: TextStyle(color: getTextColor(isDarkMode))
-                .useSystemChineseFont(),
-          ),
-          leading: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: Icon(
-                CupertinoIcons.back,
-                color: activeIconRed,
-              ),
-              onPressed: () {
-                popPage(context, widget.isDesktop);
-              }),
-          trailing: MusicPlaylistSmartPullDownMenu(
-            musicAggPageController: _pagingController,
-            builder: (context, showMenu) => CupertinoButton(
-                padding: const EdgeInsets.all(0),
-                onPressed: showMenu,
-                child: Text(
-                  '选项',
-                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-                )),
-            playlist: widget.playlist,
-            fetchAllMusicAggregators: _fetchAllMusicAggregators,
-            isDesktop: widget.isDesktop,
-          )),
-      child: CustomScrollView(
-        slivers: <Widget>[
-          if (widget.playlist != null)
-            MobilePlaylistHeader(
-              playlist: widget.playlist!,
-              musicAggregators: _pagingController.itemList ?? [],
-              fetchAllMusicAggregators: () async {
-                await _fetchAllMusicAggregators();
-                return _pagingController.itemList ?? [];
-              },
-              isDarkMode: isDarkMode,
-            ),
-          if (widget.playlist == null && widget.title != null)
-            MobileMusicAggsHeader(
-              title: widget.title!,
-              summary: widget.summary,
-              cover: widget.cover,
-              isDarkMode: isDarkMode,
-              musicAggregators: [],
-              fetchAllMusicAggregators: () async {
-                await _fetchAllMusicAggregators();
-                return _pagingController.itemList ?? [];
-              },
-            ),
-          PagedSliverList(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
-                noItemsFoundIndicatorBuilder: (context) {
-              return Center(
-                child: Text(
-                  '没有找到任何音乐',
+        backgroundColor: backgroundColor,
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+                backgroundColor: getNavigatorBarColor(isDarkMode),
+                middle: Text(
+                  widget.playlist?.name ?? widget.title ?? "在线歌曲",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: getTextColor(isDarkMode))
                       .useSystemChineseFont(),
                 ),
-              );
-            }, itemBuilder: (context, musicAggregator, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Column(
-                  children: [
-                    MobileMusicAggregatorListItem(
-                      musicAgg: musicAggregator,
+                leading: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: Icon(
+                      CupertinoIcons.back,
+                      color: activeIconRed,
                     ),
-                    Divider(
-                      color: dividerColor,
-                    )
-                  ],
-                ),
-              );
-            }),
-          ),
-          const SliverToBoxAdapter(
-            child: Padding(padding: EdgeInsets.only(top: 200)),
-          ),
-        ],
-      ),
-    );
+                    onPressed: () {
+                      popPage(context, widget.isDesktop);
+                    }),
+                trailing: MusicPlaylistSmartPullDownMenu(
+                  musicAggPageController: _pagingController,
+                  builder: (context, showMenu) => CupertinoButton(
+                      padding: const EdgeInsets.all(0),
+                      onPressed: showMenu,
+                      child: Text(
+                        '选项',
+                        style: TextStyle(color: activeIconRed)
+                            .useSystemChineseFont(),
+                      )),
+                  playlist: widget.playlist,
+                  fetchAllMusicAggregators: _fetchAllMusicAggregators,
+                  isDesktop: widget.isDesktop,
+                )),
+            Expanded(
+              child: CustomScrollView(
+                slivers: <Widget>[
+                  if (widget.playlist != null)
+                    MobilePlaylistHeader(
+                      playlist: widget.playlist!,
+                      musicAggregators: _pagingController.itemList ?? [],
+                      fetchAllMusicAggregators: () async {
+                        await _fetchAllMusicAggregators();
+                        return _pagingController.itemList ?? [];
+                      },
+                      isDarkMode: isDarkMode,
+                    ),
+                  if (widget.playlist == null && widget.title != null)
+                    MobileMusicAggsHeader(
+                      title: widget.title!,
+                      summary: widget.summary,
+                      cover: widget.cover,
+                      isDarkMode: isDarkMode,
+                      musicAggregators: [],
+                      fetchAllMusicAggregators: () async {
+                        await _fetchAllMusicAggregators();
+                        return _pagingController.itemList ?? [];
+                      },
+                    ),
+                  PagedSliverList(
+                    pagingController: _pagingController,
+                    builderDelegate: PagedChildBuilderDelegate<MusicAggregator>(
+                        noItemsFoundIndicatorBuilder: (context) {
+                      return Center(
+                        child: Text(
+                          '没有找到任何音乐',
+                          style: TextStyle(color: getTextColor(isDarkMode))
+                              .useSystemChineseFont(),
+                        ),
+                      );
+                    }, itemBuilder: (context, musicAggregator, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Column(
+                          children: [
+                            MobileMusicAggregatorListItem(
+                              musicAgg: musicAggregator,
+                            ),
+                            Divider(
+                              color: dividerColor,
+                            )
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: Padding(padding: EdgeInsets.only(top: 200)),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ));
   }
 }

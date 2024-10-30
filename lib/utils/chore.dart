@@ -44,7 +44,7 @@ Future<void> exitApp() async {
 
 bool? globalIsTouchScreenTablet;
 bool isTouchScreenDesktop(BuildContext context) {
-  if (isDesktop()) {
+  if (isDesktopDevice()) {
     return false;
   }
 
@@ -58,7 +58,7 @@ bool isTouchScreenDesktop(BuildContext context) {
   return globalIsTouchScreenTablet!;
 }
 
-bool isDesktop() {
+bool isDesktopDevice() {
   return Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 }
 

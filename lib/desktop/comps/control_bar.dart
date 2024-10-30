@@ -26,7 +26,7 @@ class ControlBar extends StatelessWidget {
         ? const Color.fromARGB(255, 42, 42, 42)
         : const Color.fromARGB(255, 247, 247, 247);
     Color dividerColor = getDividerColor(isDarkMode);
-    bool isDesktop_ = isDesktop();
+    bool isDesktop_ = isDesktopDevice();
     final childWidget = GestureDetector(
       onPanStart: (details) {
         if (isDesktop_) {

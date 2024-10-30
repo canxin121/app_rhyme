@@ -110,21 +110,24 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text(
-          '搜索${_selectedSegment.displayName}', // 使用 displayName 方法展示名称
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: textColor,
-          ).useSystemChineseFont(),
-        ),
-        trailing: _selectedSegment == SearchSegment.music
-            ? MusicPlaylistSmartPullDownMenu(
-                fetchAllMusicAggregators: _fetchAllMusicAggregators,
-                musicAggPageController: pagingControllerMusicAggregator,
-                builder:
-                    (BuildContext context, Future<void> Function() showMenu) =>
+      child: Column(
+        children: [
+          CupertinoNavigationBar(
+            middle: Text(
+              '搜索${_selectedSegment.displayName}', // 使用 displayName 方法展示名称
+              maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: textColor,
+              ).useSystemChineseFont(),
+            ),
+            trailing: _selectedSegment == SearchSegment.music
+                ? MusicPlaylistSmartPullDownMenu(
+                    fetchAllMusicAggregators: _fetchAllMusicAggregators,
+                    musicAggPageController: pagingControllerMusicAggregator,
+                    builder: (BuildContext context,
+                            Future<void> Function() showMenu) =>
                         CupertinoButton(
                             padding: const EdgeInsets.all(0),
                             onPressed: showMenu,
@@ -133,12 +136,12 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
                               style: TextStyle(color: activeIconRed)
                                   .useSystemChineseFont(),
                             )),
-                isDesktop: false,
-              )
-            : SearchPlaylistPullDownMenu(
-                pagingController: pagingControllerPlaylist,
-                builder:
-                    (BuildContext context, Future<void> Function() showMenu) =>
+                    isDesktop: false,
+                  )
+                : SearchPlaylistPullDownMenu(
+                    pagingController: pagingControllerPlaylist,
+                    builder: (BuildContext context,
+                            Future<void> Function() showMenu) =>
                         CupertinoButton(
                             padding: const EdgeInsets.all(0),
                             onPressed: showMenu,
@@ -147,60 +150,61 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
                               style: TextStyle(color: activeIconRed)
                                   .useSystemChineseFont(),
                             )),
-                fetchAllMusicAggregators: _fetchAllPlaylists,
-                isDesktop: false,
-              ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
-              child: CupertinoSearchTextField(
-                style: TextStyle(color: textColor).useSystemChineseFont(),
-                controller: inputContentController,
-                onSubmitted: (String value) {
-                  if (value.isNotEmpty) {
-                    if (_selectedSegment == SearchSegment.music) {
-                      pagingControllerMusicAggregator.refresh();
-                    } else {
-                      pagingControllerPlaylist.refresh();
-                    }
+                    fetchAllMusicAggregators: _fetchAllPlaylists,
+                    isDesktop: false,
+                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
+            child: CupertinoSearchTextField(
+              style: TextStyle(color: textColor).useSystemChineseFont(),
+              controller: inputContentController,
+              onSubmitted: (String value) {
+                if (value.isNotEmpty) {
+                  if (_selectedSegment == SearchSegment.music) {
+                    pagingControllerMusicAggregator.refresh();
+                  } else {
+                    pagingControllerPlaylist.refresh();
                   }
-                },
-              ),
+                }
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: CupertinoSlidingSegmentedControl<SearchSegment>(
-                groupValue: _selectedSegment,
-                onValueChanged: (SearchSegment? value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedSegment = value;
-                    });
-                  }
-                },
-                children: {
-                  SearchSegment.music: Text(SearchSegment.music.displayName),
-                  SearchSegment.playlist:
-                      Text(SearchSegment.playlist.displayName),
-                },
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: CupertinoSlidingSegmentedControl<SearchSegment>(
+              groupValue: _selectedSegment,
+              onValueChanged: (SearchSegment? value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedSegment = value;
+                  });
+                }
+              },
+              children: {
+                SearchSegment.music: Text(
+                  SearchSegment.music.displayName,
+                  style: TextStyle(color: textColor).useSystemChineseFont(),
+                ),
+                SearchSegment.playlist: Text(
+                  SearchSegment.playlist.displayName,
+                  style: TextStyle(color: textColor).useSystemChineseFont(),
+                ),
+              },
             ),
-            Expanded(
-              child: _selectedSegment == SearchSegment.music
-                  ? PagedMusicAggregatorList(
-                      isDesktop: false,
-                      pagingController: pagingControllerMusicAggregator,
-                    )
-                  : PagedPlaylistGridview(
-                      isDesktop: false,
-                      pagingController: pagingControllerPlaylist,
-                    ),
-            ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: _selectedSegment == SearchSegment.music
+                ? PagedMusicAggregatorList(
+                    isDesktop: false,
+                    pagingController: pagingControllerMusicAggregator,
+                  )
+                : PagedPlaylistGridview(
+                    isDesktop: false,
+                    pagingController: pagingControllerPlaylist,
+                  ),
+          ),
+        ],
       ),
     );
   }

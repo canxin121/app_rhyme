@@ -131,51 +131,60 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
     final Color navigatorBarColor = getNavigatorBarColor(isDarkMode);
 
     return CupertinoPageScaffold(
-      backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-      child: Column(
-        children: [
-          CupertinoNavigationBar(
-            backgroundColor: navigatorBarColor,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  playlistCollection.name,
-                  style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: textColor)
-                      .useSystemChineseFont(),
+        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+              backgroundColor: navigatorBarColor,
+              middle: Text(
+                playlistCollection.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: getTextColor(isDarkMode),
+                ).useSystemChineseFont(),
+              ),
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 0.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    playlistCollection.name,
+                    style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: textColor)
+                        .useSystemChineseFont(),
+                  ),
                 ),
               ),
+              trailing: PlaylistGridPageMenu(
+                playlists: playlists,
+                builder: (context, showMenu) => CupertinoButton(
+                    padding: const EdgeInsets.all(0),
+                    onPressed: showMenu,
+                    child: Text(
+                      '选项',
+                      style: TextStyle(color: activeIconRed)
+                          .useSystemChineseFont(),
+                    )),
+                isDesktop: true,
+                playlistCollection: playlistCollection,
+              ),
             ),
-            trailing: PlaylistGridPageMenu(
-              playlists: playlists,
-              builder: (context, showMenu) => CupertinoButton(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: showMenu,
-                  child: Text(
-                    '选项',
-                    style:
-                        TextStyle(color: activeIconRed).useSystemChineseFont(),
-                  )),
-              isDesktop: true,
-              playlistCollection: playlistCollection,
+            Expanded(
+              child: playlists.isEmpty
+                  ? Center(
+                      child: Text("没有歌单",
+                          style: TextStyle(color: textColor)
+                              .useSystemChineseFont()),
+                    )
+                  : buildDesktopGrid(),
             ),
-          ),
-          Expanded(
-            child: playlists.isEmpty
-                ? Center(
-                    child: Text("没有歌单",
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont()),
-                  )
-                : buildDesktopGrid(),
-          ),
-        ],
-      ),
-    );
+          ],
+        ));
   }
 
   /// 移动端 UI 构建
@@ -187,38 +196,41 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
 
     return CupertinoPageScaffold(
       backgroundColor: backgroundColor,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor: backgroundColor,
-        leading: CupertinoButton(
-          padding: const EdgeInsets.all(0),
-          child: Icon(CupertinoIcons.back, color: activeIconRed),
-          onPressed: () {
-            popPage(context, widget.isDesktop);
-          },
-        ),
-        middle: Text(
-          playlistCollection.name,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: getTextColor(isDarkMode),
-          ).useSystemChineseFont(),
-        ),
-        trailing: PlaylistGridPageMenu(
-          playlists: playlists,
-          builder: (context, showMenu) => CupertinoButton(
-              padding: const EdgeInsets.all(0),
-              onPressed: showMenu,
-              child: Text(
-                '选项',
-                style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-              )),
-          isDesktop: false,
-          playlistCollection: playlistCollection,
-        ),
-      ),
       child: Column(
         children: [
+          CupertinoNavigationBar(
+            backgroundColor: backgroundColor,
+            leading: CupertinoButton(
+              padding: const EdgeInsets.all(0),
+              child: Icon(CupertinoIcons.back, color: activeIconRed),
+              onPressed: () {
+                popPage(context, widget.isDesktop);
+              },
+            ),
+            middle: Text(
+              playlistCollection.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: getTextColor(isDarkMode),
+              ).useSystemChineseFont(),
+            ),
+            trailing: PlaylistGridPageMenu(
+              playlists: playlists,
+              builder: (context, showMenu) => CupertinoButton(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: showMenu,
+                  child: Text(
+                    '选项',
+                    style:
+                        TextStyle(color: activeIconRed).useSystemChineseFont(),
+                  )),
+              isDesktop: false,
+              playlistCollection: playlistCollection,
+            ),
+          ),
           Expanded(
             child: playlists.isEmpty
                 ? Center(
@@ -234,45 +246,43 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
   }
 
   Widget buildDesktopGrid() {
-    return SafeArea(
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.symmetric(
-                horizontal: Platform.isIOS ? 0.0 : 10.0, vertical: 20),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithResponsiveColumnCount(
-                minColumnWidth: 200.0,
-                mainAxisSpacing: 10.0,
-                crossAxisSpacing: 10.0,
-                minColumnCount: 4,
-                maxColumnCount: 8,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  var musicList = playlists[index];
-                  return PlaylistCard(
-                    key: ValueKey(musicList.identity),
-                    playlist: musicList,
-                    onTap: () {
-                      navigate(
-                          context,
-                          DbMusicContainerListPage(
-                            playlist: musicList,
-                            isDesktop: true,
-                          ),
-                          widget.isDesktop,
-                          "###Playlist_${musicList.identity}###");
-                    },
-                    cacheCover: globalConfig.storageConfig.saveCover,
-                  );
-                },
-                childCount: playlists.length,
-              ),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.symmetric(
+              horizontal: Platform.isIOS ? 0.0 : 10.0, vertical: 20),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithResponsiveColumnCount(
+              minColumnWidth: 200.0,
+              mainAxisSpacing: 10.0,
+              crossAxisSpacing: 10.0,
+              minColumnCount: 4,
+              maxColumnCount: 8,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                var musicList = playlists[index];
+                return PlaylistCard(
+                  key: ValueKey(musicList.identity),
+                  playlist: musicList,
+                  onTap: () {
+                    navigate(
+                        context,
+                        DbMusicContainerListPage(
+                          playlist: musicList,
+                          isDesktop: true,
+                        ),
+                        widget.isDesktop,
+                        "###Playlist_${musicList.identity}###");
+                  },
+                  cacheCover: globalConfig.storageConfig.saveCover,
+                );
+              },
+              childCount: playlists.length,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -280,8 +290,7 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
     return CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: EdgeInsets.symmetric(
-              horizontal: Platform.isIOS ? 0.0 : 10.0, vertical: 20),
+          padding: EdgeInsets.only(top: 20),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -290,21 +299,23 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 var playlisy = playlists[index];
-                return PlaylistCard(
-                  playlist: playlists[index],
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => DbMusicContainerListPage(
-                          playlist: playlisy,
-                          isDesktop: false,
-                        ),
-                      ),
-                    );
-                  },
-                  key: ValueKey(playlisy.identity),
-                );
+                return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: PlaylistCard(
+                      playlist: playlists[index],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => DbMusicContainerListPage(
+                              playlist: playlisy,
+                              isDesktop: false,
+                            ),
+                          ),
+                        );
+                      },
+                      key: ValueKey(playlisy.identity),
+                    ));
               },
               childCount: playlists.length,
             ),

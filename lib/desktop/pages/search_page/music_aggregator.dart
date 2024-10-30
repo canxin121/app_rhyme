@@ -77,35 +77,39 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor:
-            widget.isDesktop ? getNavigatorBarColor(isDarkMode) : primaryColor,
-        middle: Text(
-          '搜索歌曲',
-          style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 24, color: textColor)
-              .useSystemChineseFont(),
-        ),
-        trailing: MusicPlaylistSmartPullDownMenu(
-          musicAggPageController: pagingControllerMusicAggregator,
-          builder: (BuildContext context, Future<void> Function() showMenu) =>
-              CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            onPressed: showMenu,
-            child: Text(
-              '选项',
-              style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-            ),
-          ),
-          fetchAllMusicAggregators: _fetchAllMusicAggregators,
-          isDesktop: widget.isDesktop,
-        ),
-      ),
       backgroundColor: widget.isDesktop
           ? getPrimaryBackgroundColor(isDarkMode)
           : primaryColor,
       child: Column(
         children: [
+          CupertinoNavigationBar(
+            backgroundColor: widget.isDesktop
+                ? getNavigatorBarColor(isDarkMode)
+                : primaryColor,
+            middle: Text(
+              '搜索歌曲',
+              style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: textColor)
+                  .useSystemChineseFont(),
+            ),
+            trailing: MusicPlaylistSmartPullDownMenu(
+              musicAggPageController: pagingControllerMusicAggregator,
+              builder:
+                  (BuildContext context, Future<void> Function() showMenu) =>
+                      CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+                ),
+              ),
+              fetchAllMusicAggregators: _fetchAllMusicAggregators,
+              isDesktop: widget.isDesktop,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
             child: CupertinoSearchTextField(

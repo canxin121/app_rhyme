@@ -48,8 +48,7 @@ class DesktopHomeState extends State<DesktopHome> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      child: SafeArea(
-          child: Row(
+      child: Row(
         children: [
           const MyNavListContainer(),
           Expanded(
@@ -78,7 +77,7 @@ class DesktopHomeState extends State<DesktopHome> {
             ),
           ),
         ],
-      )),
+      ),
     );
   }
 }

@@ -54,34 +54,37 @@ class DbPlaylistCollectionPageState extends State<DbPlaylistCollectionPage>
 
     return CupertinoPageScaffold(
         backgroundColor: getPrimaryBackgroundColor(isDarkMode),
-        navigationBar: CupertinoNavigationBar(
-          backgroundColor: getNavigatorBarColor(isDarkMode),
-          middle: Text(
-            '所有歌单列表',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: getTextColor(isDarkMode),
-            ).useSystemChineseFont(),
-          ),
-          trailing: PlaylistCollectionPageMenu(
-            builder: (context, showMenu) => CupertinoButton(
-                padding: const EdgeInsets.all(0),
-                onPressed: showMenu,
-                child: Text(
-                  '选项',
-                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-                )),
-            isDesktop: widget.isDesktop,
-            playlists:
-                playlistsCollections.map((e) => e.$2).expand((e) => e).toList(),
-            playlistCollections: playlistsCollections.map((e) => e.$1).toList(),
-          ),
-        ),
-        child: SafeArea(
-            child: Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CupertinoNavigationBar(
+              backgroundColor: getNavigatorBarColor(isDarkMode),
+              middle: Text(
+                '所有歌单列表',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: getTextColor(isDarkMode),
+                ).useSystemChineseFont(),
+              ),
+              trailing: PlaylistCollectionPageMenu(
+                builder: (context, showMenu) => CupertinoButton(
+                    padding: const EdgeInsets.all(0),
+                    onPressed: showMenu,
+                    child: Text(
+                      '选项',
+                      style: TextStyle(color: activeIconRed)
+                          .useSystemChineseFont(),
+                    )),
+                isDesktop: widget.isDesktop,
+                playlists: playlistsCollections
+                    .map((e) => e.$2)
+                    .expand((e) => e)
+                    .toList(),
+                playlistCollections:
+                    playlistsCollections.map((e) => e.$1).toList(),
+              ),
+            ),
             Expanded(
               child: ListView.builder(
                 itemCount: playlistsCollections.length,
@@ -99,7 +102,7 @@ class DbPlaylistCollectionPageState extends State<DbPlaylistCollectionPage>
               ),
             ),
           ],
-        )));
+        ));
   }
 
   @override

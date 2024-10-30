@@ -60,7 +60,7 @@ class MyAppState extends State<MyApp> {
                   .useSystemChineseFont(),
             ),
           ),
-          home: _isWidthGreaterThanHeight || isDesktop()
+          home: _isWidthGreaterThanHeight || isDesktopDevice()
               ? const DesktopHome()
               : const MobileHome(),
         ));

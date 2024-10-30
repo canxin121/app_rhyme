@@ -65,109 +65,113 @@ class MusicAggregatorMultiSelectionPageState
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
-      child: Column(children: [
-        CupertinoNavigationBar(
-          padding: const EdgeInsetsDirectional.only(end: 16),
-          backgroundColor: backgroundColor,
-          leading: CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            child: Icon(CupertinoIcons.back, color: activeIconRed),
-            onPressed: () {
-              if (context.mounted) popPage(context, widget.isDesktop);
-            },
-          ),
-          trailing: MusicAggMultiSelectMenu(
-            playlist: widget.playlist,
-            musicAggs: widget.musicAggs,
-            setState: () => setState(() {}),
-            builder: (context, showMenu) => CupertinoButton(
-              padding: const EdgeInsets.all(0),
-              onPressed: showMenu,
-              child: Text(
-                '选项',
-                style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+        backgroundColor: backgroundColor,
+        child: Column(
+          children: [
+            CupertinoNavigationBar(
+              padding: const EdgeInsetsDirectional.only(end: 16),
+              backgroundColor: backgroundColor,
+              leading: CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                child: Icon(CupertinoIcons.back, color: activeIconRed),
+                onPressed: () {
+                  if (context.mounted) popPage(context, widget.isDesktop);
+                },
+              ),
+              trailing: MusicAggMultiSelectMenu(
+                playlist: widget.playlist,
+                musicAggs: widget.musicAggs,
+                setState: () => setState(() {}),
+                builder: (context, showMenu) => CupertinoButton(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: showMenu,
+                  child: Text(
+                    '选项',
+                    style:
+                        TextStyle(color: activeIconRed).useSystemChineseFont(),
+                  ),
+                ),
+                controller: controller,
               ),
             ),
-            controller: controller,
-          ),
-        ),
-        Expanded(
-          child: widget.musicAggs.isEmpty
-              ? Center(
-                  child: Text(
-                    "没有音乐",
-                    style: TextStyle(
-                            color: isDarkMode
-                                ? CupertinoColors.white
-                                : CupertinoColors.black)
-                        .useSystemChineseFont(),
-                  ),
-                )
-              : Align(
-                  key: ValueKey(controller.hashCode),
-                  alignment: Alignment.topCenter,
-                  child: DragSelectGridView(
-                    gridController: controller,
-                    padding: EdgeInsets.only(
-                      bottom: 100,
-                      top: 10,
-                      left: widget.isDesktop ? 0 : 10,
-                      right: widget.isDesktop ? 0 : 10,
-                    ),
-                    itemCount: widget.musicAggs.length,
-                    triggerSelectionOnTap: true,
-                    itemBuilder: (context, index, selected) {
-                      final musicAgg = widget.musicAggs[index];
+            Expanded(
+              child: widget.musicAggs.isEmpty
+                  ? Center(
+                      child: Text(
+                        "没有音乐",
+                        style: TextStyle(
+                                color: isDarkMode
+                                    ? CupertinoColors.white
+                                    : CupertinoColors.black)
+                            .useSystemChineseFont(),
+                      ),
+                    )
+                  : Align(
+                      key: ValueKey(controller.hashCode),
+                      alignment: Alignment.topCenter,
+                      child: DragSelectGridView(
+                        gridController: controller,
+                        padding: EdgeInsets.only(
+                          bottom: 100,
+                          top: 10,
+                          left: widget.isDesktop ? 0 : 10,
+                          right: widget.isDesktop ? 0 : 10,
+                        ),
+                        itemCount: widget.musicAggs.length,
+                        triggerSelectionOnTap: true,
+                        itemBuilder: (context, index, selected) {
+                          final musicAgg = widget.musicAggs[index];
 
-                      Widget musicAggItem = widget.isDesktop
-                          ? DesktopMusicAggregatorListItem(
-                              musicAgg: musicAgg,
-                              playlist: widget.playlist,
-                              isDarkMode: isDarkMode,
-                              hasBackgroundColor: index % 2 == 0,
-                            )
-                          : MobileMusicAggregatorListItem(
-                              showMenu: false,
-                              musicAgg: musicAgg,
-                              playlist: widget.playlist,
-                            );
-                      return Column(
-                        children: [
-                          Row(
-                            key: ValueKey("${selected}_${musicAgg.identity()}"),
+                          Widget musicAggItem = widget.isDesktop
+                              ? DesktopMusicAggregatorListItem(
+                                  musicAgg: musicAgg,
+                                  playlist: widget.playlist,
+                                  isDarkMode: isDarkMode,
+                                  hasBackgroundColor: index % 2 == 0,
+                                )
+                              : MobileMusicAggregatorListItem(
+                                  showMenu: false,
+                                  musicAgg: musicAgg,
+                                  playlist: widget.playlist,
+                                );
+                          return Column(
                             children: [
-                              Expanded(
-                                child: musicAggItem,
+                              Row(
+                                key: ValueKey(
+                                    "${selected}_${musicAgg.identity()}"),
+                                children: [
+                                  Expanded(
+                                    child: musicAggItem,
+                                  ),
+                                  Icon(
+                                    selected
+                                        ? CupertinoIcons.check_mark_circled
+                                        : CupertinoIcons.circle,
+                                    color: selected
+                                        ? CupertinoColors.systemGreen
+                                        : CupertinoColors.systemGrey4,
+                                  ),
+                                ],
                               ),
-                              Icon(
-                                selected
-                                    ? CupertinoIcons.check_mark_circled
-                                    : CupertinoIcons.circle,
-                                color: selected
-                                    ? CupertinoColors.systemGreen
-                                    : CupertinoColors.systemGrey4,
-                              ),
+                              const Padding(padding: EdgeInsets.only(top: 10)),
+                              SizedBox(
+                                width: screenWidth * 0.85,
+                                child: Divider(
+                                  color: dividerColor,
+                                  height: 0.5,
+                                ),
+                              )
                             ],
-                          ),
-                          const Padding(padding: EdgeInsets.only(top: 10)),
-                          SizedBox(
-                            width: screenWidth * 0.85,
-                            child: Divider(
-                              color: dividerColor,
-                              height: 0.5,
-                            ),
-                          )
-                        ],
-                      );
-                    },
-                    gridDelegate: const SliverGridDelegateWithFixedRowHeight(
-                      rowHeight: 60,
-                    ),
-                  )),
-        )
-      ]),
-    );
+                          );
+                        },
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedRowHeight(
+                          rowHeight: 60,
+                        ),
+                      )),
+            )
+          ],
+        ));
   }
 }
 

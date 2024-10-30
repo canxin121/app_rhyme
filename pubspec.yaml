@@ -13,7 +13,7 @@ dependencies:
   rust_lib_app_rhyme:
     path: rust_builder
   cupertino_icons: ^1.0.6
-  flutter_rust_bridge: 2.5.0
+  flutter_rust_bridge: 2.5.1
   interactive_slider:
     git: https://github.com/canxin121/interactive_slider
   dismissible_page: ^1.0.2

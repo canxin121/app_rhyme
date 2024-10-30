@@ -6,8 +6,8 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 
 class MusicControlBar extends StatefulWidget {
-  final double maxHeight;
-  const MusicControlBar({super.key, required this.maxHeight});
+  final double height;
+  const MusicControlBar({super.key, required this.height});
 
   @override
   MusicControlBarState createState() => MusicControlBarState();
@@ -43,10 +43,9 @@ class MusicControlBarState extends State<MusicControlBar>
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: widget.maxHeight,
-      ),
+
+    return SizedBox(
+      height: widget.height,
       child: GestureDetector(
         onVerticalDragUpdate: (details) {
           if (details.delta.dy < 0) {
@@ -64,11 +63,16 @@ class MusicControlBarState extends State<MusicControlBar>
                 padding: const EdgeInsets.all(8.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(6.0),
-                  child: Obx(() => imageWithCache(
-                      globalAudioHandler.playingMusic.value?.currentMusic
-                          .getCover(size: 250),
-                      height: 50,
-                      width: 50)),
+                  child: Obx(() => SizedBox(
+                        width: widget.height - 16, // 确保图片是正方形
+                        height: widget.height - 16,
+                        child: imageWithCache(
+                          globalAudioHandler.playingMusic.value?.currentMusic
+                              .getCover(size: 250),
+                          height: widget.height - 16,
+                          width: widget.height - 16,
+                        ),
+                      )),
                 ),
               ),
               Expanded(

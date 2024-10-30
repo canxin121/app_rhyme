@@ -91,6 +91,7 @@ class MobileHomeState extends State<MobileHome> {
         : const Color.fromARGB(255, 209, 209, 209);
     return CupertinoPageScaffold(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
             child: IndexedStack(
@@ -118,7 +119,7 @@ class MobileHomeState extends State<MobileHome> {
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const MusicControlBar(maxHeight: 60),
+                      const MusicControlBar(height: 60),
                       Center(
                         child: Divider(
                           color: dividerColor,

@@ -76,46 +76,50 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor:
-            widget.isDesktop ? getNavigatorBarColor(isDarkMode) : primaryColor,
-        leading: CupertinoButton(
-            padding: EdgeInsets.zero,
-            child: Icon(
-              CupertinoIcons.back,
-              color: activeIconRed,
-            ),
-            onPressed: () {
-              popPage(context, widget.isDesktop);
-            }),
-        middle: Text(
-          widget.title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: textColor,
-          ).useSystemChineseFont(),
-        ),
-        trailing: SearchPlaylistPullDownMenu(
-          builder: (BuildContext context, Future<void> Function() showMenu) =>
-              CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            onPressed: showMenu,
-            child: Text(
-              '选项',
-              style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-            ),
-          ),
-          fetchAllMusicAggregators: _fetchAllPlaylists,
-          pagingController: _pagingController,
-          isDesktop: widget.isDesktop,
-        ),
-      ),
       backgroundColor: widget.isDesktop
           ? getPrimaryBackgroundColor(isDarkMode)
           : primaryColor,
       child: Column(
         children: [
+          CupertinoNavigationBar(
+            backgroundColor: widget.isDesktop
+                ? getNavigatorBarColor(isDarkMode)
+                : primaryColor,
+            leading: CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: Icon(
+                  CupertinoIcons.back,
+                  color: activeIconRed,
+                ),
+                onPressed: () {
+                  popPage(context, widget.isDesktop);
+                }),
+            middle: Text(
+              widget.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: textColor,
+              ).useSystemChineseFont(),
+            ),
+            trailing: SearchPlaylistPullDownMenu(
+              builder:
+                  (BuildContext context, Future<void> Function() showMenu) =>
+                      CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+                ),
+              ),
+              fetchAllMusicAggregators: _fetchAllPlaylists,
+              pagingController: _pagingController,
+              isDesktop: widget.isDesktop,
+            ),
+          ),
           Expanded(
             child: PagedPlaylistGridview(
                 isDesktop: widget.isDesktop,

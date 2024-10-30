@@ -155,8 +155,7 @@ class _VolumeSliderOverlayState extends State<_VolumeSliderOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: CupertinoPageScaffold(
+    return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemFill.withOpacity(0.0),
       child: GestureDetector(
         onTap: widget.onRemove,
@@ -182,6 +181,6 @@ class _VolumeSliderOverlayState extends State<_VolumeSliderOverlay>
           ],
         ),
       ),
-    ));
+    );
   }
 }

@@ -77,34 +77,36 @@ class SearchMusicListState extends State<PlaylistSearchPage>
       backgroundColor: widget.isDesktop
           ? getPrimaryBackgroundColor(isDarkMode)
           : primaryColor,
-      navigationBar: CupertinoNavigationBar(
-        backgroundColor:
-            widget.isDesktop ? getNavigatorBarColor(isDarkMode) : primaryColor,
-        middle: Text(
-          '搜索歌单',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-            color: textColor,
-          ).useSystemChineseFont(),
-        ),
-        trailing: SearchPlaylistPullDownMenu(
-          builder: (BuildContext context, Future<void> Function() showMenu) =>
-              CupertinoButton(
-            padding: const EdgeInsets.all(0),
-            onPressed: showMenu,
-            child: Text(
-              '选项',
-              style: TextStyle(color: activeIconRed).useSystemChineseFont(),
-            ),
-          ),
-          fetchAllMusicAggregators: _fetchAllMusicLists,
-          pagingController: pagingControllerPlaylist,
-          isDesktop: widget.isDesktop,
-        ),
-      ),
       child: Column(
         children: [
+          CupertinoNavigationBar(
+            backgroundColor: widget.isDesktop
+                ? getNavigatorBarColor(isDarkMode)
+                : primaryColor,
+            middle: Text(
+              '搜索歌单',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: textColor,
+              ).useSystemChineseFont(),
+            ),
+            trailing: SearchPlaylistPullDownMenu(
+              builder:
+                  (BuildContext context, Future<void> Function() showMenu) =>
+                      CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: showMenu,
+                child: Text(
+                  '选项',
+                  style: TextStyle(color: activeIconRed).useSystemChineseFont(),
+                ),
+              ),
+              fetchAllMusicAggregators: _fetchAllMusicLists,
+              pagingController: pagingControllerPlaylist,
+              isDesktop: widget.isDesktop,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
             child: CupertinoSearchTextField(
