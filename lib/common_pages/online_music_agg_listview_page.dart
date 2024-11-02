@@ -218,10 +218,6 @@ class OnlineMusicAggregatorListViewPageState
   Widget _buildMobile(BuildContext context, bool isDarkMode) {
     final Color backgroundColor =
         isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    final Color dividerColor = isDarkMode
-        ? const Color.fromARGB(255, 41, 41, 43)
-        : const Color.fromARGB(255, 245, 245, 246);
-
     return CupertinoPageScaffold(
         backgroundColor: backgroundColor,
         child: Column(
@@ -304,7 +300,7 @@ class OnlineMusicAggregatorListViewPageState
                               musicAgg: musicAggregator,
                             ),
                             Divider(
-                              color: dividerColor,
+                              color: getDividerColor(isDarkMode),
                             )
                           ],
                         ),

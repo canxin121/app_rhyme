@@ -83,27 +83,28 @@ class MobileExplorePageState extends State<MobileExplorePage> {
               ).useSystemChineseFont(),
             ),
           ),
-          SizedBox(height: 0),
-          CupertinoSlidingSegmentedControl<ExploreSegment>(
-            groupValue: _selectedSegment,
-            onValueChanged: (ExploreSegment? value) {
-              if (value != null) {
-                setState(() {
-                  _selectedSegment = value;
-                });
-              }
-            },
-            children: {
-              ExploreSegment.musicChart: Text(
-                  ExploreSegment.musicChart.displayName,
-                  style: TextStyle(color: getTextColor(isDarkMode))
-                      .useSystemChineseFont()),
-              ExploreSegment.playlistTag: Text(
-                  ExploreSegment.playlistTag.displayName,
-                  style: TextStyle(color: getTextColor(isDarkMode))
-                      .useSystemChineseFont()),
-            },
-          ),
+          Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: CupertinoSlidingSegmentedControl<ExploreSegment>(
+                groupValue: _selectedSegment,
+                onValueChanged: (ExploreSegment? value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedSegment = value;
+                    });
+                  }
+                },
+                children: {
+                  ExploreSegment.musicChart: Text(
+                      ExploreSegment.musicChart.displayName,
+                      style: TextStyle(color: getTextColor(isDarkMode))
+                          .useSystemChineseFont()),
+                  ExploreSegment.playlistTag: Text(
+                      ExploreSegment.playlistTag.displayName,
+                      style: TextStyle(color: getTextColor(isDarkMode))
+                          .useSystemChineseFont()),
+                },
+              )),
           Expanded(
             child: isLoading
                 ? Center(child: CupertinoActivityIndicator())
