@@ -189,7 +189,7 @@ class MyNavListViewState extends State<MyNavListView> {
         NavGroup(title: "浏览", icon: CupertinoIcons.compass, items: [
           NavItem(
             title: '歌曲排行榜',
-            icon: CupertinoIcons.search,
+            icon: CupertinoIcons.music_note_2,
             onTap: () {
               globalSetNavItemSelected("###MusicChart###");
               navigatorToPage(const MusicChartPage(
@@ -200,7 +200,7 @@ class MyNavListViewState extends State<MyNavListView> {
           ),
           NavItem(
             title: '浏览歌单',
-            icon: CupertinoIcons.search,
+            icon: CupertinoIcons.music_albums,
             onTap: () {
               globalSetNavItemSelected("###PlaylistTag###");
               navigatorToPage(const PlaylistTagPage(
@@ -213,7 +213,7 @@ class MyNavListViewState extends State<MyNavListView> {
         NavGroup(title: "搜索", icon: CupertinoIcons.search, items: [
           NavItem(
             title: '搜索单曲',
-            icon: CupertinoIcons.search,
+            icon: CupertinoIcons.music_note_2,
             onTap: () {
               globalSetNavItemSelected("###SearchSingleMusicAggregator###");
               navigatorToPage(const MusicAggregatorSearchPage(
@@ -224,7 +224,7 @@ class MyNavListViewState extends State<MyNavListView> {
           ),
           NavItem(
             title: '搜索歌单',
-            icon: CupertinoIcons.search,
+            icon: CupertinoIcons.music_albums,
             onTap: () {
               globalSetNavItemSelected("###SearchMusicList###");
               navigatorToPage(const PlaylistSearchPage(

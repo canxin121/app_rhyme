@@ -1,10 +1,16 @@
 import 'dart:io';
 
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<String?> pickDirectory() async {
+  if (Platform.isIOS) {
+    LogToast.info("保存路径", "在IOS上,将自动保存到文件中的AppRhyme目录的Export目录中。",
+        "[pickDictory]The save path will be automatically set to the Export directory in the AppRhyme directory in Files on iOS.");
+    return "$globalDocumentPath/app_rhyme/Export";
+  }
   var permission = true;
   if (Platform.isAndroid) {
     permission = await Permission.manageExternalStorage.request().isGranted;
