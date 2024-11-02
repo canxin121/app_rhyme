@@ -606,7 +606,7 @@ Future<void> importDatabaseJson(BuildContext context, bool isDesktop,
       musicDataJson = await MusicDataJsonWrapper.loadFrom(path: filePath);
     }
     var type = await musicDataJson.getType();
-    if (type != MusicDataType.musicAggregators) {
+    if (type != MusicDataType.database) {
       throw "错误的Json数据类型, 应导入'数据库'数据Json, 而非${musicDataTypeToString(type)}";
     }
     await musicDataJson.applyToDb();
