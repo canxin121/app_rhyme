@@ -97,7 +97,7 @@ class OnlineMusicAggregatorListViewPageState
     double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
-        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(

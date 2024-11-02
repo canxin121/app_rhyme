@@ -53,7 +53,7 @@ class DbPlaylistCollectionPageState extends State<DbPlaylistCollectionPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

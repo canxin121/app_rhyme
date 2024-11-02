@@ -71,27 +71,19 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
   Widget build(BuildContext context) {
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color primaryColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      backgroundColor: widget.isDesktop
-          ? getPrimaryBackgroundColor(isDarkMode)
-          : primaryColor,
+      backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
       child: Column(
         children: [
           CupertinoNavigationBar(
-            backgroundColor: widget.isDesktop
-                ? getNavigatorBarColor(isDarkMode)
-                : primaryColor,
+            backgroundColor: getNavigatorBarColor(isDarkMode),
             middle: Text(
               '搜索歌曲',
               style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
-                      color: textColor)
+                      color: getTextColor(isDarkMode))
                   .useSystemChineseFont(),
             ),
             trailing: MusicPlaylistSmartPullDownMenu(
@@ -113,7 +105,8 @@ class MusicAggregatorSearchPageState extends State<MusicAggregatorSearchPage>
           Padding(
             padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 10.0),
             child: CupertinoSearchTextField(
-              style: TextStyle(color: textColor).useSystemChineseFont(),
+              style: TextStyle(color: getTextColor(isDarkMode))
+                  .useSystemChineseFont(),
               controller: inputContentController,
               onSubmitted: (String value) {
                 if (value.isNotEmpty) {

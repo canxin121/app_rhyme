@@ -122,20 +122,15 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
   }
 
   Widget _buildMobileLayout(bool isDarkMode, bool isDesktop) {
-    final Color backgroundColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    final Color dividerColor = isDarkMode
-        ? const Color.fromARGB(255, 41, 41, 43)
-        : const Color.fromARGB(255, 245, 245, 246);
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: getBackgroundColor(isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(
                 padding: const EdgeInsetsDirectional.only(end: 16),
-                backgroundColor: backgroundColor,
+                backgroundColor: getNavigatorBarColor(isDarkMode),
                 leading: CupertinoButton(
                   padding: const EdgeInsets.all(0),
                   child: Icon(CupertinoIcons.back, color: activeIconRed),
@@ -198,7 +193,7 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
                               child: SizedBox(
                                 width: screenWidth * 0.85,
                                 child: Divider(
-                                  color: dividerColor,
+                                  color: getDividerColor(isDarkMode),
                                   height: 0.5,
                                 ),
                               ),
@@ -224,12 +219,12 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
-        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        backgroundColor: getBackgroundColor(isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(
                 padding: const EdgeInsetsDirectional.only(end: 16),
-                backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+                backgroundColor: getBackgroundColor(isDesktop, isDarkMode),
                 middle: Text(
                   playlist.name,
                   maxLines: 1,

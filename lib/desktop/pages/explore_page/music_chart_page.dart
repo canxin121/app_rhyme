@@ -55,7 +55,7 @@ class MusicChartPageState extends State<MusicChartPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return CupertinoPageScaffold(
-        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(

@@ -1,5 +1,6 @@
 import 'package:app_rhyme/common_comps/explore/music_chart_collection.dart';
 import 'package:app_rhyme/common_comps/explore/playlist_tag_collection.dart';
+import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
@@ -64,13 +65,12 @@ class MobileExplorePageState extends State<MobileExplorePage> {
   Widget build(BuildContext context) {
     final bool isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
 
     return CupertinoPageScaffold(
       child: Column(
         children: [
           CupertinoNavigationBar(
+            backgroundColor: getNavigatorBarColor(isDarkMode),
             middle: Text(
               _selectedSegment.displayName,
               maxLines: 1,
@@ -78,31 +78,28 @@ class MobileExplorePageState extends State<MobileExplorePage> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
-                color: textColor,
+                color: getTextColor(isDarkMode),
               ).useSystemChineseFont(),
             ),
           ),
-          SizedBox(),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: CupertinoSlidingSegmentedControl<ExploreSegment>(
-              groupValue: _selectedSegment,
-              onValueChanged: (ExploreSegment? value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedSegment = value;
-                  });
-                }
-              },
-              children: {
-                ExploreSegment.musicChart: Text(
-                    ExploreSegment.musicChart.displayName,
-                    style: TextStyle(color: textColor).useSystemChineseFont()),
-                ExploreSegment.playlistTag: Text(
-                    ExploreSegment.playlistTag.displayName,
-                    style: TextStyle(color: textColor).useSystemChineseFont()),
-              },
-            ),
+          SizedBox(height: 0),
+          CupertinoSlidingSegmentedControl<ExploreSegment>(
+            groupValue: _selectedSegment,
+            onValueChanged: (ExploreSegment? value) {
+              if (value != null) {
+                setState(() {
+                  _selectedSegment = value;
+                });
+              }
+            },
+            children: {
+              ExploreSegment.musicChart: Text(
+                  ExploreSegment.musicChart.displayName,
+                  style: TextStyle(color: getTextColor(isDarkMode)).useSystemChineseFont()),
+              ExploreSegment.playlistTag: Text(
+                  ExploreSegment.playlistTag.displayName,
+                  style: TextStyle(color: getTextColor(isDarkMode)).useSystemChineseFont()),
+            },
           ),
           Expanded(
             child: isLoading

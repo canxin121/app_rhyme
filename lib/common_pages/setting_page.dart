@@ -93,26 +93,6 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                             TextStyle(color: textColor).useSystemChineseFont()),
                     children: [
                       CupertinoFormRow(
-                          prefix: SizedBox(
-                              height: 50,
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child:
-                                    imageWithCache("", width: 50, height: 50),
-                              )),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Text(
-                                  'AppRhyme',
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 20.0,
-                                  ).useSystemChineseFont(),
-                                ),
-                              ))),
-                      CupertinoFormRow(
                         prefix: Text(
                           '版本号',
                           style: TextStyle(color: textColor)

@@ -70,19 +70,13 @@ class SearchMusicListState extends State<PlaylistSearchPage>
         MediaQuery.of(context).platformBrightness == Brightness.dark;
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color primaryColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-      backgroundColor: widget.isDesktop
-          ? getPrimaryBackgroundColor(isDarkMode)
-          : primaryColor,
+      backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
       child: Column(
         children: [
           CupertinoNavigationBar(
-            backgroundColor: widget.isDesktop
-                ? getNavigatorBarColor(isDarkMode)
-                : primaryColor,
+            backgroundColor: getNavigatorBarColor(isDarkMode),
             middle: Text(
               '搜索歌单',
               style: TextStyle(

@@ -59,16 +59,13 @@ class PlaylistCollectionReorderPageState
     final double screenWidth = MediaQuery.of(context).size.width;
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color backgroundColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return CupertinoPageScaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(
+              backgroundColor: getNavigatorBarColor(isDarkMode),
               padding: const EdgeInsetsDirectional.all(0),
               leading: CupertinoButton(
                 padding: const EdgeInsets.all(0),
@@ -90,7 +87,7 @@ class PlaylistCollectionReorderPageState
               child: widget.collections.isEmpty
                   ? Center(
                       child: Text("没有歌单集合",
-                          style: TextStyle(color: textColor)
+                          style: TextStyle(color: getTextColor(isDarkMode))
                               .useSystemChineseFont()),
                     )
                   : Align(

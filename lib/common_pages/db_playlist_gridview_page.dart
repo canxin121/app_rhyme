@@ -128,14 +128,13 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
   Widget buildDesktopUI(bool isDarkMode) {
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color navigatorBarColor = getNavigatorBarColor(isDarkMode);
 
     return CupertinoPageScaffold(
-        backgroundColor: getPrimaryBackgroundColor(isDarkMode),
+        backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(
-              backgroundColor: navigatorBarColor,
+              backgroundColor: getNavigatorBarColor(isDarkMode),
               middle: Text(
                 playlistCollection.name,
                 maxLines: 1,
@@ -189,17 +188,12 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
 
   /// 移动端 UI 构建
   Widget buildMobileUI(bool isDarkMode) {
-    final Color textColor =
-        isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color backgroundColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-
     return CupertinoPageScaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
       child: Column(
         children: [
           CupertinoNavigationBar(
-            backgroundColor: backgroundColor,
+            backgroundColor: getNavigatorBarColor(isDarkMode),
             leading: CupertinoButton(
               padding: const EdgeInsets.all(0),
               child: Icon(CupertinoIcons.back, color: activeIconRed),
@@ -235,10 +229,10 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
             child: playlists.isEmpty
                 ? Center(
                     child: Text("没有歌单",
-                        style:
-                            TextStyle(color: textColor).useSystemChineseFont()),
+                        style: TextStyle(color: getTextColor(isDarkMode))
+                            .useSystemChineseFont()),
                   )
-                : buildMobileGrid(textColor),
+                : buildMobileGrid(),
           ),
         ],
       ),
@@ -286,7 +280,7 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
     );
   }
 
-  Widget buildMobileGrid(Color textColor) {
+  Widget buildMobileGrid() {
     return CustomScrollView(
       slivers: [
         SliverPadding(

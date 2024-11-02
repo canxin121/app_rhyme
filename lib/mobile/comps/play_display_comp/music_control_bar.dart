@@ -1,3 +1,4 @@
+import 'package:app_rhyme/utils/colors.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -41,8 +42,6 @@ class MusicControlBarState extends State<MusicControlBar>
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color backgroundColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
 
     return SizedBox(
       height: widget.height,
@@ -56,7 +55,7 @@ class MusicControlBarState extends State<MusicControlBar>
           navigateToSongDisplayPage(context);
         },
         child: Container(
-          color: backgroundColor,
+          color: getBackgroundColor(false, isDarkMode),
           child: Row(
             children: <Widget>[
               Padding(

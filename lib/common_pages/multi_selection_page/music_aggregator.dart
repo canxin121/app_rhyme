@@ -57,20 +57,15 @@ class MusicAggregatorMultiSelectionPageState
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
     final bool isDarkMode = brightness == Brightness.dark;
-    final Color backgroundColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    final Color dividerColor = isDarkMode
-        ? const Color.fromARGB(255, 41, 41, 43)
-        : const Color.fromARGB(255, 245, 245, 246);
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return CupertinoPageScaffold(
-        backgroundColor: backgroundColor,
+        backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
           children: [
             CupertinoNavigationBar(
               padding: const EdgeInsetsDirectional.only(end: 16),
-              backgroundColor: backgroundColor,
+              backgroundColor: getNavigatorBarColor(isDarkMode),
               leading: CupertinoButton(
                 padding: const EdgeInsets.all(0),
                 child: Icon(CupertinoIcons.back, color: activeIconRed),
@@ -157,7 +152,7 @@ class MusicAggregatorMultiSelectionPageState
                               SizedBox(
                                 width: screenWidth * 0.85,
                                 child: Divider(
-                                  color: dividerColor,
+                                  color: getDividerColor(isDarkMode),
                                   height: 0.5,
                                 ),
                               )

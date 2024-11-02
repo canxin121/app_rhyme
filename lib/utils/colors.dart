@@ -15,10 +15,14 @@ Color getNavigatorBarColor(bool isDarkMode) {
       : const Color.fromARGB(255, 247, 247, 247);
 }
 
-Color getPrimaryBackgroundColor(bool isDarkMode) {
-  return isDarkMode
-      ? const Color.fromARGB(255, 40, 40, 40)
-      : const Color.fromARGB(255, 249, 249, 249);
+Color getBackgroundColor(bool isDesktop, bool isDarkMode) {
+  if (isDesktop) {
+    return isDarkMode
+        ? const Color.fromARGB(255, 40, 40, 40)
+        : const Color.fromARGB(255, 249, 249, 249);
+  } else {
+    return isDarkMode ? CupertinoColors.black : CupertinoColors.white;
+  }
 }
 
 Color getSettingPageBackgroundColor(bool isDarkMode) {

@@ -113,6 +113,7 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
       child: Column(
         children: [
           CupertinoNavigationBar(
+            backgroundColor: getNavigatorBarColor(isDarkMode),
             middle: Text(
               '搜索${_selectedSegment.displayName}', // 使用 displayName 方法展示名称
               maxLines: 1, overflow: TextOverflow.ellipsis,
