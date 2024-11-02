@@ -68,6 +68,7 @@ class MobileExplorePageState extends State<MobileExplorePage> {
 
     return CupertinoPageScaffold(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           CupertinoNavigationBar(
             backgroundColor: getNavigatorBarColor(isDarkMode),
@@ -95,10 +96,12 @@ class MobileExplorePageState extends State<MobileExplorePage> {
             children: {
               ExploreSegment.musicChart: Text(
                   ExploreSegment.musicChart.displayName,
-                  style: TextStyle(color: getTextColor(isDarkMode)).useSystemChineseFont()),
+                  style: TextStyle(color: getTextColor(isDarkMode))
+                      .useSystemChineseFont()),
               ExploreSegment.playlistTag: Text(
                   ExploreSegment.playlistTag.displayName,
-                  style: TextStyle(color: getTextColor(isDarkMode)).useSystemChineseFont()),
+                  style: TextStyle(color: getTextColor(isDarkMode))
+                      .useSystemChineseFont()),
             },
           ),
           Expanded(

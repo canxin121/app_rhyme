@@ -111,6 +111,7 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
 
     return CupertinoPageScaffold(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           CupertinoNavigationBar(
             backgroundColor: getNavigatorBarColor(isDarkMode),

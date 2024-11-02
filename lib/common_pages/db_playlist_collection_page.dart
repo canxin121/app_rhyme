@@ -55,6 +55,7 @@ class DbPlaylistCollectionPageState extends State<DbPlaylistCollectionPage>
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CupertinoNavigationBar(

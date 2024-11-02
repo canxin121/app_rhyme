@@ -54,7 +54,7 @@ class PlaylistMultiSelectionPageState extends State<PlaylistMultiSelectionPage>
     final bool isDarkMode = brightness == Brightness.dark;
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
-        child: Column(children: [
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
           CupertinoNavigationBar(
             backgroundColor: getNavigatorBarColor(isDarkMode),
             padding: const EdgeInsetsDirectional.all(0),

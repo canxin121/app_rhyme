@@ -14,7 +14,6 @@ import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/src/rust/api/types/external_api.dart';
 import 'package:app_rhyme/src/rust/api/utils/database.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
-import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/clipboard_helper.dart';
@@ -70,6 +69,7 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
     return CupertinoPageScaffold(
         backgroundColor: getSettingPageBackgroundColor(isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               backgroundColor: getNavigatorBarColor(isDarkMode),
@@ -266,6 +266,7 @@ class QualityConfigPageState extends State<QualityConfigPage>
     return CupertinoPageScaffold(
         backgroundColor: getSettingPageBackgroundColor(isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               backgroundColor: getNavigatorBarColor(isDarkMode),
@@ -377,6 +378,7 @@ class UpdateConfigPageState extends State<UpdateConfigPage>
     return CupertinoPageScaffold(
         backgroundColor: getSettingPageBackgroundColor(isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               backgroundColor: getNavigatorBarColor(isDarkMode),
@@ -508,6 +510,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
     return CupertinoPageScaffold(
         backgroundColor: getSettingPageBackgroundColor(isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               middle: Text('储存设置', style: TextStyle(color: textColor)),
@@ -968,6 +971,7 @@ class ExternalApiConfigPageState extends State<ExternalApiConfigPage>
     return CupertinoPageScaffold(
         backgroundColor: getSettingPageBackgroundColor(isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               middle: Text('第三方音源设置', style: TextStyle(color: textColor)),
@@ -1207,6 +1211,7 @@ class WindowConfigPageState extends State<WindowConfigPage>
     return CupertinoPageScaffold(
         backgroundColor: getSettingPageBackgroundColor(isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               middle: Text('窗口设置(重启后生效)', style: TextStyle(color: textColor)),

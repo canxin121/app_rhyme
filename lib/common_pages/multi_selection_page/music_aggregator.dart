@@ -62,6 +62,7 @@ class MusicAggregatorMultiSelectionPageState
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               padding: const EdgeInsetsDirectional.only(end: 16),

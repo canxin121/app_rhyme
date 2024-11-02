@@ -99,9 +99,7 @@ class MobileMusicAggregatorListItemState
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: imageWithCache(defaultMusic!.getCover(size: 250),
-                width: 40,
-                height: 40,
-                enableCache: widget.cacheCover),
+                width: 40, height: 40, enableCache: widget.cacheCover),
           ),
           // 歌曲的信息(歌名, 歌手)
           Expanded(

@@ -61,7 +61,7 @@ class PlaylistCollectionMultiSelectionPageState
 
     return CupertinoPageScaffold(
       backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
-      child: Column(children: [
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
         CupertinoNavigationBar(
           padding: const EdgeInsetsDirectional.only(end: 16),
           backgroundColor: getNavigatorBarColor(isDarkMode),

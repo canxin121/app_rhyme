@@ -62,6 +62,7 @@ class PlaylistReorderPageState extends State<PlaylistReorderPage>
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               backgroundColor: getNavigatorBarColor(isDarkMode),

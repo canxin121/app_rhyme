@@ -31,7 +31,8 @@ class MusicList extends StatelessWidget {
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: MobileMusicAggregatorListItem(
-                  key: ValueKey(musicContainerList[index].musicAggregator.identity()),
+                  key: ValueKey(
+                      musicContainerList[index].musicAggregator.identity()),
                   musicAgg: musicContainerList[index].musicAggregator,
                   isDark: isDarkMode,
                   onTap: () {

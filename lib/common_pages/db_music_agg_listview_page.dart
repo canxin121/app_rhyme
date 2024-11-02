@@ -127,6 +127,7 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
                 padding: const EdgeInsetsDirectional.only(end: 16),
@@ -221,6 +222,7 @@ class DbMusicContainerListPageState extends State<DbMusicContainerListPage>
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
                 padding: const EdgeInsetsDirectional.only(end: 16),

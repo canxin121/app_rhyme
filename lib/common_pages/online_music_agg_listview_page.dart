@@ -99,6 +99,7 @@ class OnlineMusicAggregatorListViewPageState
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
                 backgroundColor: getNavigatorBarColor(isDarkMode),
@@ -224,6 +225,7 @@ class OnlineMusicAggregatorListViewPageState
     return CupertinoPageScaffold(
         backgroundColor: backgroundColor,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
                 backgroundColor: getNavigatorBarColor(isDarkMode),

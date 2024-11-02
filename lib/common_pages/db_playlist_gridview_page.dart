@@ -132,6 +132,7 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
     return CupertinoPageScaffold(
         backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoNavigationBar(
               backgroundColor: getNavigatorBarColor(isDarkMode),
@@ -191,6 +192,7 @@ class DbPlaylistGridPageState extends State<DbPlaylistGridPage>
     return CupertinoPageScaffold(
       backgroundColor: getBackgroundColor(widget.isDesktop, isDarkMode),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           CupertinoNavigationBar(
             backgroundColor: getNavigatorBarColor(isDarkMode),
