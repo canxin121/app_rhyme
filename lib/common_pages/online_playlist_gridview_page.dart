@@ -17,7 +17,8 @@ class OnlinePlaylistGridViewPage extends StatefulWidget {
       required this.fetchPlaylists,
       this.title = "在线歌单"});
   final String title;
-  final Future<List<Playlist>> Function(int page, int limit) fetchPlaylists;
+  final Future<List<Playlist>> Function(
+      int page, int limit, List<Playlist> playlists) fetchPlaylists;
   final bool isDesktop;
 
   @override
@@ -36,7 +37,7 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
     _pagingController.addPageRequestListener((pageKey) async {
       if (_pagingController.nextPageKey == null) return;
       try {
-        var fetchedPlaylists = await widget.fetchPlaylists(pageKey, 30);
+        var fetchedPlaylists = await widget.fetchPlaylists(pageKey, 30, []);
         _pagingController.appendPage(
             fetchedPlaylists, _pagingController.nextPageKey! + 1);
       } catch (e) {
@@ -60,9 +61,9 @@ class SearchMusicListState extends State<OnlinePlaylistGridViewPage>
 
   Future<void> _fetchAllPlaylists() async {
     await fetchAllItemsWithPagingController(
-      widget.fetchPlaylists,
-      _pagingController,
-      "歌单",
+      fetchItems: widget.fetchPlaylists,
+      pagingController: _pagingController,
+      itemName: "歌单",
     );
   }
 

@@ -46,7 +46,7 @@ class OnlineMusicAggregatorListViewPageState
       PagingController(firstPageKey: 1);
 
   Future<List<MusicAggregator>> _fetchMusicAggregators(
-      int page, int pageSize) async {
+      int page, int pageSize, List<MusicAggregator> aggs) async {
     if (widget.playlist != null) {
       return await widget.playlist!.fetchMusicsOnline(page: page, limit: 30);
     } else if (widget.fetchMusicAggregators != null) {
@@ -77,9 +77,12 @@ class OnlineMusicAggregatorListViewPageState
 
   Future<void> _fetchAllMusicAggregators() async {
     await fetchAllItemsWithPagingController(
-      _fetchMusicAggregators,
-      _pagingController,
-      "音乐",
+      fetchItems: _fetchMusicAggregators,
+      pagingController: _pagingController,
+      itemName: "音乐",
+      shouldEnd: (pagingController, lastItemLen, newResult) {
+        return newResult.length <= lastItemLen;
+      },
     );
   }
 

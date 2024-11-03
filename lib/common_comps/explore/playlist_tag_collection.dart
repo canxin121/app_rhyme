@@ -64,7 +64,8 @@ class PlaylistTagCollectionSlider extends StatelessWidget {
                                 OnlinePlaylistGridViewPage(
                                   title: tag.name,
                                   isDesktop: isDesktop,
-                                  fetchPlaylists: (int page, int limit) async {
+                                  fetchPlaylists: (int page, int limit,
+                                      List<Playlist> playlists) async {
                                     return await ServerPlaylistTagCollection
                                         .getPlaylistsFromTag(
                                       server: server,

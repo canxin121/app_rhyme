@@ -30,6 +30,7 @@ class SearchMusicListState extends State<PlaylistSearchPage>
             int page,
             int pageSize,
             String content,
+            List<Playlist> playlists,
           ) async {
             return await Playlist.searchOnline(
               servers: MusicServer.all(),
@@ -55,13 +56,16 @@ class SearchMusicListState extends State<PlaylistSearchPage>
   }
 
   Future<void> _fetchAllMusicLists() async {
-    await fetchAllItemsWithPagingController((int page, int limit) async {
-      return await Playlist.searchOnline(
-          servers: [MusicServer.kuwo, MusicServer.netease],
-          content: inputContentController.value.text,
-          page: page,
-          size: limit);
-    }, pagingControllerPlaylist, "歌单");
+    await fetchAllItemsWithPagingController(
+        fetchItems: (int page, int limit, List<Playlist> playlists) async {
+          return await Playlist.searchOnline(
+              servers: [MusicServer.kuwo, MusicServer.netease],
+              content: inputContentController.value.text,
+              page: page,
+              size: limit);
+        },
+        pagingController: pagingControllerPlaylist,
+        itemName: "歌单");
   }
 
   @override

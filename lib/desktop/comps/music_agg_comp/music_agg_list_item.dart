@@ -5,7 +5,6 @@ import 'package:app_rhyme/src/rust/api/cache/music_cache.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
-import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
@@ -243,21 +242,27 @@ class MusicCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(2.0),
-          child: imageWithCache(music.getCover(size: 250),
-              width: 40, height: 40, enableCache: cacheCover),
-        ),
-        const SizedBox(width: 8),
+        // ClipRRect(
+        //   borderRadius: BorderRadius.circular(2.0),
+        //   child: imageWithCache(music.getCover(size: 250),
+        //       width: 40, height: 40, enableCache: cacheCover),
+        // ),
+        // const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            music.name,
-            style: TextStyle(
-              color: isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-            ).useSystemChineseFont(),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+            child: SizedBox(
+          height: 40,
+          child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                music.name,
+                style: TextStyle(
+                  color: isDarkMode
+                      ? CupertinoColors.white
+                      : CupertinoColors.black,
+                ).useSystemChineseFont(),
+                overflow: TextOverflow.ellipsis,
+              )),
+        )),
       ],
     );
   }

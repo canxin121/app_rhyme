@@ -1,5 +1,6 @@
 // 涉及非常多bug的bypass, 很难run, 需要谨慎修改
 
+import 'dart:async';
 import 'dart:io';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
@@ -368,6 +369,8 @@ class AudioUiController extends GetxController {
   Rx<Duration> duration = Duration.zero.obs;
   Rx<Duration> position = Duration.zero.obs;
   Rx<double> playProgress = 0.0.obs;
+  int shouldSkip = 0;
+
   AudioUiController() {
     playerState = globalAudioHandler.player.playerState.obs;
 
@@ -406,10 +409,29 @@ class AudioUiController extends GetxController {
           position.value.inMicroseconds / duration.value.inMicroseconds;
       update();
     });
+
+    _startMonitoring();
   }
 
   Duration seekDurationFromPercent(double percent) {
     return Duration(
         microseconds: (percent * duration.value.inMicroseconds).toInt());
+  }
+
+  void _startMonitoring() {
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (shouldSkip == 3) {
+        shouldSkip = 0;
+        globalAudioHandler.seekToNext();
+        globalTalker
+            .error("[AudioUiController._startMonitoring] Skip to next song");
+      } else if (position.value.inSeconds >= duration.value.inSeconds) {
+        shouldSkip++;
+        globalTalker.error(
+            "[AudioUiController._startMonitoring] Skip to next song error times: $shouldSkip");
+      } else {
+        shouldSkip = 0;
+      }
+    });
   }
 }

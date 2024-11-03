@@ -42,13 +42,10 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
       fetchItemWithInputPagingController(
           inputController: inputContentController,
           pagingController: pagingControllerMusicAggregator,
-          fetchFunction: (
-            int page,
-            int pageSize,
-            String content,
-          ) async {
+          fetchFunction: (int page, int pageSize, String content,
+              List<MusicAggregator> aggs) async {
             return await MusicAggregator.searchOnline(
-              aggs: pagingControllerMusicAggregator.itemList ?? [],
+              aggs: aggs,
               servers: MusicServer.all(),
               content: content,
               page: pageKey,
@@ -56,6 +53,9 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
             );
           },
           pageKey: pageKey,
+          shouldEnd: (pagingController, lastItemLen, newResult) {
+            return newResult.length <= lastItemLen;
+          },
           itemName: "歌曲");
     });
     pagingControllerPlaylist.addPageRequestListener((pageKey) {
@@ -66,6 +66,7 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
             int page,
             int pageSize,
             String content,
+            List<Playlist> playlists,
           ) async {
             return await Playlist.searchOnline(
               servers: MusicServer.all(),
@@ -80,26 +81,36 @@ class _SearchPageMobileState extends State<SearchPageMobile> {
   }
 
   Future<void> _fetchAllMusicAggregators() async {
-    await fetchAllItemsWithPagingController((int page, int limit) async {
-      return await MusicAggregator.searchOnline(
-        aggs: pagingControllerMusicAggregator.itemList ?? [],
-        servers: MusicServer.all(),
-        content: inputContentController.value.text,
-        page: page,
-        size: limit,
-      );
-    }, pagingControllerMusicAggregator, "歌曲");
+    await fetchAllItemsWithPagingController(
+      fetchItems: (int page, int limit, List<MusicAggregator> aggs) async {
+        return await MusicAggregator.searchOnline(
+          aggs: aggs,
+          servers: MusicServer.all(),
+          content: inputContentController.value.text,
+          page: page,
+          size: limit,
+        );
+      },
+      pagingController: pagingControllerMusicAggregator,
+      itemName: "歌曲",
+      shouldEnd: (pagingController, lastItemLen, newResult) {
+        return newResult.length <= lastItemLen;
+      },
+    );
   }
 
   Future<void> _fetchAllPlaylists() async {
-    await fetchAllItemsWithPagingController((int page, int limit) async {
-      return await Playlist.searchOnline(
-        servers: [MusicServer.kuwo, MusicServer.netease],
-        content: inputContentController.value.text,
-        page: page,
-        size: limit,
-      );
-    }, pagingControllerPlaylist, "歌单");
+    await fetchAllItemsWithPagingController(
+        fetchItems: (int page, int limit, List<Playlist> playlists) async {
+          return await Playlist.searchOnline(
+            servers: [MusicServer.kuwo, MusicServer.netease],
+            content: inputContentController.value.text,
+            page: page,
+            size: limit,
+          );
+        },
+        pagingController: pagingControllerPlaylist,
+        itemName: "歌单");
   }
 
   @override

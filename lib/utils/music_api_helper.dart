@@ -37,18 +37,24 @@ Music? getMusicAggregatorDefaultMusic(MusicAggregator musicAggregator) {
   return null;
 }
 
-const int fetchAllPageSize = 500;
+const int fetchAllPageSize = 2333;
 const int fetchOnePageSize = 30;
 
 Future<void> fetchItemWithInputPagingController<T>({
   required TextEditingController inputController,
   required PagingController<int, T> pagingController,
-  required Future<List<T>> Function(int page, int pageSize, String content)
+  required Future<List<T>> Function(
+          int page, int pageSize, String content, List<T> items)
       fetchFunction,
   required int pageKey,
   required String itemName,
+  bool Function(PagingController<int, T> pagingController, int lastItemLen,
+          List<T> newResult)?
+      shouldEnd,
 }) async {
   try {
+    int lastItemLen = pagingController.itemList?.length ?? 0;
+
     if (inputController.value.text.isEmpty) {
       pagingController.appendLastPage([]);
       return;
@@ -58,12 +64,20 @@ Future<void> fetchItemWithInputPagingController<T>({
       pageKey,
       fetchOnePageSize,
       inputController.value.text,
+      pagingController.itemList ?? [],
     );
-
-    if (results.isEmpty) {
-      pagingController.appendLastPage([]);
+    if (shouldEnd != null) {
+      if (shouldEnd(pagingController, lastItemLen, results)) {
+        pagingController.appendLastPage(results);
+      } else {
+        pagingController.appendPage(results, pageKey + 1);
+      }
     } else {
-      pagingController.appendPage(results, pageKey + 1);
+      if (results.isEmpty) {
+        pagingController.appendLastPage([]);
+      } else {
+        pagingController.appendPage(results, pageKey + 1);
+      }
     }
   } catch (error) {
     LogToast.error(
@@ -77,12 +91,14 @@ Future<void> fetchItemWithInputPagingController<T>({
 
 Future<void> fetchItemWithPagingController<T>({
   required PagingController<int, T> pagingController,
-  required Future<List<T>> Function(int page, int pageSize) fetchFunction,
+  required Future<List<T>> Function(int page, int pageSize, List<T> items)
+      fetchFunction,
   required int pageKey,
   required String itemName,
 }) async {
   try {
-    var results = await fetchFunction(pageKey, fetchOnePageSize);
+    var results = await fetchFunction(
+        pageKey, fetchOnePageSize, pagingController.itemList ?? []);
 
     if (results.isEmpty) {
       pagingController.appendLastPage([]);
@@ -130,25 +146,38 @@ Future<List<T>?> fetchAllItems<T>(
 
 // safe
 Future<List<T>?> fetchAllItemsWithPagingController<T>(
-    Future<List<T>> Function(int page, int limit) fetchItems,
-    PagingController<int, T> pagingController,
-    String itemName) async {
+    {required Future<List<T>> Function(int page, int limit, List<T> items)
+        fetchItems,
+    required PagingController<int, T> pagingController,
+    required String itemName,
+    bool Function(PagingController<int, T> pagingController, int lastItemLen,
+            List<T> newResult)?
+        shouldEnd}) async {
   if (pagingController.nextPageKey == null) return null;
   LogToast.info("获取所有$itemName", "正在获取所有$itemName,请稍等",
       "[fetchAllItemsWithPagingController] fetching all $itemName, please wait.");
   try {
-    var fetchedItems = await fetchItems(1, fetchAllPageSize);
+    var fetchedItems =
+        await fetchItems(1, fetchAllPageSize, pagingController.itemList ?? []);
 
     pagingController.value = PagingState<int, T>(
         nextPageKey: 2, itemList: fetchedItems, error: null);
 
     while (pagingController.nextPageKey != null) {
-      var fetchedItems =
-          await fetchItems(pagingController.nextPageKey!, fetchAllPageSize);
+      var fetchedItems = await fetchItems(pagingController.nextPageKey!,
+          fetchAllPageSize, pagingController.itemList ?? []);
 
-      if (fetchedItems.isEmpty) {
-        pagingController.appendLastPage([]);
-        break;
+      if (shouldEnd != null) {
+        if (shouldEnd(pagingController, pagingController.itemList!.length,
+            fetchedItems)) {
+          pagingController.appendLastPage(fetchedItems);
+          break;
+        }
+      } else {
+        if (fetchedItems.isEmpty) {
+          pagingController.appendLastPage([]);
+          break;
+        }
       }
 
       pagingController.appendPage(
@@ -790,7 +819,7 @@ Future<void> viewArtistAlbums(
       OnlinePlaylistGridViewPage(
         title: artist.name,
         isDesktop: isDesktop,
-        fetchPlaylists: (int page, int limit) async {
+        fetchPlaylists: (int page, int limit, List<Playlist> playlists) async {
           return await Playlist.fetchArtistAlbums(
               server: music.server,
               artistId: artist!.id!,
