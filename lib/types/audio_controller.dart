@@ -420,6 +420,10 @@ class AudioUiController extends GetxController {
 
   void _startMonitoring() {
     Timer.periodic(Duration(seconds: 1), (timer) {
+      if (position.value.inSeconds == 0) {
+        return;
+      }
+
       if (shouldSkip == 3) {
         shouldSkip = 0;
         globalAudioHandler.seekToNext();

@@ -20,6 +20,7 @@ Future<void> initDesktopWindowSetting() async {
         ..minSize = Size(globalConfig.windowConfig?.minWidth.toDouble() ?? 1100,
             globalConfig.windowConfig?.minHeight.toDouble() ?? 600)
         ..alignment = Alignment.center;
+
       if (globalConfig.windowConfig != null &&
           globalConfig.windowConfig!.fullscreen) {
         windowSetting.maximize();
