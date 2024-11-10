@@ -441,9 +441,13 @@ class StorageConfigPage extends StatefulWidget {
 
 class StorageConfigPageState extends State<StorageConfigPage>
     with WidgetsBindingObserver {
+  String StoragePath = "";
+
   @override
   void initState() {
     super.initState();
+    StoragePath =
+        globalConfig.getStorageFolder(documentFolder: globalDocumentPath);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -480,20 +484,23 @@ class StorageConfigPageState extends State<StorageConfigPage>
 
         await moveCacheData(
             documentPath: globalDocumentPath,
-            newCustomCacheRoot: newCustomCacheRoot);
+            newCustomCacheRoot: newCustomCacheRoot,
+            oldCustomCacheRoot: globalConfig.storageConfig.customCacheRoot);
       } else {
         if (mounted) {
           await showWaitDialog(context, isDesktop, "正在清理旧数据中,稍后将自动退出应用以应用更改");
         }
-        await delOldCacheData(documentPath: globalDocumentPath);
+        await delOldCacheData(
+            documentPath: globalDocumentPath,
+            oldCustomCacheRoot: globalConfig.storageConfig.customCacheRoot);
       }
 
       globalConfig.storageConfig.customCacheRoot = newCustomCacheRoot;
       await globalConfig.save(documentFolder: globalDocumentPath);
-
-      if (mounted) {
-        context.findAncestorStateOfType<SettingPageState>()?.refresh();
-      }
+      setState(() {
+        StoragePath =
+            globalConfig.getStorageFolder(documentFolder: globalDocumentPath);
+      });
     } finally {
       if (mounted) {
         popPage(context, isDesktop);
@@ -557,8 +564,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
                                   alignment: Alignment.centerRight,
                                   height: 50,
                                   child: Text(
-                                    globalConfig.getStorageFolder(
-                                        documentFolder: globalDocumentPath),
+                                    StoragePath,
                                     style: TextStyle(color: textColor)
                                         .useSystemChineseFont(),
                                   ))),
@@ -914,7 +920,9 @@ class StorageConfigPageState extends State<StorageConfigPage>
                               if (confirm == null || !confirm) return;
                               try {
                                 await delOldCacheData(
-                                    documentPath: globalDocumentPath);
+                                    documentPath: globalDocumentPath,
+                                    oldCustomCacheRoot: globalConfig
+                                        .storageConfig.customCacheRoot);
                                 LogToast.success("清理空间", "清理缓存成功",
                                     "[storageConfig.clearCache] success");
                               } catch (e) {
@@ -1093,6 +1101,8 @@ class ExternalApiConfigPageState extends State<ExternalApiConfigPage>
                                 var externalApi =
                                     await ExternalApiConfig.fromPath(
                                         path: filePath,
+                                        customCacheRoot: globalConfig
+                                            .storageConfig.customCacheRoot,
                                         documentFolder: globalDocumentPath);
 
                                 globalConfig.externalApi = externalApi;
@@ -1137,7 +1147,10 @@ class ExternalApiConfigPageState extends State<ExternalApiConfigPage>
                                 var externalApi =
                                     await ExternalApiConfig.fromUrl(
                                         url: link,
-                                        documentFolder: globalDocumentPath);
+                                        documentFolder: globalDocumentPath,
+                                        customCacheRoot: globalConfig
+                                            .storageConfig.customCacheRoot);
+
                                 globalConfig.externalApi = externalApi;
                                 await globalConfig.save(
                                     documentFolder: globalDocumentPath);

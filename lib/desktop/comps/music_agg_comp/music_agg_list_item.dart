@@ -365,6 +365,7 @@ class OptionsCellState extends State<OptionsCell> {
     hasCacheMusic(
             name: widget.musicAgg.name,
             artists: widget.musicAgg.artist,
+            customCacheRoot: globalConfig.storageConfig.customCacheRoot,
             documentFolder: globalDocumentPath)
         .then((value) {
       if (mounted) {

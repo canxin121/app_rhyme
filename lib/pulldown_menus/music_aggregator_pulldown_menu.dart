@@ -30,6 +30,7 @@ Future<void> showMusicAggregatorMenu(
     hasCache = await hasCacheMusic(
         name: musicAgg.name,
         artists: musicAgg.artist,
+        customCacheRoot: globalConfig.storageConfig.customCacheRoot,
         documentFolder: globalDocumentPath);
     if (!context.mounted) return;
     menuItems = _musicAggregetorPullDownItems(

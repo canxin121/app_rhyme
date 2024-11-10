@@ -68,6 +68,7 @@ class MobileMusicAggregatorListItemState
     bool cacheStatus = await hasCacheMusic(
         name: widget.musicAgg.name,
         artists: widget.musicAgg.artist,
+        customCacheRoot: globalConfig.storageConfig.customCacheRoot,
         documentFolder: globalDocumentPath);
     if (mounted) {
       setState(() {

@@ -75,7 +75,7 @@ ExtendedImage imageWithCache(
   }
 
   String? uri =
-      _getFileCacheWithUriWrapper(url, picCacheFolder, cacheNow: enableCache);
+      _getFileCacheWithUriWrapper(url, picCacheFolder, cacheNow: enableCache,);
 
   if (uri.startsWith("http")) {
     return ExtendedImage.network(

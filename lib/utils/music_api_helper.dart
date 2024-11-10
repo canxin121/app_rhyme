@@ -214,6 +214,7 @@ Future<void> delMusicCache(
 }) async {
   if (!await rust_api_music_cache.hasCacheMusic(
       documentFolder: globalDocumentPath,
+      customCacheRoot: globalConfig.storageConfig.customCacheRoot,
       name: musicAggregator.name,
       artists: musicAggregator.artist)) {
     return;
@@ -247,6 +248,7 @@ Future<void> cacheMusicContainer(MusicContainer musicContainer,
     {bool hasCache = false}) async {
   if (await rust_api_music_cache.hasCacheMusic(
       documentFolder: globalDocumentPath,
+      customCacheRoot: globalConfig.storageConfig.customCacheRoot,
       name: musicContainer.musicAggregator.name,
       artists: musicContainer.musicAggregator.artist)) {
     return;
@@ -264,7 +266,8 @@ Future<void> cacheMusicContainer(MusicContainer musicContainer,
         artists: musicContainer.musicAggregator.artist,
         playinfo: musicContainer.playinfo!,
         lyric: musicContainer.lyric,
-        documentFolder: globalDocumentPath);
+        documentFolder: globalDocumentPath,
+        customCacheRoot: globalConfig.storageConfig.customCacheRoot);
 
     musicAggregatorCacheController
         .add((true, musicContainer.musicAggregator.identity()));
