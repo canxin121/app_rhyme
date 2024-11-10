@@ -55,7 +55,7 @@ class ProgressSliderState extends State<ProgressSlider> {
           padding: const EdgeInsets.all(0),
           controller: _progressController,
           onProgressUpdated: (value) {
-            var toSeek = globalAudioUiController.getToSeek(value);
+            var toSeek = globalAudioUiController.seekDurationFromPercent(value);
             globalTalker.info(
                 "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
             globalAudioHandler.seek(toSeek);

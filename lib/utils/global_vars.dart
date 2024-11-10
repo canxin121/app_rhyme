@@ -1,4 +1,4 @@
-import 'package:app_rhyme/audioControl/audio_controller.dart';
+import 'package:app_rhyme/types/audio_controller.dart';
 import 'package:app_rhyme/src/rust/api/init.dart';
 import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/types/chore.dart';
@@ -10,10 +10,8 @@ import 'package:talker/talker.dart';
 
 Talker globalTalker = Talker();
 
-// 在`init_backend.dart` 中被初始化
 late Config globalConfig;
-
-late ExternApiEvaler? globalExternApiEvaler;
+late ExternalApiEvaler? globalExternalApiEvaler;
 late AudioHandler globalAudioHandler;
 late AudioUiController globalAudioUiController;
 late PackageInfo globalPackageInfo;
@@ -28,12 +26,13 @@ Future<void> initGlobalVars() async {
   // 初始化rust全局配置，将documentPath设置为应用程序文档目录
   globalDocumentPath = (await getApplicationDocumentsDirectory()).path;
   // 初始化全局变量globalConfig
-  globalConfig = await initBackend(storeRoot: globalDocumentPath);
-  // 初始化全局变量globalExternApi
-  if (globalConfig.externApi != null) {
-    globalExternApiEvaler = ExternApiEvaler(globalConfig.externApi!.localPath);
+  globalConfig = await initBackend(documentFolder: globalDocumentPath);
+  // 初始化全局变量globalExternalApi
+  if (globalConfig.externalApi != null) {
+    globalExternalApiEvaler =
+        ExternalApiEvaler(globalConfig.externalApi!.filePath);
   } else {
-    globalExternApiEvaler = null;
+    globalExternalApiEvaler = null;
   }
   // 初始化应用包信息
   globalPackageInfo = await PackageInfo.fromPlatform();

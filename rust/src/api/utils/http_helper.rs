@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 use flutter_rust_bridge::frb;
-use music_api::util::CLIENT;
+use music_api::CLIENT;
 use reqwest::header::HeaderMap;
 
 #[frb]
@@ -30,8 +30,10 @@ async fn send(
     headers: HeaderMap,
     body: Option<String>,
 ) -> Result<String, anyhow::Error> {
-    let client = &CLIENT;
-    let request = client.request(method.parse()?, url).headers(headers);
+    let request = CLIENT
+        .request(method.parse()?, url)
+        .timeout(Duration::from_secs(5))
+        .headers(headers);
 
     let request = if let Some(body) = body {
         request.body(body)

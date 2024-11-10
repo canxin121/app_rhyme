@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:better_cupertino_slider/better_cupertino_slider.dart';
+// import 'package:better_cupertino_slider/better_cupertino_slider.dart';
 import 'package:flutter/cupertino.dart';
 
 class VolumeSlider extends StatefulWidget {
@@ -10,10 +9,10 @@ class VolumeSlider extends StatefulWidget {
   const VolumeSlider({super.key, required this.isDarkMode});
 
   @override
-  _VolumeSliderState createState() => _VolumeSliderState();
+  VolumeSliderState createState() => VolumeSliderState();
 }
 
-class _VolumeSliderState extends State<VolumeSlider> {
+class VolumeSliderState extends State<VolumeSlider> {
   double _volume = 0.5;
   late StreamSubscription<double> volumeListener;
 
@@ -60,22 +59,22 @@ class _VolumeSliderState extends State<VolumeSlider> {
                     ? CupertinoColors.white
                     : CupertinoColors.black),
             Expanded(
-              child: BetterCupertinoSlider(
+              child: CupertinoSlider(
                 min: 0.0,
                 max: 1.0,
                 value: _volume,
-                configure: BetterCupertinoSliderConfigure(
-                  trackHorizontalPadding: 8.0,
-                  trackHeight: 4.0,
-                  thumbRadius: 8.0,
-                  thumbPainter: (canvas, rect) {
-                    final RRect rrect = RRect.fromRectAndRadius(
-                      rect,
-                      Radius.circular(rect.shortestSide / 2.0),
-                    );
-                    canvas.drawRRect(rrect, Paint()..color = activeIconRed);
-                  },
-                ),
+                // configure: BetterCupertinoSliderConfigure(
+                //   trackHorizontalPadding: 8.0,
+                //   trackHeight: 4.0,
+                //   thumbRadius: 8.0,
+                //   thumbPainter: (canvas, rect) {
+                //     final RRect rrect = RRect.fromRectAndRadius(
+                //       rect,
+                //       Radius.circular(rect.shortestSide / 2.0),
+                //     );
+                //     canvas.drawRRect(rrect, Paint()..color = activeIconRed);
+                //   },
+                // ),
                 onChanged: (value) {
                   setState(() {
                     _volume = value;
@@ -156,8 +155,7 @@ class _VolumeSliderOverlayState extends State<_VolumeSliderOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: CupertinoPageScaffold(
+    return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemFill.withOpacity(0.0),
       child: GestureDetector(
         onTap: widget.onRemove,
@@ -183,6 +181,6 @@ class _VolumeSliderOverlayState extends State<_VolumeSliderOverlay>
           ],
         ),
       ),
-    ));
+    );
   }
 }

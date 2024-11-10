@@ -7,9 +7,6 @@
 
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
-analyzer:
-  errors:
-    library_private_types_in_public_api: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:

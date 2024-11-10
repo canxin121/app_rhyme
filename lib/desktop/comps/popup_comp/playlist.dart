@@ -1,4 +1,4 @@
-import 'package:app_rhyme/mobile/comps/music_container_comp/music_container_list_item.dart';
+import 'package:app_rhyme/mobile/comps/music_agg_comp/music_agg_list_item.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +16,7 @@ class MusicList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      var musics = globalAudioHandler.musicList;
+      var musicContainerList = globalAudioHandler.musicContainerList;
       return Expanded(
         child: CustomScrollView(
           slivers: <Widget>[
@@ -30,8 +30,10 @@ class MusicList extends StatelessWidget {
               ),
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
-                child: MusicContainerListItem(
-                  musicContainer: musics[index],
+                child: MobileMusicAggregatorListItem(
+                  key: ValueKey(
+                      musicContainerList[index].musicAggregator.identity()),
+                  musicAgg: musicContainerList[index].musicAggregator,
                   isDark: isDarkMode,
                   onTap: () {
                     globalAudioHandler.seek(Duration.zero, index: index);
@@ -39,7 +41,7 @@ class MusicList extends StatelessWidget {
                   index: index,
                 ),
               ),
-              itemCount: musics.length,
+              itemCount: musicContainerList.length,
             ),
           ],
         ),

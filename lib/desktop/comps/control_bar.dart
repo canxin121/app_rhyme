@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:app_rhyme/desktop/comps/popup_comp/lyric.dart';
 import 'package:app_rhyme/desktop/comps/popup_comp/playlist.dart';
 import 'package:app_rhyme/desktop/comps/popup_comp/volume_slider.dart';
-import 'package:app_rhyme/desktop/utils/colors.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/chore.dart';
+import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/time_parser.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -26,7 +26,7 @@ class ControlBar extends StatelessWidget {
         ? const Color.fromARGB(255, 42, 42, 42)
         : const Color.fromARGB(255, 247, 247, 247);
     Color dividerColor = getDividerColor(isDarkMode);
-    bool isDesktop_ = isDesktop();
+    bool isDesktop_ = isDesktopDevice();
     final childWidget = GestureDetector(
       onPanStart: (details) {
         if (isDesktop_) {
@@ -245,8 +245,11 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                 ),
                 child: Obx(() => ClipRRect(
                       borderRadius: BorderRadius.circular(3),
-                      child: imageCacheHelper(
-                          globalAudioHandler.playingMusic.value?.info.artPic),
+                      child: imageWithCache(
+                          globalAudioHandler.playingMusic.value?.currentMusic
+                              .getCover(size: 250),
+                          width: 47,
+                          height: 47),
                     )),
               ),
               SizedBox(
@@ -258,24 +261,36 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                       children: [
                         const SizedBox(height: 5),
                         Center(
-                          child: Obx(() => Text(
-                                globalAudioHandler
-                                        .playingMusic.value?.info.name ??
-                                    "Music",
-                                style: TextStyle(color: textColor, fontSize: 13)
-                                    .useSystemChineseFont(),
-                              )),
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              child: Obx(() => Text(
+                                    globalAudioHandler.playingMusic.value
+                                            ?.currentMusic.name ??
+                                        "Music",
+                                    style: TextStyle(
+                                            color: textColor, fontSize: 13)
+                                        .useSystemChineseFont(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ))),
                         ),
                         Center(
-                          child: Obx(() => Text(
-                                globalAudioHandler
-                                        .playingMusic.value?.info.artist
-                                        .join(", ") ??
-                                    "Artist",
-                                style:
-                                    TextStyle(color: textColor2, fontSize: 12)
-                                        .useSystemChineseFont(),
-                              )),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 20, right: 20),
+                            child: Obx(() => Text(
+                                  globalAudioHandler.playingMusic.value
+                                          ?.currentMusic.artists
+                                          .map((e) => e.name)
+                                          .join(", ") ??
+                                      "Artist",
+                                  style:
+                                      TextStyle(color: textColor2, fontSize: 12)
+                                          .useSystemChineseFont(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                )),
+                          ),
                         ),
                         Expanded(child: Container()),
                       ],
@@ -295,6 +310,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                                   style:
                                       TextStyle(color: textColor2, fontSize: 12)
                                           .useSystemChineseFont(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 )),
                             Obx(() => Text(
                                   formatDuration(globalAudioUiController
@@ -302,6 +319,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                                   style:
                                       TextStyle(color: textColor2, fontSize: 12)
                                           .useSystemChineseFont(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 )),
                           ],
                         ),
@@ -322,7 +341,8 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                         padding: const EdgeInsets.all(0),
                         isDragging: _isDragging,
                         onProgressUpdated: (value) {
-                          var toSeek = globalAudioUiController.getToSeek(value);
+                          var toSeek = globalAudioUiController
+                              .seekDurationFromPercent(value);
                           globalTalker.info(
                               "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
                           globalAudioHandler.seek(toSeek);

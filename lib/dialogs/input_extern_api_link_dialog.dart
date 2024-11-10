@@ -1,7 +1,7 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-Future<String?> showInputExternApiLinkDialog(BuildContext context) async {
+Future<String?> showInputExternalApiLinkDialog(BuildContext context) async {
   TextEditingController textEditingController = TextEditingController();
   String? result;
 

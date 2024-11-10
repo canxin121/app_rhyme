@@ -1,7 +1,7 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-Future<bool> showExternApiUpdateDialog(BuildContext context) async {
+Future<bool> showExternalApiUpdateDialog(BuildContext context) async {
   final Brightness brightness = MediaQuery.of(context).platformBrightness;
   final bool isDarkMode = brightness == Brightness.dark;
 

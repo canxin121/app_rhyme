@@ -1,6 +1,6 @@
+import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/desktop/comps/control_bar.dart';
 import 'package:app_rhyme/desktop/comps/navigation_column.dart';
-import 'package:app_rhyme/desktop/pages/local_music_list_gridview_page.dart';
 import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
@@ -13,10 +13,10 @@ class DesktopHome extends StatefulWidget {
   const DesktopHome({super.key});
 
   @override
-  _DesktopHomeState createState() => _DesktopHomeState();
+  DesktopHomeState createState() => DesktopHomeState();
 }
 
-class _DesktopHomeState extends State<DesktopHome> {
+class DesktopHomeState extends State<DesktopHome> {
   @override
   void initState() {
     super.initState();
@@ -48,8 +48,7 @@ class _DesktopHomeState extends State<DesktopHome> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      child: SafeArea(
-          child: Row(
+      child: Row(
         children: [
           const MyNavListContainer(),
           Expanded(
@@ -66,7 +65,9 @@ class _DesktopHomeState extends State<DesktopHome> {
                       return CupertinoPageRoute(
                         builder: (context) {
                           globalDesktopPageContext = context;
-                          return const DesktopLocalMusicListGridPage();
+                          return const DbPlaylistCollectionPage(
+                            isDesktop: true,
+                          );
                         },
                       );
                     },
@@ -76,7 +77,7 @@ class _DesktopHomeState extends State<DesktopHome> {
             ),
           ),
         ],
-      )),
+      ),
     );
   }
 }

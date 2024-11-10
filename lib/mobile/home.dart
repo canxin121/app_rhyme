@@ -1,8 +1,9 @@
+import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
-import 'package:app_rhyme/mobile/pages/search_page/combined_search_page.dart';
 import 'package:app_rhyme/mobile/comps/play_display_comp/music_control_bar.dart';
-import 'package:app_rhyme/mobile/pages/local_music_list_gridview_page.dart';
-import 'package:app_rhyme/pages/more_page.dart';
+import 'package:app_rhyme/common_pages/setting_page.dart';
+import 'package:app_rhyme/mobile/pages/explore_page.dart';
+import 'package:app_rhyme/mobile/pages/search_page.dart';
 import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,17 +19,24 @@ class MobileHome extends StatefulWidget {
 }
 
 class MobileHomeState extends State<MobileHome> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
+
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
 
   final List<Widget> _pages = [
-    const LocalMusicListGridPage(),
-    const CombinedSearchPage(),
-    const MorePage(),
+    const MobileExplorePage(),
+    const SearchPageMobile(),
+    const DbPlaylistCollectionPage(
+      isDesktop: false,
+    ),
+    const SettingPage(
+      isDesktop: false,
+    ),
   ];
 
   @override
@@ -65,6 +73,15 @@ class MobileHomeState extends State<MobileHome> {
     return false;
   }
 
+  BottomNavigationBarItem buildBottomNavigationBarItem(IconData iconData) {
+    return BottomNavigationBarItem(
+      icon: Padding(
+        padding: EdgeInsets.only(top: 10, bottom: 10),
+        child: Icon(iconData),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Brightness brightness = MediaQuery.of(context).platformBrightness;
@@ -74,6 +91,7 @@ class MobileHomeState extends State<MobileHome> {
         : const Color.fromARGB(255, 209, 209, 209);
     return CupertinoPageScaffold(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Expanded(
             child: IndexedStack(
@@ -92,7 +110,6 @@ class MobileHomeState extends State<MobileHome> {
               }).toList(),
             ),
           ),
-          // 页面底部的音乐控制栏和底部导航栏
           KeyboardVisibilityBuilder(
             builder: (p0, isKeyboardVisible) => isKeyboardVisible
                 ? const SizedBox(
@@ -102,7 +119,7 @@ class MobileHomeState extends State<MobileHome> {
                 : Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const MusicControlBar(maxHeight: 60),
+                      const MusicControlBar(height: 60),
                       Center(
                         child: Divider(
                           color: dividerColor,
@@ -116,27 +133,13 @@ class MobileHomeState extends State<MobileHome> {
                             _selectedIndex = index;
                           });
                         },
-                        items: const [
-                          BottomNavigationBarItem(
-                            icon: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: Icon(
-                                CupertinoIcons.music_albums_fill,
-                              ),
-                            ),
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: Icon(CupertinoIcons.search),
-                            ),
-                          ),
-                          BottomNavigationBarItem(
-                            icon: Padding(
-                              padding: EdgeInsets.only(top: 10, bottom: 10),
-                              child: Icon(CupertinoIcons.settings),
-                            ),
-                          ),
+                        items: [
+                          buildBottomNavigationBarItem(
+                              CupertinoIcons.music_note),
+                          buildBottomNavigationBarItem(CupertinoIcons.search),
+                          buildBottomNavigationBarItem(
+                              CupertinoIcons.music_albums),
+                          buildBottomNavigationBarItem(CupertinoIcons.settings),
                         ],
                         activeColor: activeIconRed,
                       ),

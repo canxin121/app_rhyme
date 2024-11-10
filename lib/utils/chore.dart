@@ -2,11 +2,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 List<T> shuffleList<T>(List<T> items) {
@@ -24,7 +22,7 @@ List<T> shuffleList<T>(List<T> items) {
   return shuffledItems;
 }
 
-void openProjectLink() async {
+void openProjectRepoLink() async {
   Uri uri = Uri.parse("https://github.com/canxin121/app_rhyme");
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri);
@@ -36,20 +34,6 @@ void openProjectLink() async {
   }
 }
 
-Future<String?> pickDirectory() async {
-  // 请求存储权限
-  if (await Permission.manageExternalStorage.request().isGranted) {
-    // 使用file_picker选择目录
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    return selectedDirectory;
-  } else {
-    // 权限被拒绝
-    LogToast.error("未授予存储权限", "请在设置中授予AppRhyme存储权限",
-        "[pickDirectory] Storage permission not granted");
-    return null;
-  }
-}
-
 Future<void> exitApp() async {
   if (Platform.isAndroid || Platform.isIOS) {
     await FlutterExitApp.exitApp(iosForceExit: true);
@@ -58,19 +42,23 @@ Future<void> exitApp() async {
   }
 }
 
-bool? globalIsTablet;
-bool isTablet(BuildContext context) {
-  if (globalIsTablet != null) {
-    return globalIsTablet!;
+bool? globalIsTouchScreenTablet;
+bool isTouchScreenDesktop(BuildContext context) {
+  if (isDesktopDevice()) {
+    return false;
+  }
+
+  if (globalIsTouchScreenTablet != null) {
+    return globalIsTouchScreenTablet!;
   }
   final mediaQuery = MediaQuery.of(context);
   final size = mediaQuery.size;
   final diagonal = sqrt(size.width * size.width + size.height * size.height);
-  globalIsTablet = diagonal > 600;
-  return globalIsTablet!;
+  globalIsTouchScreenTablet = diagonal > 600;
+  return globalIsTouchScreenTablet!;
 }
 
-bool isDesktop() {
+bool isDesktopDevice() {
   return Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 }
 

@@ -1,3 +1,4 @@
+import 'package:app_rhyme/utils/colors.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -6,14 +7,14 @@ import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 
 class MusicControlBar extends StatefulWidget {
-  final double maxHeight;
-  const MusicControlBar({super.key, required this.maxHeight});
+  final double height;
+  const MusicControlBar({super.key, required this.height});
 
   @override
-  _MusicControlBarState createState() => _MusicControlBarState();
+  MusicControlBarState createState() => MusicControlBarState();
 }
 
-class _MusicControlBarState extends State<MusicControlBar>
+class MusicControlBarState extends State<MusicControlBar>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -41,12 +42,9 @@ class _MusicControlBarState extends State<MusicControlBar>
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
     final Color textColor =
         isDarkMode ? CupertinoColors.white : CupertinoColors.black;
-    final Color backgroundColor =
-        isDarkMode ? CupertinoColors.black : CupertinoColors.white;
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: widget.maxHeight,
-      ),
+
+    return SizedBox(
+      height: widget.height,
       child: GestureDetector(
         onVerticalDragUpdate: (details) {
           if (details.delta.dy < 0) {
@@ -57,21 +55,30 @@ class _MusicControlBarState extends State<MusicControlBar>
           navigateToSongDisplayPage(context);
         },
         child: Container(
-          color: backgroundColor,
+          color: getBackgroundColor(false, isDarkMode),
           child: Row(
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(6.0),
-                  child: Obx(() => imageCacheHelper(
-                      globalAudioHandler.playingMusic.value?.info.artPic)),
+                  child: Obx(() => SizedBox(
+                        width: widget.height - 16, // 确保图片是正方形
+                        height: widget.height - 16,
+                        child: imageWithCache(
+                          globalAudioHandler.playingMusic.value?.currentMusic
+                              .getCover(size: 250),
+                          height: widget.height - 16,
+                          width: widget.height - 16,
+                        ),
+                      )),
                 ),
               ),
               Expanded(
                 child: Obx(
                   () => Text(
-                    globalAudioHandler.playingMusic.value?.info.name ?? "Music",
+                    globalAudioHandler.playingMusic.value?.currentMusic.name ??
+                        "Music",
                     style: TextStyle(fontSize: 15.0, color: textColor)
                         .useSystemChineseFont(),
                     textAlign: TextAlign.left,

@@ -1,100 +1,156 @@
-use std::path::PathBuf;
-
-use flutter_rust_bridge::frb;
-use music_api::MusicInfo;
-
+use super::file_cache::{cache_file_from_content, cache_file_from_uri};
 use crate::api::{
-    types::playinfo::PlayInfo,
-    utils::path_util::{get_root_path, url_encode_special_chars},
-    CONFIG,
+    types::playinfo::PlayInfo, utils::path_util::url_encode_special_chars, APP_RHYME_FOLDER,
+    MUSIC_FOLDER, PLAYINFO_FOLDER,
 };
+use flutter_rust_bridge::frb;
+use std::{path::PathBuf, str::FromStr};
 
-use super::file_cache::cache_file;
-
-#[frb(ignore)]
-async fn gen_json_file_name(music_info: &MusicInfo) -> Result<PathBuf, anyhow::Error> {
-    let file_name = format!(
-        "{}_{}_{}.json",
-        music_info.name,
-        music_info.artist.join(","),
-        music_info.duration.unwrap_or(0)
-    );
-    let file_name = url_encode_special_chars(&file_name);
-    let mut path = get_root_path().await?;
-    path.push("Music");
-    path.push("MetaData");
-    path.push(file_name);
-    Ok(path)
-}
-
-#[frb(ignore)]
-async fn gen_music_path(filename: &str) -> Result<PathBuf, anyhow::Error> {
-    let mut path = get_root_path().await?;
-    path.push("Music");
-    path.push(filename);
-    Ok(path)
-}
-
-pub async fn has_cache_playinfo(music_info: &MusicInfo) -> Result<bool, anyhow::Error> {
-    let path = gen_json_file_name(music_info).await?;
-    Ok(path.exists())
-}
-
-pub async fn get_cache_playinfo(music_info: &MusicInfo) -> Result<PlayInfo, anyhow::Error> {
-    let path = gen_json_file_name(music_info).await?;
-    if path.exists() {
-        let file = std::fs::File::open(path)?;
-        let reader = std::io::BufReader::new(file);
-        let cache: PlayInfo = serde_json::from_reader(reader)?;
-        Ok(cache)
-    } else {
-        Err(anyhow::anyhow!("File not found"))
-    }
-}
-
-pub async fn cache_music(music_info: &MusicInfo, playinfo: &PlayInfo) -> Result<(), anyhow::Error> {
-    let mut playinfo = playinfo.clone();
-    let config = CONFIG.read().await;
-    let config = config.as_ref().ok_or(anyhow::anyhow!("Config not found"))?;
-    let music_filename = format!(
-        "{}_{}_{}.{}",
-        music_info.name,
-        music_info.artist.join(","),
-        music_info.duration.unwrap_or(0),
+fn format_music_file_name(name: &str, artists: &str, playinfo: &PlayInfo) -> String {
+    url_encode_special_chars(&format!(
+        "{}_{}.{}",
+        name,
+        artists,
         playinfo
             .quality
             .format
             .clone()
-            .unwrap_or("unknown".to_string().replace("\r", ""))
-    );
-    let music_filename = url_encode_special_chars(&music_filename);
-    let music_path = cache_file(
+            .unwrap_or("unknown".to_string())
+    ))
+}
+
+async fn format_music_meta_file_path(
+    document_folder: &str,
+    custom_cache_root: Option<String>,
+    name: &str,
+    artists: &str,
+) -> Result<PathBuf, anyhow::Error> {
+    Ok(match custom_cache_root {
+        Some(custom_cache_root) => PathBuf::from_str(&custom_cache_root)?,
+        None => PathBuf::from_str(document_folder)?,
+    }
+    .join(APP_RHYME_FOLDER)
+    .join(MUSIC_FOLDER)
+    .join(PLAYINFO_FOLDER)
+    .join(url_encode_special_chars(&format!(
+        "{}_{}.json",
+        name, artists
+    ))))
+}
+
+#[frb]
+pub async fn has_cache_music(
+    document_folder: &str,
+    custom_cache_root: Option<String>,
+    name: String,
+    artists: String,
+) -> bool {
+    format_music_meta_file_path(document_folder, custom_cache_root, &name, &artists)
+        .await
+        .ok()
+        .map(|path| path.exists())
+        .unwrap_or(false)
+}
+
+/// get cached music playinfo and lyric
+#[frb]
+pub async fn get_cache_music(
+    document_folder: &str,
+    custom_cache_root: Option<String>,
+    name: String,
+    artists: String,
+) -> Option<(PlayInfo, String)> {
+    let playinfo = {
+        let path = format_music_meta_file_path(document_folder, custom_cache_root, &name, &artists)
+            .await
+            .ok()?;
+
+        if path.exists() {
+            let content_str = tokio::fs::read_to_string(path).await.ok()?;
+            let playinfo: PlayInfo = serde_json::from_str(&content_str).ok()?;
+            Some(playinfo)
+        } else {
+            None
+        }
+    }?;
+    let lyric_path = PathBuf::from(&playinfo.uri);
+    let lyric_path = lyric_path.with_extension("lrc");
+    let lyric = tokio::fs::read_to_string(lyric_path).await.ok()?;
+    Some((playinfo, lyric))
+}
+
+pub async fn cache_music(
+    document_folder: &str,
+    custom_cache_root: Option<String>,
+    name: String,
+    artists: String,
+    playinfo: &PlayInfo,
+    lyric: Option<String>,
+) -> Result<(), anyhow::Error> {
+    let mut playinfo = playinfo.clone();
+
+    // cache music file
+    let cached_music_path = cache_file_from_uri(
+        document_folder,
         &playinfo.uri,
-        "Music",
-        Some(music_filename),
-        config.export_cache_root.clone(),
+        MUSIC_FOLDER,
+        Some(url_encode_special_chars(&format_music_file_name(
+            &name, &artists, &playinfo,
+        ))),
+        custom_cache_root.clone(),
     )
     .await?;
-    playinfo.uri = music_path;
 
-    let path = gen_json_file_name(&music_info).await?;
-    // 如果file的父目录不存在，就创建
-    if let Some(parent) = path.parent() {
+    playinfo.uri = cached_music_path;
+
+    // cache lyric file
+    if let Some(lyric) = lyric {
+        let lyric_filename = PathBuf::from(&playinfo.uri).with_extension("lrc");
+        cache_file_from_content(
+            document_folder,
+            lyric,
+            MUSIC_FOLDER,
+            lyric_filename.to_string_lossy().to_string(),
+            custom_cache_root.clone(),
+        )
+        .await?;
+    }
+
+    // save music meta info
+    let music_meta_json_path =
+        format_music_meta_file_path(document_folder, custom_cache_root, &name, &artists).await?;
+    if let Some(parent) = music_meta_json_path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let file = std::fs::File::create(&path)?;
-    let writer = std::io::BufWriter::new(file);
-    serde_json::to_writer(writer, &playinfo)?;
+
+    let playinfo_json = serde_json::to_string(&playinfo)?;
+    tokio::fs::write(music_meta_json_path, playinfo_json).await?;
     Ok(())
 }
 
-pub async fn delete_music_cache(music_info: &MusicInfo) -> Result<(), anyhow::Error> {
-    let path = gen_json_file_name(music_info).await?;
+pub async fn delete_music_cache(
+    document_folder: &str,
+    custom_cache_root: Option<String>,
+    name: &str,
+    artists: &str,
+) -> Result<(), anyhow::Error> {
+    let path =
+        format_music_meta_file_path(document_folder, custom_cache_root, name, artists).await?;
     if path.exists() {
-        let file = std::fs::File::open(&path)?;
-        let reader = std::io::BufReader::new(file);
-        let playinfo: PlayInfo = serde_json::from_reader(reader)?;
-        let _ = tokio::fs::remove_file(playinfo.uri).await;
+        let file_content = tokio::fs::read_to_string(&path).await?;
+        let playinfo: PlayInfo = serde_json::from_str(&file_content)?;
+
+        let music_path = PathBuf::from_str(&playinfo.uri)?;
+        if music_path.exists() {
+            tokio::fs::remove_file(&music_path).await?;
+        }
+
+        let mut lyric_path = music_path.clone();
+        lyric_path.set_extension("lrc");
+        if lyric_path.exists() {
+            tokio::fs::remove_file(&lyric_path).await?;
+        }
+
         tokio::fs::remove_file(path).await?;
     }
     Ok(())

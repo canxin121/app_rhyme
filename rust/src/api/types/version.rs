@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use flutter_rust_bridge::frb;
-use music_api::util::CLIENT;
+use music_api::CLIENT;
 use reqwest::header::{HeaderValue, USER_AGENT};
 use serde::{Deserialize, Serialize};
 

@@ -1,7 +1,7 @@
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-Widget buildButton(BuildContext context,
+Widget buildMobileRedButton(BuildContext context,
     {required IconData icon,
     required String label,
     required VoidCallback onPressed}) {

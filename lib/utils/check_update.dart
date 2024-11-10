@@ -27,47 +27,47 @@ Future<void> checkVersionUpdate(BuildContext context, bool toast) async {
   }
 }
 
-Future<void> checkExternApiUpdate(BuildContext context, bool toast) async {
+Future<void> checkExternalApiUpdate(BuildContext context, bool toast) async {
   try {
-    if (globalConfig.externApi != null &&
-        globalConfig.externApi!.url != null &&
-        globalConfig.externApi!.url!.isNotEmpty) {
+    if (globalConfig.externalApi != null &&
+        globalConfig.externalApi!.url != null &&
+        globalConfig.externalApi!.url!.isNotEmpty) {
       if (toast) {
         LogToast.info("检查自定义源更新", "正在加载数据,请稍等",
-            "[checkExternApiUpdate] Checking custom source update");
+            "[checkExternalApiUpdate] Checking custom source update");
       }
-      var externApi = await globalConfig.externApi!.fetchUpdate();
-      if (externApi != null) {
+      var externalApi = await globalConfig.externalApi!.fetchUpdate();
+      if (externalApi != null) {
         if (context.mounted) {
-          if (await showExternApiUpdateDialog(context)) {
-            globalConfig.externApi = externApi;
-            await globalConfig.save();
-            globalExternApiEvaler =
-                ExternApiEvaler(globalConfig.externApi!.localPath);
+          if (await showExternalApiUpdateDialog(context)) {
+            globalConfig.externalApi = externalApi;
+            await globalConfig.save(documentFolder: globalDocumentPath);
+            globalExternalApiEvaler =
+                ExternalApiEvaler(globalConfig.externalApi!.filePath);
             LogToast.success("自定义源更新", "更新自定义源成功",
-                "[checkExternApiUpdate] Successfully updated custom source");
+                "[checkExternalApiUpdate] Successfully updated custom source");
           }
         }
       } else {
         if (toast) {
           LogToast.info("自定义源更新", "当前自定义源无需更新",
-              "[checkExternApiUpdate] The current custom source does not need to be updated");
+              "[checkExternalApiUpdate] The current custom source does not need to be updated");
         }
       }
     }
   } catch (e) {
     LogToast.error("自定义源更新", "更新自定义源失败: $e",
-        "[checkExternApiUpdate] Failed to update custom source: $e");
+        "[checkExternalApiUpdate] Failed to update custom source: $e");
   }
 }
 
 Future<void> autoCheckUpdate(BuildContext context) async {
-  if (globalConfig.versionAutoUpdate) {
+  if (globalConfig.updateConfig.versionAutoUpdate) {
     await checkVersionUpdate(context, false);
   }
-  if (globalConfig.externApiAutoUpdate) {
+  if (globalConfig.updateConfig.externalApiAutoUpdate) {
     if (context.mounted) {
-      await checkExternApiUpdate(context, false);
+      await checkExternalApiUpdate(context, false);
     }
   }
 }

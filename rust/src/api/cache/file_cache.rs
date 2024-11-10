@@ -1,14 +1,13 @@
 use anyhow::Result;
 use futures::StreamExt as _;
-use music_api::util::CLIENT;
+use music_api::CLIENT;
 use std::hash::{DefaultHasher, Hash as _, Hasher as _};
 use std::path::PathBuf;
-use std::thread::sleep;
-use std::time::Duration;
-use tokio::io::AsyncWriteExt;
+use std::str::FromStr;
+use tokio::io::AsyncWriteExt as _;
 
 use crate::api::utils::path_util::url_encode_special_chars;
-use crate::api::ROOT_PATH;
+use crate::api::APP_RHYME_FOLDER;
 
 use super::FILE_OP_SEMAPHORE;
 
@@ -20,132 +19,148 @@ pub fn gen_hash(str_: &str) -> String {
     format!("{:x}", hasher.finish())
 }
 
+/// cache file
+/// uri: file path or url
+/// filename: file name, if None, use hash value
+/// custom_cache_root: custom storage path, if None, use root path of the app
 #[flutter_rust_bridge::frb]
-pub async fn cache_file(
-    file: &str,
-    cache_path: &str,
+pub async fn cache_file_from_uri(
+    document_folder: &str,
+    uri: &str,
+    cache_folder: &str,
     filename: Option<String>,
-    export_root: Option<String>,
+    custom_cache_root: Option<String>,
 ) -> Result<String, anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
     let filename = match filename {
-        None => gen_hash(file),
+        None => gen_hash(uri),
         Some(filename) => url_encode_special_chars(&filename),
     };
-    let mut root_path = match export_root {
+
+    let cache_folder_path = match custom_cache_root {
         Some(export_root) => export_root.into(),
-        None => ROOT_PATH.read().await.clone(),
-    };
+        None => PathBuf::from_str(document_folder)?,
+    }
+    .join(APP_RHYME_FOLDER)
+    .join(cache_folder);
 
-    root_path.push(cache_path);
-
-    if !root_path.exists() {
-        tokio::fs::create_dir_all(&root_path).await?;
+    if !cache_folder_path.exists() {
+        tokio::fs::create_dir_all(&cache_folder_path).await?;
     }
 
-    let filepath = root_path
-        .join(&filename)
-        .to_string_lossy()
-        .to_string()
-        .replace("\r", "");
-
-    if file.starts_with("http") {
-        let response = CLIENT.get(file).send().await?;
+    let file_path = cache_folder_path.join(&filename);
+    if (file_path.exists()) {
+        tokio::fs::remove_file(&file_path).await?;
+    }
+    if uri.starts_with("http") {
+        let response = CLIENT.get(uri).send().await?;
         let mut stream = response.bytes_stream();
-        let mut file = tokio::fs::File::create(&filepath).await?;
+        let mut file = tokio::fs::File::create(&file_path).await?;
         while let Some(chunk) = stream.next().await {
             let data = chunk?;
             file.write_all(&data).await?;
         }
     } else {
-        tokio::fs::copy(file, &filepath).await?;
+        tokio::fs::copy(uri, &file_path).await?;
     }
 
-    Ok(filepath)
+    Ok(file_path.to_string_lossy().to_string())
 }
 
+/// cache file from content
+/// content: file content
+/// filename: file name
+/// custom_cache_root: custom storage path, if None, use root path of the app
+pub async fn cache_file_from_content(
+    document_folder: &str,
+    content: String,
+    cache_folder: &str,
+    filename: String,
+    custom_cache_root: Option<String>,
+) -> Result<String, anyhow::Error> {
+    let _ = FILE_OP_SEMAPHORE.acquire().await?;
+
+    let cache_folder_path = match custom_cache_root {
+        Some(export_root) => export_root.into(),
+        None => PathBuf::from_str(document_folder)?,
+    }
+    .join(APP_RHYME_FOLDER)
+    .join(cache_folder);
+
+    if !cache_folder_path.exists() {
+        tokio::fs::create_dir_all(&cache_folder_path).await?;
+    }
+
+    let file_path = cache_folder_path.join(&filename);
+
+    let mut file = tokio::fs::File::create(&file_path).await?;
+    file.write_all(content.as_bytes()).await?;
+
+    Ok(file_path.to_string_lossy().to_string())
+}
+
+// get cached file path from uri
+// uri: file path or url
+// root: root path of the app
+// filename: file name, if None, use hash value
+// custom_cache_root: custom storage path, if None, use root path of the app
 #[flutter_rust_bridge::frb(sync)]
-pub fn use_cache_file(
-    file: &str,
-    cache_path: &str,
+pub fn get_cache_file_from_uri(
+    document_folder: &str,
+    uri: &str,
+    cache_folder: &str,
     filename: Option<String>,
-    export_root: Option<String>,
+    custom_cache_root: Option<String>,
 ) -> Option<String> {
     let filename = match filename {
-        None => gen_hash(file),
+        None => gen_hash(uri),
         Some(filename) => url_encode_special_chars(&filename),
     };
 
-    let mut attempts = 0;
-    let max_attempts = 5;
-    let mut root_path = match export_root {
-        Some(export_root) => {
-            let mut root_path: PathBuf = export_root.into();
-            root_path.push(cache_path);
-            let filepath = root_path.join(&filename);
+    let file_path = match custom_cache_root {
+        Some(export_root) => export_root.into(),
+        None => PathBuf::from_str(document_folder).ok()?,
+    }
+    .join(APP_RHYME_FOLDER)
+    .join(cache_folder)
+    .join(filename);
 
-            if filepath.exists() {
-                return Some(filepath.to_string_lossy().into_owned());
-            } else {
-                None
-            }
-        }
-        None => {
-            let mut root = None;
-
-            while attempts < max_attempts {
-                match ROOT_PATH.try_read() {
-                    Ok(lock) => {
-                        root = Some(lock.clone());
-                        break;
-                    }
-                    Err(_) => {
-                        attempts += 1;
-                        sleep(Duration::from_millis(10)); // 等待 10 毫秒后重试
-                    }
-                }
-            }
-
-            let root = root;
-            root
-        }
-    }?;
-
-    root_path.push(cache_path);
-    let filepath = root_path.join(&filename);
-
-    if filepath.exists() {
-        Some(filepath.to_string_lossy().into_owned())
+    if file_path.exists() {
+        Some(file_path.to_string_lossy().into_owned())
     } else {
         None
     }
 }
 
+// delete cached file
+// uri: file path or url
+// filename: file name, if None, use hash value
+// custom_cache_root: custom storage path, if None, use root path of the app
 #[flutter_rust_bridge::frb]
-pub async fn delete_cache_file(
-    file: &str,
-    cache_path: &str,
+pub async fn delete_cache_file_with_uri(
+    document_folder: &str,
+    uri: &str,
+    cache_folder: &str,
     filename: Option<String>,
-    export_root: Option<String>,
+    custom_cache_root: Option<String>,
 ) -> Result<(), anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
 
     let filename = match filename {
-        None => gen_hash(file),
+        None => gen_hash(uri),
         Some(filename) => url_encode_special_chars(&filename),
     };
 
-    let mut root_path = match export_root {
+    let file_path = match custom_cache_root {
         Some(export_root) => export_root.into(),
-        None => ROOT_PATH.read().await.clone(),
-    };
+        None => PathBuf::from_str(document_folder)?,
+    }
+    .join(APP_RHYME_FOLDER)
+    .join(cache_folder)
+    .join(&filename);
 
-    root_path.push(cache_path);
-
-    let filepath = root_path.join(&filename);
-
-    if filepath.exists() {
-        tokio::fs::remove_file(&filepath).await?;
+    if file_path.exists() {
+        tokio::fs::remove_file(&file_path).await?;
         Ok(())
     } else {
         Err(anyhow::Error::new(std::io::Error::new(

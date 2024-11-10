@@ -1,5 +1,5 @@
 use flutter_rust_bridge::frb;
-use music_api::Quality;
+use music_api::interface::quality::Quality;
 use serde::{Deserialize, Serialize};
 
 #[frb]

@@ -7,28 +7,61 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-anyhow = "1.0.86"
-flutter_rust_bridge = { version = "=2.0.0", features = ["chrono"] }
-lazy_static = "1.5.0"
-music_api = { git = "https://github.com/canxin121/music_api" }
-# music_api = {path = "D:\\Git\\music_api"}
+flutter_rust_bridge = { version = "=2.5.1", features = ["chrono"] }
 rayon = "1.10.0"
-sea-query = "0.30.7"
-serde = "1.0.203"
-sqlx = "0.7.4"
-tokio = { version = "1.38.0", features = ["full"] }
-reqwest = { version = "0.12.5", features = [
+futures = "0.3.31"
+futures-util = "0.3.31"
+chrono = { version = "0.4.38", features = ["serde"] }
+base64 = "0.22.1"
+rc4 = { git = "https://github.com/rsdump/rc4" }
+aes = "0.8.4"
+cbc = "0.1.2"
+crypto = "0.5.1"
+ecb = "0.1.2"
+env_logger = "0.11.5"
+generic-array = "1.1.0"
+hex = "0.4.3"
+log = "0.4.22"
+md-5 = "0.10.6"
+once_cell = "1.20.2"
+rand = "0.8.5"
+regex = "1.11.1"
+reqwest = { version = "0.12.9", features = [
     "json",
     "rustls-tls",
     "rustls-tls-webpki-roots",
     "stream",
 ], default-features = false }
-futures = "0.3.30"
-reqwest-middleware = "0.3.1"
-reqwest-retry = "0.6.0"
-futures-util = "0.3.30"
-serde_json = "1.0.119"
-chrono = { version = "0.4.38", features = ["serde"] }
+reqwest-middleware = "0.3.3"
+reqwest-retry = "0.6.1"
+rsa = { version = "0.9.6", features = ["hazmat"] }
+sea-orm = { version = "1.1.0", default-features = false, features = [
+    "sqlx-sqlite",
+    "runtime-tokio-rustls",
+    "serde_json",
+    "with-json",
+] }
+sea-orm-migration = { version = "1.1.0", features = [
+    "sqlx-sqlite",
+    "runtime-tokio-rustls",
+], default-features = false }
+sea-query = { version = "0.32.0" }
+sea-query-binder = { version = "0.7.0", features = ["sqlx-any", "sqlx-sqlite"] }
+serde = { version = "1.0.214", features = ["derive"] }
+serde_json = "1.0.132"
 sha2 = "0.10.8"
-base64 = "0.22.1"
-rc4 = { git = "https://github.com/rsdump/rc4" }
+tokio = { version = "1.41.0", features = ["full"] }
+tracing-subscriber = "0.3.18"
+urlencoding = "2.1.3"
+music_api = { git = "https://github.com/canxin121/music_api" }
+anyhow = "1.0.92"
+
+[dev-dependencies]
+serial_test = "3.1.1"
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"
+codegen-units = 1
+panic = "abort"

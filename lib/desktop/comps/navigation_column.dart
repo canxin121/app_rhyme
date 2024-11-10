@@ -1,17 +1,22 @@
+import 'dart:async';
+
+import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
+import 'package:app_rhyme/common_pages/db_playlist_gridview_page.dart';
+import 'package:app_rhyme/desktop/pages/explore_page/music_chart_page.dart';
+import 'package:app_rhyme/desktop/pages/explore_page/playlist_tag_page.dart';
+import 'package:app_rhyme/desktop/pages/search_page/music_aggregator.dart';
+import 'package:app_rhyme/desktop/pages/search_page/playlist.dart';
 import 'package:app_rhyme/desktop/home.dart';
-import 'package:app_rhyme/desktop/pages/local_music_container_listview_page.dart';
-import 'package:app_rhyme/desktop/pages/local_music_list_gridview_page.dart';
-import 'package:app_rhyme/desktop/pages/search_pages/search_music_aggregator_page.dart';
-import 'package:app_rhyme/desktop/pages/search_pages/search_music_list_page.dart';
-import 'package:app_rhyme/pages/more_page.dart';
-import 'package:app_rhyme/src/rust/api/bind/factory_bind.dart';
-import 'package:app_rhyme/src/rust/api/bind/type_bind.dart';
+import 'package:app_rhyme/common_pages/setting_page.dart';
+import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
+import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
-void Function() globalDesktopMusicListNavColumnRefreshFunction = () {};
-void Function(Widget page) globalNavigatorToPage = (Widget page) {
+void Function() globalDesktopPopPage = () {};
+void Function(Widget page, {bool replace}) globalDesktopNavigatorToPage =
+    (Widget page, {bool replace = true}) {
   return;
 };
 void Function(String item) globalSetNavItemSelected = (String item) {};
@@ -41,7 +46,7 @@ class MyNavListContainer extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 16),
-                child: imageCacheHelper("", width: 30, height: 30),
+                child: imageWithCache("", width: 30, height: 30),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -65,38 +70,102 @@ class MyNavListView extends StatefulWidget {
   const MyNavListView({super.key});
 
   @override
-  _MyNavListViewState createState() => _MyNavListViewState();
+  MyNavListViewState createState() => MyNavListViewState();
 }
 
-class _MyNavListViewState extends State<MyNavListView> {
-  List<MusicListW> musicLists = [];
-
-  Future<void> refresh() async {
-    musicLists = await SqlFactoryW.getAllMusiclists();
-    setState(() {});
-  }
-
-  void navigatorToPage(Widget page) {
-    if (globalDesktopNavigatorKey.currentContext == null) return;
-    Navigator.of(globalDesktopNavigatorKey.currentContext!).push(
-      CupertinoPageRoute(
-        builder: (context) => NestedNavigator(child: page),
-      ),
-    );
-  }
+class MyNavListViewState extends State<MyNavListView> {
+  List<PlaylistCollection> playlistCollections = [];
+  late StreamSubscription<void>
+      playlistCollectionsPageRefreshStreamSubscription;
+  late StreamSubscription<int> playlistCollectionDeleteStreamSubscription;
+  late StreamSubscription<PlaylistCollection>
+      playlistCollectionUpdateStreamSubscription;
+  late StreamSubscription<PlaylistCollection>
+      playlistCollectionCreateStreamSubscription;
 
   @override
   void initState() {
-    refresh();
-    globalDesktopMusicListNavColumnRefreshFunction = refresh;
-    globalNavigatorToPage = navigatorToPage;
+    playlistCollectionsPageRefreshStreamSubscription =
+        playlistCollectionsPageRefreshStreamController.stream.listen((e) {
+      PlaylistCollection.getFormDb().then((e) {
+        setState(() {
+          playlistCollections = e;
+        });
+      });
+    });
+
+    playlistCollectionDeleteStreamSubscription =
+        playlistCollectionDeleteStreamController.stream.listen((p) {
+      setState(() {
+        playlistCollections.removeWhere((element) => element.id == p);
+      });
+    });
+
+    playlistCollectionUpdateStreamSubscription =
+        playlistCollectionUpdateStreamController.stream.listen((e) {
+      setState(() {
+        var index =
+            playlistCollections.indexWhere((element) => element.id == e.id);
+        if (index != -1) {
+          playlistCollections[index] = e;
+        } else {
+          playlistCollections.add(e);
+        }
+      });
+    });
+
+    playlistCollectionCreateStreamSubscription =
+        playlistCollectionCreateStreamController.stream.listen((e) {
+      setState(() {
+        playlistCollections.add(e);
+      });
+    });
+
+    globalDesktopNavigatorToPage = navigatorToPage;
+    globalDesktopPopPage = popPage;
+
+    PlaylistCollection.getFormDb().then((e) {
+      setState(() {
+        playlistCollections = e;
+      });
+    });
     super.initState();
   }
 
   @override
   void dispose() {
-    globalDesktopMusicListNavColumnRefreshFunction = () {};
+    playlistCollectionsPageRefreshStreamSubscription.cancel();
+    playlistCollectionDeleteStreamSubscription.cancel();
+    playlistCollectionUpdateStreamSubscription.cancel();
+    playlistCollectionCreateStreamSubscription.cancel();
+
+    globalDesktopNavigatorToPage = (Widget page, {bool replace = true}) {};
+    globalDesktopPopPage = () {};
     super.dispose();
+  }
+
+  void navigatorToPage(Widget page, {bool replace = true}) {
+    if (globalDesktopNavigatorKey.currentContext == null) return;
+    if (replace) {
+      Navigator.of(globalDesktopNavigatorKey.currentContext!).pushReplacement(
+        CupertinoPageRoute(
+          builder: (context) => NestedNavigator(child: page),
+        ),
+      );
+    } else {
+      Navigator.of(globalDesktopNavigatorKey.currentContext!).push(
+        CupertinoPageRoute(
+          builder: (context) => NestedNavigator(child: page),
+        ),
+      );
+    }
+  }
+
+  void popPage() {
+    var navigator = Navigator.of(globalDesktopNavigatorKey.currentContext!);
+    if (navigator.canPop()) {
+      navigator.pop();
+    }
   }
 
   @override
@@ -104,20 +173,65 @@ class _MyNavListViewState extends State<MyNavListView> {
     return NavListView(
       initSelectedItem: '所有播放列表',
       children: [
+        NavItem(
+          title: '设置',
+          icon: CupertinoIcons.settings,
+          onTap: () {
+            globalSetNavItemSelected("###Setting###");
+            navigatorToPage(
+              const SettingPage(
+                isDesktop: true,
+              ),
+            );
+          },
+          identity: '###Setting###',
+        ),
+        NavGroup(title: "浏览", icon: CupertinoIcons.compass, items: [
+          NavItem(
+            title: '歌曲排行榜',
+            icon: CupertinoIcons.music_note_2,
+            onTap: () {
+              globalSetNavItemSelected("###MusicChart###");
+              navigatorToPage(const MusicChartPage(
+                isDesktop: true,
+              ));
+            },
+            identity: '###MusicChart###',
+          ),
+          NavItem(
+            title: '浏览歌单',
+            icon: CupertinoIcons.music_albums,
+            onTap: () {
+              globalSetNavItemSelected("###PlaylistTag###");
+              navigatorToPage(const PlaylistTagPage(
+                isDesktop: true,
+              ));
+            },
+            identity: "###PlaylistTag###",
+          ),
+        ]),
         NavGroup(title: "搜索", icon: CupertinoIcons.search, items: [
           NavItem(
             title: '搜索单曲',
-            icon: CupertinoIcons.search,
+            icon: CupertinoIcons.music_note_2,
             onTap: () {
-              navigatorToPage(const SearchMusicAggregatorPage());
+              globalSetNavItemSelected("###SearchSingleMusicAggregator###");
+              navigatorToPage(const MusicAggregatorSearchPage(
+                isDesktop: true,
+              ));
             },
+            identity: '###SearchSingleMusicAggregator###',
           ),
           NavItem(
             title: '搜索歌单',
-            icon: CupertinoIcons.search,
+            icon: CupertinoIcons.music_albums,
             onTap: () {
-              navigatorToPage(const SearchMusicListPage());
+              globalSetNavItemSelected("###SearchMusicList###");
+              navigatorToPage(const PlaylistSearchPage(
+                isDesktop: true,
+              ));
             },
+            identity: "###SearchMusicList###",
           )
         ]),
         NavGroup(
@@ -125,41 +239,40 @@ class _MyNavListViewState extends State<MyNavListView> {
           icon: CupertinoIcons.music_note,
           items: [
             NavItem(
-              title: '所有播放列表',
+              title: '所有歌单列表',
               icon: CupertinoIcons.music_albums,
               onTap: () {
+                globalSetNavItemSelected("###AllPlaylistCollection###");
                 navigatorToPage(
-                  const DesktopLocalMusicListGridPage(),
+                  const DbPlaylistCollectionPage(
+                    isDesktop: true,
+                  ),
                 );
               },
+              identity: '###AllPlaylistCollection###',
             ),
-            ...musicLists.map(
-              (e) {
-                var title = e.getMusiclistInfo().name;
+            ...playlistCollections.map(
+              (pc) {
+                var title = pc.name;
                 return NavItem(
                   title: title,
                   icon: CupertinoIcons.music_albums,
                   onTap: () {
-                    globalSetNavItemSelected(title);
-                    navigatorToPage(
-                      LocalMusicContainerListPage(
-                        musicList: e,
-                      ),
-                    );
+                    globalSetNavItemSelected(
+                        "###PlaylistCollection_${pc.id}###");
+                    pc
+                        .getPlaylistsFromDb()
+                        .then((pls) => navigatorToPage(DbPlaylistGridPage(
+                              isDesktop: true,
+                              playlists: pls,
+                              playlistCollection: pc,
+                            )));
                   },
+                  identity: "###PlaylistCollection_${pc.id}###",
                 );
               },
             )
           ],
-        ),
-        NavItem(
-          title: '设置',
-          icon: CupertinoIcons.settings,
-          onTap: () {
-            navigatorToPage(
-              const MorePage(),
-            );
-          },
         ),
       ],
     );
@@ -193,10 +306,10 @@ class NavListView extends StatefulWidget {
   });
 
   @override
-  _NavListViewState createState() => _NavListViewState();
+  NavListViewState createState() => NavListViewState();
 }
 
-class _NavListViewState extends State<NavListView> {
+class NavListViewState extends State<NavListView> {
   late String _selectedItem;
 
   void _setItemSelected(String title) {
@@ -231,11 +344,12 @@ class _NavListViewState extends State<NavListView> {
             return NavItem(
               title: item.title,
               icon: item.icon,
-              isSelected: _selectedItem == item.title,
+              isSelected: _selectedItem == item.identity,
               onTap: () {
                 _setItemSelected(item.title);
                 item.onTap();
               },
+              identity: '###Widget_$index###',
             );
           } else if (item is NavGroup) {
             return NavGroup(
@@ -275,10 +389,10 @@ class NavGroup extends StatefulWidget {
   });
 
   @override
-  _NavGroupState createState() => _NavGroupState();
+  NavGroupState createState() => NavGroupState();
 }
 
-class _NavGroupState extends State<NavGroup> {
+class NavGroupState extends State<NavGroup> {
   bool _isExpanded = true;
 
   @override
@@ -300,6 +414,7 @@ class _NavGroupState extends State<NavGroup> {
                 _isExpanded = !_isExpanded;
               });
             },
+            identity: '###NavGroup###',
           ),
         ),
         AnimatedCrossFade(
@@ -311,11 +426,12 @@ class _NavGroupState extends State<NavGroup> {
                 child: NavItem(
                   title: e.title,
                   icon: e.icon,
-                  isSelected: e.title == widget.selectedSubItem,
+                  isSelected: e.identity == widget.selectedSubItem,
                   onTap: () {
                     widget.onSubItemSelected?.call(e.title);
                     e.onTap();
                   },
+                  identity: '###NavGroup_###',
                 ),
               );
             }).toList(),
@@ -336,6 +452,7 @@ class NavItem extends StatefulWidget {
   final bool isSelected;
   final bool? isExpanded;
   final VoidCallback onTap;
+  final String identity;
 
   const NavItem({
     super.key,
@@ -344,13 +461,14 @@ class NavItem extends StatefulWidget {
     this.isSelected = false,
     this.isExpanded,
     required this.onTap,
+    required this.identity,
   });
 
   @override
-  _NavItemState createState() => _NavItemState();
+  NavItemState createState() => NavItemState();
 }
 
-class _NavItemState extends State<NavItem> {
+class NavItemState extends State<NavItem> {
   bool _isHovered = false;
 
   void _onHover(bool isHovered) {

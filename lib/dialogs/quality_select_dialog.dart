@@ -1,3 +1,4 @@
+import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
