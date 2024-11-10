@@ -7,13 +7,11 @@ jobs:
     name: Build and Push Android APKs
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      # Step 2: Fetch version from pubspec.yaml and set tag variable
       - name: Set version var
         id: vars
         run: |
@@ -21,7 +19,6 @@ jobs:
           app_version=$(yq eval '.version' pubspec.yaml)
           echo "app_version=$app_version" >> $GITHUB_OUTPUT
 
-      # Step 3: Set up signing files for APK
       - name: Set up signing files
         env:
           APK_SIGN_PWD: "${{ secrets.APK_SIGN_PWD }}"
@@ -31,7 +28,6 @@ jobs:
           chmod a+x tools/generate_jks_linux_amd64
           tools/generate_jks_linux_amd64
 
-      # Step 4: Replace keys in the project
       - name: Replace key
         env:
           SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
@@ -41,30 +37,25 @@ jobs:
           chmod a+x tools/key_replace_linux_amd64    
           tools/key_replace_linux_amd64
 
-      # Step 5: Install Rust (if required for build)
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      # Step 6: Set up Java (required for Flutter build)
       - uses: actions/setup-java@v4
         with:
           distribution: 'oracle'
           java-version: '17'
 
-      # Step 7: Set up Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable 
 
-      # Step 8: Build APK
       - name: Build APK
         run: flutter build apk --release    
 
       - name: Build APK (split per ABI)
         run: flutter build apk --release --split-per-abi
 
-      # Step 9: Rename APKs with version and commit SHA
       - name: Rename APKs
         run: |
           mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_unknown.apk
@@ -72,31 +63,30 @@ jobs:
           mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_arm64-v8a.apk
           mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_x86_64.apk
 
-      # Step 10: Upload APKs as artifacts
       - name: Upload APK (unknown)
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme_android_unknown
+          name: AppRhyme_android_unknown_${{ steps.vars.outputs.app_version }}
           path: build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_unknown.apk
           compression-level: 9
 
       - name: Upload APK (armeabi-v7a)
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme_android_armeabi-v7a
+          name: AppRhyme_android_armeabi-v7a_${{ steps.vars.outputs.app_version }}
           path: build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_armeabi-v7a.apk
           compression-level: 9
 
       - name: Upload APK (arm64-v8a)
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme_android_arm64-v8a
+          name: AppRhyme_android_arm64-v8a_${{ steps.vars.outputs.app_version }}
           path: build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_arm64-v8a.apk
           compression-level: 9
 
       - name: Upload APK (x86_64)
         uses: actions/upload-artifact@v4
         with:
-          name: AppRhyme_android_x86_64
+          name: AppRhyme_android_x86_64_${{ steps.vars.outputs.app_version }}
           path: build/app/outputs/flutter-apk/AppRhyme_android_${{ steps.vars.outputs.app_version }}_x86_64.apk
           compression-level: 9

@@ -12,13 +12,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-
+          
       - name: Fetch Version
         id: fetch_version
         run: |
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
-          echo "::set-output name=app_version::$app_version"
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
 
   build_and_push:
     name: Build and Push Macos Packages 

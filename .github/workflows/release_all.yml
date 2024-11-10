@@ -1,7 +1,8 @@
-name: Build All Packages 
+name: Release All Packages 
 on:
-  workflow_dispatch:
-    
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -20,7 +21,7 @@ jobs:
           app_version=$(yq eval '.version' pubspec.yaml)
           echo "app_version=$app_version" >> $GITHUB_OUTPUT
 
-  build_android_apks:
+  release_android_apks:
     name: Build and Push Android APKs
     needs: get_version
     runs-on: ubuntu-latest
@@ -73,36 +74,20 @@ jobs:
           mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_armeabi-v7a.apk
           mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_arm64-v8a.apk
           mv build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_x86_64.apk
-
-      - name: Upload APK (unknown)
-        uses: actions/upload-artifact@v4
+      
+      - name: Release Apks
+        uses: softprops/action-gh-release@v1
         with:
-          name: AppRhyme_android_unknown_${{ needs.get_version.outputs.app_version }}
-          path: build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_unknown.apk
-          compression-level: 9
+          files: >
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_unknown.apk
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_armeabi-v7a.apk
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_arm64-v8a.apk
+            build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_x86_64.apk
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: Upload APK (armeabi-v7a)
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme_android_armeabi-v7a_${{ needs.get_version.outputs.app_version }}
-          path: build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_armeabi-v7a.apk
-          compression-level: 9
-
-      - name: Upload APK (arm64-v8a)
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme_android_arm64-v8a_${{ needs.get_version.outputs.app_version }}
-          path: build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_arm64-v8a.apk
-          compression-level: 9
-
-      - name: Upload APK (x86_64)
-        uses: actions/upload-artifact@v4
-        with:
-          name: AppRhyme_android_x86_64_${{ needs.get_version.outputs.app_version }}
-          path: build/app/outputs/flutter-apk/AppRhyme_android_${{ needs.get_version.outputs.app_version }}_x86_64.apk
-          compression-level: 9
-
-  build_ios_ipa:
+  release_ios_ipa:
     name: Build and Push Ios Ipa
     needs: get_version
     runs-on: macos-latest
@@ -144,14 +129,17 @@ jobs:
           mv ./build/ios/iphoneos/Runner.app Payload
           zip -r -y AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa Payload/Runner.app
 
-      - name: Upload AppImage Package
-        uses: actions/upload-artifact@v4
+      - name: Release Ipa 
+        uses: softprops/action-gh-release@v1
         with:
-          name: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}_ipa
-          path: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa
-          compression-level: 9
+          files: >
+            AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
-  build_windows_setup_exe:
+
+  release_windows_setup_exe:
     name: Build and Push Windows Packages 
     needs: get_version
     runs-on: windows-latest
@@ -194,14 +182,16 @@ jobs:
         run: |
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
 
-      - name: Upload exe Package
-        uses: actions/upload-artifact@v4
+      - name: Release exe Package 
+        uses: softprops/action-gh-release@v1
         with:
-            name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_exe
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
-            compression-level: 9
+          files: >
+            dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
-  build_linux_packages:
+  release_linux_packages:
     name: Build and Push Linux Packages 
     needs: get_version
     runs-on: ubuntu-latest
@@ -248,29 +238,19 @@ jobs:
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.deb ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.rpm ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.AppImage ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage
-
-      - name: Upload deb Package
-        uses: actions/upload-artifact@v4
+      
+      - name: Release Packages 
+        uses: softprops/action-gh-release@v1
         with:
-            name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_deb
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
-            compression-level: 9
+          files: >
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage 
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: Upload rpm Package
-        uses: actions/upload-artifact@v4
-        with:
-            name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_rpm
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
-            compression-level: 9
-
-      - name: Upload AppImage Package
-        uses: actions/upload-artifact@v4
-        with:
-            name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_AppImage
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage
-            compression-level: 9
-
-  build_macos_package:
+  release_macos_package:
     name: Build and Push Macos Packages 
     needs: get_version
     runs-on: macos-latest
@@ -315,9 +295,11 @@ jobs:
         run: |
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.dmg ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
 
-      - name: Upload AppImage Package
-        uses: actions/upload-artifact@v4
+      - name: Release Dmg Package 
+        uses: softprops/action-gh-release@v1
         with:
-            name: AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}_dmg
-            path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
-            compression-level: 9
+          files: >
+            ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
+          prerelease: false
+          tag_name: ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.RELEASE_TOKEN }}

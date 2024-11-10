@@ -1,7 +1,7 @@
-name: Build Ios Ipa 
+name: Build Ios Ipa
 on:
   workflow_dispatch:
-    
+
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -18,10 +18,10 @@ jobs:
         run: |
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
-          echo "::set-output name=app_version::$app_version"
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
 
   build_and_push:
-    name: Build and Push Ios Ipa 
+    name: Build and Push Ios Ipa
     needs: get_version
     runs-on: macos-latest
     steps:
@@ -36,7 +36,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          chmod a+x tools/key_replace_macox_unknown    
+          chmod a+x tools/key_replace_macox_unknown
           tools/key_replace_macox_unknown
 
       - name: Install Rust
@@ -45,9 +45,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
+          channel: stable
 
-      - name: Flutter Build Ios 
+      - name: Flutter Build Ios
         run: |-
           flutter build ios --release --no-codesign --verbose
 
@@ -65,6 +65,6 @@ jobs:
       - name: Upload AppImage Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}_ipa
-            path: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa
-            compression-level: 9
+          name: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}_ipa
+          path: AppRhyme_ios_unknown_${{ needs.get_version.outputs.app_version }}.ipa
+          compression-level: 9
