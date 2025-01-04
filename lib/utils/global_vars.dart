@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:app_rhyme/types/audio_controller.dart';
 import 'package:app_rhyme/src/rust/api/init.dart';
 import 'package:app_rhyme/src/rust/api/types/config.dart';
@@ -27,13 +29,35 @@ Future<void> initGlobalVars() async {
   globalDocumentPath = (await getApplicationDocumentsDirectory()).path;
   // 初始化全局变量globalConfig
   globalConfig = await initBackend(documentFolder: globalDocumentPath);
+
+  // 如果没有配置外部API或API文件不存在,则加载内置API
+  if (globalConfig.externalApi == null || 
+      !File(globalConfig.externalApi?.filePath ?? "").existsSync()) {
+        
+    // 从assets中读取内置API文件
+    ByteData data = await rootBundle.load('lib/assets/api/custom_api_2.0.evc');
+    List<int> bytes = data.buffer.asUint8List();
+    
+    // 将文件写入应用文档目录
+    String apiPath = '$globalDocumentPath/builtin_api_2.0.evc';
+    await File(apiPath).writeAsBytes(bytes);
+    
+    // 更新配置
+    globalConfig.externalApi = ExternalApi(
+      filePath: apiPath,
+      url: "", // 留空表示使用内置API
+    );
+    await globalConfig.save(documentFolder: globalDocumentPath);
+  }
+
   // 初始化全局变量globalExternalApi
   if (globalConfig.externalApi != null) {
-    globalExternalApiEvaler =
+    globalExternalApiEvaler = 
         ExternalApiEvaler(globalConfig.externalApi!.filePath);
   } else {
     globalExternalApiEvaler = null;
   }
+
   // 初始化应用包信息
   globalPackageInfo = await PackageInfo.fromPlatform();
   // 监听网络状态变化
