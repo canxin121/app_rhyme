@@ -441,12 +441,12 @@ class StorageConfigPage extends StatefulWidget {
 
 class StorageConfigPageState extends State<StorageConfigPage>
     with WidgetsBindingObserver {
-  String StoragePath = "";
+  String storagePath = "";
 
   @override
   void initState() {
     super.initState();
-    StoragePath =
+    storagePath =
         globalConfig.getStorageFolder(documentFolder: globalDocumentPath);
     WidgetsBinding.instance.addObserver(this);
   }
@@ -498,7 +498,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
       globalConfig.storageConfig.customCacheRoot = newCustomCacheRoot;
       await globalConfig.save(documentFolder: globalDocumentPath);
       setState(() {
-        StoragePath =
+        storagePath =
             globalConfig.getStorageFolder(documentFolder: globalDocumentPath);
       });
     } finally {
@@ -564,7 +564,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
                                   alignment: Alignment.centerRight,
                                   height: 50,
                                   child: Text(
-                                    StoragePath,
+                                    storagePath,
                                     style: TextStyle(color: textColor)
                                         .useSystemChineseFont(),
                                   ))),

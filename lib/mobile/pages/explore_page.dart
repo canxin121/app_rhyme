@@ -17,8 +17,6 @@ extension ExploreSegmentExtension on ExploreSegment {
         return '音乐排行榜';
       case ExploreSegment.playlistTag:
         return '浏览歌单';
-      default:
-        return '';
     }
   }
 }

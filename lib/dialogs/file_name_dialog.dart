@@ -23,8 +23,8 @@ Future<String?> showFileNameDialog(BuildContext context, String suffix,
                 child: CupertinoTextField(
                   controller: controller,
                   placeholder: "请输入文件名",
-                  placeholderStyle:
-                      TextStyle(color: textColor.withOpacity(0.5)),
+                  placeholderStyle: TextStyle(
+                      color: textColor.withAlpha((255.0 * 0.5).round())),
                   style: TextStyle(color: textColor),
                   autofocus: true,
                 ),

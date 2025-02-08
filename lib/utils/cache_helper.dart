@@ -70,12 +70,14 @@ ExtendedImage imageWithCache(
       fit: BoxFit.cover,
       scale: scale,
       borderRadius: borderRadius,
-      enableMemoryCache: true,
     );
   }
 
-  String? uri =
-      _getFileCacheWithUriWrapper(url, picCacheFolder, cacheNow: enableCache,);
+  String? uri = _getFileCacheWithUriWrapper(
+    url,
+    picCacheFolder,
+    cacheNow: enableCache,
+  );
 
   if (uri.startsWith("http")) {
     return ExtendedImage.network(
@@ -87,7 +89,6 @@ ExtendedImage imageWithCache(
       fit: BoxFit.cover,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
-      enableMemoryCache: true,
       loadStateChanged: (state) {
         switch (state.extendedImageLoadState) {
           case LoadState.loading:
@@ -109,7 +110,6 @@ ExtendedImage imageWithCache(
               borderRadius: borderRadius,
               clearMemoryCacheIfFailed: true,
               clearMemoryCacheWhenDispose: true,
-              enableMemoryCache: true,
             );
         }
       },
@@ -124,7 +124,6 @@ ExtendedImage imageWithCache(
       fit: BoxFit.cover,
       scale: scale ?? 1.0,
       borderRadius: borderRadius,
-      enableMemoryCache: true,
       loadStateChanged: (state) {
         switch (state.extendedImageLoadState) {
           case LoadState.loading:
@@ -143,7 +142,6 @@ ExtendedImage imageWithCache(
               borderRadius: borderRadius,
               clearMemoryCacheIfFailed: true,
               clearMemoryCacheWhenDispose: true,
-              enableMemoryCache: true,
             );
         }
       },

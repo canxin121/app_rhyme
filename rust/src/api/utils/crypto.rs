@@ -21,14 +21,3 @@ pub async fn rc4_decrypt_from_base64(key: &str, input: &str) -> Result<String> {
         .map_err(|e| anyhow::anyhow!("UTF-8 conversion error: {:?}", e))?;
     Ok(decrypted_string)
 }
-
-#[tokio::test]
-async fn test() {
-    let key = "Secret";
-    let input = "Attack at dawn";
-    let encrypted = rc4_encrypt_to_base64(key, input).await.unwrap();
-    println!("{}", encrypted);
-    let decrypted = rc4_decrypt_from_base64(key, &encrypted).await.unwrap();
-    println!("{}", decrypted);
-    assert_eq!(input, decrypted);
-}

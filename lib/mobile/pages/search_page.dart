@@ -21,8 +21,6 @@ extension SearchSegmentExtension on SearchSegment {
         return '歌曲';
       case SearchSegment.playlist:
         return '歌单';
-      default:
-        return '';
     }
   }
 }

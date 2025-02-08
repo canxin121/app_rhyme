@@ -57,12 +57,6 @@ class AudioHandler {
     player.setLoopMode(LoopMode.all);
     player.setShuffleModeEnabled(false);
 
-    // use globalTalker to record all error logs
-    player.playbackEventStream.listen((event) {},
-        onError: (Object e, StackTrace stackTrace) {
-      globalTalker.error('[PlaybackEventStream Error] $e');
-    });
-
     // LazyLoad Music when index changed
     player.currentIndexStream.listen((index) async {
       MusicContainer? targetMusicContainer;

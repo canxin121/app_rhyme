@@ -1,7 +1,6 @@
 pub mod cache;
 pub mod init;
 pub mod music_api;
-pub mod plugin;
 pub mod types;
 pub mod utils;
 

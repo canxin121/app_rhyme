@@ -292,12 +292,15 @@ class _CustomCupertinoButtonState extends State<CustomCupertinoButton>
             : CupertinoDynamicColor.resolve(
                 CupertinoColors.placeholderText, context);
 
-    final Color effectiveFocusOutlineColor = widget.focusColor ??
-        HSLColor.fromColor((backgroundColor ?? CupertinoColors.activeBlue)
-                .withOpacity(_kCupertinoFocusColorOpacity))
-            .withLightness(_kCupertinoFocusColorBrightness)
-            .withSaturation(_kCupertinoFocusColorSaturation)
-            .toColor();
+    final Color sourceColor = backgroundColor ?? CupertinoColors.activeBlue;
+    final HSLColor hsl = HSLColor.fromColor(sourceColor);
+    final HSLColor adjustedHSL = HSLColor.fromAHSL(
+      _kCupertinoFocusColorOpacity,
+      hsl.hue,
+      _kCupertinoFocusColorSaturation,
+      _kCupertinoFocusColorBrightness,
+    );
+    final Color effectiveFocusOutlineColor = adjustedHSL.toColor();
 
     final TextStyle textStyle =
         themeData.textTheme.textStyle.copyWith(color: foregroundColor);

@@ -23,8 +23,8 @@ class MusicArtPicState extends State<MusicArtPic> {
         padding: widget.padding,
         child: GlassContainer(
           shadowColor: Platform.isIOS
-              ? CupertinoColors.black.withOpacity(0.2)
-              : CupertinoColors.black.withOpacity(0.4),
+              ? CupertinoColors.black.withAlpha((255.0 * 0.2).round())
+              : CupertinoColors.black.withAlpha((255.0 * 0.4).round()),
           shadowStrength: Platform.isIOS ? 3 : 8,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(18.0),

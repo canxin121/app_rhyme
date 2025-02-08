@@ -51,8 +51,9 @@ class PlayingMusicCardState extends State<PlayingMusicCard> {
               Obx(
                 () => GlassContainer(
                     shadowColor: Platform.isIOS
-                        ? CupertinoColors.black.withOpacity(0.2)
-                        : CupertinoColors.black.withOpacity(0.4),
+                        ? CupertinoColors.black.withAlpha((255.0 * 0.2).round())
+                        : CupertinoColors.black
+                            .withAlpha((255.0 * 0.2).round()),
                     shadowStrength: Platform.isIOS ? 4 : 8,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(4.0),
