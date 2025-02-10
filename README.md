@@ -1,19 +1,15 @@
 # AppRhyme
-## 果韵
 使用Flutter和Rust开发的跨平台`自定义音源`音乐播放器 
 
 后端Rust库仓库[music_api](https://github.com/canxin121/music_api).
-
-### 最近动态:
-- ~~寻求sea-orm上游的动态表名Entity实现以重写music_api数据库~~ -> ~~sea-orm的Entity牵一发动全身，相当难以修改而共存~~
 
 ### 支持的音乐平台:
 - 网易云音乐
 - 酷我音乐
 
 ### 开发维护优先级
-1. Linux Android Ios
-2. Windows 
+1. Windows Android Ios
+2. Linux 
 3. Macos
 
 ### 安装说明
