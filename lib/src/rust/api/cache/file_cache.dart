@@ -9,10 +9,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<String> genHash({required String str}) =>
     RustLib.instance.api.crateApiCacheFileCacheGenHash(str: str);
 
-/// cache file
-/// uri: file path or url
-/// filename: file name, if None, use hash value
-/// custom_cache_root: custom storage path, if None, use root path of the app
+/// 缓存文件
+/// uri: 文件路径或 URL
+/// filename: 文件名，如果为 None，则使用哈希值
+/// custom_cache_root: 自定义存储路径，如果为 None，则使用document_folder
 Future<String> cacheFileFromUri(
         {required String documentFolder,
         required String uri,
@@ -26,10 +26,10 @@ Future<String> cacheFileFromUri(
         filename: filename,
         customCacheRoot: customCacheRoot);
 
-/// cache file from content
-/// content: file content
-/// filename: file name
-/// custom_cache_root: custom storage path, if None, use root path of the app
+/// 从内容缓存文件
+/// content: 文件内容
+/// filename: 文件名
+/// custom_cache_root: 自定义存储路径，如果为 None，则使用根路径
 Future<String> cacheFileFromContent(
         {required String documentFolder,
         required String content,

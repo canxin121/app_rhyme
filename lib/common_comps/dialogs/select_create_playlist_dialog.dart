@@ -1,4 +1,4 @@
-import 'package:app_rhyme/dialogs/select_create_playlist_collection_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/select_create_playlist_collection_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';

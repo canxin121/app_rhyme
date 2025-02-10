@@ -1,4 +1,4 @@
-import 'package:app_rhyme/dialogs/music_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/music_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/global_vars.dart';

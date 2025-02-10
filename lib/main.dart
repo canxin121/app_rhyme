@@ -2,7 +2,7 @@ import 'package:app_rhyme/desktop/home.dart';
 import 'package:app_rhyme/mobile/home.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
-import 'package:app_rhyme/types/audio_controller.dart';
+import 'package:app_rhyme/types/audio_control.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
 import 'package:app_rhyme/utils/bypass_netimg_error.dart';
 import 'package:app_rhyme/utils/device_set.dart';

@@ -2,7 +2,7 @@ import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist_collection.dart';
 import 'package:app_rhyme/common_pages/reorder_page/playlist_collection.dart';
-import 'package:app_rhyme/dialogs/playlist_collection_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/playlist_collection_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/log_toast.dart';

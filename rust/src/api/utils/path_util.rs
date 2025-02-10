@@ -9,6 +9,7 @@ pub fn url_encode_special_chars(input: &str) -> String {
         ('<', "%3C"),
         ('>', "%3E"),
         ('|', "%7C"),
+        (' ', "%20"),
     ];
 
     let mut encoded = String::new();

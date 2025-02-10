@@ -32,13 +32,17 @@ dependencies:
   glassmorphism_ui: ^0.3.0
   toastification: ^2.0.0
   synchronized: ^3.3.0+3
+  # just_audio的实现库
   just_audio_media_kit: ^2.0.0
+  # just_audio的实现库just_audio_media_kit的linux实现
   media_kit_libs_linux: any
+  # just_audio的实现库just_audio_media_kit的windows实现
+  media_kit_libs_windows_audio: any
   just_audio: ^0.9.38
-  just_audio_windows:
-    git:
-      url: https://github.com/bdlukaa/just_audio_windows
-      path: just_audio_windows
+  # just_audio_windows:
+  #   git:
+  #     url: https://github.com/bdlukaa/just_audio_windows
+  #     path: just_audio_windows
   package_info_plus: ^8.0.0
   drag_select_grid_view: ^0.6.2
   extended_image: ^9.1.0

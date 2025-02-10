@@ -8,7 +8,7 @@ import '../music_api/mirror.dart';
 import '../types/playinfo.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `format_music_file_name`, `format_music_meta_file_path`
+// These functions are ignored because they are not marked as `pub`: `format_lrc_file_name`, `format_lrc_file_path`, `format_music_file_name`, `format_music_play_info_file_name`, `format_music_play_info_file_path`
 
 Future<bool> hasCacheMusic(
         {required String documentFolder,
@@ -21,8 +21,7 @@ Future<bool> hasCacheMusic(
         name: name,
         artists: artists);
 
-/// get cached music playinfo and lyric
-Future<(PlayInfo, String)?> getCacheMusic(
+Future<(PlayInfo?, String?)> getCacheMusic(
         {required String documentFolder,
         String? customCacheRoot,
         required String name,

@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   connectivity_plus
   file_selector_windows
-  just_audio_windows
+  media_kit_libs_windows_audio
   permission_handler_windows
   share_plus
   url_launcher_windows

@@ -1,6 +1,6 @@
 import 'package:app_rhyme/common_pages/multi_selection_page/music_aggregator.dart';
 import 'package:app_rhyme/common_pages/reorder_page/music_aggregator.dart';
-import 'package:app_rhyme/dialogs/confirm_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';

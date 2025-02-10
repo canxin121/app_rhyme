@@ -4,7 +4,7 @@ use flutter_rust_bridge::frb;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use crate::api::{APP_RHYME_FOLDER, CONFIG_FILE};
+use crate::api::{APP_RHYME_FOLDER, CONFIG_FILE, DB_FILE};
 
 use super::external_api::ExternalApiConfig;
 
@@ -178,6 +178,7 @@ fn wifi_auto_quality() -> QualityOption {
 fn mobile_auto_quality() -> QualityOption {
     QualityOption::Medium
 }
+
 fn default_true() -> bool {
     true
 }
@@ -187,16 +188,8 @@ fn default_false() -> bool {
 }
 
 impl Config {
-    pub async fn update(self) -> Result<Self, anyhow::Error> {
-        Ok(self)
-    }
-
     pub async fn save(&self, document_folder: &str) -> Result<(), anyhow::Error> {
-        let storage_folder = match &self.storage_config.custom_cache_root {
-            Some(custom_cache_root) => PathBuf::from_str(custom_cache_root)?,
-            None => PathBuf::from_str(document_folder)?,
-        }
-        .join(APP_RHYME_FOLDER);
+        let storage_folder = PathBuf::from_str(document_folder)?.join(APP_RHYME_FOLDER);
 
         if !storage_folder.exists() {
             fs::create_dir_all(&storage_folder).await?;
@@ -216,18 +209,16 @@ impl Config {
             .join(APP_RHYME_FOLDER)
             .join(CONFIG_FILE);
 
-        // if the config file does not exist, create a new one and save it
-        let mut self_ = if !config_file_path.exists() {
+        if !config_file_path.exists() {
             let config = Config::default();
             config.save(document_folder).await?;
-            config
-        } else {
-            serde_json::from_str::<Self>(&fs::read_to_string(config_file_path).await?)?
-        };
+            return Ok(config);
+        }
 
-        self_ = self_.update().await?;
+        let config_str = fs::read_to_string(config_file_path).await?;
+        let config = serde_json::from_str::<Self>(&config_str)?;
 
-        Ok(self_)
+        Ok(config)
     }
 
     #[frb(sync)]
@@ -249,7 +240,7 @@ impl Config {
                 "sqlite:///{}",
                 PathBuf::from_str(document_folder)?
                     .join(APP_RHYME_FOLDER)
-                    .join("rhyme.db")
+                    .join(DB_FILE)
                     .to_string_lossy()
                     .to_string(),
             ),

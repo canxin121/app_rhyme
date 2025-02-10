@@ -57,11 +57,6 @@ class Config {
       RustLib.instance.api.crateApiTypesConfigConfigSave(
           that: this, documentFolder: documentFolder);
 
-  Future<Config> update() =>
-      RustLib.instance.api.crateApiTypesConfigConfigUpdate(
-        that: this,
-      );
-
   @override
   int get hashCode =>
       userAgreement.hashCode ^

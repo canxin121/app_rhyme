@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_api/plugin_fn.dart';
+import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/src/rust/api/types/playinfo.dart';
 import 'package:app_rhyme/src/rust/api/utils/crypto.dart' as crypto;
 import 'package:app_rhyme/utils/global_vars.dart';
+import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:app_rhyme/utils/type_helper.dart';
 import 'package:dart_eval/dart_eval.dart';
 import 'package:dart_eval/dart_eval_bridge.dart';
@@ -228,9 +230,9 @@ class $Crypto extends Crypto with $Bridge {
   void $bridgeSet(String identifier, $Value value) {}
 }
 
-class ExternalApiEvaler {
+class PluginEvaler {
   late Runtime runTime;
-  ExternalApiEvaler(String path) {
+  PluginEvaler(String path) {
     final compile = Compiler();
     compile.defineBridgeClasses([$HttpHelper.$declaration]);
     var file = File(path);
@@ -245,7 +247,8 @@ class ExternalApiEvaler {
         isBridge: true);
   }
 
-  Future<PlayInfo?> getMusicPlayInfo(Music music, Quality quality) async {
+  Future<PlayInfo?> getMusicPlayInfo(Music music, Quality quality,
+      {bool firstTime = true}) async {
     try {
       var server = music.server.toString();
       var payload = await musicToJson(music: music, quality: quality);
@@ -253,7 +256,20 @@ class ExternalApiEvaler {
           "getMusicPlayInfo", [$String(server), $String(payload)]) as Future;
       dynamic result = await resultFuture;
       if (result.runtimeType != $null) {
-        return playInfoFromObject(result.$reified);
+        PlayInfo? playinfo = playInfoFromObject(result.$reified);
+        // 检验返回的playinfo的quality的format是否和请求的一致
+        // 需要满足 格式相同 或者 bitrate相同 中的一个 即可
+        if (playinfo != null &&
+            (playinfo.quality.format == quality.format ||
+                playinfo.quality.bitrate == quality.bitrate)) {
+          return playinfo;
+        } else if (firstTime) {
+          return getMusicPlayInfo(music,
+              autoPickQualityByOption(music.qualities, QualityOption.low),
+              firstTime: false);
+        } else {
+          return playinfo;
+        }
       } else {
         return null;
       }

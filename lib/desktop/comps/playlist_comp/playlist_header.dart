@@ -1,5 +1,5 @@
 import 'package:app_rhyme/desktop/comps/play_button.dart';
-import 'package:app_rhyme/dialogs/confirm_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/confirm_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/cache_helper.dart';

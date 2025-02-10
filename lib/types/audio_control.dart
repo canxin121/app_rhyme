@@ -15,17 +15,18 @@ import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 import 'package:synchronized/synchronized.dart';
 
 Future<void> initGlobalAudioHandler() async {
-  if (Platform.isLinux) {
+  // 在linux和windows上使用JustAudioMediaKit
+  if (Platform.isLinux || Platform.isWindows) {
     JustAudioMediaKit.ensureInitialized(
       linux: true,
-      windows: false,
+      windows: true,
       android: false,
       iOS: false,
       macOS: false,
     );
   }
 
-  // 测试后windows上，just_audio_background会导致播放异常，不使用表现反而更加正常
+  // 在linux和windows上不需要使用JustAudioBackground
   if (!Platform.isWindows && !Platform.isLinux) {
     await JustAudioBackground.init(
       androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
@@ -46,10 +47,13 @@ bool isFirstPlay = true;
 
 class AudioHandler {
   final AudioPlayer player = AudioPlayer();
+
   final RxList<MusicContainer> musicContainerList = RxList<MusicContainer>([]);
   final Rx<MusicContainer?> playingMusic = Rx<MusicContainer?>(null);
   final ConcatenatingAudioSource audioSourceList =
       ConcatenatingAudioSource(children: []);
+
+  // 用于保护musicContainerList和audioSourceList的异步读写
   final listLock = Lock();
   int allowFailedTimes = 3;
 
@@ -57,40 +61,41 @@ class AudioHandler {
     player.setLoopMode(LoopMode.all);
     player.setShuffleModeEnabled(false);
 
-    // LazyLoad Music when index changed
+    // 监听播放器的索引变化
+    // 当索引变化时, 对音乐进行惰性加载
+    // 当惰性加载失败次数过多时, 暂停播放
     player.currentIndexStream.listen((index) async {
-      MusicContainer? targetMusicContainer;
-      await listLock.synchronized(() async {
-        if (index != null &&
-            index >= 0 &&
-            index < musicContainerList.length &&
-            musicContainerList.isNotEmpty) {
-          targetMusicContainer = musicContainerList[index];
-        }
-      });
-
-      globalTalker.info(
-        "[AudioHandler.indexStream] Music Index Changed: [$index](${targetMusicContainer?.musicAggregator.name})",
-      );
-
-      if (targetMusicContainer == null) {
+      // 索引无效的情况, 直接暂停播放
+      if (index == null ||
+          index < 0 ||
+          musicContainerList.isEmpty ||
+          index >= musicContainerList.length) {
+        globalTalker
+            .info("[AudioHandler.indexStream] Music Index Invalid: $index");
         pause();
+        playingMusic.value = null; // 确保UI也更新
         return;
       }
 
-      playingMusic.value = targetMusicContainer;
-      await _lazyLoadMusic(index!);
+      // 获取目标音乐容器
+      final targetMusicContainer = musicContainerList[index];
 
-      if (targetMusicContainer!.shouldUpdate()) {
+      // 惰性加载音乐
+      await _lazyLoadMusic(index);
+
+      // 检查是否需要更新，如果需要则进行处理
+      if (targetMusicContainer.shouldUpdate()) {
         allowFailedTimes--;
-        if (allowFailedTimes == 0) {
+        if (allowFailedTimes <= 0) {
+          // 失败次数过多，停止播放
           allowFailedTimes = 3;
-          if (isPlaying) await pause();
-          LogToast.error("播放失败!", "播放失败次数过多，暂停播放!",
+          pause();
+          LogToast.error("加载失败!", "音乐惰性加载失败次数过多，暂停播放!",
               "[tryLazyLoadMusic] Failed to lazy load music to many times, stop playing.");
           return;
         } else {
-          if (isPlaying) await pause();
+          // 尝试播放下一首
+          pause();
           await seekToNext();
           return;
         }
@@ -100,53 +105,51 @@ class AudioHandler {
 
   /// safe;
   /// lock;
-  /// load to ui, query music playinfo, seek and play
+  /// 惰性加载音乐, 每次切换音乐时调用, 这会加载对应index的音乐, 并且从头开始播放
   Future<void> _lazyLoadMusic(int index,
-      {Quality? quality, bool force = false}) async {
-    MusicContainer? targetMusicContainer;
+      {Quality? selectedQuality, bool force = false}) async {
+    // 检查索引是否有效
+    if (musicContainerList.isEmpty ||
+        index < 0 ||
+        index >= musicContainerList.length) {
+      return;
+    }
 
-    await listLock.synchronized(() async {
-      if (musicContainerList.isNotEmpty &&
-          index >= 0 &&
-          index < musicContainerList.length) {
-        targetMusicContainer = musicContainerList[index];
+    MusicContainer targetMusicContainer = musicContainerList[index];
 
-        if (force == false &&
-            quality == null &&
-            !targetMusicContainer!.shouldUpdate()) {
-          targetMusicContainer = null;
-        }
-      }
-    });
-    if (targetMusicContainer == null) return;
+    // 如果不是强制更新, 且不需要更新, 则直接返回
+    if (!force &&
+        selectedQuality == null &&
+        !targetMusicContainer.shouldUpdate()) {
+      return;
+    }
 
+    // 先设置当前播放音乐, 用于ui立刻显示, 但是这时播放的是本地空音频
     playingMusic.value = targetMusicContainer;
     playingMusic.refresh();
-    try {
-      if (!await targetMusicContainer!.updateAll(quality)) {
-        globalTalker.info(
-            "[AudioHandler.lazyLoadMusic] LazyLoad Music Failed to updateAudioSource: ${targetMusicContainer!.musicAggregator.name}");
-        return;
-      }
 
-      if (player.playing) await pause();
-
-      await listLock.synchronized(() async {
-        await audioSourceList.clear();
-        await audioSourceList
-            .addAll(musicContainerList.map((e) => e.audioSource).toList());
-      });
-
-      await seek(Duration.zero, index: index);
-
-      play();
+    // 更新 MusicContainer
+    if (!await targetMusicContainer.updateSelf(selectedQuality)) {
       globalTalker.info(
-          "[AudioHanlder.lazyLoadMusic] LazyLoad Music Succeed: ${targetMusicContainer!.musicAggregator.name}");
-    } catch (e) {
-      playingMusic.value = null;
-      playingMusic.refresh();
-      globalTalker.error("[AudioHandler.tryLazyLoadMusic] Unknown Error: $e");
+          "[AudioHandler.lazyLoadMusic] LazyLoad Music Failed to updateAudioSource: ${targetMusicContainer.musicAggregator.name}");
+      return;
     }
+
+    // 暂停播放器
+    if (player.playing) await pause();
+
+    // 更新 audioSourceList
+    await listLock.synchronized(() async {
+      await audioSourceList.clear();
+      await audioSourceList
+          .addAll(musicContainerList.map((e) => e.audioSource).toList());
+    });
+
+    // 跳转到播放音乐
+    await seek(Duration.zero, index: index);
+
+    globalTalker.info(
+        "[AudioHanlder.lazyLoadMusic] LazyLoad Music Succeed: ${targetMusicContainer.musicAggregator.name}");
   }
 
   /// safe
@@ -201,7 +204,7 @@ class AudioHandler {
         var position = player.position;
 
         await _lazyLoadMusic(player.currentIndex!,
-            quality: quality, force: true);
+            selectedQuality: quality, force: true);
         playingMusic.refresh();
         await seek(position);
       }
@@ -404,7 +407,7 @@ class AudioUiController extends GetxController {
       update();
     });
 
-    _startMonitoring();
+    _startNotSkippintToNextFixMonitoring();
   }
 
   Duration seekDurationFromPercent(double percent) {
@@ -412,24 +415,46 @@ class AudioUiController extends GetxController {
         microseconds: (percent * duration.value.inMicroseconds).toInt());
   }
 
-  void _startMonitoring() {
+  // 用于修复播放器在播放结束后未自动切换到下一曲的问题
+  void _startNotSkippintToNextFixMonitoring() {
+    int consecutiveBugCount = 0;
+    int lastPositionSeconds = position.value.inSeconds;
+
     Timer.periodic(Duration(seconds: 1), (timer) {
-      if (position.value.inSeconds == 0) {
+      int currentPosSec = position.value.inSeconds;
+      int totalDurationSec = duration.value.inSeconds;
+
+      // 忽略尚未开始播放的情况
+      if (currentPosSec == 0) {
+        lastPositionSeconds = currentPosSec;
+        consecutiveBugCount = 0;
         return;
       }
 
-      if (shouldSkip == 3) {
-        shouldSkip = 0;
-        globalAudioHandler.seekToNext();
-        globalTalker
-            .error("[AudioUiController._startMonitoring] Skip to next song");
-      } else if (position.value.inSeconds >= duration.value.inSeconds) {
-        shouldSkip++;
+      // Bug 情况1：当前位置超过或等于总时长。
+      bool bugCase1 = currentPosSec >= totalDurationSec;
+
+      // Bug 情况2：当曲目接近结束（剩余10秒内）且位置没有进展。
+      bool bugCase2 = (totalDurationSec > 0 &&
+          currentPosSec >= (totalDurationSec - 10) &&
+          currentPosSec == lastPositionSeconds);
+
+      if (bugCase1 || bugCase2) {
+        consecutiveBugCount++;
         globalTalker.error(
-            "[AudioUiController._startMonitoring] Skip to next song error times: $shouldSkip");
+            "[AudioUiController._startNotSkippintToNextFixMonitoring] 检测到Bug条件："
+            "${bugCase1 ? "当前播放位置（${currentPosSec}s）已达到或超过曲目总时长（${totalDurationSec}s），可能播放已结束但未自动切换到下一曲" : "当前播放位置（${currentPosSec}s）接近曲目末尾（剩余不足10s）且未更新，可能是播放进度卡顿"}，连续出现 $consecutiveBugCount 次.");
+        if (consecutiveBugCount >= 3) {
+          consecutiveBugCount = 0;
+          globalAudioHandler.seekToNext();
+          globalTalker.error(
+              "[AudioUiController._startNotSkippintToNextFixMonitoring] 连续3次检测到 Bug，触发 seekToNext().");
+        }
       } else {
-        shouldSkip = 0;
+        consecutiveBugCount = 0;
       }
+
+      lastPositionSeconds = currentPosSec;
     });
   }
 }

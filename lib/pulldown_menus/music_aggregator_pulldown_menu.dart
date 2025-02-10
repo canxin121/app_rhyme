@@ -70,7 +70,7 @@ List<dynamic> _playinglistItems(BuildContext context, int index,
     // 查看歌手专辑
     viewArtistAlbumPullDownItem(context, defaultMusic, isDesktop),
     // 查看歌手单曲
-    viewArtistMusicAggregators(context, defaultMusic, isDesktop),
+    viewArtistMusicAggregatorsPullDownItem(context, defaultMusic, isDesktop),
     // 导出歌曲Json
     exportMusicAggregatorsJsonPullDownItem(context, musicAgg),
   ];

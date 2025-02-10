@@ -6,18 +6,16 @@
 import '../../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `copy_data`
-
 Future<void> moveCacheData(
         {required String documentPath,
         String? oldCustomCacheRoot,
-        String? newCustomCacheRoot}) =>
-    RustLib.instance.api.crateApiCacheCacheOpMoveCacheData(
+        required String newCustomCacheRoot}) =>
+    RustLib.instance.api.crateApiCacheCacheUtilMoveCacheData(
         documentPath: documentPath,
         oldCustomCacheRoot: oldCustomCacheRoot,
         newCustomCacheRoot: newCustomCacheRoot);
 
-Future<void> delOldCacheData(
-        {required String documentPath, String? oldCustomCacheRoot}) =>
-    RustLib.instance.api.crateApiCacheCacheOpDelOldCacheData(
-        documentPath: documentPath, oldCustomCacheRoot: oldCustomCacheRoot);
+Future<void> deleteCacheData(
+        {required String documentPath, String? customCacheRoot}) =>
+    RustLib.instance.api.crateApiCacheCacheUtilDeleteCacheData(
+        documentPath: documentPath, customCacheRoot: customCacheRoot);

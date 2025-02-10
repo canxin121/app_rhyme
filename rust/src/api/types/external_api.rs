@@ -24,13 +24,13 @@ impl ExternalApiConfig {
     pub async fn from_url(
         url: &str,
         document_folder: &str,
-        custom_cache_root: Option<String>,
+        custom_cache_root: &Option<String>,
     ) -> Result<Self, anyhow::Error> {
         let extern_api_cache_path = cache_file_from_uri(
             document_folder,
             url,
             EXTERNAL_API_FOLDER,
-            Some(EXTERNAL_API_FILE.to_string()),
+            &Some(EXTERNAL_API_FILE.to_string()),
             custom_cache_root,
         )
         .await?;
@@ -49,13 +49,13 @@ impl ExternalApiConfig {
     pub async fn from_path(
         path: &str,
         document_folder: &str,
-        custom_cache_root: Option<String>,
+        custom_cache_root: &Option<String>,
     ) -> Result<Self, anyhow::Error> {
         let path = cache_file_from_uri(
             document_folder,
             path,
             EXTERNAL_API_FOLDER,
-            Some(EXTERNAL_API_FILE.to_string()),
+            &Some(EXTERNAL_API_FILE.to_string()),
             custom_cache_root,
         )
         .await?;

@@ -41,7 +41,8 @@ class PlaylistDialogState extends State<PlaylistDialog> {
         TextEditingController(text: widget.defaultMusicList?.name ?? '');
     descController =
         TextEditingController(text: widget.defaultMusicList?.summary ?? '');
-    image = imageWithCache(widget.defaultMusicList?.cover);
+    image =
+        imageWithCache(widget.defaultMusicList?.cover, width: 100, height: 100);
     artPicPath = widget.defaultMusicList?.getCover(size: 250) ?? '';
   }
 
@@ -68,7 +69,6 @@ class PlaylistDialogState extends State<PlaylistDialog> {
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           GestureDetector(
             onTap: widget.readonly
@@ -80,7 +80,6 @@ class PlaylistDialogState extends State<PlaylistDialog> {
                     if (imageFile != null) {
                       setState(() {
                         artPicPath = imageFile.path;
-                        // image = ExtendedImage.file(File(artPicPath));
                         image =
                             imageWithCache(artPicPath, width: 100, height: 100);
                         cacheFileFromUriWrapper(imageFile.path, picCacheFolder);
@@ -102,70 +101,81 @@ class PlaylistDialogState extends State<PlaylistDialog> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              '歌单',
-              style: TextStyle(
-                color: isDarkMode
-                    ? CupertinoColors.systemGrey2
-                    : CupertinoColors.black,
-                fontSize: 14,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '歌单',
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? CupertinoColors.systemGrey2
+                        : CupertinoColors.black,
+                    fontSize: 14,
+                  ),
+                ),
+                CupertinoTextField(
+                  controller: nameController,
+                  placeholder: '歌单',
+                  readOnly: widget.readonly,
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                  placeholderStyle: TextStyle(
+                    color: isDarkMode
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? CupertinoColors.darkBackgroundGray
+                        : CupertinoColors.white,
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: CupertinoTextField(
-              controller: nameController,
-              placeholder: '歌单',
-              readOnly: widget.readonly,
-              style: TextStyle(
-                color:
-                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
-              placeholderStyle: TextStyle(
-                color: isDarkMode
-                    ? CupertinoColors.systemGrey
-                    : CupertinoColors.systemGrey2,
-              ),
-              decoration: BoxDecoration(
-                color: isDarkMode
-                    ? CupertinoColors.darkBackgroundGray
-                    : CupertinoColors.white,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-            ),
-          ),
-          Text(
-            '介绍',
-            style: TextStyle(
-              color: isDarkMode
-                  ? CupertinoColors.systemGrey2
-                  : CupertinoColors.black,
-              fontSize: 14,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0),
-            child: CupertinoTextField(
-              controller: descController,
-              placeholder: '介绍',
-              readOnly: widget.readonly,
-              maxLines: widget.readonly ? null : 1,
-              style: TextStyle(
-                color:
-                    isDarkMode ? CupertinoColors.white : CupertinoColors.black,
-              ),
-              placeholderStyle: TextStyle(
-                color: isDarkMode
-                    ? CupertinoColors.systemGrey
-                    : CupertinoColors.systemGrey2,
-              ),
-              decoration: BoxDecoration(
-                color: isDarkMode
-                    ? CupertinoColors.darkBackgroundGray
-                    : CupertinoColors.white,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '介绍',
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? CupertinoColors.systemGrey2
+                        : CupertinoColors.black,
+                    fontSize: 14,
+                  ),
+                ),
+                CupertinoTextField(
+                  controller: descController,
+                  placeholder: '介绍',
+                  readOnly: widget.readonly,
+                  maxLines: 3,
+                  minLines: 1,
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? CupertinoColors.white
+                        : CupertinoColors.black,
+                  ),
+                  placeholderStyle: TextStyle(
+                    color: isDarkMode
+                        ? CupertinoColors.systemGrey
+                        : CupertinoColors.systemGrey2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? CupertinoColors.darkBackgroundGray
+                        : CupertinoColors.white,
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:app_rhyme/dialogs/confirm_dialog.dart';
-import 'package:app_rhyme/dialogs/database_url_dialog.dart';
-import 'package:app_rhyme/dialogs/file_name_dialog.dart';
-import 'package:app_rhyme/dialogs/input_extern_api_link_dialog.dart';
-import 'package:app_rhyme/dialogs/quality_select_dialog.dart';
-import 'package:app_rhyme/dialogs/wait_dialog.dart';
-import 'package:app_rhyme/src/rust/api/cache/cache_op.dart';
+import 'package:app_rhyme/common_comps/dialogs/confirm_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/database_url_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/file_name_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/input_extern_api_link_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/quality_select_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/wait_dialog.dart';
+import 'package:app_rhyme/src/rust/api/cache/cache_util.dart';
 import 'package:app_rhyme/src/rust/api/music_api/fns.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
@@ -18,7 +18,7 @@ import 'package:app_rhyme/utils/check_update.dart';
 import 'package:app_rhyme/utils/chore.dart';
 import 'package:app_rhyme/utils/clipboard_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/types/extern_api.dart';
+import 'package:app_rhyme/types/plugin.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
@@ -447,7 +447,7 @@ class StorageConfigPageState extends State<StorageConfigPage>
   void initState() {
     super.initState();
     storagePath =
-        globalConfig.getStorageFolder(documentFolder: globalDocumentPath);
+        globalConfig.storageConfig.customCacheRoot ?? globalDocumentPath;
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -474,9 +474,10 @@ class StorageConfigPageState extends State<StorageConfigPage>
     }
 
     try {
-      globalAudioHandler.clear();
+      // 解除所有资源的占用
       await globalAudioHandler.clear();
       await closeDb();
+
       if (needMove) {
         if (mounted) {
           await showWaitDialog(context, isDesktop, "正在移动数据中,稍后将自动退出应用以应用更改");
@@ -490,21 +491,19 @@ class StorageConfigPageState extends State<StorageConfigPage>
         if (mounted) {
           await showWaitDialog(context, isDesktop, "正在清理旧数据中,稍后将自动退出应用以应用更改");
         }
-        await delOldCacheData(
+
+        await deleteCacheData(
             documentPath: globalDocumentPath,
-            oldCustomCacheRoot: globalConfig.storageConfig.customCacheRoot);
+            customCacheRoot: globalConfig.storageConfig.customCacheRoot);
       }
 
       globalConfig.storageConfig.customCacheRoot = newCustomCacheRoot;
       await globalConfig.save(documentFolder: globalDocumentPath);
-      setState(() {
-        storagePath =
-            globalConfig.getStorageFolder(documentFolder: globalDocumentPath);
-      });
+    } catch (e) {
+      LogToast.error("缓存设置", "移动缓存文件夹失败: $e",
+          "[storageConfig.useNewCacheRoot] failed: $e");
     } finally {
-      if (mounted) {
-        popPage(context, isDesktop);
-      }
+      await exitApp();
     }
   }
 
@@ -919,9 +918,9 @@ class StorageConfigPageState extends State<StorageConfigPage>
                                   "是否继续?");
                               if (confirm == null || !confirm) return;
                               try {
-                                await delOldCacheData(
+                                await deleteCacheData(
                                     documentPath: globalDocumentPath,
-                                    oldCustomCacheRoot: globalConfig
+                                    customCacheRoot: globalConfig
                                         .storageConfig.customCacheRoot);
                                 LogToast.success("清理空间", "清理缓存成功",
                                     "[storageConfig.clearCache] success");
@@ -1108,7 +1107,7 @@ class ExternalApiConfigPageState extends State<ExternalApiConfigPage>
                                 globalConfig.externalApi = externalApi;
                                 await globalConfig.save(
                                     documentFolder: globalDocumentPath);
-                                globalExternalApiEvaler = ExternalApiEvaler(
+                                globalExternalApiEvaler = PluginEvaler(
                                     globalConfig.externalApi!.filePath);
 
                                 if (context.mounted) {
@@ -1154,7 +1153,7 @@ class ExternalApiConfigPageState extends State<ExternalApiConfigPage>
                                 globalConfig.externalApi = externalApi;
                                 await globalConfig.save(
                                     documentFolder: globalDocumentPath);
-                                globalExternalApiEvaler = ExternalApiEvaler(
+                                globalExternalApiEvaler = PluginEvaler(
                                     globalConfig.externalApi!.filePath);
                                 LogToast.success("第三方音源", "导入第三方音源成功",
                                     "[externalApi] success");

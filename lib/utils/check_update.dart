@@ -1,8 +1,8 @@
 import 'package:app_rhyme/src/rust/api/types/version.dart';
-import 'package:app_rhyme/types/extern_api.dart';
+import 'package:app_rhyme/types/plugin.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/dialogs/extern_api_update_dialog.dart';
-import 'package:app_rhyme/dialogs/version_update_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/extern_api_update_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/version_update_dialog.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/widgets.dart';
 
@@ -43,7 +43,7 @@ Future<void> checkExternalApiUpdate(BuildContext context, bool toast) async {
             globalConfig.externalApi = externalApi;
             await globalConfig.save(documentFolder: globalDocumentPath);
             globalExternalApiEvaler =
-                ExternalApiEvaler(globalConfig.externalApi!.filePath);
+                PluginEvaler(globalConfig.externalApi!.filePath);
             LogToast.success("自定义源更新", "更新自定义源成功",
                 "[checkExternalApiUpdate] Successfully updated custom source");
           }

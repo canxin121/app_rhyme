@@ -19,6 +19,7 @@ pub async fn copy_file(from: &PathBuf, to: &PathBuf) -> Result<(), anyhow::Error
 }
 
 #[frb(ignore)]
+// 仅适用于文件夹下只有文件，没有文件夹的情况
 pub async fn copy_directory(from: &PathBuf, to: &PathBuf) -> Result<(), anyhow::Error> {
     if !to.exists() {
         fs::create_dir_all(to).await?;
@@ -38,5 +39,15 @@ pub async fn copy_directory(from: &PathBuf, to: &PathBuf) -> Result<(), anyhow::
         }
     }
 
+    Ok(())
+}
+
+// 仅适用于文件夹下只有文件，没有文件夹的情况
+#[frb(ignore)]
+pub async fn move_directory(src: &PathBuf, dst: &PathBuf) -> Result<(), anyhow::Error> {
+    // 直接复制文件夹
+    copy_directory(src, dst).await?;
+    // 删除源文件夹
+    fs::remove_dir_all(src).await?;
     Ok(())
 }

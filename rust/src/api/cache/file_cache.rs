@@ -19,17 +19,17 @@ pub fn gen_hash(str_: &str) -> String {
     format!("{:x}", hasher.finish())
 }
 
-/// cache file
-/// uri: file path or url
-/// filename: file name, if None, use hash value
-/// custom_cache_root: custom storage path, if None, use root path of the app
+/// 缓存文件
+/// uri: 文件路径或 URL
+/// filename: 文件名，如果为 None，则使用哈希值
+/// custom_cache_root: 自定义存储路径，如果为 None，则使用document_folder
 #[flutter_rust_bridge::frb]
 pub async fn cache_file_from_uri(
     document_folder: &str,
     uri: &str,
     cache_folder: &str,
-    filename: Option<String>,
-    custom_cache_root: Option<String>,
+    filename: &Option<String>,
+    custom_cache_root: &Option<String>,
 ) -> Result<String, anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
     let filename = match filename {
@@ -67,16 +67,16 @@ pub async fn cache_file_from_uri(
     Ok(file_path.to_string_lossy().to_string())
 }
 
-/// cache file from content
-/// content: file content
-/// filename: file name
-/// custom_cache_root: custom storage path, if None, use root path of the app
+/// 从内容缓存文件
+/// content: 文件内容
+/// filename: 文件名
+/// custom_cache_root: 自定义存储路径，如果为 None，则使用根路径
 pub async fn cache_file_from_content(
     document_folder: &str,
     content: String,
     cache_folder: &str,
     filename: String,
-    custom_cache_root: Option<String>,
+    custom_cache_root: &Option<String>,
 ) -> Result<String, anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
 
@@ -99,18 +99,18 @@ pub async fn cache_file_from_content(
     Ok(file_path.to_string_lossy().to_string())
 }
 
-// get cached file path from uri
-// uri: file path or url
-// root: root path of the app
-// filename: file name, if None, use hash value
-// custom_cache_root: custom storage path, if None, use root path of the app
+// 根据uri获取缓存文件路径
+// uri: 文件路径或 URL
+// root: 应用根路径
+// filename: 文件名，如果为 None，则使用哈希值
+// custom_cache_root: 自定义存储路径，如果为 None，则使用根路径
 #[flutter_rust_bridge::frb(sync)]
 pub fn get_cache_file_from_uri(
     document_folder: &str,
     uri: &str,
     cache_folder: &str,
-    filename: Option<String>,
-    custom_cache_root: Option<String>,
+    filename: &Option<String>,
+    custom_cache_root: &Option<String>,
 ) -> Option<String> {
     let filename = match filename {
         None => gen_hash(uri),
@@ -141,8 +141,8 @@ pub async fn delete_cache_file_with_uri(
     document_folder: &str,
     uri: &str,
     cache_folder: &str,
-    filename: Option<String>,
-    custom_cache_root: Option<String>,
+    filename: &Option<String>,
+    custom_cache_root: &Option<String>,
 ) -> Result<(), anyhow::Error> {
     let _ = FILE_OP_SEMAPHORE.acquire().await?;
 

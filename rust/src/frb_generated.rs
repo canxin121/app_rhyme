@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.7.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 539112346;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1980707479;
 
 // Section: executor
 
@@ -465,7 +465,7 @@ fn wire__crate__api__cache__file_cache__cache_file_from_content_impl(
                             api_content,
                             &api_cache_folder,
                             api_filename,
-                            api_custom_cache_root,
+                            &api_custom_cache_root,
                         )
                         .await?;
                         Ok(output_ok)
@@ -511,8 +511,8 @@ fn wire__crate__api__cache__file_cache__cache_file_from_uri_impl(
                             &api_document_folder,
                             &api_uri,
                             &api_cache_folder,
-                            api_filename,
-                            api_custom_cache_root,
+                            &api_filename,
+                            &api_custom_cache_root,
                         )
                         .await?;
                         Ok(output_ok)
@@ -558,10 +558,10 @@ fn wire__crate__api__cache__music_cache__cache_music_impl(
                     (move || async move {
                         let output_ok = crate::api::cache::music_cache::cache_music(
                             &api_document_folder,
-                            api_custom_cache_root,
+                            &api_custom_cache_root,
                             api_name,
                             api_artists,
-                            &api_playinfo,
+                            api_playinfo,
                             api_lyric,
                         )
                         .await?;
@@ -863,7 +863,7 @@ fn wire__crate__api__types__config__config_save_impl(
         },
     )
 }
-fn wire__crate__api__types__config__config_update_impl(
+fn wire__crate__api__cache__cache_util__delete_cache_data_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -871,43 +871,7 @@ fn wire__crate__api__types__config__config_update_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "config_update",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <crate::api::types::config::Config>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
-                    (move || async move {
-                        let output_ok = crate::api::types::config::Config::update(api_that).await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__cache__cache_op__del_old_cache_data_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "del_old_cache_data",
+            debug_name: "delete_cache_data",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -922,14 +886,14 @@ fn wire__crate__api__cache__cache_op__del_old_cache_data_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_document_path = <String>::sse_decode(&mut deserializer);
-            let api_old_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
+            let api_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
-                        let output_ok = crate::api::cache::cache_op::del_old_cache_data(
+                        let output_ok = crate::api::cache::cache_util::delete_cache_data(
                             &api_document_path,
-                            api_old_custom_cache_root,
+                            api_custom_cache_root,
                         )
                         .await?;
                         Ok(output_ok)
@@ -975,8 +939,8 @@ fn wire__crate__api__cache__file_cache__delete_cache_file_with_uri_impl(
                             &api_document_folder,
                             &api_uri,
                             &api_cache_folder,
-                            api_filename,
-                            api_custom_cache_root,
+                            &api_filename,
+                            &api_custom_cache_root,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1019,7 +983,7 @@ fn wire__crate__api__cache__music_cache__delete_music_cache_impl(
                     (move || async move {
                         let output_ok = crate::api::cache::music_cache::delete_music_cache(
                             &api_document_folder,
-                            api_custom_cache_root,
+                            &api_custom_cache_root,
                             &api_name,
                             &api_artists,
                         )
@@ -1106,7 +1070,7 @@ fn wire__crate__api__types__external_api__external_api_config_from_path_impl(
                             crate::api::types::external_api::ExternalApiConfig::from_path(
                                 &api_path,
                                 &api_document_folder,
-                                api_custom_cache_root,
+                                &api_custom_cache_root,
                             )
                             .await?;
                         Ok(output_ok)
@@ -1150,7 +1114,7 @@ fn wire__crate__api__types__external_api__external_api_config_from_url_impl(
                             crate::api::types::external_api::ExternalApiConfig::from_url(
                                 &api_url,
                                 &api_document_folder,
-                                api_custom_cache_root,
+                                &api_custom_cache_root,
                             )
                             .await?;
                         Ok(output_ok)
@@ -1228,8 +1192,8 @@ fn wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
                         &api_document_folder,
                         &api_uri,
                         &api_cache_folder,
-                        api_filename,
-                        api_custom_cache_root,
+                        &api_filename,
+                        &api_custom_cache_root,
                     ))?;
                 Ok(output_ok)
             })())
@@ -1269,7 +1233,7 @@ fn wire__crate__api__cache__music_cache__get_cache_music_impl(
                         let output_ok = Result::<_, ()>::Ok(
                             crate::api::cache::music_cache::get_cache_music(
                                 &api_document_folder,
-                                api_custom_cache_root,
+                                &api_custom_cache_root,
                                 api_name,
                                 api_artists,
                             )
@@ -1351,7 +1315,7 @@ fn wire__crate__api__cache__music_cache__has_cache_music_impl(
                         let output_ok = Result::<_, ()>::Ok(
                             crate::api::cache::music_cache::has_cache_music(
                                 &api_document_folder,
-                                api_custom_cache_root,
+                                &api_custom_cache_root,
                                 api_name,
                                 api_artists,
                             )
@@ -1438,7 +1402,7 @@ fn wire__crate__api__init__init_backend_impl(
         },
     )
 }
-fn wire__crate__api__cache__cache_op__move_cache_data_impl(
+fn wire__crate__api__cache__cache_util__move_cache_data_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1462,12 +1426,12 @@ fn wire__crate__api__cache__cache_op__move_cache_data_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_document_path = <String>::sse_decode(&mut deserializer);
             let api_old_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
-            let api_new_custom_cache_root = <Option<String>>::sse_decode(&mut deserializer);
+            let api_new_custom_cache_root = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
-                        let output_ok = crate::api::cache::cache_op::move_cache_data(
+                        let output_ok = crate::api::cache::cache_util::move_cache_data(
                             &api_document_path,
                             api_old_custom_cache_root,
                             api_new_custom_cache_root,
@@ -4223,11 +4187,11 @@ impl SseDecode for Option<crate::api::music_api::mirror::MusicServer> {
     }
 }
 
-impl SseDecode for Option<crate::api::music_api::mirror::Playlist> {
+impl SseDecode for Option<crate::api::types::playinfo::PlayInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
-            return Some(<crate::api::music_api::mirror::Playlist>::sse_decode(
+            return Some(<crate::api::types::playinfo::PlayInfo>::sse_decode(
                 deserializer,
             ));
         } else {
@@ -4236,13 +4200,13 @@ impl SseDecode for Option<crate::api::music_api::mirror::Playlist> {
     }
 }
 
-impl SseDecode for Option<(crate::api::types::playinfo::PlayInfo, String)> {
+impl SseDecode for Option<crate::api::music_api::mirror::Playlist> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
-            return Some(
-                <(crate::api::types::playinfo::PlayInfo, String)>::sse_decode(deserializer),
-            );
+            return Some(<crate::api::music_api::mirror::Playlist>::sse_decode(
+                deserializer,
+            ));
         } else {
             return None;
         }
@@ -4462,6 +4426,21 @@ impl SseDecode for crate::api::types::config::QualityOption {
 
 impl SseDecode
     for (
+        Option<crate::api::types::playinfo::PlayInfo>,
+        Option<String>,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 =
+            <Option<crate::api::types::playinfo::PlayInfo>>::sse_decode(deserializer);
+        let mut var_field1 = <Option<String>>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode
+    for (
         Option<crate::api::music_api::mirror::Playlist>,
         Vec<crate::api::music_api::mirror::MusicAggregator>,
     )
@@ -4472,15 +4451,6 @@ impl SseDecode
             <Option<crate::api::music_api::mirror::Playlist>>::sse_decode(deserializer);
         let mut var_field1 =
             <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_decode(deserializer);
-        return (var_field0, var_field1);
-    }
-}
-
-impl SseDecode for (crate::api::types::playinfo::PlayInfo, String) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_field0 = <crate::api::types::playinfo::PlayInfo>::sse_decode(deserializer);
-        let mut var_field1 = <String>::sse_decode(deserializer);
         return (var_field0, var_field1);
     }
 }
@@ -4680,70 +4650,69 @@ fn pde_ffi_dispatcher_primary_impl(
 16 => wire__crate__api__types__config__config_default_impl(port, ptr, rust_vec_len, data_len),
 19 => wire__crate__api__types__config__config_load_impl(port, ptr, rust_vec_len, data_len),
 20 => wire__crate__api__types__config__config_save_impl(port, ptr, rust_vec_len, data_len),
-21 => wire__crate__api__types__config__config_update_impl(port, ptr, rust_vec_len, data_len),
-22 => wire__crate__api__cache__cache_op__del_old_cache_data_impl(port, ptr, rust_vec_len, data_len),
-23 => wire__crate__api__cache__file_cache__delete_cache_file_with_uri_impl(port, ptr, rust_vec_len, data_len),
-24 => wire__crate__api__cache__music_cache__delete_music_cache_impl(port, ptr, rust_vec_len, data_len),
-25 => wire__crate__api__types__external_api__external_api_config_fetch_update_impl(port, ptr, rust_vec_len, data_len),
-26 => wire__crate__api__types__external_api__external_api_config_from_path_impl(port, ptr, rust_vec_len, data_len),
-27 => wire__crate__api__types__external_api__external_api_config_from_url_impl(port, ptr, rust_vec_len, data_len),
-28 => wire__crate__api__cache__file_cache__gen_hash_impl(port, ptr, rust_vec_len, data_len),
-30 => wire__crate__api__cache__music_cache__get_cache_music_impl(port, ptr, rust_vec_len, data_len),
-31 => wire__crate__api__types__version__get_release_impl(port, ptr, rust_vec_len, data_len),
-32 => wire__crate__api__cache__music_cache__has_cache_music_impl(port, ptr, rust_vec_len, data_len),
-33 => wire__crate__api__init__init_impl(port, ptr, rust_vec_len, data_len),
-34 => wire__crate__api__init__init_backend_impl(port, ptr, rust_vec_len, data_len),
-35 => wire__crate__api__cache__cache_op__move_cache_data_impl(port, ptr, rust_vec_len, data_len),
-36 => wire__crate__api__music_api__mirror__music_aggregator_change_default_server_in_db_impl(port, ptr, rust_vec_len, data_len),
-37 => wire__crate__api__music_api__mirror__music_aggregator_clear_unused_impl(port, ptr, rust_vec_len, data_len),
-38 => wire__crate__api__music_api__mirror__music_aggregator_del_from_db_impl(port, ptr, rust_vec_len, data_len),
-39 => wire__crate__api__music_api__mirror__music_aggregator_fetch_artist_music_aggregators_impl(port, ptr, rust_vec_len, data_len),
-40 => wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_impl(port, ptr, rust_vec_len, data_len),
-41 => wire__crate__api__music_api__mirror__music_aggregator_from_music_impl(port, ptr, rust_vec_len, data_len),
-43 => wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(port, ptr, rust_vec_len, data_len),
-44 => wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(port, ptr, rust_vec_len, data_len),
-45 => wire__crate__api__music_api__mirror__music_aggregator_update_order_to_db_impl(port, ptr, rust_vec_len, data_len),
-46 => wire__crate__api__music_api__mirror__music_get_album_impl(port, ptr, rust_vec_len, data_len),
-48 => wire__crate__api__music_api__mirror__music_get_lyric_impl(port, ptr, rust_vec_len, data_len),
-49 => wire__crate__api__music_api__mirror__music_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
-50 => wire__crate__api__music_api__mirror__music_search_online_impl(port, ptr, rust_vec_len, data_len),
-54 => wire__crate__api__music_api__plugin_fn__music_to_json_impl(port, ptr, rust_vec_len, data_len),
-55 => wire__crate__api__music_api__mirror__music_update_to_db_impl(port, ptr, rust_vec_len, data_len),
-56 => wire__crate__api__music_api__mirror__playlist_add_aggs_to_db_impl(port, ptr, rust_vec_len, data_len),
-57 => wire__crate__api__music_api__mirror__playlist_collection_delete_from_db_impl(port, ptr, rust_vec_len, data_len),
-58 => wire__crate__api__music_api__mirror__playlist_collection_find_in_db_impl(port, ptr, rust_vec_len, data_len),
-59 => wire__crate__api__music_api__mirror__playlist_collection_get_form_db_impl(port, ptr, rust_vec_len, data_len),
-60 => wire__crate__api__music_api__mirror__playlist_collection_get_playlists_from_db_impl(port, ptr, rust_vec_len, data_len),
-61 => wire__crate__api__music_api__mirror__playlist_collection_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
-62 => wire__crate__api__music_api__mirror__playlist_collection_new_impl(port, ptr, rust_vec_len, data_len),
-63 => wire__crate__api__music_api__mirror__playlist_collection_update_to_db_impl(port, ptr, rust_vec_len, data_len),
-64 => wire__crate__api__music_api__mirror__playlist_del_from_db_impl(port, ptr, rust_vec_len, data_len),
-65 => wire__crate__api__music_api__mirror__playlist_del_music_agg_impl(port, ptr, rust_vec_len, data_len),
-66 => wire__crate__api__music_api__mirror__playlist_fetch_artist_albums_impl(port, ptr, rust_vec_len, data_len),
-67 => wire__crate__api__music_api__mirror__playlist_fetch_musics_online_impl(port, ptr, rust_vec_len, data_len),
-68 => wire__crate__api__music_api__mirror__playlist_find_in_db_impl(port, ptr, rust_vec_len, data_len),
-70 => wire__crate__api__music_api__mirror__playlist_get_from_db_impl(port, ptr, rust_vec_len, data_len),
-71 => wire__crate__api__music_api__mirror__playlist_get_from_share_impl(port, ptr, rust_vec_len, data_len),
-72 => wire__crate__api__music_api__mirror__playlist_get_musics_from_db_impl(port, ptr, rust_vec_len, data_len),
-73 => wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
-74 => wire__crate__api__music_api__mirror__playlist_new_impl(port, ptr, rust_vec_len, data_len),
-75 => wire__crate__api__music_api__mirror__playlist_search_online_impl(port, ptr, rust_vec_len, data_len),
-76 => wire__crate__api__music_api__mirror__playlist_update_subscription_impl(port, ptr, rust_vec_len, data_len),
-77 => wire__crate__api__music_api__mirror__playlist_update_to_db_impl(port, ptr, rust_vec_len, data_len),
-78 => wire__crate__api__types__config__quality_config_default_impl(port, ptr, rust_vec_len, data_len),
-79 => wire__crate__api__utils__crypto__rc4_decrypt_from_base64_impl(port, ptr, rust_vec_len, data_len),
-80 => wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(port, ptr, rust_vec_len, data_len),
-81 => wire__crate__api__music_api__fns__reinit_db_impl(port, ptr, rust_vec_len, data_len),
-82 => wire__crate__api__utils__http_helper__send_request_impl(port, ptr, rust_vec_len, data_len),
-83 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_music_chart_collection_impl(port, ptr, rust_vec_len, data_len),
-84 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_musics_from_chart_impl(port, ptr, rust_vec_len, data_len),
-85 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlist_tags_impl(port, ptr, rust_vec_len, data_len),
-86 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlists_from_tag_impl(port, ptr, rust_vec_len, data_len),
-87 => wire__crate__api__music_api__fns__set_db_impl(port, ptr, rust_vec_len, data_len),
-88 => wire__crate__api__types__config__storage_config_default_impl(port, ptr, rust_vec_len, data_len),
-89 => wire__crate__api__types__config__update_config_default_impl(port, ptr, rust_vec_len, data_len),
-90 => wire__crate__api__utils__path_util__url_encode_special_chars_impl(port, ptr, rust_vec_len, data_len),
-91 => wire__crate__api__utils__database__verify_sqlite_url_impl(port, ptr, rust_vec_len, data_len),
+21 => wire__crate__api__cache__cache_util__delete_cache_data_impl(port, ptr, rust_vec_len, data_len),
+22 => wire__crate__api__cache__file_cache__delete_cache_file_with_uri_impl(port, ptr, rust_vec_len, data_len),
+23 => wire__crate__api__cache__music_cache__delete_music_cache_impl(port, ptr, rust_vec_len, data_len),
+24 => wire__crate__api__types__external_api__external_api_config_fetch_update_impl(port, ptr, rust_vec_len, data_len),
+25 => wire__crate__api__types__external_api__external_api_config_from_path_impl(port, ptr, rust_vec_len, data_len),
+26 => wire__crate__api__types__external_api__external_api_config_from_url_impl(port, ptr, rust_vec_len, data_len),
+27 => wire__crate__api__cache__file_cache__gen_hash_impl(port, ptr, rust_vec_len, data_len),
+29 => wire__crate__api__cache__music_cache__get_cache_music_impl(port, ptr, rust_vec_len, data_len),
+30 => wire__crate__api__types__version__get_release_impl(port, ptr, rust_vec_len, data_len),
+31 => wire__crate__api__cache__music_cache__has_cache_music_impl(port, ptr, rust_vec_len, data_len),
+32 => wire__crate__api__init__init_impl(port, ptr, rust_vec_len, data_len),
+33 => wire__crate__api__init__init_backend_impl(port, ptr, rust_vec_len, data_len),
+34 => wire__crate__api__cache__cache_util__move_cache_data_impl(port, ptr, rust_vec_len, data_len),
+35 => wire__crate__api__music_api__mirror__music_aggregator_change_default_server_in_db_impl(port, ptr, rust_vec_len, data_len),
+36 => wire__crate__api__music_api__mirror__music_aggregator_clear_unused_impl(port, ptr, rust_vec_len, data_len),
+37 => wire__crate__api__music_api__mirror__music_aggregator_del_from_db_impl(port, ptr, rust_vec_len, data_len),
+38 => wire__crate__api__music_api__mirror__music_aggregator_fetch_artist_music_aggregators_impl(port, ptr, rust_vec_len, data_len),
+39 => wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_impl(port, ptr, rust_vec_len, data_len),
+40 => wire__crate__api__music_api__mirror__music_aggregator_from_music_impl(port, ptr, rust_vec_len, data_len),
+42 => wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(port, ptr, rust_vec_len, data_len),
+43 => wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(port, ptr, rust_vec_len, data_len),
+44 => wire__crate__api__music_api__mirror__music_aggregator_update_order_to_db_impl(port, ptr, rust_vec_len, data_len),
+45 => wire__crate__api__music_api__mirror__music_get_album_impl(port, ptr, rust_vec_len, data_len),
+47 => wire__crate__api__music_api__mirror__music_get_lyric_impl(port, ptr, rust_vec_len, data_len),
+48 => wire__crate__api__music_api__mirror__music_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
+49 => wire__crate__api__music_api__mirror__music_search_online_impl(port, ptr, rust_vec_len, data_len),
+53 => wire__crate__api__music_api__plugin_fn__music_to_json_impl(port, ptr, rust_vec_len, data_len),
+54 => wire__crate__api__music_api__mirror__music_update_to_db_impl(port, ptr, rust_vec_len, data_len),
+55 => wire__crate__api__music_api__mirror__playlist_add_aggs_to_db_impl(port, ptr, rust_vec_len, data_len),
+56 => wire__crate__api__music_api__mirror__playlist_collection_delete_from_db_impl(port, ptr, rust_vec_len, data_len),
+57 => wire__crate__api__music_api__mirror__playlist_collection_find_in_db_impl(port, ptr, rust_vec_len, data_len),
+58 => wire__crate__api__music_api__mirror__playlist_collection_get_form_db_impl(port, ptr, rust_vec_len, data_len),
+59 => wire__crate__api__music_api__mirror__playlist_collection_get_playlists_from_db_impl(port, ptr, rust_vec_len, data_len),
+60 => wire__crate__api__music_api__mirror__playlist_collection_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
+61 => wire__crate__api__music_api__mirror__playlist_collection_new_impl(port, ptr, rust_vec_len, data_len),
+62 => wire__crate__api__music_api__mirror__playlist_collection_update_to_db_impl(port, ptr, rust_vec_len, data_len),
+63 => wire__crate__api__music_api__mirror__playlist_del_from_db_impl(port, ptr, rust_vec_len, data_len),
+64 => wire__crate__api__music_api__mirror__playlist_del_music_agg_impl(port, ptr, rust_vec_len, data_len),
+65 => wire__crate__api__music_api__mirror__playlist_fetch_artist_albums_impl(port, ptr, rust_vec_len, data_len),
+66 => wire__crate__api__music_api__mirror__playlist_fetch_musics_online_impl(port, ptr, rust_vec_len, data_len),
+67 => wire__crate__api__music_api__mirror__playlist_find_in_db_impl(port, ptr, rust_vec_len, data_len),
+69 => wire__crate__api__music_api__mirror__playlist_get_from_db_impl(port, ptr, rust_vec_len, data_len),
+70 => wire__crate__api__music_api__mirror__playlist_get_from_share_impl(port, ptr, rust_vec_len, data_len),
+71 => wire__crate__api__music_api__mirror__playlist_get_musics_from_db_impl(port, ptr, rust_vec_len, data_len),
+72 => wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
+73 => wire__crate__api__music_api__mirror__playlist_new_impl(port, ptr, rust_vec_len, data_len),
+74 => wire__crate__api__music_api__mirror__playlist_search_online_impl(port, ptr, rust_vec_len, data_len),
+75 => wire__crate__api__music_api__mirror__playlist_update_subscription_impl(port, ptr, rust_vec_len, data_len),
+76 => wire__crate__api__music_api__mirror__playlist_update_to_db_impl(port, ptr, rust_vec_len, data_len),
+77 => wire__crate__api__types__config__quality_config_default_impl(port, ptr, rust_vec_len, data_len),
+78 => wire__crate__api__utils__crypto__rc4_decrypt_from_base64_impl(port, ptr, rust_vec_len, data_len),
+79 => wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(port, ptr, rust_vec_len, data_len),
+80 => wire__crate__api__music_api__fns__reinit_db_impl(port, ptr, rust_vec_len, data_len),
+81 => wire__crate__api__utils__http_helper__send_request_impl(port, ptr, rust_vec_len, data_len),
+82 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_music_chart_collection_impl(port, ptr, rust_vec_len, data_len),
+83 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_musics_from_chart_impl(port, ptr, rust_vec_len, data_len),
+84 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlist_tags_impl(port, ptr, rust_vec_len, data_len),
+85 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlists_from_tag_impl(port, ptr, rust_vec_len, data_len),
+86 => wire__crate__api__music_api__fns__set_db_impl(port, ptr, rust_vec_len, data_len),
+87 => wire__crate__api__types__config__storage_config_default_impl(port, ptr, rust_vec_len, data_len),
+88 => wire__crate__api__types__config__update_config_default_impl(port, ptr, rust_vec_len, data_len),
+89 => wire__crate__api__utils__path_util__url_encode_special_chars_impl(port, ptr, rust_vec_len, data_len),
+90 => wire__crate__api__utils__database__verify_sqlite_url_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -4762,38 +4731,38 @@ fn pde_ffi_dispatcher_sync_impl(
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
+        28 => wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        42 => wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
+        41 => wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        47 => {
+        46 => {
             wire__crate__api__music_api__mirror__music_get_cover_impl(ptr, rust_vec_len, data_len)
         }
-        51 => {
+        50 => {
             wire__crate__api__music_api__mirror__music_server_all_impl(ptr, rust_vec_len, data_len)
         }
-        52 => wire__crate__api__music_api__mirror__music_server_length_impl(
+        51 => wire__crate__api__music_api__mirror__music_server_length_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        53 => wire__crate__api__music_api__mirror__music_server_to_string_impl(
+        52 => wire__crate__api__music_api__mirror__music_server_to_string_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        69 => wire__crate__api__music_api__mirror__playlist_get_cover_impl(
+        68 => wire__crate__api__music_api__mirror__playlist_get_cover_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        92 => {
+        91 => {
             wire__crate__api__types__config__window_config_default_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -5981,22 +5950,22 @@ impl SseEncode for Option<crate::api::music_api::mirror::MusicServer> {
     }
 }
 
+impl SseEncode for Option<crate::api::types::playinfo::PlayInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::types::playinfo::PlayInfo>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::api::music_api::mirror::Playlist> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::api::music_api::mirror::Playlist>::sse_encode(value, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<(crate::api::types::playinfo::PlayInfo, String)> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <(crate::api::types::playinfo::PlayInfo, String)>::sse_encode(value, serializer);
         }
     }
 }
@@ -6161,6 +6130,19 @@ impl SseEncode for crate::api::types::config::QualityOption {
 
 impl SseEncode
     for (
+        Option<crate::api::types::playinfo::PlayInfo>,
+        Option<String>,
+    )
+{
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<crate::api::types::playinfo::PlayInfo>>::sse_encode(self.0, serializer);
+        <Option<String>>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode
+    for (
         Option<crate::api::music_api::mirror::Playlist>,
         Vec<crate::api::music_api::mirror::MusicAggregator>,
     )
@@ -6169,14 +6151,6 @@ impl SseEncode
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<crate::api::music_api::mirror::Playlist>>::sse_encode(self.0, serializer);
         <Vec<crate::api::music_api::mirror::MusicAggregator>>::sse_encode(self.1, serializer);
-    }
-}
-
-impl SseEncode for (crate::api::types::playinfo::PlayInfo, String) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::types::playinfo::PlayInfo>::sse_encode(self.0, serializer);
-        <String>::sse_encode(self.1, serializer);
     }
 }
 

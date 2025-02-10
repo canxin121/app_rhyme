@@ -1,5 +1,5 @@
 import 'package:app_rhyme/common_pages/db_playlist_collection_page.dart';
-import 'package:app_rhyme/dialogs/user_aggrement_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/user_aggrement_dialog.dart';
 import 'package:app_rhyme/mobile/comps/play_display_comp/music_control_bar.dart';
 import 'package:app_rhyme/common_pages/setting_page.dart';
 import 'package:app_rhyme/mobile/pages/explore_page.dart';

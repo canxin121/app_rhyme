@@ -6,7 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
-import 'api/cache/cache_op.dart';
+import 'api/cache/cache_util.dart';
 import 'api/cache/file_cache.dart';
 import 'api/cache/music_cache.dart';
 import 'api/init.dart';
@@ -104,10 +104,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Quality dco_decode_box_autoadd_quality(dynamic raw);
-
-  @protected
-  (PlayInfo, String) dco_decode_box_autoadd_record_play_info_string(
-      dynamic raw);
 
   @protected
   Release dco_decode_box_autoadd_release(dynamic raw);
@@ -215,11 +211,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   MusicServer? dco_decode_opt_box_autoadd_music_server(dynamic raw);
 
   @protected
-  Playlist? dco_decode_opt_box_autoadd_playlist(dynamic raw);
+  PlayInfo? dco_decode_opt_box_autoadd_play_info(dynamic raw);
 
   @protected
-  (PlayInfo, String)? dco_decode_opt_box_autoadd_record_play_info_string(
-      dynamic raw);
+  Playlist? dco_decode_opt_box_autoadd_playlist(dynamic raw);
 
   @protected
   Release? dco_decode_opt_box_autoadd_release(dynamic raw);
@@ -266,12 +261,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QualityOption dco_decode_quality_option(dynamic raw);
 
   @protected
+  (PlayInfo?, String?) dco_decode_record_opt_box_autoadd_play_info_opt_string(
+      dynamic raw);
+
+  @protected
   (Playlist?, List<MusicAggregator>)
       dco_decode_record_opt_box_autoadd_playlist_list_music_aggregator(
           dynamic raw);
-
-  @protected
-  (PlayInfo, String) dco_decode_record_play_info_string(dynamic raw);
 
   @protected
   (String, String) dco_decode_record_string_string(dynamic raw);
@@ -383,10 +379,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Quality sse_decode_box_autoadd_quality(SseDeserializer deserializer);
-
-  @protected
-  (PlayInfo, String) sse_decode_box_autoadd_record_play_info_string(
-      SseDeserializer deserializer);
 
   @protected
   Release sse_decode_box_autoadd_release(SseDeserializer deserializer);
@@ -503,11 +495,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  Playlist? sse_decode_opt_box_autoadd_playlist(SseDeserializer deserializer);
+  PlayInfo? sse_decode_opt_box_autoadd_play_info(SseDeserializer deserializer);
 
   @protected
-  (PlayInfo, String)? sse_decode_opt_box_autoadd_record_play_info_string(
-      SseDeserializer deserializer);
+  Playlist? sse_decode_opt_box_autoadd_playlist(SseDeserializer deserializer);
 
   @protected
   Release? sse_decode_opt_box_autoadd_release(SseDeserializer deserializer);
@@ -559,13 +550,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QualityOption sse_decode_quality_option(SseDeserializer deserializer);
 
   @protected
+  (PlayInfo?, String?) sse_decode_record_opt_box_autoadd_play_info_opt_string(
+      SseDeserializer deserializer);
+
+  @protected
   (Playlist?, List<MusicAggregator>)
       sse_decode_record_opt_box_autoadd_playlist_list_music_aggregator(
           SseDeserializer deserializer);
-
-  @protected
-  (PlayInfo, String) sse_decode_record_play_info_string(
-      SseDeserializer deserializer);
 
   @protected
   (String, String) sse_decode_record_string_string(
@@ -682,10 +673,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_quality(Quality self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_box_autoadd_record_play_info_string(
-      (PlayInfo, String) self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_release(Release self, SseSerializer serializer);
@@ -806,12 +793,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       MusicServer? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_playlist(
-      Playlist? self, SseSerializer serializer);
+  void sse_encode_opt_box_autoadd_play_info(
+      PlayInfo? self, SseSerializer serializer);
 
   @protected
-  void sse_encode_opt_box_autoadd_record_play_info_string(
-      (PlayInfo, String)? self, SseSerializer serializer);
+  void sse_encode_opt_box_autoadd_playlist(
+      Playlist? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_release(
@@ -863,12 +850,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_quality_option(QualityOption self, SseSerializer serializer);
 
   @protected
-  void sse_encode_record_opt_box_autoadd_playlist_list_music_aggregator(
-      (Playlist?, List<MusicAggregator>) self, SseSerializer serializer);
+  void sse_encode_record_opt_box_autoadd_play_info_opt_string(
+      (PlayInfo?, String?) self, SseSerializer serializer);
 
   @protected
-  void sse_encode_record_play_info_string(
-      (PlayInfo, String) self, SseSerializer serializer);
+  void sse_encode_record_opt_box_autoadd_playlist_list_music_aggregator(
+      (Playlist?, List<MusicAggregator>) self, SseSerializer serializer);
 
   @protected
   void sse_encode_record_string_string(

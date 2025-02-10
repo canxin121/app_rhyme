@@ -1,12 +1,12 @@
 import 'package:app_rhyme/common_pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/common_pages/online_playlist_gridview_page.dart';
-import 'package:app_rhyme/dialogs/artist_select_dialog.dart';
-import 'package:app_rhyme/dialogs/confirm_dialog.dart';
-import 'package:app_rhyme/dialogs/file_name_dialog.dart';
-import 'package:app_rhyme/dialogs/input_musiclist_sharelink_dialog.dart';
-import 'package:app_rhyme/dialogs/playlist_collection_dialog.dart';
-import 'package:app_rhyme/dialogs/select_create_playlist_collection_dialog.dart';
-import 'package:app_rhyme/dialogs/wait_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/artist_select_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/confirm_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/file_name_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/input_musiclist_sharelink_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/playlist_collection_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/select_create_playlist_collection_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/wait_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart'
     as rust_api_music_cache;
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
@@ -14,9 +14,9 @@ import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/log_toast.dart';
-import 'package:app_rhyme/dialogs/music_dialog.dart';
-import 'package:app_rhyme/dialogs/playlist_dialog.dart';
-import 'package:app_rhyme/dialogs/select_create_playlist_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/music_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/playlist_dialog.dart';
+import 'package:app_rhyme/common_comps/dialogs/select_create_playlist_dialog.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
@@ -119,8 +119,8 @@ Future<void> fetchItemWithPagingController<T>({
 Future<List<T>?> fetchAllItems<T>(
     Future<List<T>> Function(int page, int limit) fetchItems,
     String itemName) async {
-  LogToast.info("获取所有$itemName", "正在获取所有$itemName,请稍等",
-      "[fetchAllItems] fetching all $itemName, please wait.");
+  // LogToast.info("获取所有$itemName", "正在获取所有$itemName,请稍等",
+  //     "[fetchAllItems] fetching all $itemName, please wait.");
   try {
     List<T> items = [];
     int page = 1;
@@ -134,8 +134,8 @@ Future<List<T>?> fetchAllItems<T>(
       page++;
     }
 
-    LogToast.success("获取所有$itemName", "成功获取所有$itemName",
-        "[fetchAllItems] Successfully fetched all items");
+    // LogToast.success("获取所有$itemName", "成功获取所有$itemName",
+    //     "[fetchAllItems] Successfully fetched all items");
     return items;
   } catch (e) {
     LogToast.error(
@@ -256,7 +256,7 @@ Future<void> cacheMusicContainer(MusicContainer musicContainer,
 
   try {
     if (musicContainer.shouldUpdate()) {
-      var success = await musicContainer.updateAll();
+      var success = await musicContainer.updateSelf();
       if (!success || musicContainer.playinfo == null) {
         return;
       }
