@@ -6,6 +6,7 @@ import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:app_rhyme/utils/navigate.dart';
+import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 
 class PlaylistCollectionCardSlider extends StatelessWidget {
@@ -47,7 +48,7 @@ class PlaylistCollectionCardSlider extends StatelessWidget {
                               fontSize: 35.0,
                               fontWeight: FontWeight.bold,
                               color: getTextColor(isDarkMode),
-                            ),
+                            ).useSystemChineseFont(),
                           ),
                           Icon(
                             CupertinoIcons.forward,
