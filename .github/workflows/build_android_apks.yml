@@ -27,9 +27,9 @@ jobs:
         run: |
           chmod a+x tools/generate_jks_linux_amd64
           tools/generate_jks_linux_amd64
-      - name: Print tree
+      - name: ls -la
         run: |
-          tree -f -L 5
+          ls -la ./lib/types/
       - name: Replace key
         env:
           SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
