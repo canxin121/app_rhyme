@@ -1,7 +1,7 @@
 name: Build Android APKs
 on:
   workflow_dispatch:
-    
+
 jobs:
   build_and_push:
     name: Build and Push Android APKs
@@ -27,7 +27,9 @@ jobs:
         run: |
           chmod a+x tools/generate_jks_linux_amd64
           tools/generate_jks_linux_amd64
-
+      - name: Print tree
+        run: |
+          tree -f -L 5
       - name: Replace key
         env:
           SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
@@ -42,16 +44,16 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'oracle'
-          java-version: '17'
+          distribution: "oracle"
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
+          channel: stable
 
       - name: Build APK
-        run: flutter build apk --release    
+        run: flutter build apk --release
 
       - name: Build APK (split per ABI)
         run: flutter build apk --release --split-per-abi
