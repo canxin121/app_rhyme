@@ -27,9 +27,9 @@ jobs:
         run: |
           chmod a+x tools/generate_jks_linux_amd64
           tools/generate_jks_linux_amd64
-      - name: ls -la
+      - name: test cat
         run: |
-          ls -la ./lib/types/
+          cat lib/types/plugin.dart
       - name: Replace key
         env:
           SOME_SECRET_KEY: ${{ secrets.SOME_SECRET_KEY }}
