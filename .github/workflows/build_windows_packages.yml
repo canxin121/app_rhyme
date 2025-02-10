@@ -1,7 +1,7 @@
-name: Build Windows Packages 
+name: Build Windows Packages
 on:
   workflow_dispatch:
-    
+
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -19,9 +19,9 @@ jobs:
           sudo snap install yq
           app_version=$(yq eval '.version' pubspec.yaml)
           echo "app_version=$app_version" >> $GITHUB_OUTPUT
-          
+
   build_and_push:
-    name: Build and Push Windows Packages 
+    name: Build and Push Windows Packages
     needs: get_version
     runs-on: windows-latest
     steps:
@@ -36,7 +36,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          tools/key_replace_windows_amd64
+          python tools/key_replace.py
         shell: pwsh
 
       - name: Setup Inno Setup 6
@@ -51,21 +51,21 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
-  
+          channel: stable
+
       - name: Distribute Packages
         run: |
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
           flutter_distributor package --platform windows --targets exe
         shell: pwsh
 
-      - name: Rename Packages 
+      - name: Rename Packages
         run: |
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
 
       - name: Upload exe Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_exe
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
-            compression-level: 9
+          name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_exe
+          path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
+          compression-level: 9

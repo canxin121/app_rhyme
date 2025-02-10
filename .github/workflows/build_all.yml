@@ -1,7 +1,7 @@
-name: Build All Packages 
+name: Build All Packages
 on:
   workflow_dispatch:
-    
+
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -45,24 +45,23 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          chmod a+x tools/key_replace_linux_amd64    
-          tools/key_replace_linux_amd64
+          python tools/key_replace.py
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/setup-java@v4
         with:
-          distribution: 'oracle'
-          java-version: '17'
+          distribution: "oracle"
+          java-version: "17"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
+          channel: stable
 
       - name: Build APK
-        run: flutter build apk --release    
+        run: flutter build apk --release
 
       - name: Build APK (split per ABI)
         run: flutter build apk --release --split-per-abi
@@ -118,8 +117,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          chmod a+x tools/key_replace_macox_unknown
-          tools/key_replace_macox_unknown
+          python tools/key_replace.py
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -152,7 +150,7 @@ jobs:
           compression-level: 9
 
   build_windows_setup_exe:
-    name: Build and Push Windows Packages 
+    name: Build and Push Windows Packages
     needs: get_version
     runs-on: windows-latest
     steps:
@@ -167,7 +165,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          tools/key_replace_windows_amd64
+          python tools/key_replace.py
         shell: pwsh
 
       - name: Setup Inno Setup 6
@@ -182,27 +180,27 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
-  
+          channel: stable
+
       - name: Distribute Packages
         run: |
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
           flutter_distributor package --platform windows --targets exe
         shell: pwsh
 
-      - name: Rename Packages 
+      - name: Rename Packages
         run: |
           mv ./dist/${{ needs.get_version.outputs.app_version }}/*.exe ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
 
       - name: Upload exe Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_exe
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
-            compression-level: 9
+          name: AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64_exe
+          path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_windows_${{ needs.get_version.outputs.app_version }}_x86-64.exe
+          compression-level: 9
 
   build_linux_packages:
-    name: Build and Push Linux Packages 
+    name: Build and Push Linux Packages
     needs: get_version
     runs-on: ubuntu-latest
     steps:
@@ -217,18 +215,17 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          chmod a+x tools/key_replace_linux_amd64    
-          tools/key_replace_linux_amd64
+          python tools/key_replace.py
 
       - name: Setup Dependencies
         run: |
-            sudo apt-get update -y
-            sudo apt install -y locate rpm patchelf libwebkit2gtk-4.1-dev
-            sudo apt-get install -y ninja-build libgtk-3-dev libfuse2 libasound2-dev
+          sudo apt-get update -y
+          sudo apt install -y locate rpm patchelf libwebkit2gtk-4.1-dev
+          sudo apt-get install -y ninja-build libgtk-3-dev libfuse2 libasound2-dev
 
-            wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-            chmod a+x appimagetool
-            sudo mv appimagetool /usr/local/bin/
+          wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+          chmod a+x appimagetool
+          sudo mv appimagetool /usr/local/bin/
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -236,7 +233,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
+          channel: stable
 
       - name: Distribute Packages
         run: |
@@ -252,26 +249,26 @@ jobs:
       - name: Upload deb Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_deb
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
-            compression-level: 9
+          name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_deb
+          path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.deb
+          compression-level: 9
 
       - name: Upload rpm Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_rpm
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
-            compression-level: 9
+          name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_rpm
+          path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86_64.rpm
+          compression-level: 9
 
       - name: Upload AppImage Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_AppImage
-            path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage
-            compression-level: 9
+          name: AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64_AppImage
+          path: dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_linux_${{ needs.get_version.outputs.app_version }}_x86-64.AppImage
+          compression-level: 9
 
   build_macos_package:
-    name: Build and Push Macos Packages 
+    name: Build and Push Macos Packages
     needs: get_version
     runs-on: macos-latest
     steps:
@@ -286,8 +283,7 @@ jobs:
           SOME_REPLACE_KEY: ${{ secrets.SOME_REPLACE_KEY }}
           SOME_REPLACE_FILE: ${{ secrets.SOME_REPLACE_FILE }}
         run: |
-          chmod a+x tools/key_replace_macox_unknown    
-          tools/key_replace_macox_unknown
+          python tools/key_replace.py
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -304,9 +300,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable 
-    
-      - name: Package Dmg 
+          channel: stable
+
+      - name: Package Dmg
         run: |-
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
           flutter_distributor package --platform macos --target dmg
@@ -318,6 +314,6 @@ jobs:
       - name: Upload AppImage Package
         uses: actions/upload-artifact@v4
         with:
-            name: AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}_dmg
-            path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
-            compression-level: 9
+          name: AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}_dmg
+          path: ./dist/${{ needs.get_version.outputs.app_version }}/AppRhyme_macos_unknown_${{ needs.get_version.outputs.app_version }}.dmg
+          compression-level: 9
