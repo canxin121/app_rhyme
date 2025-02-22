@@ -5,7 +5,7 @@ import 'package:app_rhyme/common_pages/reorder_page/playlist_collection.dart';
 import 'package:app_rhyme/common_comps/dialogs/playlist_collection_dialog.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';

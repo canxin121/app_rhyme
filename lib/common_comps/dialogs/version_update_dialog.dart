@@ -1,5 +1,5 @@
 import 'package:app_rhyme/src/rust/api/types/version.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';

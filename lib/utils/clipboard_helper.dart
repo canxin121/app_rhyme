@@ -1,4 +1,4 @@
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:flutter/services.dart';
 
 Future<void> setClipboard(String text) async {

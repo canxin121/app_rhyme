@@ -4,7 +4,6 @@ import 'package:app_rhyme/utils/chore.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:app_rhyme/types/audio_control.dart';
 import 'package:app_rhyme/src/rust/frb_generated.dart';
-import 'package:app_rhyme/utils/bypass_netimg_error.dart';
 import 'package:app_rhyme/utils/device_set.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +15,7 @@ Future<void> main() async {
   await RustLib.init();
   await initGlobalVars();
   await initBypassNetImgError();
-  // initFlutterLogger();
+  initFlutterLogger();
 
   await initGlobalAudioHandler();
   await initGlobalAudioUiController();

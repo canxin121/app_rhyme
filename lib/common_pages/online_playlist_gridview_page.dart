@@ -2,7 +2,7 @@ import 'package:app_rhyme/common_comps/paged/paged_playlist_gridview.dart';
 import 'package:app_rhyme/common_pages/multi_selection_page/playlist.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';

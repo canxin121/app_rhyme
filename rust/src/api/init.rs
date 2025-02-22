@@ -16,6 +16,7 @@ pub async fn init_backend(document_folder: String) -> Result<Config, anyhow::Err
             .to_string_lossy()
             .to_string()
     ));
+
     set_db(&db_url).await?;
     Ok(config)
 }

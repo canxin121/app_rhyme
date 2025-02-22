@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:extended_image/extended_image.dart';
 import 'dart:math';
+import 'dart:ui';
 
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
+import 'package:app_rhyme/utils/global_vars.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
@@ -65,4 +68,23 @@ bool isDesktopDevice() {
 bool isWidthGreaterThanHeight(BuildContext context) {
   final size = MediaQuery.of(context).size;
   return size.width > size.height;
+}
+
+/// 防止tls问题导致图片无法加载
+Future<void> initBypassNetImgError() async {
+  HttpClient client = ExtendedNetworkImageProvider.httpClient;
+  client.userAgent = null;
+  client.badCertificateCallback =
+      (X509Certificate cert, String host, int port) => true;
+}
+
+void initFlutterLogger() {
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    globalLogger.error("[Flutter Error] $details");
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    globalLogger.error("[PlatForm Error] Error: $error");
+    return true;
+  };
 }

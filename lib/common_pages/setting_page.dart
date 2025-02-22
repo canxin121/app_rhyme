@@ -20,7 +20,7 @@ import 'package:app_rhyme/utils/clipboard_helper.dart';
 import 'package:app_rhyme/utils/colors.dart';
 import 'package:app_rhyme/types/plugin.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:app_rhyme/utils/music_api_helper.dart';
 import 'package:app_rhyme/utils/navigate.dart';
 import 'package:app_rhyme/utils/pick_file.dart';
@@ -28,7 +28,6 @@ import 'package:app_rhyme/utils/quality_picker.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:chinese_font_library/chinese_font_library.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key, required this.isDesktop});
@@ -209,13 +208,12 @@ class SettingPageState extends State<SettingPage> with WidgetsBindingObserver {
                         ),
                       ),
                     CupertinoFormRow(
-                      prefix: Text('查看日志',
+                      prefix: Text('导出日志',
                           style: TextStyle(color: textColor)
                               .useSystemChineseFont()),
                       child: CupertinoButton(
                         onPressed: () {
-                          navigate(context, TalkerScreen(talker: globalTalker),
-                              widget.isDesktop, "");
+                          exportLogCompressed(context);
                         },
                         child: const Icon(CupertinoIcons.right_chevron),
                       ),

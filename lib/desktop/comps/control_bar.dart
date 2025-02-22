@@ -343,7 +343,7 @@ class PlayDisplayCardState extends State<PlayDisplayCard> {
                         onProgressUpdated: (value) {
                           var toSeek = globalAudioUiController
                               .seekDurationFromPercent(value);
-                          globalTalker.info(
+                          globalLogger.info(
                               "[Slider] Call seek to ${formatDuration(toSeek.inSeconds)}");
                           globalAudioHandler.seek(toSeek);
                         },

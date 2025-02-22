@@ -1,3 +1,7 @@
+use std::{path::PathBuf, str::FromStr};
+
+use crate::api::{APP_RHYME_FOLDER, LOGS_FOLDER};
+
 pub fn url_encode_special_chars(input: &str) -> String {
     let special_chars = [
         ('\\', "%5C"),
@@ -22,4 +26,12 @@ pub fn url_encode_special_chars(input: &str) -> String {
     }
 
     encoded
+}
+
+pub fn get_log_dir(document_dir: String) -> anyhow::Result<String> {
+    Ok(PathBuf::from_str(&document_dir)?
+        .join(APP_RHYME_FOLDER)
+        .join(LOGS_FOLDER)
+        .to_string_lossy()
+        .to_string())
 }

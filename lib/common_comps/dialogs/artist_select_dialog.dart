@@ -1,7 +1,7 @@
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:app_rhyme/utils/colors.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 
 Future<Artist?> showArtistSelectDialog(
     BuildContext context, List<Artist> artists) async {

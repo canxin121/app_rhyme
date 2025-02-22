@@ -3,7 +3,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:app_rhyme/types/music_container.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -70,7 +70,7 @@ class AudioHandler {
           index < 0 ||
           musicContainerList.isEmpty ||
           index >= musicContainerList.length) {
-        globalTalker
+        globalLogger
             .info("[AudioHandler.indexStream] Music Index Invalid: $index");
         pause();
         playingMusic.value = null; // 确保UI也更新
@@ -130,7 +130,7 @@ class AudioHandler {
 
     // 更新 MusicContainer
     if (!await targetMusicContainer.updateSelf(selectedQuality)) {
-      globalTalker.info(
+      globalLogger.info(
           "[AudioHandler.lazyLoadMusic] LazyLoad Music Failed to updateAudioSource: ${targetMusicContainer.musicAggregator.name}");
       return;
     }
@@ -148,7 +148,7 @@ class AudioHandler {
     // 跳转到播放音乐
     await seek(Duration.zero, index: index);
 
-    globalTalker.info(
+    globalLogger.info(
         "[AudioHanlder.lazyLoadMusic] LazyLoad Music Succeed: ${targetMusicContainer.musicAggregator.name}");
   }
 
@@ -209,7 +209,7 @@ class AudioHandler {
         await seek(position);
       }
     } catch (e) {
-      globalTalker.error("[AudioHandler.replacePlayingMusic] $e");
+      globalLogger.error("[AudioHandler.replacePlayingMusic] $e");
     }
   }
 
@@ -283,7 +283,7 @@ class AudioHandler {
 
       await player.seekToNext();
     } catch (e) {
-      globalTalker.error("[AudioHandler.seekToNext] $e");
+      globalLogger.error("[AudioHandler.seekToNext] $e");
     }
 
     play();
@@ -302,7 +302,7 @@ class AudioHandler {
       }
       await player.seekToPrevious();
     } catch (e) {
-      globalTalker.error("[AudioHandler.seekToPrevious] $e");
+      globalLogger.error("[AudioHandler.seekToPrevious] $e");
     }
 
     play();
@@ -316,7 +316,7 @@ class AudioHandler {
         player.pause();
       });
     } catch (e) {
-      globalTalker.error("[AudioHandler] In pause, error occur: $e");
+      globalLogger.error("[AudioHandler] In pause, error occur: $e");
     }
   }
 
@@ -345,7 +345,7 @@ class AudioHandler {
 
       play();
 
-      globalTalker.info(
+      globalLogger.info(
           "[AudioHandler.seek] Seek to [$index] ${formatDuration(position.inSeconds)}");
     } catch (e) {
       LogToast.error("跳转播放歌曲", "播放失败: $e", "[AudioHandler.seek] $e");
@@ -441,14 +441,14 @@ class AudioUiController extends GetxController {
 
       if (bugCase1 || bugCase2) {
         consecutiveBugCount++;
-        globalTalker.error(
-            "[AudioUiController._startNotSkippintToNextFixMonitoring] 检测到Bug条件："
-            "${bugCase1 ? "当前播放位置（${currentPosSec}s）已达到或超过曲目总时长（${totalDurationSec}s），可能播放已结束但未自动切换到下一曲" : "当前播放位置（${currentPosSec}s）接近曲目末尾（剩余不足10s）且未更新，可能是播放进度卡顿"}，连续出现 $consecutiveBugCount 次.");
+        globalLogger.error(
+                "[AudioUiController._startNotSkippintToNextFixMonitoring] 检测到Bug条件："
+                "${bugCase1 ? "当前播放位置（${currentPosSec}s）已达到或超过曲目总时长（${totalDurationSec}s），可能播放已结束但未自动切换到下一曲" : "当前播放位置（${currentPosSec}s）接近曲目末尾（剩余不足10s）且未更新，可能是播放进度卡顿"}，连续出现 $consecutiveBugCount 次.");
         if (consecutiveBugCount >= 3) {
           consecutiveBugCount = 0;
           globalAudioHandler.seekToNext();
-          globalTalker.error(
-              "[AudioUiController._startNotSkippintToNextFixMonitoring] 连续3次检测到 Bug，触发 seekToNext().");
+          globalLogger.error(
+                  "[AudioUiController._startNotSkippintToNextFixMonitoring] 连续3次检测到 Bug，触发 seekToNext().");
         }
       } else {
         consecutiveBugCount = 0;

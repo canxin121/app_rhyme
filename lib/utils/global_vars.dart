@@ -2,14 +2,13 @@ import 'package:app_rhyme/types/audio_control.dart';
 import 'package:app_rhyme/src/rust/api/init.dart';
 import 'package:app_rhyme/src/rust/api/types/config.dart';
 import 'package:app_rhyme/types/chore.dart';
+import 'package:app_rhyme/types/fr_logger.dart';
 import 'package:app_rhyme/types/plugin.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:talker/talker.dart';
 
-Talker globalTalker = Talker();
-
+late FRLogger globalLogger;
 late Config globalConfig;
 late PluginEvaler? globalExternalApiEvaler;
 late AudioHandler globalAudioHandler;
@@ -33,6 +32,9 @@ Future<void> initGlobalVars() async {
   } else {
     globalExternalApiEvaler = null;
   }
+
+  globalLogger = await createFRLogger();
+
   // 初始化应用包信息
   globalPackageInfo = await PackageInfo.fromPlatform();
   // 监听网络状态变化

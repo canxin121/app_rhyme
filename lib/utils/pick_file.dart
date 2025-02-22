@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 

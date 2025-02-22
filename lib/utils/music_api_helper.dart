@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_rhyme/common_pages/online_music_agg_listview_page.dart';
 import 'package:app_rhyme/common_pages/online_playlist_gridview_page.dart';
 import 'package:app_rhyme/common_comps/dialogs/artist_select_dialog.dart';
@@ -9,11 +11,13 @@ import 'package:app_rhyme/common_comps/dialogs/select_create_playlist_collection
 import 'package:app_rhyme/common_comps/dialogs/wait_dialog.dart';
 import 'package:app_rhyme/src/rust/api/cache/music_cache.dart'
     as rust_api_music_cache;
+import 'package:app_rhyme/src/rust/api/log.dart';
 import 'package:app_rhyme/src/rust/api/music_api/mirror.dart';
 import 'package:app_rhyme/src/rust/api/music_api/wrapper.dart';
+import 'package:app_rhyme/src/rust/api/utils/path_util.dart';
 import 'package:app_rhyme/types/stream_controller.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:app_rhyme/common_comps/dialogs/music_dialog.dart';
 import 'package:app_rhyme/common_comps/dialogs/playlist_dialog.dart';
 import 'package:app_rhyme/common_comps/dialogs/select_create_playlist_dialog.dart';
@@ -832,4 +836,35 @@ Future<void> viewArtistAlbums(
       ),
       isDesktop,
       "");
+}
+
+/// safe
+Future<void> exportLogCompressed(BuildContext context) async {
+  String? outputDir;
+  
+  if (Platform.isIOS) {
+    bool? confirm = await showConfirmationDialog(
+        context, "本功能可以导出日志文件为压缩文件\n在ios上, 只能保存目录到本软件的目录");
+    if (confirm != true || !context.mounted) return;
+    outputDir = await getLogDir(documentDir: globalDocumentPath);
+  } else {
+    bool? confirm = await showConfirmationDialog(
+        context, "本功能可以导出日志文件为压缩文件\n请选择要保存日志的目录"); 
+    if (confirm != true || !context.mounted) return;
+    outputDir = await pickDirectory();
+    if (outputDir == null) return;
+  }
+
+  try {
+    LogToast.info("导出日志", "正在导出日志, 请稍后", 
+        "[exportLogCompressed] Start to export log file");
+
+    await saveLog(documentDir: globalDocumentPath, outputDir: outputDir);
+    
+    LogToast.success("导出日志", "导出日志成功",
+        "[exportLogCompressed] Successfully exported log file");
+  } catch (e) {
+    LogToast.error("导出日志", "导出日志失败: $e",
+        "[exportLogCompressed] Failed to export log file: $e");
+  }
 }

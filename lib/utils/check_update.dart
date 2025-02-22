@@ -1,6 +1,6 @@
 import 'package:app_rhyme/src/rust/api/types/version.dart';
 import 'package:app_rhyme/types/plugin.dart';
-import 'package:app_rhyme/utils/log_toast.dart';
+import 'package:app_rhyme/types/log_toast.dart';
 import 'package:app_rhyme/common_comps/dialogs/extern_api_update_dialog.dart';
 import 'package:app_rhyme/common_comps/dialogs/version_update_dialog.dart';
 import 'package:app_rhyme/utils/global_vars.dart';
@@ -23,7 +23,7 @@ Future<void> checkVersionUpdate(BuildContext context, bool toast) async {
       }
     }
   } catch (e) {
-    globalTalker.log("[VersionUpdate] $e");
+    globalLogger.info("[VersionUpdate] $e");
   }
 }
 

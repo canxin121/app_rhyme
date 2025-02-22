@@ -105,7 +105,7 @@ class Crypto {
     try {
       return await crypto.rc4DecryptFromBase64(key: key, input: input);
     } catch (e) {
-      globalTalker.error("[Crypto] $e");
+      globalLogger.error("[Crypto] $e");
       return "";
     }
   }
@@ -114,7 +114,7 @@ class Crypto {
     try {
       return await crypto.rc4EncryptToBase64(key: key, input: input);
     } catch (e) {
-      globalTalker.error("[Crypto] $e");
+      globalLogger.error("[Crypto] $e");
       return "";
     }
   }
@@ -125,7 +125,7 @@ class Crypto {
       return await crypto.rc4DecryptFromBase64(
           key: "512388e3-c321-47b1-be50-641f75738cb2", input: input);
     } catch (e) {
-      globalTalker.error("[Crypto] $e");
+      globalLogger.error("[Crypto] $e");
       return "";
     }
   }
@@ -274,7 +274,7 @@ class PluginEvaler {
         return null;
       }
     } catch (e) {
-      globalTalker.error("[ExternEvaler] $e");
+      globalLogger.error("[ExternEvaler] $e");
       return null;
     }
   }
