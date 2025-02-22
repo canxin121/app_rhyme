@@ -35,8 +35,26 @@ tokio = { version = "1.43.0", features = ["full"] }
 music_api = { git = "https://github.com/canxin121/music_api" }
 anyhow = "1.0.96"
 flexi_logger = { version = "0.29.8", features = ["async"] }
-zip = "2.2.2"
-
+zip = { version = "2.2.2", features = [
+    "_deflate-any",
+    "aes",
+    "aes-crypto",
+    "constant_time_eq",
+    "deflate",
+    "deflate-flate2",
+    "deflate-zopfli",
+    "deflate64",
+    "hmac",
+    "lzma",
+    "pbkdf2",
+    "rand",
+    "sha1",
+    "time",
+    "xz",
+    "zeroize",
+    "zopfli",
+    "zstd",
+], default-features = false }
 [profile.release]
 lto = true
 strip = true
