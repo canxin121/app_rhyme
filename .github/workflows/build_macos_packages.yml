@@ -54,11 +54,10 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - name: Build Rust Lib
-        run: |-
-          cd ./rust
-          cargo build --release
-          cd ..
+          
+      - name: Install bzip2
+        run: brew install bzip2
+
       - name: Package Dmg
         run: |-
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
