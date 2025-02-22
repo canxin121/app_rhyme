@@ -54,10 +54,15 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          
+      - name: Install bzip2
+        run: brew install bzip2
 
       - name: Package Dmg
         run: |-
           dart pub global activate --source git https://github.com/canxin121/flutter_distributor --git-ref temp --git-path packages/flutter_distributor
+          export LDFLAGS="-L/opt/homebrew/opt/bzip2/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/bzip2/include"
           flutter_distributor package --platform macos --target dmg
 
       - name: Rename Dmg
