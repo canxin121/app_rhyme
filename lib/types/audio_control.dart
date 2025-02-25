@@ -134,6 +134,7 @@ class AudioHandler {
           "[AudioHandler.lazyLoadMusic] LazyLoad Music Failed to updateAudioSource: ${targetMusicContainer.musicAggregator.name}");
       return;
     }
+    playingMusic.refresh();
 
     // 暂停播放器
     if (player.playing) await pause();
@@ -442,13 +443,13 @@ class AudioUiController extends GetxController {
       if (bugCase1 || bugCase2) {
         consecutiveBugCount++;
         globalLogger.error(
-                "[AudioUiController._startNotSkippintToNextFixMonitoring] 检测到Bug条件："
-                "${bugCase1 ? "当前播放位置（${currentPosSec}s）已达到或超过曲目总时长（${totalDurationSec}s），可能播放已结束但未自动切换到下一曲" : "当前播放位置（${currentPosSec}s）接近曲目末尾（剩余不足10s）且未更新，可能是播放进度卡顿"}，连续出现 $consecutiveBugCount 次.");
+            "[AudioUiController._startNotSkippintToNextFixMonitoring] 检测到Bug条件："
+            "${bugCase1 ? "当前播放位置（${currentPosSec}s）已达到或超过曲目总时长（${totalDurationSec}s），可能播放已结束但未自动切换到下一曲" : "当前播放位置（${currentPosSec}s）接近曲目末尾（剩余不足10s）且未更新，可能是播放进度卡顿"}，连续出现 $consecutiveBugCount 次.");
         if (consecutiveBugCount >= 3) {
           consecutiveBugCount = 0;
           globalAudioHandler.seekToNext();
           globalLogger.error(
-                  "[AudioUiController._startNotSkippintToNextFixMonitoring] 连续3次检测到 Bug，触发 seekToNext().");
+              "[AudioUiController._startNotSkippintToNextFixMonitoring] 连续3次检测到 Bug，触发 seekToNext().");
         }
       } else {
         consecutiveBugCount = 0;
