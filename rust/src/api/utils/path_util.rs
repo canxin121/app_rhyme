@@ -35,3 +35,10 @@ pub fn get_log_dir(document_dir: String) -> anyhow::Result<String> {
         .to_string_lossy()
         .to_string())
 }
+
+pub fn get_apprhyme_dir(document_dir: String) -> anyhow::Result<String> {
+    Ok(PathBuf::from_str(&document_dir)?
+        .join(APP_RHYME_FOLDER)
+        .to_string_lossy()
+        .to_string())
+}

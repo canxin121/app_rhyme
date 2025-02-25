@@ -841,26 +841,26 @@ Future<void> viewArtistAlbums(
 /// safe
 Future<void> exportLogCompressed(BuildContext context) async {
   String? outputDir;
-  
+
   if (Platform.isIOS) {
     bool? confirm = await showConfirmationDialog(
         context, "本功能可以导出日志文件为压缩文件\n在ios上, 只能保存目录到本软件的目录");
     if (confirm != true || !context.mounted) return;
-    outputDir = await getLogDir(documentDir: globalDocumentPath);
+    outputDir = await getApprhymeDir(documentDir: globalDocumentPath);
   } else {
-    bool? confirm = await showConfirmationDialog(
-        context, "本功能可以导出日志文件为压缩文件\n请选择要保存日志的目录"); 
+    bool? confirm =
+        await showConfirmationDialog(context, "本功能可以导出日志文件为压缩文件\n请选择要保存日志的目录");
     if (confirm != true || !context.mounted) return;
     outputDir = await pickDirectory();
     if (outputDir == null) return;
   }
 
   try {
-    LogToast.info("导出日志", "正在导出日志, 请稍后", 
+    LogToast.info("导出日志", "正在导出日志, 请稍后",
         "[exportLogCompressed] Start to export log file");
 
     await saveLog(documentDir: globalDocumentPath, outputDir: outputDir);
-    
+
     LogToast.success("导出日志", "导出日志成功",
         "[exportLogCompressed] Successfully exported log file");
   } catch (e) {

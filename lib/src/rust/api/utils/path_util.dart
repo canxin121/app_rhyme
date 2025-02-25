@@ -12,3 +12,7 @@ Future<String> urlEncodeSpecialChars({required String input}) =>
 
 Future<String> getLogDir({required String documentDir}) => RustLib.instance.api
     .crateApiUtilsPathUtilGetLogDir(documentDir: documentDir);
+
+Future<String> getApprhymeDir({required String documentDir}) =>
+    RustLib.instance.api
+        .crateApiUtilsPathUtilGetApprhymeDir(documentDir: documentDir);

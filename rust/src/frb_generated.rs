@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.8.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1482957345;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1258401814;
 
 // Section: executor
 
@@ -1155,6 +1155,42 @@ fn wire__crate__api__cache__file_cache__gen_hash_impl(
                         Result::<_, ()>::Ok(crate::api::cache::file_cache::gen_hash(&api_str_))?;
                     Ok(output_ok)
                 })())
+            }
+        },
+    )
+}
+fn wire__crate__api__utils__path_util__get_apprhyme_dir_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_apprhyme_dir",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_document_dir = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
+                    (move || {
+                        let output_ok =
+                            crate::api::utils::path_util::get_apprhyme_dir(api_document_dir)?;
+                        Ok(output_ok)
+                    })(),
+                )
             }
         },
     )
@@ -4978,70 +5014,71 @@ fn pde_ffi_dispatcher_primary_impl(
 25 => wire__crate__api__types__external_api__external_api_config_from_path_impl(port, ptr, rust_vec_len, data_len),
 26 => wire__crate__api__types__external_api__external_api_config_from_url_impl(port, ptr, rust_vec_len, data_len),
 27 => wire__crate__api__cache__file_cache__gen_hash_impl(port, ptr, rust_vec_len, data_len),
-29 => wire__crate__api__cache__music_cache__get_cache_music_impl(port, ptr, rust_vec_len, data_len),
-30 => wire__crate__api__utils__path_util__get_log_dir_impl(port, ptr, rust_vec_len, data_len),
-31 => wire__crate__api__types__version__get_release_impl(port, ptr, rust_vec_len, data_len),
-32 => wire__crate__api__cache__music_cache__has_cache_music_impl(port, ptr, rust_vec_len, data_len),
-33 => wire__crate__api__init__init_impl(port, ptr, rust_vec_len, data_len),
-34 => wire__crate__api__log__init_impl(port, ptr, rust_vec_len, data_len),
-35 => wire__crate__api__init__init_backend_impl(port, ptr, rust_vec_len, data_len),
-36 => wire__crate__api__log__logger_debug_impl(port, ptr, rust_vec_len, data_len),
-37 => wire__crate__api__log__logger_error_impl(port, ptr, rust_vec_len, data_len),
-38 => wire__crate__api__log__logger_info_impl(port, ptr, rust_vec_len, data_len),
-39 => wire__crate__api__log__logger_new_impl(port, ptr, rust_vec_len, data_len),
-40 => wire__crate__api__log__logger_warn_impl(port, ptr, rust_vec_len, data_len),
-41 => wire__crate__api__cache__cache_util__move_cache_data_impl(port, ptr, rust_vec_len, data_len),
-42 => wire__crate__api__music_api__mirror__music_aggregator_change_default_server_in_db_impl(port, ptr, rust_vec_len, data_len),
-43 => wire__crate__api__music_api__mirror__music_aggregator_clear_unused_impl(port, ptr, rust_vec_len, data_len),
-44 => wire__crate__api__music_api__mirror__music_aggregator_del_from_db_impl(port, ptr, rust_vec_len, data_len),
-45 => wire__crate__api__music_api__mirror__music_aggregator_fetch_artist_music_aggregators_impl(port, ptr, rust_vec_len, data_len),
-46 => wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_impl(port, ptr, rust_vec_len, data_len),
-47 => wire__crate__api__music_api__mirror__music_aggregator_from_music_impl(port, ptr, rust_vec_len, data_len),
-49 => wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(port, ptr, rust_vec_len, data_len),
-50 => wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(port, ptr, rust_vec_len, data_len),
-51 => wire__crate__api__music_api__mirror__music_aggregator_update_order_to_db_impl(port, ptr, rust_vec_len, data_len),
-52 => wire__crate__api__music_api__mirror__music_get_album_impl(port, ptr, rust_vec_len, data_len),
-54 => wire__crate__api__music_api__mirror__music_get_lyric_impl(port, ptr, rust_vec_len, data_len),
-55 => wire__crate__api__music_api__mirror__music_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
-56 => wire__crate__api__music_api__mirror__music_search_online_impl(port, ptr, rust_vec_len, data_len),
-60 => wire__crate__api__music_api__plugin_fn__music_to_json_impl(port, ptr, rust_vec_len, data_len),
-61 => wire__crate__api__music_api__mirror__music_update_to_db_impl(port, ptr, rust_vec_len, data_len),
-62 => wire__crate__api__music_api__mirror__playlist_add_aggs_to_db_impl(port, ptr, rust_vec_len, data_len),
-63 => wire__crate__api__music_api__mirror__playlist_collection_delete_from_db_impl(port, ptr, rust_vec_len, data_len),
-64 => wire__crate__api__music_api__mirror__playlist_collection_find_in_db_impl(port, ptr, rust_vec_len, data_len),
-65 => wire__crate__api__music_api__mirror__playlist_collection_get_form_db_impl(port, ptr, rust_vec_len, data_len),
-66 => wire__crate__api__music_api__mirror__playlist_collection_get_playlists_from_db_impl(port, ptr, rust_vec_len, data_len),
-67 => wire__crate__api__music_api__mirror__playlist_collection_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
-68 => wire__crate__api__music_api__mirror__playlist_collection_new_impl(port, ptr, rust_vec_len, data_len),
-69 => wire__crate__api__music_api__mirror__playlist_collection_update_to_db_impl(port, ptr, rust_vec_len, data_len),
-70 => wire__crate__api__music_api__mirror__playlist_del_from_db_impl(port, ptr, rust_vec_len, data_len),
-71 => wire__crate__api__music_api__mirror__playlist_del_music_agg_impl(port, ptr, rust_vec_len, data_len),
-72 => wire__crate__api__music_api__mirror__playlist_fetch_artist_albums_impl(port, ptr, rust_vec_len, data_len),
-73 => wire__crate__api__music_api__mirror__playlist_fetch_musics_online_impl(port, ptr, rust_vec_len, data_len),
-74 => wire__crate__api__music_api__mirror__playlist_find_in_db_impl(port, ptr, rust_vec_len, data_len),
-76 => wire__crate__api__music_api__mirror__playlist_get_from_db_impl(port, ptr, rust_vec_len, data_len),
-77 => wire__crate__api__music_api__mirror__playlist_get_from_share_impl(port, ptr, rust_vec_len, data_len),
-78 => wire__crate__api__music_api__mirror__playlist_get_musics_from_db_impl(port, ptr, rust_vec_len, data_len),
-79 => wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
-80 => wire__crate__api__music_api__mirror__playlist_new_impl(port, ptr, rust_vec_len, data_len),
-81 => wire__crate__api__music_api__mirror__playlist_search_online_impl(port, ptr, rust_vec_len, data_len),
-82 => wire__crate__api__music_api__mirror__playlist_update_subscription_impl(port, ptr, rust_vec_len, data_len),
-83 => wire__crate__api__music_api__mirror__playlist_update_to_db_impl(port, ptr, rust_vec_len, data_len),
-84 => wire__crate__api__types__config__quality_config_default_impl(port, ptr, rust_vec_len, data_len),
-85 => wire__crate__api__utils__crypto__rc4_decrypt_from_base64_impl(port, ptr, rust_vec_len, data_len),
-86 => wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(port, ptr, rust_vec_len, data_len),
-87 => wire__crate__api__music_api__fns__reinit_db_impl(port, ptr, rust_vec_len, data_len),
-88 => wire__crate__api__log__save_log_impl(port, ptr, rust_vec_len, data_len),
-89 => wire__crate__api__utils__http_helper__send_request_impl(port, ptr, rust_vec_len, data_len),
-90 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_music_chart_collection_impl(port, ptr, rust_vec_len, data_len),
-91 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_musics_from_chart_impl(port, ptr, rust_vec_len, data_len),
-92 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlist_tags_impl(port, ptr, rust_vec_len, data_len),
-93 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlists_from_tag_impl(port, ptr, rust_vec_len, data_len),
-94 => wire__crate__api__music_api__fns__set_db_impl(port, ptr, rust_vec_len, data_len),
-95 => wire__crate__api__types__config__storage_config_default_impl(port, ptr, rust_vec_len, data_len),
-96 => wire__crate__api__types__config__update_config_default_impl(port, ptr, rust_vec_len, data_len),
-97 => wire__crate__api__utils__path_util__url_encode_special_chars_impl(port, ptr, rust_vec_len, data_len),
-98 => wire__crate__api__utils__database__verify_sqlite_url_impl(port, ptr, rust_vec_len, data_len),
+28 => wire__crate__api__utils__path_util__get_apprhyme_dir_impl(port, ptr, rust_vec_len, data_len),
+30 => wire__crate__api__cache__music_cache__get_cache_music_impl(port, ptr, rust_vec_len, data_len),
+31 => wire__crate__api__utils__path_util__get_log_dir_impl(port, ptr, rust_vec_len, data_len),
+32 => wire__crate__api__types__version__get_release_impl(port, ptr, rust_vec_len, data_len),
+33 => wire__crate__api__cache__music_cache__has_cache_music_impl(port, ptr, rust_vec_len, data_len),
+34 => wire__crate__api__init__init_impl(port, ptr, rust_vec_len, data_len),
+35 => wire__crate__api__log__init_impl(port, ptr, rust_vec_len, data_len),
+36 => wire__crate__api__init__init_backend_impl(port, ptr, rust_vec_len, data_len),
+37 => wire__crate__api__log__logger_debug_impl(port, ptr, rust_vec_len, data_len),
+38 => wire__crate__api__log__logger_error_impl(port, ptr, rust_vec_len, data_len),
+39 => wire__crate__api__log__logger_info_impl(port, ptr, rust_vec_len, data_len),
+40 => wire__crate__api__log__logger_new_impl(port, ptr, rust_vec_len, data_len),
+41 => wire__crate__api__log__logger_warn_impl(port, ptr, rust_vec_len, data_len),
+42 => wire__crate__api__cache__cache_util__move_cache_data_impl(port, ptr, rust_vec_len, data_len),
+43 => wire__crate__api__music_api__mirror__music_aggregator_change_default_server_in_db_impl(port, ptr, rust_vec_len, data_len),
+44 => wire__crate__api__music_api__mirror__music_aggregator_clear_unused_impl(port, ptr, rust_vec_len, data_len),
+45 => wire__crate__api__music_api__mirror__music_aggregator_del_from_db_impl(port, ptr, rust_vec_len, data_len),
+46 => wire__crate__api__music_api__mirror__music_aggregator_fetch_artist_music_aggregators_impl(port, ptr, rust_vec_len, data_len),
+47 => wire__crate__api__music_api__mirror__music_aggregator_fetch_server_online_impl(port, ptr, rust_vec_len, data_len),
+48 => wire__crate__api__music_api__mirror__music_aggregator_from_music_impl(port, ptr, rust_vec_len, data_len),
+50 => wire__crate__api__music_api__mirror__music_aggregator_save_to_db_impl(port, ptr, rust_vec_len, data_len),
+51 => wire__crate__api__music_api__mirror__music_aggregator_search_online_impl(port, ptr, rust_vec_len, data_len),
+52 => wire__crate__api__music_api__mirror__music_aggregator_update_order_to_db_impl(port, ptr, rust_vec_len, data_len),
+53 => wire__crate__api__music_api__mirror__music_get_album_impl(port, ptr, rust_vec_len, data_len),
+55 => wire__crate__api__music_api__mirror__music_get_lyric_impl(port, ptr, rust_vec_len, data_len),
+56 => wire__crate__api__music_api__mirror__music_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
+57 => wire__crate__api__music_api__mirror__music_search_online_impl(port, ptr, rust_vec_len, data_len),
+61 => wire__crate__api__music_api__plugin_fn__music_to_json_impl(port, ptr, rust_vec_len, data_len),
+62 => wire__crate__api__music_api__mirror__music_update_to_db_impl(port, ptr, rust_vec_len, data_len),
+63 => wire__crate__api__music_api__mirror__playlist_add_aggs_to_db_impl(port, ptr, rust_vec_len, data_len),
+64 => wire__crate__api__music_api__mirror__playlist_collection_delete_from_db_impl(port, ptr, rust_vec_len, data_len),
+65 => wire__crate__api__music_api__mirror__playlist_collection_find_in_db_impl(port, ptr, rust_vec_len, data_len),
+66 => wire__crate__api__music_api__mirror__playlist_collection_get_form_db_impl(port, ptr, rust_vec_len, data_len),
+67 => wire__crate__api__music_api__mirror__playlist_collection_get_playlists_from_db_impl(port, ptr, rust_vec_len, data_len),
+68 => wire__crate__api__music_api__mirror__playlist_collection_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
+69 => wire__crate__api__music_api__mirror__playlist_collection_new_impl(port, ptr, rust_vec_len, data_len),
+70 => wire__crate__api__music_api__mirror__playlist_collection_update_to_db_impl(port, ptr, rust_vec_len, data_len),
+71 => wire__crate__api__music_api__mirror__playlist_del_from_db_impl(port, ptr, rust_vec_len, data_len),
+72 => wire__crate__api__music_api__mirror__playlist_del_music_agg_impl(port, ptr, rust_vec_len, data_len),
+73 => wire__crate__api__music_api__mirror__playlist_fetch_artist_albums_impl(port, ptr, rust_vec_len, data_len),
+74 => wire__crate__api__music_api__mirror__playlist_fetch_musics_online_impl(port, ptr, rust_vec_len, data_len),
+75 => wire__crate__api__music_api__mirror__playlist_find_in_db_impl(port, ptr, rust_vec_len, data_len),
+77 => wire__crate__api__music_api__mirror__playlist_get_from_db_impl(port, ptr, rust_vec_len, data_len),
+78 => wire__crate__api__music_api__mirror__playlist_get_from_share_impl(port, ptr, rust_vec_len, data_len),
+79 => wire__crate__api__music_api__mirror__playlist_get_musics_from_db_impl(port, ptr, rust_vec_len, data_len),
+80 => wire__crate__api__music_api__mirror__playlist_insert_to_db_impl(port, ptr, rust_vec_len, data_len),
+81 => wire__crate__api__music_api__mirror__playlist_new_impl(port, ptr, rust_vec_len, data_len),
+82 => wire__crate__api__music_api__mirror__playlist_search_online_impl(port, ptr, rust_vec_len, data_len),
+83 => wire__crate__api__music_api__mirror__playlist_update_subscription_impl(port, ptr, rust_vec_len, data_len),
+84 => wire__crate__api__music_api__mirror__playlist_update_to_db_impl(port, ptr, rust_vec_len, data_len),
+85 => wire__crate__api__types__config__quality_config_default_impl(port, ptr, rust_vec_len, data_len),
+86 => wire__crate__api__utils__crypto__rc4_decrypt_from_base64_impl(port, ptr, rust_vec_len, data_len),
+87 => wire__crate__api__utils__crypto__rc4_encrypt_to_base64_impl(port, ptr, rust_vec_len, data_len),
+88 => wire__crate__api__music_api__fns__reinit_db_impl(port, ptr, rust_vec_len, data_len),
+89 => wire__crate__api__log__save_log_impl(port, ptr, rust_vec_len, data_len),
+90 => wire__crate__api__utils__http_helper__send_request_impl(port, ptr, rust_vec_len, data_len),
+91 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_music_chart_collection_impl(port, ptr, rust_vec_len, data_len),
+92 => wire__crate__api__music_api__mirror__server_music_chart_collection_get_musics_from_chart_impl(port, ptr, rust_vec_len, data_len),
+93 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlist_tags_impl(port, ptr, rust_vec_len, data_len),
+94 => wire__crate__api__music_api__mirror__server_playlist_tag_collection_get_playlists_from_tag_impl(port, ptr, rust_vec_len, data_len),
+95 => wire__crate__api__music_api__fns__set_db_impl(port, ptr, rust_vec_len, data_len),
+96 => wire__crate__api__types__config__storage_config_default_impl(port, ptr, rust_vec_len, data_len),
+97 => wire__crate__api__types__config__update_config_default_impl(port, ptr, rust_vec_len, data_len),
+98 => wire__crate__api__utils__path_util__url_encode_special_chars_impl(port, ptr, rust_vec_len, data_len),
+99 => wire__crate__api__utils__database__verify_sqlite_url_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
@@ -5060,38 +5097,38 @@ fn pde_ffi_dispatcher_sync_impl(
             rust_vec_len,
             data_len,
         ),
-        28 => wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
+        29 => wire__crate__api__cache__file_cache__get_cache_file_from_uri_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        48 => wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
+        49 => wire__crate__api__music_api__mirror__music_aggregator_identity_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        53 => {
+        54 => {
             wire__crate__api__music_api__mirror__music_get_cover_impl(ptr, rust_vec_len, data_len)
         }
-        57 => {
+        58 => {
             wire__crate__api__music_api__mirror__music_server_all_impl(ptr, rust_vec_len, data_len)
         }
-        58 => wire__crate__api__music_api__mirror__music_server_length_impl(
+        59 => wire__crate__api__music_api__mirror__music_server_length_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        59 => wire__crate__api__music_api__mirror__music_server_to_string_impl(
+        60 => wire__crate__api__music_api__mirror__music_server_to_string_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        75 => wire__crate__api__music_api__mirror__playlist_get_cover_impl(
+        76 => wire__crate__api__music_api__mirror__playlist_get_cover_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        99 => {
+        100 => {
             wire__crate__api__types__config__window_config_default_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
